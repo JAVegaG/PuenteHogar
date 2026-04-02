@@ -1,0 +1,634 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["users", "property_listings", "landlord_portfolio", "tracking_process", "payments", "accounting", "notifications", "contracts"]
+}
+
+// ─────────────────────────────────────────────
+// Schema: users
+// ─────────────────────────────────────────────
+
+model User {
+  id              String               @id @default(uuid())
+  doc_type        String
+  document_number String               // cifrado AES-256 (PII)
+  mail            String               @unique
+  hashed_password String
+  phone_number    String               // cifrado AES-256 (PII)
+  is_active       Boolean              @default(true)
+  expiration_date DateTime?
+  created_at      DateTime             @default(now())
+  updated_at      DateTime             @updatedAt
+
+  natural_person NaturalPersonDetail?
+  legal_person   LegalPersonDetail?
+  users_roles    UserRole[]
+
+  @@schema("users")
+}
+
+model NaturalPersonDetail {
+  id           String   @id @default(uuid())
+  user_id      String   @unique
+  first_name   String
+  last_name    String
+  birth_date   DateTime
+  pref_cl_type String?
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@schema("users")
+}
+
+model LegalPersonDetail {
+  id            String @id @default(uuid())
+  user_id       String @unique
+  business_name String
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@schema("users")
+}
+
+model Role {
+  id          String           @id @default(uuid())
+  name        String           @unique
+  description String?
+
+  users_roles UserRole[]
+  roles_perms RolePermission[]
+
+  @@schema("users")
+}
+
+model Permission {
+  id       String @id @default(uuid())
+  effect   String // ALLOW | DENY
+  action   String
+  resource String
+
+  roles_perms RolePermission[]
+
+  @@schema("users")
+}
+
+model UserRole {
+  user_id String
+  role_id String
+
+  user User @relation(fields: [user_id], references: [id])
+  role Role @relation(fields: [role_id], references: [id])
+
+  @@id([user_id, role_id])
+  @@schema("users")
+}
+
+model RolePermission {
+  role_id       String
+  permission_id String
+
+  role       Role       @relation(fields: [role_id], references: [id])
+  permission Permission @relation(fields: [permission_id], references: [id])
+
+  @@id([role_id, permission_id])
+  @@schema("users")
+}
+
+model UsersRaw {
+  id         String   @id @default(uuid())
+  payload    Json
+  created_at DateTime @default(now())
+  processed  Boolean  @default(false)
+
+  @@schema("users")
+}
+
+// ─────────────────────────────────────────────
+// Schema: property_listings
+// ─────────────────────────────────────────────
+
+model Property {
+  id                  String  @id @default(uuid())
+  property_type       String
+  length              Decimal?
+  width               Decimal?
+  number_of_bathrooms Int
+  number_of_rooms     Int
+  is_active           Boolean  @default(true)
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  address             Address?
+  additional_features PropertyAdditionalFeature[]
+
+  @@schema("property_listings")
+}
+
+model Address {
+  id           String   @id @default(uuid())
+  property_id  String   @unique
+  state        String
+  city         String
+  neighborhood String
+  address      String
+  latitude     Decimal?
+  longitude    Decimal?
+
+  property Property @relation(fields: [property_id], references: [id])
+
+  @@schema("property_listings")
+}
+
+model Listing {
+  id                String   @id @default(uuid())
+  portfolio_unit_id String   // cross-schema ref — no FK
+  title             String
+  description       String?
+  listing_date      DateTime @default(now())
+  price             Decimal
+  currency          String   @default("COP")
+  is_active         Boolean  @default(true)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  photos Photo[]
+
+  @@schema("property_listings")
+}
+
+model Photo {
+  id         String   @id @default(uuid())
+  listing_id String
+  file_url   String
+  is_main    Boolean  @default(false)
+  tx_hash    String?
+  created_at DateTime @default(now())
+
+  listing Listing @relation(fields: [listing_id], references: [id])
+
+  @@schema("property_listings")
+}
+
+model AdditionalFeature {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+
+  properties PropertyAdditionalFeature[]
+
+  @@schema("property_listings")
+}
+
+model PropertyAdditionalFeature {
+  property_id           String
+  additional_feature_id String
+  value                 String?
+  order                 Int?
+
+  property Property          @relation(fields: [property_id], references: [id])
+  feature  AdditionalFeature @relation(fields: [additional_feature_id], references: [id])
+
+  @@id([property_id, additional_feature_id])
+  @@schema("property_listings")
+}
+
+model PropertyListingsRaw {
+  id         String   @id @default(uuid())
+  payload    Json
+  created_at DateTime @default(now())
+  processed  Boolean  @default(false)
+
+  @@schema("property_listings")
+}
+
+// ─────────────────────────────────────────────
+// Schema: landlord_portfolio
+// ─────────────────────────────────────────────
+
+model LandlordPortfolio {
+  id            String   @id @default(uuid())
+  user_id       String   // cross-schema ref — no FK
+  name          String
+  creation_date DateTime @default(now())
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  units PortfolioUnit[]
+
+  @@schema("landlord_portfolio")
+}
+
+model PortfolioUnit {
+  id                  String   @id @default(uuid())
+  portfolio_id        String
+  property_id         String   // cross-schema ref — no FK
+  conditions          String?
+  lease_base_amount   Decimal
+  lease_base_currency String   @default("COP")
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  portfolio LandlordPortfolio @relation(fields: [portfolio_id], references: [id])
+  leases    Lease[]
+
+  @@schema("landlord_portfolio")
+}
+
+model Lease {
+  id                String   @id @default(uuid())
+  portfolio_unit_id String
+  user_id           String   // cross-schema ref — no FK (arrendatario)
+  start_date        DateTime
+  end_date          DateTime?
+  enc_blob          String?  // datos sensibles cifrados
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  portfolio_unit PortfolioUnit @relation(fields: [portfolio_unit_id], references: [id])
+
+  @@schema("landlord_portfolio")
+}
+
+model PortfolioRaw {
+  id         String   @id @default(uuid())
+  payload    Json
+  created_at DateTime @default(now())
+  processed  Boolean  @default(false)
+
+  @@schema("landlord_portfolio")
+}
+
+// ─────────────────────────────────────────────
+// Schema: tracking_process
+// ─────────────────────────────────────────────
+
+model LeaseStatus {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+
+  history LeaseStatusHistory[]
+  current LeaseCurrentStatus[]
+
+  @@schema("tracking_process")
+}
+
+model LeaseStatusHistory {
+  id                String   @id @default(uuid())
+  lease_id          String   // cross-schema ref — no FK
+  lease_status_id   String
+  record_created_at DateTime @default(now())
+
+  status  LeaseStatus        @relation(fields: [lease_status_id], references: [id])
+  current LeaseCurrentStatus?
+
+  @@schema("tracking_process")
+}
+
+model LeaseCurrentStatus {
+  lease_id                String @id // cross-schema ref — no FK
+  lease_status_history_id String @unique
+  lease_status_id         String
+
+  history LeaseStatusHistory @relation(fields: [lease_status_history_id], references: [id])
+  status  LeaseStatus        @relation(fields: [lease_status_id], references: [id])
+
+  @@schema("tracking_process")
+}
+
+model ListingStatus {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+
+  history ListingStatusHistory[]
+  current ListingCurrentStatus[]
+
+  @@schema("tracking_process")
+}
+
+model ListingStatusHistory {
+  id                String   @id @default(uuid())
+  listing_id        String   // cross-schema ref — no FK
+  listing_status_id String
+  record_created_at DateTime @default(now())
+
+  status  ListingStatus        @relation(fields: [listing_status_id], references: [id])
+  current ListingCurrentStatus?
+
+  @@schema("tracking_process")
+}
+
+model ListingCurrentStatus {
+  listing_id                String @id // cross-schema ref — no FK
+  listing_status_history_id String @unique
+  listing_status_id         String
+
+  history ListingStatusHistory @relation(fields: [listing_status_history_id], references: [id])
+  status  ListingStatus        @relation(fields: [listing_status_id], references: [id])
+
+  @@schema("tracking_process")
+}
+
+model TrackingRaw {
+  id         String   @id @default(uuid())
+  payload    Json
+  created_at DateTime @default(now())
+  processed  Boolean  @default(false)
+
+  @@schema("tracking_process")
+}
+
+// ─────────────────────────────────────────────
+// Schema: payments
+// ─────────────────────────────────────────────
+
+model ScheduledPayment {
+  id         String   @id @default(uuid())
+  lease_id   String   // cross-schema ref — no FK
+  amount     Decimal
+  currency   String   @default("COP")
+  due_date   DateTime
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  payments Payment[]
+
+  @@schema("payments")
+}
+
+model Payment {
+  id                   String   @id @default(uuid())
+  scheduled_payment_id String
+  amount               Decimal
+  currency             String   @default("COP")
+  payment_desc         String?
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+
+  scheduled_payment ScheduledPayment @relation(fields: [scheduled_payment_id], references: [id])
+  logs              PaymentLog[]
+
+  @@schema("payments")
+}
+
+model PaymentStatus {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+
+  logs PaymentLog[]
+
+  @@schema("payments")
+}
+
+model PaymentLog {
+  id                String   @id @default(uuid())
+  payment_id        String
+  payment_status_id String
+  status            String
+  platform          String?
+  data              Json?
+  creation_date     DateTime @default(now())
+
+  payment        Payment       @relation(fields: [payment_id], references: [id])
+  payment_status PaymentStatus @relation(fields: [payment_status_id], references: [id])
+
+  @@schema("payments")
+}
+
+model PaymentsRaw {
+  id         String   @id @default(uuid())
+  payload    Json
+  created_at DateTime @default(now())
+  processed  Boolean  @default(false)
+
+  @@schema("payments")
+}
+
+// ─────────────────────────────────────────────
+// Schema: accounting
+// ─────────────────────────────────────────────
+
+model AggregatedPaymentReport {
+  id               String    @id @default(uuid())
+  portfolio_id     String    // cross-schema ref — no FK
+  as_of_date       DateTime
+  window_months    Int
+  period_start     DateTime
+  period_end       DateTime
+  currency         String    @default("COP")
+  number_of_units  Int
+  total_amount     Decimal
+  avg_amount       Decimal
+  payment_count    Int
+  min_amount       Decimal
+  max_amount       Decimal
+  last_payment_at  DateTime?
+  first_payment_at DateTime?
+  expected_amount  Decimal
+  overdue_count    Int
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+
+  @@schema("accounting")
+}
+
+model IndividualPaymentReport {
+  id                String    @id @default(uuid())
+  portfolio_unit_id String    // cross-schema ref — no FK
+  as_of_date        DateTime
+  window_months     Int
+  period_start      DateTime
+  period_end        DateTime
+  currency          String    @default("COP")
+  total_amount      Decimal
+  min_amount        Decimal
+  max_amount        Decimal
+  payment_count     Int
+  last_payment_at   DateTime?
+  first_payment_at  DateTime?
+  expected_amount   Decimal
+  overdue_count     Int
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+
+  @@schema("accounting")
+}
+
+model AccountingRaw {
+  id         String   @id @default(uuid())
+  payload    Json
+  created_at DateTime @default(now())
+  processed  Boolean  @default(false)
+
+  @@schema("accounting")
+}
+
+// ─────────────────────────────────────────────
+// Schema: notifications
+// ─────────────────────────────────────────────
+
+model NotificationType {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+
+  preferences NotificationPreference[]
+
+  @@schema("notifications")
+}
+
+model NotificationPreference {
+  id                   String   @id @default(uuid())
+  user_id              String   // cross-schema ref — no FK
+  notification_type_id String
+  channel              String   // EMAIL | WHATSAPP
+  is_active            Boolean  @default(true)
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+
+  notification_type NotificationType @relation(fields: [notification_type_id], references: [id])
+
+  @@schema("notifications")
+}
+
+model NotificationsRaw {
+  id         String   @id @default(uuid())
+  payload    Json
+  created_at DateTime @default(now())
+  processed  Boolean  @default(false)
+
+  @@schema("notifications")
+}
+
+// ─────────────────────────────────────────────
+// Schema: contracts
+// ─────────────────────────────────────────────
+
+model ContractStatus {
+  id          String  @id @default(uuid())
+  name        String  @unique // PENDING | SIGNATURE_PENDING | SIGNED
+  description String?
+
+  contracts Contract[]
+
+  @@schema("contracts")
+}
+
+model Contract {
+  id                 String    @id @default(uuid())
+  lease_id           String    // cross-schema ref — no FK
+  contract_status_id String
+  start_date         DateTime
+  end_date           DateTime?
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @updatedAt
+
+  status  ContractStatus  @relation(fields: [contract_status_id], references: [id])
+  parties ContractParty[]
+  files   File[]
+
+  @@schema("contracts")
+}
+
+model ContractParty {
+  id               String @id @default(uuid())
+  user_id          String // cross-schema ref — no FK
+  contract_id      String
+  role_in_contract String
+
+  contract Contract  @relation(fields: [contract_id], references: [id])
+  signings Signing[]
+
+  @@schema("contracts")
+}
+
+model FileType {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+
+  files File[]
+
+  @@schema("contracts")
+}
+
+model FileStatus {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+
+  files File[]
+
+  @@schema("contracts")
+}
+
+model File {
+  id             String   @id @default(uuid())
+  contract_id    String
+  file_type_id   String
+  file_status_id String
+  file_url       String
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  contract    Contract   @relation(fields: [contract_id], references: [id])
+  file_type   FileType   @relation(fields: [file_type_id], references: [id])
+  file_status FileStatus @relation(fields: [file_status_id], references: [id])
+
+  @@schema("contracts")
+}
+
+model SigningStatus {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+
+  signings Signing[]
+  logs     SigningLog[]
+
+  @@schema("contracts")
+}
+
+model Signing {
+  id                String    @id @default(uuid())
+  contract_party_id String
+  signing_status_id String
+  signing_timestamp DateTime?
+  document_hash     String?
+
+  contract_party ContractParty @relation(fields: [contract_party_id], references: [id])
+  signing_status SigningStatus  @relation(fields: [signing_status_id], references: [id])
+  logs           SigningLog[]
+
+  @@schema("contracts")
+}
+
+model SigningLog {
+  id                String   @id @default(uuid())
+  signing_id        String
+  signing_status_id String
+  platform          String?
+  data              Json?
+  creation_date     DateTime @default(now())
+
+  signing        Signing      @relation(fields: [signing_id], references: [id])
+  signing_status SigningStatus @relation(fields: [signing_status_id], references: [id])
+
+  @@schema("contracts")
+}
+
+model ContractsRaw {
+  id         String   @id @default(uuid())
+  payload    Json
+  created_at DateTime @default(now())
+  processed  Boolean  @default(false)
+
+  @@schema("contracts")
+}
