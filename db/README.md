@@ -16,7 +16,7 @@ db/
 
 | Esquema | Modelos principales | Descripción |
 |---------|-------------------|-------------|
-| `users` | User, Role, Permission, UserRole, RolePermission | Identidad, autenticación y RBAC |
+| `users` | User, DocumentType, NaturalPersonDetail, LegalPersonDetail, Role, Permission, UserRole, RolePermission, UsersRaw | Identidad, autenticación y RBAC |
 | `property_listings` | Property, Address, Listing, Photo, AdditionalFeature | Oferta de inmuebles |
 | `landlord_portfolio` | LandlordPortfolio, PortfolioUnit, Lease | Portafolio del arrendador |
 | `tracking_process` | LeaseStatus, LeaseStatusHistory, LeaseCurrentStatus, ListingStatus | Seguimiento de estados |

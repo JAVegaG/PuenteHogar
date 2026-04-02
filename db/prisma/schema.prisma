@@ -14,17 +14,19 @@ datasource db {
 // ─────────────────────────────────────────────
 
 model User {
-  id              String               @id @default(uuid())
-  doc_type        String
-  document_number String               // cifrado AES-256 (PII)
-  mail            String               @unique
-  hashed_password String
-  phone_number    String               // cifrado AES-256 (PII)
-  is_active       Boolean              @default(true)
-  expiration_date DateTime?
-  created_at      DateTime             @default(now())
-  updated_at      DateTime             @updatedAt
+  id                String               @id @default(uuid())
+  user_type         String               // desnormalización del rol: LANDLORD | TENANT
+  document_type_id  String
+  document_number   String               // cifrado AES-256 (PII)
+  mail              String               @unique
+  hashed_password   String
+  phone_number      String               // cifrado AES-256 (PII)
+  is_active         Boolean              @default(true)
+  registration_date DateTime             @default(now())
+  created_at        DateTime             @default(now())
+  updated_at        DateTime             @updatedAt
 
+  document_type  DocumentType         @relation(fields: [document_type_id], references: [id])
   natural_person NaturalPersonDetail?
   legal_person   LegalPersonDetail?
   users_roles    UserRole[]
@@ -32,13 +34,23 @@ model User {
   @@schema("users")
 }
 
+model DocumentType {
+  id          String  @id @default(uuid())
+  code        String  @unique  // ej: CC, NIT, CE, PP
+  description String           // ej: Cédula de Ciudadanía, NIT, Cédula de Extranjería, Pasaporte
+  is_active   Boolean @default(true)
+
+  users User[]
+
+  @@schema("users")
+}
+
 model NaturalPersonDetail {
-  id           String   @id @default(uuid())
-  user_id      String   @unique
-  first_name   String
-  last_name    String
-  birth_date   DateTime
-  pref_cl_type String?
+  id             String  @id @default(uuid())
+  user_id        String  @unique
+  first_name     String
+  last_name      String
+  preferred_name String?
 
   user User @relation(fields: [user_id], references: [id])
 
@@ -78,13 +90,13 @@ model Permission {
 }
 
 model UserRole {
+  id      String @id @default(uuid())
   user_id String
   role_id String
 
   user User @relation(fields: [user_id], references: [id])
   role Role @relation(fields: [role_id], references: [id])
 
-  @@id([user_id, role_id])
   @@schema("users")
 }
 
