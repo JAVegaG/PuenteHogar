@@ -1,0 +1,29 @@
+{
+  "mcpServers": {
+    "clickup": {
+      "type": "http",
+      "url": "https://mcp.clickup.com/mcp",
+      "disabledTools": [
+        "clickup_get_workspace_hierarchy",
+        "clickup_create_task",
+        "clickup_delete_task",
+        "clickup_add_task_to_list",
+        "clickup_move_task",
+        "clickup_remove_task_from_list",
+        "clickup_create_list",
+        "clickup_create_list_in_folder",
+        "clickup_create_folder",
+        "clickup_update_folder",
+        "clickup_get_workspace_members",
+        "clickup_find_member_by_name",
+        "clickup_get_chat_channels",
+        "clickup_send_chat_message",
+        "clickup_get_chat_channel_messages",
+        "clickup_get_chat_message_replies"
+      ],
+      "autoApprove": [
+        "clickup_get_task"
+      ]
+    }
+  }
+}
