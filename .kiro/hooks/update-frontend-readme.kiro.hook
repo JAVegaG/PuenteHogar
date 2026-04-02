@@ -1,0 +1,18 @@
+{
+  "enabled": true,
+  "name": "Update Frontend README",
+  "description": "When any file inside src/frontend/ is edited, asks the agent to review and update src/frontend/README.md to reflect the current state of the frontend.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "src/frontend/**/*.ts",
+      "src/frontend/**/*.tsx",
+      "src/frontend/**/*.json"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A file in src/frontend/ was just edited. Review the current state of the frontend codebase and update src/frontend/README.md if needed to accurately reflect: the pages and modules that exist, the components available, any new scripts or environment variables, and the overall structure. Only update sections that are outdated or incomplete. Do not rewrite sections that are still accurate."
+  }
+}

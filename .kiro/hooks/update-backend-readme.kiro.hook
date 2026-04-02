@@ -1,0 +1,17 @@
+{
+  "enabled": true,
+  "name": "Update Backend README",
+  "description": "When any file inside src/backend/ is edited, asks the agent to review and update src/backend/README.md to reflect the current state of the backend.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "src/backend/**/*.ts",
+      "src/backend/**/*.json"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A file in src/backend/ was just edited. Review the current state of the backend codebase and update src/backend/README.md if needed to accurately reflect: the modules that exist, the shared components available, any new scripts or environment variables, and the overall architecture. Only update sections that are outdated or incomplete. Do not rewrite sections that are still accurate."
+  }
+}

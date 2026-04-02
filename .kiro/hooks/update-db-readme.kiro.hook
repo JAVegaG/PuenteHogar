@@ -1,0 +1,18 @@
+{
+  "enabled": true,
+  "name": "Update DB README",
+  "description": "When schema.prisma or any seed/migration file is edited, asks the agent to review and update db/README.md to reflect the current state of the database schema.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "db/**/*.prisma",
+      "db/**/*.ts",
+      "db/**/*.sql"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A file in db/ was just edited. Review the current state of db/prisma/schema.prisma and update db/README.md if needed to accurately reflect: the schemas and models that exist, the cross-schema references, the RAW/curated table strategy, and any new seed data or migration notes. Only update sections that are outdated or incomplete."
+  }
+}
