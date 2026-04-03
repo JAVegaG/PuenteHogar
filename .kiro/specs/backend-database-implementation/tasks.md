@@ -6,7 +6,7 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
 
 ## Tareas
 
-- [ ] 1. Configuración inicial del proyecto NestJS + Prisma + Redis
+- [x] 1. Configuración inicial del proyecto NestJS + Prisma + Redis
   - Inicializar proyecto NestJS con TypeScript en `src/backend/`
   - Configurar `ConfigModule` con variables de entorno (DATABASE_URL, REDIS_URL, JWT_SECRET, etc.)
   - Instalar y configurar Prisma (`prisma init`, `schema.prisma` con `previewFeatures = ["multiSchema"]`)
@@ -15,28 +15,33 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
   - Añadir scripts npm: `migration:run`, `migration:generate`, `db:studio`
   - _Requirements: 13.1, 13.2_
 
-- [ ] 2. Schema Prisma completo — 8 esquemas PostgreSQL
-  - [ ] 2.1 Definir esquema `users` en `schema.prisma`
-    - Modelos: `User`, `NaturalPersonDetail`, `LegalPersonDetail`, `Role`, `Permission`, `UserRole`, `RolePermission`, `UsersRaw`
-    - Restricciones de unicidad: `mail @unique`, `@@id([user_id, role_id])`, `@@id([role_id, permission_id])`
-    - _Requirements: 13.1, 13.3, 13.4, 13.6, 14.6_
+- [x] 2. Schema Prisma completo — 8 esquemas PostgreSQL
+  - [x] 2.1 Definir esquema `users` en `schema.prisma`
+    - Modelos: `User`, `DocumentType`, `NaturalPersonDetail`, `LegalPersonDetail`, `Role`, `Permission`, `UserRole`, `RolePermission`, `UsersRaw`
+    - `User.user_type` — desnormalización del rol para quick lookups (LANDLORD | TENANT)
+    - `User.document_type_id` — FK hacia catálogo `DocumentType` (no string libre)
+    - `DocumentType` — catálogo con `code` @unique, `description`, `is_active`
+    - `NaturalPersonDetail` — `first_name`, `last_name`, `preferred_name?` (sin `birth_date` ni `pref_cl_type`)
+    - `UserRole` — PK propia `id` (no clave compuesta)
+    - `User.registration_date` @default(now()) (no `expiration_date`)
+    - _Requirements: 13.1, 13.3, 13.4, 13.6, 14.6, 15.1_
 
-  - [ ] 2.2 Definir esquema `property_listings` en `schema.prisma`
+  - [x] 2.2 Definir esquema `property_listings` en `schema.prisma`
     - Modelos: `Property`, `Address`, `Listing`, `Photo`, `AdditionalFeature`, `PropertyAdditionalFeature`, `PropertyListingsRaw`
     - `portfolio_unit_id` en `Listing` como cross-schema ref sin FK declarada
     - _Requirements: 13.1, 13.3, 13.5, 14.1_
 
-  - [ ] 2.3 Definir esquema `landlord_portfolio` en `schema.prisma`
+  - [x] 2.3 Definir esquema `landlord_portfolio` en `schema.prisma`
     - Modelos: `LandlordPortfolio`, `PortfolioUnit`, `Lease`, `PortfolioRaw`
     - `user_id` en `LandlordPortfolio` y `Lease` como cross-schema refs sin FK
     - _Requirements: 13.1, 13.3, 13.5, 14.2_
 
-  - [ ] 2.4 Definir esquema `tracking_process` en `schema.prisma`
+  - [x] 2.4 Definir esquema `tracking_process` en `schema.prisma`
     - Modelos: `LeaseStatus`, `LeaseStatusHistory`, `LeaseCurrentStatus`, `ListingStatus`, `ListingStatusHistory`, `ListingCurrentStatus`, `TrackingRaw`
     - `lease_id` y `listing_id` como cross-schema refs sin FK
     - _Requirements: 13.1, 13.3, 13.5, 14.3_
 
-  - [ ] 2.5 Definir esquemas `payments`, `accounting`, `notifications`, `contracts` en `schema.prisma`
+  - [x] 2.5 Definir esquemas `payments`, `accounting`, `notifications`, `contracts` en `schema.prisma`
     - `payments`: `ScheduledPayment`, `Payment`, `PaymentStatus`, `PaymentLog`, `PaymentsRaw`
     - `accounting`: `AggregatedPaymentReport`, `IndividualPaymentReport`, `AccountingRaw`
     - `notifications`: `NotificationType`, `NotificationPreference`, `NotificationsRaw`
@@ -52,8 +57,8 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - **Validates: Requirements 13.4**
 
 
-- [ ] 3. Componentes transversales (`shared`)
-  - [ ] 3.1 Implementar `JwtAuthGuard` y `RBACGuard`
+- [x] 3. Componentes transversales (`shared`)
+  - [x] 3.1 Implementar `JwtAuthGuard` y `RBACGuard`
     - `JwtAuthGuard`: valida token JWT en todos los endpoints protegidos, retorna 401 si inválido/expirado
     - `RBACGuard`: verifica rol del usuario contra el endpoint, retorna 403 si rol incorrecto
     - Decoradores `@Roles()` y `@Public()` para configuración por endpoint
@@ -67,7 +72,7 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - **Propiedad 11: RBAC — rol incorrecto recibe 403 en endpoints restringidos**
     - **Validates: Requirements 2.2, 7.5, 11.1**
 
-  - [ ] 3.4 Implementar `ValidationInterceptor`
+  - [x] 3.4 Implementar `ValidationInterceptor`
     - Sanitización y validación de DTOs con `class-validator` + `class-transformer`
     - Rechazo de payloads con patrones SQL injection y XSS antes de llegar a la capa de aplicación
     - Formato de error consistente: `{ statusCode, message, errors? }`
@@ -78,7 +83,7 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - Usar `arbitraryMaliciousPayload()` con patrones SQL injection y XSS
     - **Validates: Requirements 1.9, 11.6**
 
-  - [ ] 3.6 Implementar `AuditLoggerService`
+  - [x] 3.6 Implementar `AuditLoggerService`
     - Registro de acciones sensibles (firma, pago, cambio de rol, acceso a PII) con userId, acción, recurso y timestamp
     - Garantizar que los logs no contengan PII en texto plano (usar IDs anonimizados)
     - _Requirements: 11.7, 11.8_
@@ -87,7 +92,7 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - **Propiedad 52: Acción sensible registrada en log de auditoría con usuario, acción, recurso y timestamp**
     - **Validates: Requirements 11.7, 11.8**
 
-  - [ ] 3.8 Implementar `CircuitBreakerFactory` y `RedisService`
+  - [x] 3.8 Implementar `CircuitBreakerFactory` y `RedisService`
     - `CircuitBreakerFactory`: factory para instanciar circuit breakers por adaptador externo (timeouts: 30s pagos, 15s firma/mensajería)
     - `RedisService`: cliente Redis compartido con patrón cache-aside y fallback a PostgreSQL
     - _Requirements: 12.1, 12.2, 12.3_
@@ -100,28 +105,29 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - **Propiedad 49: Llamadas a servicios externos son canceladas al superar el timeout configurado**
     - **Validates: Requirements 12.3**
 
-- [ ] 4. Checkpoint — Infraestructura base
+- [x] 4. Checkpoint — Infraestructura base
   - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 5. Módulo `users` — Autenticación (US-AUT-01, US-AUT-02, US-AUT-03)
-  - [ ] 5.1 Implementar dominio y puertos del módulo `users`
-    - Entidades: `User`, `NaturalPersonDetail`, `LegalPersonDetail`, `Role`, `Permission`
-    - Puertos de salida: `IUserRepository`, `IPasswordHasher`, `IPIIEncryptor`, `IAuditLogger`
-    - _Requirements: 1.1, 1.6, 1.7_
+- [x] 5. Módulo `users` — Autenticación (US-AUT-01, US-AUT-02, US-AUT-03)
+  - [x] 5.1 Implementar dominio y puertos del módulo `users`
+    - Entidades: `UserEntity` (con `userType`, `documentTypeId`), `NaturalPersonDetail` (con `preferredName?`), `LegalPersonDetail`, `Role`, `Permission`
+    - Puertos de salida: `IUserRepository` (incluye `findDocumentTypeByCode()` y `findAllDocumentTypes()`), `IPasswordHasher`, `IPIIEncryptor`, `IAuditLogger`
+    - _Requirements: 1.1, 1.6, 1.7, 1.8, 15.1_
 
-  - [ ] 5.2 Implementar casos de uso: `RegisterUserUseCase`, `LoginUseCase`, `GetUserProfileUseCase`
-    - `RegisterUserUseCase`: crea cuenta, asigna rol, retorna confirmación; rechaza correo duplicado con 409; valida campos obligatorios con 400
-    - `LoginUseCase`: autentica con bcrypt, genera JWT con rol e id; retorna 401 genérico ante credenciales incorrectas
-    - Cifrado AES-256 de `document_number` y `phone_number` antes de persistir
-    - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7_
+  - [x] 5.2 Implementar casos de uso: `RegisterUserUseCase`, `LoginUseCase`, `GetUserProfileUseCase`
+    - `RegisterUserUseCase`: valida `documentTypeCode` contra catálogo (400 si no existe); crea cuenta con `user_type` como desnormalización del rol; rechaza correo duplicado con 409; cifra PII
+    - `LoginUseCase`: autentica con bcrypt, genera JWT con rol e id; retorna 401 genérico ante credenciales incorrectas; registra intentos fallidos en audit log
+    - `RegisterUserDto`: campos `userType`, `documentTypeCode`, `documentNumber`, `mail`, `phoneNumber` (10 dígitos), `password` (≥8 chars), `role`, `personType`, `naturalDetails?` (firstName, lastName, preferredName?), `legalDetails?`
+    - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.12, 1.13, 15.4_
 
-  - [ ] 5.3 Implementar adaptadores de infraestructura del módulo `users`
-    - `PrismaUserRepository implements IUserRepository`
-    - `BcryptPasswordHasher implements IPasswordHasher` (cost factor ≥ 12)
-    - `AES256PIIEncryptor implements IPIIEncryptor`
-    - Registro de intentos de login fallidos en `AuditLoggerService` (timestamp + IP, sin PII)
-    - _Requirements: 1.6, 1.7, 1.10_
+  - [x] 5.3 Implementar adaptadores de infraestructura del módulo `users`
+    - `PrismaUserRepository`: implementa todos los métodos del port incluyendo `findDocumentTypeByCode()` y `findAllDocumentTypes()`
+    - `BcryptPasswordHasher`: bcrypt cost factor 12
+    - `AES256PIIEncryptor`: AES-256-CBC con IV aleatorio, lee `PII_ENCRYPTION_KEY` del env
+    - `JwtStrategy`: Passport JWT strategy con Bearer token
+    - Endpoint `GET /auth/document-types` expuesto públicamente en `UsersController`
+    - _Requirements: 1.6, 1.7, 1.10, 1.11, 15.3_
 
   - [ ]* 5.4 Test de propiedad: registro con datos válidos crea cuenta con rol asignado
     - **Propiedad 1: Registro de usuario con datos válidos crea cuenta con rol asignado**
@@ -158,7 +164,7 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - **Validates: Requirements 1.10, 11.8**
 
 
-- [ ] 6. Módulo `landlord-portfolio` — Gestión de portafolio (US-06 a US-09)
+- [x] 6. Módulo `landlord-portfolio` — Gestión de portafolio (US-06 a US-09)
   - [ ] 6.1 Implementar dominio y puertos del módulo `landlord-portfolio`
     - Entidades: `LandlordPortfolio`, `PortfolioUnit`, `Lease`
     - Puerto de salida: `IPortfolioRepository`, `IAuditLogger`
@@ -190,7 +196,7 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - **Validates: Requirements 2.6, 6.10, 10.1**
 
 
-- [ ] 7. Módulo `property-listings` — Exploración de oferta (US-01 a US-05)
+- [x] 7. Módulo `property-listings` — Exploración de oferta (US-01 a US-05)
   - [ ] 7.1 Implementar dominio y puertos del módulo `property-listings`
     - Entidades: `Property`, `Address`, `Listing`, `Photo`, `AdditionalFeature`
     - Puertos de salida: `IListingRepository`, `IObjectStorage`, `IListingCache`, `INotificationPort`
@@ -251,7 +257,7 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - **Propiedad 24: Evento de contacto dispara notificación al arrendador**
     - **Validates: Requirements 4.2**
 
-- [ ] 8. Checkpoint — Módulos de exploración y portafolio
+- [x] 8. Checkpoint — Módulos de exploración y portafolio
   - Ensure all tests pass, ask the user if questions arise.
 
 
@@ -472,9 +478,14 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - _Requirements: 11.1, 11.2_
 
   - [ ] 17.3 Configurar seeds de base de datos
-    - Seeds para roles (`LANDLORD`, `TENANT`), permisos, estados de lease, estados de contrato, estados de pago, tipos de notificación
+    - Seeds para roles (`LANDLORD`, `TENANT`), permisos por rol
+    - Seeds para tipos de documento: `CC` (Cédula de Ciudadanía), `NIT` (Número de Identificación Tributaria), `CE` (Cédula de Extranjería), `PP` (Pasaporte), `TI` (Tarjeta de Identidad)
+    - Seeds para estados de lease: `PUBLISHED`, `CONTACT_INITIATED`, `CONTRACT_UPLOADED`, `CONTRACT_SIGNED`, `PAYMENT_RECEIVED`
+    - Seeds para estados de contrato: `PENDING`, `SIGNATURE_PENDING`, `SIGNED`
+    - Seeds para estados de pago: `PENDING`, `PROCESSING`, `PAID`, `REJECTED`
+    - Seeds para tipos de notificación: `NEW_INTEREST`, `CONTRACT_SIGNED`, `PAYMENT_RECEIVED`, `PAYMENT_DUE`
     - Archivo en `db/seeds/`
-    - _Requirements: 11.1, 8.1_
+    - _Requirements: 11.1, 8.1, 15.2_
 
 - [ ] 18. Checkpoint final — Integración completa
   - Ensure all tests pass, ask the user if questions arise.
@@ -489,3 +500,36 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
 - Los generadores `arbitraryValidUser()`, `arbitraryInvalidRegistrationDto()`, `arbitraryListing()`, `arbitraryLeaseState()`, `arbitraryRawPayload()`, `arbitraryMaliciousPayload()` y `arbitraryPaymentEvent()` deben implementarse en `src/backend/shared/test/arbitraries.ts` antes de los tests de propiedades
 - Las referencias cross-schema (e.g. `user_id` en `LandlordPortfolio`) se resuelven por ID sin FK declarada en Prisma — nunca joins directos entre esquemas
 - El orden de implementación garantiza que cada módulo se integra sobre infraestructura ya validada
+
+## Decisiones de diseño aplicadas durante la implementación
+
+Las siguientes decisiones surgieron durante la implementación y están reflejadas en el código y en los documentos de requisitos y diseño:
+
+### Esquema `users` — ajustes al modelo físico
+- **`user_type`** es una desnormalización del rol (`LANDLORD`/`TENANT`) almacenada directamente en `User` para permitir lookups rápidos sin join con `users_roles`.
+- **`DocumentType`** es un catálogo normalizado (tabla separada) en lugar de un string libre en `User`. Centraliza los tipos válidos (CC, NIT, CE, PP, TI) y permite que el backend exponga `GET /auth/document-types` para que el frontend pueble sus dropdowns.
+- **`NaturalPersonDetail`** no incluye `birth_date` ni `pref_cl_type`. Incluye `preferred_name?` para comunicaciones cercanas con el usuario.
+- **`UserRole`** tiene PK propia (`id UUID`) en lugar de clave compuesta `(user_id, role_id)`, alineado con el ERD del diseño.
+- **`User.registration_date`** reemplaza `expiration_date` — registra cuándo se creó la cuenta.
+
+### Escenarios Gherkin de ClickUp incorporados
+Los escenarios Gherkin extraídos de la lista "Implementación del Prototipo" en ClickUp fueron incorporados como criterios de aceptación adicionales en los requisitos y como guía para los casos de uso implementados:
+- **US-01**: búsqueda básica por texto con mensaje claro si no hay resultados
+- **US-02**: filtro por zona actualiza el listado mostrando solo inmuebles de esa zona
+- **US-03**: cada tarjeta del listado muestra al menos una foto representativa
+- **US-04**: fecha de publicación visible en el detalle del inmueble
+- **US-05**: botón "contactar" desde el detalle registra la solicitud para el arrendador
+- **US-06**: publicación con campos básicos queda visible en el listado
+- **US-07**: bloquear publicación sin fotos con mensaje explicativo
+- **US-08**: flujo completo de publicación funcional desde celular
+- **US-09**: notificación al arrendador cuando hay nuevo interesado
+- **US-10**: contrato subido queda asociado al arriendo y disponible para el arrendatario
+- **US-11**: resumen de puntos clave (canon, duración, reajustes, penalidades) antes del texto completo
+- **US-12**: firma digital por ambas partes, contrato firmado disponible para consulta
+- **US-13**: notificación de confirmación al completar la firma de todas las partes
+- **US-14**: pago exitoso vía pasarela registrado para el periodo correspondiente
+- **US-15**: notificación al arrendador tras pago exitoso
+- **US-16**: historial con fecha, valor y estado de cada pago
+- **US-17**: reporte mensual de ingresos por arriendo
+- **US-18**: estado consolidado visible: publicado / contrato firmado / pago al día
+- **US-19**: notificaciones en eventos clave: contrato firmado, pago registrado, pago próximo a vencer

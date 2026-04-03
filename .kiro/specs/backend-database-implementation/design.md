@@ -150,23 +150,29 @@ sequenceDiagram
 
 ### Módulo `users`
 
-**Responsabilidades:** Registro, autenticación, gestión de roles y permisos, cifrado de PII.
+**Responsabilidades:** Registro, autenticación, gestión de roles y permisos, cifrado de PII, catálogo de tipos de documento.
 
 Puertos de entrada (input ports):
-- `RegisterUserUseCase(dto: RegisterUserDto): Promise<UserCreatedDto>`
-- `LoginUseCase(dto: LoginDto): Promise<AuthTokenDto>`
+- `RegisterUserUseCase(dto: RegisterUserDto): Promise<{ userId: string; message: string }>`
+- `LoginUseCase(dto: LoginDto, ip: string): Promise<AuthTokenDto>`
 - `GetUserProfileUseCase(userId: string): Promise<UserProfileDto>`
 
 Puertos de salida (output ports):
-- `IUserRepository` — CRUD sobre tablas curadas del esquema `users`
+- `IUserRepository` — CRUD sobre tablas curadas del esquema `users`, incluyendo `findDocumentTypeByCode()` y `findAllDocumentTypes()`
 - `IPasswordHasher` — bcrypt con cost factor ≥ 12
-- `IPIIEncryptor` — cifrado AES-256 para document_number y phone_number
+- `IPIIEncryptor` — cifrado AES-256 para `document_number` y `phone_number`
 - `IAuditLogger` — registro de intentos fallidos de login
 
 Adaptadores de infraestructura:
 - `PrismaUserRepository implements IUserRepository`
 - `BcryptPasswordHasher implements IPasswordHasher`
 - `AES256PIIEncryptor implements IPIIEncryptor`
+
+Endpoints expuestos:
+- `GET /auth/document-types` — público, retorna catálogo de tipos de documento activos
+- `POST /auth/register` — público, registro de nuevo usuario
+- `POST /auth/login` — público, autenticación y emisión de JWT
+- `GET /auth/profile` — protegido (JwtAuthGuard), perfil del usuario autenticado
 
 ---
 
@@ -311,32 +317,46 @@ Puertos de salida:
 
 ```prisma
 model User {
-  id               String   @id @default(uuid())
-  doc_type         String
-  document_number  String   // cifrado AES-256 (PII)
-  mail             String   @unique
-  hashed_password  String
-  phone_number     String   // cifrado AES-256 (PII)
-  is_active        Boolean  @default(true)
-  expiration_date  DateTime?
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
+  id                String               @id @default(uuid())
+  user_type         String               // desnormalización del rol: LANDLORD | TENANT (quick lookup)
+  document_type_id  String
+  document_number   String               // cifrado AES-256 (PII)
+  mail              String               @unique
+  hashed_password   String
+  phone_number      String               // cifrado AES-256 (PII)
+  is_active         Boolean              @default(true)
+  registration_date DateTime             @default(now())
+  created_at        DateTime             @default(now())
+  updated_at        DateTime             @updatedAt
 
-  natural_person   NaturalPersonDetail?
-  legal_person     LegalPersonDetail?
-  users_roles      UserRole[]
+  document_type  DocumentType         @relation(fields: [document_type_id], references: [id])
+  natural_person NaturalPersonDetail?
+  legal_person   LegalPersonDetail?
+  users_roles    UserRole[]
+
+  @@schema("users")
+}
+
+model DocumentType {
+  id          String  @id @default(uuid())
+  code        String  @unique  // CC | NIT | CE | PP | TI
+  description String           // Cédula de Ciudadanía | NIT | Cédula de Extranjería | Pasaporte | Tarjeta de Identidad
+  is_active   Boolean @default(true)
+
+  users User[]
 
   @@schema("users")
 }
 
 model NaturalPersonDetail {
-  id           String   @id @default(uuid())
-  user_id      String   @unique
-  first_name   String
-  last_name    String
-  birth_date   DateTime
-  pref_cl_type String?
-  user         User     @relation(fields: [user_id], references: [id])
+  id             String  @id @default(uuid())
+  user_id        String  @unique
+  first_name     String
+  last_name      String
+  preferred_name String? // nombre preferido para comunicaciones cercanas
+
+  user User @relation(fields: [user_id], references: [id])
+
   @@schema("users")
 }
 
@@ -344,7 +364,9 @@ model LegalPersonDetail {
   id            String @id @default(uuid())
   user_id       String @unique
   business_name String
-  user          User   @relation(fields: [user_id], references: [id])
+
+  user User @relation(fields: [user_id], references: [id])
+
   @@schema("users")
 }
 
@@ -354,6 +376,7 @@ model Role {
   description String?
   users_roles UserRole[]
   roles_perms RolePermission[]
+
   @@schema("users")
 }
 
@@ -363,23 +386,28 @@ model Permission {
   action      String
   resource    String
   roles_perms RolePermission[]
+
   @@schema("users")
 }
 
 model UserRole {
+  id      String @id @default(uuid())
   user_id String
   role_id String
-  user    User   @relation(fields: [user_id], references: [id])
-  role    Role   @relation(fields: [role_id], references: [id])
-  @@id([user_id, role_id])
+
+  user User @relation(fields: [user_id], references: [id])
+  role Role @relation(fields: [role_id], references: [id])
+
   @@schema("users")
 }
 
 model RolePermission {
   role_id       String
   permission_id String
-  role          Role       @relation(fields: [role_id], references: [id])
-  permission    Permission @relation(fields: [permission_id], references: [id])
+
+  role       Role       @relation(fields: [role_id], references: [id])
+  permission Permission @relation(fields: [permission_id], references: [id])
+
   @@id([role_id, permission_id])
   @@schema("users")
 }
@@ -389,6 +417,7 @@ model UsersRaw {
   payload    Json
   created_at DateTime @default(now())
   processed  Boolean  @default(false)
+
   @@schema("users")
 }
 ```

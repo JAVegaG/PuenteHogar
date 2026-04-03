@@ -41,6 +41,9 @@ El alcance de este spec cubre los ocho módulos del backend: `users`, `property-
 - **tx_hash**: Hash de verificación de integridad asociado a fotos y documentos almacenados en object storage.
 - **signing_timestamp**: Marca temporal del evento de firma electrónica registrada en `signings`.
 - **document_hash**: Hash del documento firmado, usado para verificar integridad post-firma.
+- **user_type**: Desnormalización del rol del usuario (`LANDLORD` o `TENANT`) almacenada directamente en la tabla `users` para permitir lookups rápidos sin join con `users_roles`.
+- **DocumentType**: Catálogo normalizado de tipos de documento de identidad (CC, NIT, CE, PP, TI). Centraliza los valores válidos y permite que el backend los exponga al frontend para poblar dropdowns.
+- **preferred_name**: Nombre preferido opcional de una persona natural, usado en comunicaciones cercanas con el usuario (ej. notificaciones, mensajes de bienvenida).
 
 ---
 
@@ -52,16 +55,19 @@ El alcance de este spec cubre los ocho módulos del backend: `users`, `property-
 
 #### Criterios de Aceptación
 
-1. WHEN un usuario envía una solicitud de registro con nombre completo, número de identificación colombiano, correo electrónico válido, número de celular y contraseña, THE Auth_Service SHALL crear la cuenta, asignar el rol correspondiente y retornar una confirmación de registro exitoso.
+1. WHEN un usuario envía una solicitud de registro con nombre completo, tipo de documento (código del catálogo), número de identificación, correo electrónico válido, número de celular de 10 dígitos, contraseña (mínimo 8 caracteres), rol (`LANDLORD` o `TENANT`) y tipo de persona (`natural` o `legal`), THE Auth_Service SHALL crear la cuenta, asignar el rol correspondiente, establecer el `user_type` como desnormalización del rol y retornar una confirmación de registro exitoso con el `userId`.
 2. IF el correo electrónico ya existe en el sistema, THEN THE Auth_Service SHALL rechazar el registro y retornar un error 409 con un mensaje indicando que el correo ya está registrado.
 3. IF algún campo obligatorio del registro está ausente o tiene formato inválido, THEN THE Auth_Service SHALL retornar un error 400 con los campos específicos que requieren corrección.
-4. WHEN un usuario registrado envía credenciales válidas (correo y contraseña), THE Auth_Service SHALL autenticar al usuario, generar un token JWT con el rol y el identificador del usuario, y retornarlo en la respuesta.
-5. IF las credenciales de inicio de sesión son incorrectas, THEN THE Auth_Service SHALL retornar un error 401 sin revelar cuál campo es incorrecto.
-6. THE Auth_Service SHALL almacenar las contraseñas usando un algoritmo de hashing seguro (bcrypt con factor de costo ≥ 12) y nunca persistir ni retornar contraseñas en texto plano.
-7. THE Auth_Service SHALL cifrar en reposo todos los campos PII del usuario (número de identificación, número de celular) conforme a la Ley 1581 de 2012.
-8. WHEN un token JWT expira o es inválido, THE Auth_Service SHALL retornar un error 401 en cualquier endpoint protegido.
-9. THE Sistema SHALL validar y sanitizar todos los datos de entrada en el boundary de la API para prevenir inyección SQL y XSS antes de procesarlos en cualquier módulo.
-10. THE Auth_Service SHALL registrar en un log de auditoría cada intento de inicio de sesión fallido, incluyendo timestamp e IP de origen, sin exponer PII en los logs.
+4. IF el código de tipo de documento enviado no existe en el catálogo `DocumentType`, THEN THE Auth_Service SHALL retornar un error 400 indicando que el tipo de documento no es válido.
+5. WHEN un usuario registrado envía credenciales válidas (correo y contraseña), THE Auth_Service SHALL autenticar al usuario, generar un token JWT con el rol y el identificador del usuario, y retornarlo en la respuesta.
+6. IF las credenciales de inicio de sesión son incorrectas, THEN THE Auth_Service SHALL retornar un error 401 sin revelar cuál campo es incorrecto.
+7. THE Auth_Service SHALL almacenar las contraseñas usando un algoritmo de hashing seguro (bcrypt con factor de costo ≥ 12) y nunca persistir ni retornar contraseñas en texto plano.
+8. THE Auth_Service SHALL cifrar en reposo todos los campos PII del usuario (número de identificación, número de celular) conforme a la Ley 1581 de 2012.
+9. WHEN un token JWT expira o es inválido, THE Auth_Service SHALL retornar un error 401 en cualquier endpoint protegido.
+10. THE Sistema SHALL validar y sanitizar todos los datos de entrada en el boundary de la API para prevenir inyección SQL y XSS antes de procesarlos en cualquier módulo.
+11. THE Auth_Service SHALL registrar en un log de auditoría cada intento de inicio de sesión fallido, incluyendo timestamp e IP de origen, sin exponer PII en los logs.
+12. WHEN un usuario de tipo `natural` se registra, THE Auth_Service SHALL persistir adicionalmente `first_name`, `last_name` y opcionalmente `preferred_name` en `NaturalPersonDetail`.
+13. WHEN un usuario de tipo `legal` se registra, THE Auth_Service SHALL persistir adicionalmente `business_name` en `LegalPersonDetail`.
 
 ---
 
@@ -282,7 +288,9 @@ El alcance de este spec cubre los ocho módulos del backend: `users`, `property-
 
 5. THE Sistema SHALL implementar en el esquema `accounting` las siguientes tablas curadas: `aggregated_payment_reports` (portfolio_id, as_of_date, window_months, period_start, period_end, currency, number_of_units, total_amount, avg_amount, payment_count, min_amount, max_amount, last_payment_at, first_payment_at, expected_amount, overdue_count), `individual_payment_reports` (portfolio_unit_id, as_of_date, window_months, period_start, period_end, currency, total_amount, min_amount, max_amount, payment_count, last_payment_at, first_payment_at, expected_amount, overdue_count).
 
-6. THE Sistema SHALL implementar en el esquema `users` las siguientes tablas curadas: `users` (doc_type, document_type, document_number, mail, hashed_password, phone_number, is_active, expiration_date), `legal_person_details` (user_id, business_name), `natural_person_details` (user_id, first_name, last_name, birth_date, pref_cl_type), `roles` (name, description), `permissions` (effect, action, resource), `users_roles` (user_id, role_id), `roles_permissions` (role_id, permission_id).
+6. THE Sistema SHALL implementar en el esquema `users` las siguientes tablas curadas: `users` (user_type, document_type_id, document_number, mail, hashed_password, phone_number, is_active, registration_date), `document_types` (code, description, is_active), `legal_person_details` (user_id, business_name), `natural_person_details` (user_id, first_name, last_name, preferred_name), `roles` (name, description), `permissions` (effect, action, resource), `users_roles` (id, user_id, role_id), `roles_permissions` (role_id, permission_id).
+
+  > **Nota de implementación:** `user_type` es una desnormalización del rol para lookups rápidos. `document_type_id` es FK hacia el catálogo `document_types`. `NaturalPersonDetail` no incluye `birth_date` ni `pref_cl_type`; incluye `preferred_name` opcional para comunicaciones cercanas. `UserRole` tiene PK propia (`id`) en lugar de clave compuesta.
 
 7. THE Sistema SHALL implementar en el esquema `notifications` las siguientes tablas curadas: `notification_preferences` (user_id, notification_type_id, channel, is_active), `notification_types` (name, description).
 
@@ -291,3 +299,18 @@ El alcance de este spec cubre los ocho módulos del backend: `users`, `property-
 9. THE Sistema SHALL implementar para cada dominio que lo requiera una tabla RAW con campos `id`, `payload` (JSONB) y `created_at`, nombrada con el sufijo `_raw` (por ejemplo: `portfolio_unit_raw`, `payments_raw`).
 
 10. THE Sistema SHALL garantizar que todas las claves foráneas entre tablas del mismo esquema estén definidas en Prisma, y que no existan relaciones directas de clave foránea entre tablas de esquemas distintos.
+
+---
+
+### Requisito 15: Catálogo de Tipos de Documento
+
+**User Story:** Como sistema, necesito centralizar los tipos de documento válidos en un catálogo para evitar ambigüedades, garantizar consistencia en el registro y permitir que el frontend muestre únicamente las opciones válidas en sus formularios.
+
+#### Criterios de Aceptación
+
+1. THE Sistema SHALL mantener un catálogo `DocumentType` en el esquema `users` con los campos `code` (único), `description` e `is_active`, que centralice los tipos de documento de identidad aceptados por la plataforma.
+2. THE Sistema SHALL incluir en los seeds iniciales los siguientes tipos de documento colombianos: `CC` (Cédula de Ciudadanía), `NIT` (Número de Identificación Tributaria), `CE` (Cédula de Extranjería), `PP` (Pasaporte), `TI` (Tarjeta de Identidad).
+3. THE Auth_Service SHALL exponer un endpoint público `GET /auth/document-types` que retorne la lista de tipos de documento activos (`is_active = true`), ordenados por código, para que el frontend pueda poblar sus dropdowns de selección.
+4. WHEN un usuario intenta registrarse con un `documentTypeCode` que no existe en el catálogo o cuyo `is_active` es `false`, THEN THE Auth_Service SHALL retornar un error 400 indicando que el tipo de documento no es válido.
+5. THE Sistema SHALL almacenar en `User.document_type_id` la FK hacia el registro correspondiente del catálogo, no el código en texto plano, garantizando integridad referencial dentro del esquema `users`.
+6. THE Sistema SHALL permitir desactivar tipos de documento (`is_active = false`) sin eliminarlos, preservando la integridad de los registros históricos de usuarios que ya los utilizaron.
