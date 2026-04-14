@@ -85,7 +85,47 @@ Application architecture per module: Hexagonal (ports & adapters).
 - `PaymentGatewayAdapter` returns `APPROVED` with a mock redirect URL — real PSE integration is post-MVP
 - `MessagingChannelAdapter` logs to console — real WhatsApp/email integration is post-MVP
 
-## TypeScript Configuration
+## API Documentation (Swagger / OpenAPI)
+
+The backend **must** expose interactive API documentation via Swagger UI. This is a mandatory requirement, not optional.
+
+- Library: `@nestjs/swagger` (already in `package.json`)
+- Available at: `http://localhost:{PORT}/api/docs` when the server is running
+- Authentication: JWT Bearer token support via the "Authorize" button in Swagger UI
+
+### Setup in `main.ts`
+
+```typescript
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
+const config = new DocumentBuilder()
+  .setTitle('Plataforma de Arriendo de Vivienda')
+  .setVersion('1.0')
+  .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'JWT')
+  .addTag('auth')
+  .addTag('listings')
+  // ... other tags
+  .build();
+
+const document = SwaggerModule.createDocument(app, config);
+SwaggerModule.setup('api/docs', app, document, {
+  swaggerOptions: { persistAuthorization: true },
+});
+```
+
+### Required decorators on every controller
+
+Every controller **must** have:
+- `@ApiTags('tag-name')` — groups endpoints in the Swagger UI
+- `@ApiOperation({ summary: '...' })` on every route method
+- `@ApiBearerAuth('JWT')` on protected routes (or at controller level if all routes are protected)
+- `@ApiOkResponse`, `@ApiCreatedResponse`, `@ApiForbiddenResponse`, etc. on every route
+
+### DTO documentation
+
+DTOs used as request bodies are automatically documented by Swagger via `class-validator` decorators. For additional clarity, use `@ApiProperty()` on DTO fields when the type is ambiguous.
+
+
 
 The backend uses strict TypeScript. Key rules that affect code style:
 
