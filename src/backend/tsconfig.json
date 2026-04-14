@@ -1,21 +1,34 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "declaration": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "target": "ES2021",
-    "sourceMap": true,
-    "outDir": "./dist",
-    "baseUrl": "./",
-    "incremental": true,
-    "skipLibCheck": true,
-    "strictNullChecks": true,
-    "noImplicitAny": true,
-    "strictBindCallApply": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true
-  }
+    "esModuleInterop": true,
+		"declaration": true,
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"allowSyntheticDefaultImports": true,
+		"sourceMap": true,
+		"incremental": true,
+		"strictBindCallApply": false,
+		"forceConsistentCasingInFileNames": false,
+		"target": "ES2021",
+		"module": "NodeNext",
+		"skipLibCheck": true,
+		"noImplicitAny": false,
+		"removeComments": true,
+		"outDir": "./dist",
+		"isolatedModules": true,
+		/* Linting */
+		"strict": true,
+		"strictNullChecks": true,
+		"strictPropertyInitialization":true,
+		// "noUnusedLocals": true,
+		// "noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": false,
+    /* Absolutes paths */
+    "paths": {
+      "@src/*": ["./src/*"],
+      "@modules/*": ["./modules/*"],
+    }
+  },
+  "resolveJsonModule": true,
+  "include": ["modules", "src"]
 }

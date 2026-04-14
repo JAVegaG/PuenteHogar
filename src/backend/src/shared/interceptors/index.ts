@@ -1,1 +1,1 @@
-export * from './validation.interceptor';
+export * from '@src/shared/interceptors/validation.interceptor';

@@ -49,9 +49,102 @@ Application architecture per module: Hexagonal (ports & adapters).
 - Interceptor/validator for incoming requests (XSS/injection prevention)
 - RBAC with resource ownership verification
 - TLS 1.2+ in transit
-- PII fields encrypted at rest
+- PII fields encrypted at rest (AES-256-CBC, key from `PII_ENCRYPTION_KEY` env var)
 - Idempotency keys on all payment operations
-- Audit logging for sensitive actions
+- Audit logging for sensitive actions (no PII in logs — identifiers anonymized via sha256)
+
+## Key Implementation Decisions
+
+### Users module
+- `user_type` is a denormalization of the role (`LANDLORD`/`TENANT`) stored directly on `User` for fast lookups without joining `users_roles`
+- `document_type_id` is a FK to the `DocumentType` catalog table — never a free string
+- `DocumentType` catalog seeds: `CC`, `NIT`, `CE`, `PP`, `TI`
+- `NaturalPersonDetail` has `preferred_name?` (no `birth_date`, no `pref_cl_type`)
+- `UserRole` has its own `id` PK (not composite key)
+- `User.registration_date` replaces `expiration_date`
+- `GET /auth/document-types` is a public endpoint for frontend dropdowns
+
+### Cross-schema references
+- References between schemas (e.g. `user_id` in `LandlordPortfolio`, `lease_id` in `Contract`) are plain `String` fields — no Prisma `@relation` across schemas
+- Cross-schema lookups use multi-step queries: e.g. `Lease → PortfolioUnit → LandlordPortfolio` to resolve the landlord user ID
+
+### Notification ports
+- Each module that fires notifications uses a local `INotificationPort` stub in its module
+- The real `notifications` module will replace these stubs when wired in `AppModule`
+- Notifications are always fire-and-forget (no `await`, no throw on failure)
+
+### Circuit Breaker
+- `payment`: failureThreshold=3, timeout=30s
+- `signature`: failureThreshold=3, timeout=15s
+- `messaging`: failureThreshold=3, timeout=15s
+- Instances cached by name in `CircuitBreakerFactory`
+
+### MVP stubs
+- `ObjectStorageAdapter` returns a placeholder S3 URL — real S3 SDK integration is post-MVP
+- `ESignatureProviderAdapter` returns a mock signing ID — real provider integration is post-MVP
+- `PaymentGatewayAdapter` returns `APPROVED` with a mock redirect URL — real PSE integration is post-MVP
+- `MessagingChannelAdapter` logs to console — real WhatsApp/email integration is post-MVP
+
+## TypeScript Configuration
+
+The backend uses strict TypeScript. Key rules that affect code style:
+
+```jsonc
+{
+  "strict": true,
+  "strictNullChecks": true,
+  "strictPropertyInitialization": true,  // class properties MUST be initialized
+  "noImplicitAny": false,                // any is allowed but discouraged
+  "module": "NodeNext",                  // use .js extensions in imports if needed
+  "isolatedModules": true
+}
+```
+
+### Implications for DTOs and entities
+
+**`strictPropertyInitialization: true`** means class properties must be initialized at declaration or in the constructor. For DTOs decorated with `class-validator`, use the definite assignment assertion `!`:
+
+```typescript
+// ✅ Correct — use ! for class-validator DTOs
+export class MyDto {
+  @IsString()
+  name!: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;  // optional fields use ? (already handles undefined)
+}
+```
+
+**Response DTOs** that are populated via `dto.field = value` pattern also need `!`:
+
+```typescript
+export class MyResponseDto {
+  id!: string;
+  name!: string;
+  createdAt!: Date;
+}
+```
+
+**Domain entities** use constructor initialization — no `!` needed:
+
+```typescript
+export class MyEntity {
+  constructor(
+    public readonly id: string,
+    public readonly name: string,
+  ) {}
+}
+```
+
+### Path aliases
+
+```
+@src/*  → ./src/*
+@modules/* → ./modules/*
+```
+
+Use these in imports when referencing across the module/src boundary.
 
 ## Quality Targets
 

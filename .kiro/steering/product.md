@@ -15,6 +15,9 @@ Reduce friction in the rental process for users with low digital literacy, while
 ## MVP Scope (Release 1)
 
 - User registration and authentication (landlord / tenant roles)
+  - Document type selected from catalog (`CC`, `NIT`, `CE`, `PP`, `TI`) — exposed via `GET /auth/document-types`
+  - Natural persons: `first_name`, `last_name`, `preferred_name?` (used in close communications)
+  - Legal persons: `business_name`
 - Property listing with mandatory photos
 - Tenant search and filtering (zone/neighborhood)
 - Contract upload and digital signing (via external e-signature provider)
@@ -30,9 +33,17 @@ Reduce friction in the rental process for users with low digital literacy, while
 - Legal contract engine
 - Debt collection / late payment management
 - Risk scoring of tenants (planned for Release 3)
+- Real external integrations (e-signature, payment gateway, WhatsApp) — MVP uses stubs
 
 ## Legal Context
 
 - Ley 820 de 2003 (rental contracts)
 - Ley 527 de 1999 / Decreto 2364 de 2012 (electronic signature)
 - Ley 1581 de 2012 (personal data protection — Habeas Data)
+
+## Rental Process States
+
+The lifecycle of a rental is tracked via these states:
+`PUBLISHED → CONTACT_INITIATED → CONTRACT_UPLOADED → CONTRACT_SIGNED → PAYMENT_RECEIVED`
+
+Notifications are triggered on `CONTRACT_SIGNED` and `PAYMENT_RECEIVED`.

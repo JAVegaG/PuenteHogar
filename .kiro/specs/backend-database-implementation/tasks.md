@@ -261,7 +261,7 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
   - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 9. Módulo `contracts` — Gestión de contrato (US-10 a US-13)
+- [x] 9. Módulo `contracts` — Gestión de contrato (US-10 a US-13)
   - [ ] 9.1 Implementar dominio y puertos del módulo `contracts`
     - Entidades: `Contract`, `ContractParty`, `File`, `Signing`, `SigningLog`
     - Puertos de salida: `IContractRepository`, `IObjectStorage`, `IESignatureProvider`, `INotificationPort`, `IAuditLogger`
@@ -309,7 +309,7 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - **Validates: Requirements 5.10**
 
 
-- [ ] 10. Módulo `payments` — Gestión de pagos (US-14 a US-17)
+- [x] 10. Módulo `payments` — Gestión de pagos (US-14 a US-17)
   - [ ] 10.1 Implementar dominio y puertos del módulo `payments`
     - Entidades: `ScheduledPayment`, `Payment`, `PaymentStatus`, `PaymentLog`
     - Puertos de salida: `IPaymentRepository`, `IPaymentGateway`, `INotificationPort`, `IAuditLogger`
@@ -352,11 +352,11 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - **Propiedad 37: Historial de pagos retorna solo pagos del usuario solicitante, ordenados por fecha desc**
     - **Validates: Requirements 6.8**
 
-- [ ] 11. Checkpoint — Módulos de contrato y pagos
+- [x] 11. Checkpoint — Módulos de contrato y pagos
   - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 12. Módulo `accounting` — Reportes contables (US-17)
+- [-] 12. Módulo `accounting` — Reportes contables (US-17)
   - [ ] 12.1 Implementar casos de uso de contabilidad
     - `GetAggregatedReportUseCase`: calcula ingresos del periodo desde pagos `PAID` en Curated_Table; retorna total cero con mensaje si no hay pagos; sirve reportes históricos (> 24h) desde caché Redis (TTL 1h)
     - `GetIndividualReportUseCase`: reporte por unidad de portafolio; rechaza con 403 si rol es TENANT
@@ -375,7 +375,7 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - **Propiedad 39: Reportes históricos servidos desde caché Redis con TTL 1 hora**
     - **Validates: Requirements 7.4**
 
-- [ ] 13. Módulo `rental-tracking` — Seguimiento del proceso (US-18 a US-19)
+- [-] 13. Módulo `rental-tracking` — Seguimiento del proceso (US-18 a US-19)
   - [ ] 13.1 Implementar dominio y puertos del módulo `rental-tracking`
     - Máquina de estados: `PUBLISHED → CONTACT_INITIATED → CONTRACT_UPLOADED → CONTRACT_SIGNED → PAYMENT_RECEIVED`
     - Puerto de salida: `ITrackingRepository`, `INotificationPort`
@@ -405,7 +405,7 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - **Validates: Requirements 8.7**
 
 
-- [ ] 14. Módulo `notifications` — Sistema de notificaciones
+- [-] 14. Módulo `notifications` — Sistema de notificaciones
   - [ ] 14.1 Implementar dominio y puertos del módulo `notifications`
     - Entidades: `NotificationType`, `NotificationPreference`
     - Puerto de salida: `INotificationRepository`, `IMessagingChannel`, `IAuditLogger`
@@ -500,6 +500,8 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
 - Los generadores `arbitraryValidUser()`, `arbitraryInvalidRegistrationDto()`, `arbitraryListing()`, `arbitraryLeaseState()`, `arbitraryRawPayload()`, `arbitraryMaliciousPayload()` y `arbitraryPaymentEvent()` deben implementarse en `src/backend/shared/test/arbitraries.ts` antes de los tests de propiedades
 - Las referencias cross-schema (e.g. `user_id` en `LandlordPortfolio`) se resuelven por ID sin FK declarada en Prisma — nunca joins directos entre esquemas
 - El orden de implementación garantiza que cada módulo se integra sobre infraestructura ya validada
+- **DTOs**: usar `!` (definite assignment assertion) en propiedades requeridas por `strictPropertyInitialization: true`. Opcionales usan `?`. Ejemplo: `name!: string;`
+- **tsconfig**: `strict: true`, `strictPropertyInitialization: true`, `module: NodeNext`, path aliases `@src/*` y `@modules/*`
 
 ## Decisiones de diseño aplicadas durante la implementación
 

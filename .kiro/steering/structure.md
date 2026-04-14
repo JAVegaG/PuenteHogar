@@ -4,9 +4,9 @@ The system is a modular monolith. Each business domain is a self-contained modul
 
 ## Business Domains
 
-- `users` — registration, authentication, roles (landlord / tenant)
-- `property-listings` — public offer, search, filtering, photos
-- `landlord-portfolio` — landlord's property management
+- `users` — registration, authentication, roles (landlord / tenant), document type catalog
+- `property-listings` — public offer, search, filtering, photos, contact events
+- `landlord-portfolio` — landlord's property management, portfolio units, leases
 - `contracts` — contract upload, e-signature integration, document storage
 - `payments` — payment gateway integration, payment scheduling, receipts
 - `accounting` — financial reports, income summaries
@@ -15,17 +15,12 @@ The system is a modular monolith. Each business domain is a self-contained modul
 
 ## Folder Structure
 
-The project is split into `src/frontend` (Next.js) and `src/backend` (NestJS). Both sides mirror the same domain structure — modules that have UI and API concerns live in both trees under the same name.
-
 ```
 src/
-  frontend/                         # Next.js app
+  frontend/                         # Next.js app (planned)
     app/                            # App Router pages and layouts
     modules/
       users/
-        components/                 # React components for this domain
-        hooks/                      # domain-specific hooks
-        services/                   # API client calls
       property-listings/
       landlord-portfolio/
       contracts/
@@ -33,16 +28,17 @@ src/
       accounting/
       rental-tracking/
       notifications/
-    shared/                         # shared UI components, utils, types
-    styles/                         # global Tailwind config / base styles
+    shared/
+    styles/
 
   backend/                          # NestJS app
     modules/
       users/
-        domain/                     # entities, value objects, domain services
-        application/                # use cases / input ports
-        infrastructure/             # adapters: DB, external APIs, messaging
+        domain/                     # entities, value objects, port interfaces
+        application/                # use cases, DTOs
+        infrastructure/             # Prisma repos, external adapters
         users.module.ts
+        users.controller.ts
       property-listings/
       landlord-portfolio/
       contracts/
@@ -50,27 +46,63 @@ src/
       accounting/
       rental-tracking/
       notifications/
-    shared/                         # guards, interceptors, pipes, decorators
-    config/                         # env config, DB, Redis setup
+    src/
+      app.module.ts
+      main.ts
+      config/
+        configuration.ts            # typed env config factory
+      shared/
+        audit/                      # AuditLoggerService
+        circuit-breaker/            # CircuitBreaker + CircuitBreakerFactory
+        decorators/                 # @Roles(), @Public()
+        guards/                     # JwtAuthGuard, RBACGuard
+        interceptors/               # ValidationInterceptor (XSS/SQL sanitization)
+        prisma/                     # PrismaService (@Global)
+        redis/                      # RedisService (@Global, cache-aside)
 
 db/
   prisma/
-    schema.prisma                   # Prisma schema (models, enums, relations)
-    migrations/                     # auto-generated migration files
-  seeds/                            # dev/test seed data
+    schema.prisma                   # Prisma schema — 8 PostgreSQL schemas
+    migrations/
+  seeds/                            # dev/test seed data (roles, document types, statuses)
 
-documentation/                      # architecture and requirements PDFs/MDs
+documentation/                      # SRS, architectural design PDFs/MDs
+.kiro/
+  specs/
+    backend-database-implementation/ # requirements.md, design.md, tasks.md
+  steering/                         # tech.md, structure.md, product.md
+```
+
+## Module Internal Structure (hexagonal)
+
+```
+modules/{name}/
+  domain/
+    entities/          # plain TypeScript classes (no Prisma dependency)
+    ports/             # interfaces: IRepository, IExternalAdapter, etc.
+  application/
+    dtos/              # class-validator decorated DTOs
+    use-cases/         # one file per use case, injection tokens defined here
+  infrastructure/
+    repositories/      # PrismaXxxRepository implements IXxxRepository
+    adapters/          # external service adapters (stubs for MVP)
+  {name}.module.ts
+  {name}.controller.ts
 ```
 
 ## Conventions
 
 - Hexagonal architecture per module: domain → application → infrastructure
 - Modules communicate only through defined API interfaces, never direct DB joins across schemas
+- Cross-schema references are plain `String` fields — no Prisma `@relation` across schemas
+- Cross-schema lookups use multi-step queries (e.g. `Lease → PortfolioUnit → LandlordPortfolio`)
 - RAW tables store incoming JSON/JSONB; curated tables are read-optimized typed columns
 - ETL cron jobs handle raw → curated transformation
 - All external service calls go through adapters with circuit breaker logic
 - RBAC enforced at the application layer; resource ownership checked per request
 - Input validation at both UI and API boundary
+- Notification ports are stubbed per-module; real `notifications` module wires them in `AppModule`
+- All notifications are fire-and-forget (no `await`, no throw on failure)
 
 ## Key Design Decisions
 
@@ -89,3 +121,5 @@ documentation/                      # architecture and requirements PDFs/MDs
 | AD-12 | Redis distributed cache (cache-aside) |
 | AD-13 | Hybrid persistence: RAW JSON + curated typed tables |
 | AD-14 | PostgreSQL as primary DB |
+| AD-15 | `user_type` denormalization for fast role lookups |
+| AD-16 | `DocumentType` catalog table — no free-string document types |

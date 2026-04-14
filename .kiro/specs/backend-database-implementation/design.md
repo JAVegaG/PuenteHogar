@@ -312,6 +312,9 @@ Puertos de salida:
 - Cada módulo tiene al menos una tabla RAW con `id`, `payload` (JSONB), `created_at`, `processed` (Boolean)
 - Las claves foráneas solo existen dentro del mismo esquema; referencias cross-schema se resuelven por ID sin FK declarada en Prisma
 - El campo `@@schema` de Prisma separa lógicamente cada módulo en PostgreSQL
+- **DTOs con `class-validator`**: las propiedades requeridas usan `!` (definite assignment assertion) por `strictPropertyInitialization: true`. Las opcionales usan `?`.
+- **Response DTOs** poblados con `dto.field = value` también usan `!` en sus propiedades.
+- **Entidades de dominio** usan inicialización por constructor — no requieren `!`.
 
 ### Esquema `users`
 
