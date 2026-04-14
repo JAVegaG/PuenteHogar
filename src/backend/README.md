@@ -34,8 +34,8 @@ src/backend/
     ├── property-listings/      # Publicaciones, búsqueda, fotos
     ├── landlord-portfolio/     # Portafolio, unidades, leases
     ├── contracts/              # Contratos, firma electrónica, almacenamiento de documentos
-    ├── payments/               # Pagos, pasarela, idempotencia
-    ├── accounting/             # Reportes financieros (dominio: entidades + puertos; sin capa application/infrastructure aún)
+    ├── payments/               # Pagos, pasarela, idempotencia (dominio, aplicación, infraestructura, controlador)
+    ├── accounting/             # Reportes financieros (dominio: entidades + puertos; application/dtos; sin infrastructure aún)
     ├── rental-tracking/        # Máquina de estados del arriendo (placeholder — solo index.ts)
     └── notifications/          # Notificaciones multicanal (placeholder — solo index.ts)
 ```
