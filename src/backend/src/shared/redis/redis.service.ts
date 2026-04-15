@@ -79,4 +79,17 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       this.logger.warn(`Redis DEL failed for key "${key}": ${message}`);
     }
   }
+
+  async delByPattern(pattern: string): Promise<void> {
+    if (!this.available || !this.client) return;
+    try {
+      const keys = await this.client.keys(pattern);
+      if (keys.length > 0) {
+        await this.client.del(...keys);
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.logger.warn(`Redis DEL pattern failed for "${pattern}": ${message}`);
+    }
+  }
 }

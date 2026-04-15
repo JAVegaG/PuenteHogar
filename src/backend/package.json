@@ -7,9 +7,10 @@
     "build": "nest build",
     "test": "jest",
     "lint": "eslint src --ext .ts",
-    "migration:run": "prisma migrate deploy --schema=../../db/prisma/schema.prisma",
-    "migration:generate": "prisma migrate dev --schema=../../db/prisma/schema.prisma",
-    "db:studio": "prisma studio --schema=../../db/prisma/schema.prisma"
+    "migration:run": "prisma migrate deploy",
+    "migration:generate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "db:seed": "tsx db/seeds/seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.19",
@@ -42,9 +43,12 @@
     "@types/node": "^25.6.0",
     "@types/passport-jwt": "^4.0.1",
     "@types/pg": "^8.20.0",
+    "@typescript-eslint/eslint-plugin": "^8.58.2",
+    "@typescript-eslint/parser": "^8.58.2",
+    "eslint": "^10.2.0",
     "fast-check": "^4.6.0",
     "jest": "^30.3.0",
-    "prisma": "^6.19.3",
+    "prisma": "^7.7.0",
     "ts-jest": "^29.4.9",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
