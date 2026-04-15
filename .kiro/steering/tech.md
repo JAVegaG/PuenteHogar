@@ -123,7 +123,75 @@ Every controller **must** have:
 
 ### DTO documentation
 
-DTOs used as request bodies are automatically documented by Swagger via `class-validator` decorators. For additional clarity, use `@ApiProperty()` on DTO fields when the type is ambiguous.
+**Every DTO field must have `@ApiProperty()` or `@ApiPropertyOptional()`** — Swagger does not infer types from TypeScript alone. Without these decorators, fields appear as `{}` in the generated schema.
+
+#### Request DTOs (class-validator)
+
+```typescript
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
+export class CreateThingDto {
+  @ApiProperty({ example: 'My title', description: 'Human-readable title' })
+  @IsString()
+  @IsNotEmpty()
+  title!: string;
+
+  @ApiPropertyOptional({ example: 'Extra info', description: 'Optional description' })
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @ApiProperty({ enum: ['A', 'B'], description: 'Allowed values' })
+  @IsIn(['A', 'B'])
+  type!: 'A' | 'B';
+}
+```
+
+#### Response DTOs
+
+Response DTOs also need `@ApiProperty()` on every field so Swagger renders the response schema:
+
+```typescript
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
+export class ThingResponseDto {
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  title!: string;
+
+  @ApiPropertyOptional({ nullable: true })
+  description!: string | null;
+
+  @ApiProperty()
+  createdAt!: Date;
+}
+```
+
+#### Nested DTOs
+
+Use `type: () => NestedDto` (lazy reference) to avoid circular dependency issues:
+
+```typescript
+@ApiProperty({ type: () => AddressDto })
+address!: AddressDto;
+
+@ApiProperty({ type: [PhotoDto] })
+photos!: PhotoDto[];
+
+@ApiPropertyOptional({ type: () => AddressDto, nullable: true })
+address!: AddressDto | null;
+```
+
+#### Controller response types
+
+Always pass `type:` to `@ApiOkResponse` / `@ApiCreatedResponse` so Swagger generates the full response schema:
+
+```typescript
+@ApiOkResponse({ description: 'Thing found', type: ThingResponseDto })
+@ApiOkResponse({ description: 'List of things', type: [ThingResponseDto] })
+```
 
 
 
@@ -209,8 +277,9 @@ npm run test       # unit tests
 npm run test:e2e   # e2e tests
 npm run lint       # lint
 
-# DB
+# DB commands (run from src/backend/)
 npm run migration:run      # prisma migrate deploy
 npm run migration:generate # prisma migrate dev --name <name>
-npm run db:studio          # prisma studio (DB browser)
+npm run db:studio          # prisma studio
+npm run db:seed            # seed catalog data (roles, document types, statuses)
 ```

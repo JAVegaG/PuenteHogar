@@ -11,10 +11,8 @@ El sistema actúa como orquestador del proceso de arriendo: publicación de inmu
 ```
 ├── src/
 │   ├── backend/          # API NestJS — lógica de negocio y persistencia
+│   │   └── db/           # Schema Prisma, migraciones y seeds (colocados con el backend)
 │   └── frontend/         # Aplicación web Next.js (mobile-first)
-├── db/
-│   ├── prisma/           # Schema Prisma y migraciones PostgreSQL
-│   └── seeds/            # Datos semilla para desarrollo
 ├── documentation/        # SRS, diseño arquitectónico y funcional
 └── .kiro/                # Specs, steering y configuración del agente
 ```
@@ -67,6 +65,7 @@ cp .env.example .env
 cd src/backend
 npm install
 npm run migration:run   # aplica migraciones Prisma
+npm run db:seed         # seed de catálogos (roles, tipos de documento, estados)
 npm run start:dev       # servidor en modo desarrollo
 ```
 

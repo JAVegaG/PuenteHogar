@@ -4,7 +4,8 @@ API REST del sistema de gestión de arriendo de vivienda. Implementada como mono
 
 ## Stack
 
-- **Framework**: NestJS + TypeScript (`"type": "module"` — ESM package, `module: NodeNext`)
+- **Framework**: NestJS + TypeScript (`module: NodeNext` in tsconfig)
+- **Prisma config**: `prisma.config.ts` at `src/backend/` root — points schema to `./db/prisma/schema.prisma`
 - **ORM**: Prisma (`@prisma/client`) + PostgreSQL
 - **Caché**: Redis (`ioredis`, cache-aside)
 - **Autenticación**: JWT (`@nestjs/jwt`, `passport-jwt`)
@@ -16,6 +17,12 @@ API REST del sistema de gestión de arriendo de vivienda. Implementada como mono
 
 ```
 src/backend/
+├── db/
+│   ├── prisma/
+│   │   ├── schema.prisma    # Schema Prisma completo (8 esquemas PostgreSQL)
+│   │   └── migrations/      # Migraciones generadas por Prisma
+│   └── seeds/
+│       └── seed.ts          # Seed de catálogos (roles, tipos de documento, estados)
 ├── src/
 │   ├── app.module.ts           # Módulo raíz
 │   ├── main.ts                 # Bootstrap con ValidationPipe global
@@ -35,9 +42,9 @@ src/backend/
     ├── landlord-portfolio/     # Portafolio, unidades, leases
     ├── contracts/              # Contratos, firma electrónica, almacenamiento de documentos
     ├── payments/               # Pagos, pasarela, idempotencia (dominio, aplicación, infraestructura, controlador)
-    ├── accounting/             # Reportes financieros (dominio: entidades + puertos; application/dtos; sin infrastructure aún)
-    ├── rental-tracking/        # Máquina de estados del arriendo (placeholder — solo index.ts)
-    └── notifications/          # Notificaciones multicanal (placeholder — solo index.ts)
+    ├── accounting/             # Reportes financieros (dominio, aplicación, infraestructura: PrismaAccountingRepository + RedisReportCache)
+    ├── rental-tracking/        # Máquina de estados del arriendo (dominio, aplicación, infraestructura, controlador)
+    └── notifications/          # Notificaciones multicanal (dominio, aplicación, infraestructura, controlador)
 ```
 
 ## Arquitectura por módulo
@@ -62,6 +69,7 @@ modules/{nombre}/
 | `AuditLoggerService` | Registra acciones sensibles sin PII en texto plano |
 | `CircuitBreakerFactory` | Instancia circuit breakers por tipo de integración externa |
 | `RedisService` | Cache-aside con fallback transparente a PostgreSQL |
+| `PrismaService` | Cliente Prisma singleton compartido entre módulos (`@src/shared/prisma/`) |
 | `PrismaService` | Cliente Prisma singleton compartido entre módulos (`@src/shared/prisma/`) |
 
 > Los módulos acceden a `shared/` mediante el alias `@src/shared/` (resuelto por `tsconfig.paths` como `@src/*` → `./src/*`).
@@ -91,12 +99,21 @@ modules/{nombre}/
 |-------|-------------|
 | `@src/*` | `./src/*` |
 | `@modules/*` | `./modules/*` |
+| `@prisma-generated/*` | `./prisma/generated/*` |
 
-> **ESM / NodeNext import convention**: `"module": "NodeNext"` requires explicit file extensions on relative imports. Use `.js` for all relative imports (e.g. `'./contract.entity.js'`). Path-alias imports (`@src/...`) do **not** need the extension — TypeScript resolves them via `tsconfig.paths`.
+> **NodeNext import convention**: `"module": "NodeNext"` is set in `tsconfig.json` and the package has `"type": "module"`, so it runs as ESM. Relative imports **must** use `.js` extensions (e.g. `import './foo.js'`). Path-alias imports (`@src/...`, `@modules/...`) are resolved via `tsconfig.paths` as usual.
 
 > **`noImplicitAny`**: currently disabled in `tsconfig.json`. Parameters with implicit `any` types (e.g. Prisma transaction callbacks) are allowed but should be typed explicitly where possible.
 
 > **`strictPropertyInitialization`**: enabled. All class properties must be explicitly initialized in the constructor or marked with the definite assignment assertion (`!`). DTOs use `!` on decorated fields (e.g. `name!: string`) since `class-validator` decorators guarantee runtime presence.
+
+## API Documentation (Swagger)
+
+Disponible en `http://localhost:{PORT}/api/docs` cuando el servidor está corriendo.
+
+- Autenticación: JWT Bearer token via el botón "Authorize" en Swagger UI
+- Todos los endpoints protegidos requieren `@ApiBearerAuth('JWT')`
+- Todos los controladores tienen `@ApiTags`, `@ApiOperation` y decoradores de respuesta por ruta
 
 ## Scripts
 
@@ -105,9 +122,10 @@ npm run start:dev          # Servidor en modo desarrollo (watch)
 npm run build              # Build de producción
 npm run test               # Tests unitarios y de propiedades
 npm run lint               # ESLint
-npm run migration:run      # Aplica migraciones Prisma
-npm run migration:generate # Genera nueva migración
+npm run migration:run      # Aplica migraciones Prisma (desde src/backend/)
+npm run migration:generate # Genera nueva migración (desde src/backend/)
 npm run db:studio          # Prisma Studio
+npm run db:seed            # Seed de catálogos (roles, tipos de documento, estados)
 ```
 
 ## Variables de entorno

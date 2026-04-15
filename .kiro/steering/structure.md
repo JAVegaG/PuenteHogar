@@ -32,6 +32,11 @@ src/
     styles/
 
   backend/                          # NestJS app
+    db/
+      prisma/
+        schema.prisma               # Prisma schema — 8 PostgreSQL schemas
+        migrations/
+      seeds/                        # dev/test seed data (roles, document types, statuses)
     modules/
       users/
         domain/                     # entities, value objects, port interfaces
@@ -59,12 +64,6 @@ src/
         interceptors/               # ValidationInterceptor (XSS/SQL sanitization)
         prisma/                     # PrismaService (@Global)
         redis/                      # RedisService (@Global, cache-aside)
-
-db/
-  prisma/
-    schema.prisma                   # Prisma schema — 8 PostgreSQL schemas
-    migrations/
-  seeds/                            # dev/test seed data (roles, document types, statuses)
 
 documentation/                      # SRS, architectural design PDFs/MDs
 .kiro/

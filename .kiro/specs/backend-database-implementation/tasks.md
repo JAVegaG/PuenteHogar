@@ -165,19 +165,19 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
 
 
 - [x] 6. Módulo `landlord-portfolio` — Gestión de portafolio (US-06 a US-09)
-  - [ ] 6.1 Implementar dominio y puertos del módulo `landlord-portfolio`
+  - [x] 6.1 Implementar dominio y puertos del módulo `landlord-portfolio`
     - Entidades: `LandlordPortfolio`, `PortfolioUnit`, `Lease`
     - Puerto de salida: `IPortfolioRepository`, `IAuditLogger`
     - _Requirements: 2.1, 2.2_
 
-  - [ ] 6.2 Implementar casos de uso: `CreatePortfolioUnitUseCase`, `GetPortfolioUseCase`, `UpdatePortfolioUnitUseCase`
+  - [x] 6.2 Implementar casos de uso: `CreatePortfolioUnitUseCase`, `GetPortfolioUseCase`, `UpdatePortfolioUnitUseCase`
     - `CreatePortfolioUnitUseCase`: crea unidad asociada al arrendador; rechaza con 403 si rol es TENANT
     - `GetPortfolioUseCase`: retorna solo unidades del arrendador autenticado
     - `UpdatePortfolioUnitUseCase`: persiste cambios; rechaza con 403 + audit log si el recurso no pertenece al usuario
     - Persistir datos de entrada en `PortfolioRaw` (JSONB) antes de transformación
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6_
 
-  - [ ] 6.3 Implementar `PrismaPortfolioRepository`
+  - [x] 6.3 Implementar `PrismaPortfolioRepository`
     - CRUD sobre esquema `landlord_portfolio`
     - _Requirements: 2.1, 2.4_
 
@@ -197,25 +197,25 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
 
 
 - [x] 7. Módulo `property-listings` — Exploración de oferta (US-01 a US-05)
-  - [ ] 7.1 Implementar dominio y puertos del módulo `property-listings`
+  - [x] 7.1 Implementar dominio y puertos del módulo `property-listings`
     - Entidades: `Property`, `Address`, `Listing`, `Photo`, `AdditionalFeature`
     - Puertos de salida: `IListingRepository`, `IObjectStorage`, `IListingCache`, `INotificationPort`
     - _Requirements: 3.1, 3.3_
 
-  - [ ] 7.2 Implementar casos de uso de publicación y exploración
+  - [x] 7.2 Implementar casos de uso de publicación y exploración
     - `CreateListingUseCase`: crea publicación en estado `PUBLISHED`; rechaza con 422 si no hay foto; almacena fotos en object storage, persiste solo URLs
     - `SearchListingsUseCase`: retorna solo publicaciones `PUBLISHED` con al menos una foto; aplica filtro por zona/barrio; sirve desde caché Redis (TTL 5 min) con fallback a PostgreSQL
     - `GetListingDetailUseCase`: retorna detalle completo (fotos, fecha, canon, habitaciones, baños, contacto arrendador)
     - `UnpublishListingUseCase`: cambia estado a `UNPUBLISHED`, invalida caché; rechaza con 403 si no es propietario
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10, 3.11, 3.12_
 
-  - [ ] 7.3 Implementar `RegisterContactEventUseCase`
+  - [x] 7.3 Implementar `RegisterContactEventUseCase`
     - Registra evento de contacto con listing_id, tenant_id y timestamp
     - Dispara notificación al arrendador vía `INotificationPort`
     - Retorna 500 si falla la persistencia del evento
     - _Requirements: 4.1, 4.2, 4.4, 4.5_
 
-  - [ ] 7.4 Implementar adaptadores: `PrismaListingRepository`, `RedisListingCache`, `ObjectStorageAdapter`
+  - [x] 7.4 Implementar adaptadores: `PrismaListingRepository`, `RedisListingCache`, `ObjectStorageAdapter`
     - `RedisListingCache`: cache-aside con TTL 5 min, fallback transparente a PostgreSQL
     - `ObjectStorageAdapter`: upload de fotos, retorna URL de referencia
     - _Requirements: 3.3, 3.9, 3.10_
@@ -262,20 +262,20 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
 
 
 - [x] 9. Módulo `contracts` — Gestión de contrato (US-10 a US-13)
-  - [ ] 9.1 Implementar dominio y puertos del módulo `contracts`
+  - [x] 9.1 Implementar dominio y puertos del módulo `contracts`
     - Entidades: `Contract`, `ContractParty`, `File`, `Signing`, `SigningLog`
     - Puertos de salida: `IContractRepository`, `IObjectStorage`, `IESignatureProvider`, `INotificationPort`, `IAuditLogger`
     - Estados del contrato: `PENDING`, `SIGNATURE_PENDING`, `SIGNED`
     - _Requirements: 5.1, 5.5_
 
-  - [ ] 9.2 Implementar casos de uso de contratos
+  - [x] 9.2 Implementar casos de uso de contratos
     - `UploadContractUseCase`: almacena PDF en object storage, persiste referencia; rechaza con 422 si no es PDF o > 10 MB; rechaza con 403 si lease no pertenece al arrendador
     - `GetContractSummaryUseCase`: retorna resumen con campos clave + URL del documento; rechaza con 403 si usuario no es parte del lease
     - `InitiateSigningUseCase`: invoca `IESignatureProvider` con circuit breaker (timeout 15s); registra eventos en audit log
     - `HandleSigningWebhookUseCase`: actualiza estado a `SIGNED` con fecha y tx_id del proveedor; dispara notificación a ambas partes; bloquea modificaciones en estado `SIGNED`
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 5.10, 5.11_
 
-  - [ ] 9.3 Implementar adaptador `ESignatureProviderAdapter`
+  - [x] 9.3 Implementar adaptador `ESignatureProviderAdapter`
     - Circuit breaker con timeout 15s y 2 reintentos con backoff exponencial
     - Estado intermedio `SIGNATURE_PENDING` ante circuit abierto
     - _Requirements: 5.7, 12.1, 12.3_
@@ -310,18 +310,18 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
 
 
 - [x] 10. Módulo `payments` — Gestión de pagos (US-14 a US-17)
-  - [ ] 10.1 Implementar dominio y puertos del módulo `payments`
+  - [x] 10.1 Implementar dominio y puertos del módulo `payments`
     - Entidades: `ScheduledPayment`, `Payment`, `PaymentStatus`, `PaymentLog`
     - Puertos de salida: `IPaymentRepository`, `IPaymentGateway`, `INotificationPort`, `IAuditLogger`
     - _Requirements: 6.1, 6.6_
 
-  - [ ] 10.2 Implementar casos de uso de pagos
+  - [x] 10.2 Implementar casos de uso de pagos
     - `InitiatePaymentUseCase`: genera `Idempotency_Key` única, redirige a pasarela; persiste evento en `PaymentsRaw` (JSONB); rechaza con 503 si circuit breaker está abierto
     - `HandlePaymentWebhookUseCase`: actualiza `ScheduledPayment` a `PAID` con tx_id, monto y fecha; mantiene `PENDING` si rechazado; registra estado `PROCESSING` si timeout
     - `GetPaymentHistoryUseCase`: retorna solo pagos del usuario autenticado, ordenados por fecha desc; rechaza con 403 si intenta acceder a pagos de otro usuario
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 6.8, 6.9, 6.10, 6.11_
 
-  - [ ] 10.3 Implementar adaptador `PaymentGatewayAdapter`
+  - [x] 10.3 Implementar adaptador `PaymentGatewayAdapter`
     - Circuit breaker con timeout 30s y 2 reintentos con backoff exponencial
     - Idempotency Key incluida en cada solicitud a la pasarela
     - Estado intermedio `PROCESSING` ante circuit abierto
@@ -356,13 +356,13 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
   - Ensure all tests pass, ask the user if questions arise.
 
 
-- [-] 12. Módulo `accounting` — Reportes contables (US-17)
-  - [ ] 12.1 Implementar casos de uso de contabilidad
+- [x] 12. Módulo `accounting` — Reportes contables (US-17)
+  - [x] 12.1 Implementar casos de uso de contabilidad
     - `GetAggregatedReportUseCase`: calcula ingresos del periodo desde pagos `PAID` en Curated_Table; retorna total cero con mensaje si no hay pagos; sirve reportes históricos (> 24h) desde caché Redis (TTL 1h)
     - `GetIndividualReportUseCase`: reporte por unidad de portafolio; rechaza con 403 si rol es TENANT
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
 
-  - [ ] 12.2 Implementar `PrismaAccountingRepository` y `RedisReportCache`
+  - [x] 12.2 Implementar `PrismaAccountingRepository` y `RedisReportCache`
     - Lectura exclusiva de tablas curadas del esquema `accounting`
     - Cache-aside con TTL 1h para reportes históricos
     - _Requirements: 7.2, 7.4_
@@ -375,13 +375,13 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - **Propiedad 39: Reportes históricos servidos desde caché Redis con TTL 1 hora**
     - **Validates: Requirements 7.4**
 
-- [-] 13. Módulo `rental-tracking` — Seguimiento del proceso (US-18 a US-19)
-  - [ ] 13.1 Implementar dominio y puertos del módulo `rental-tracking`
+- [x] 13. Módulo `rental-tracking` — Seguimiento del proceso (US-18 a US-19)
+  - [x] 13.1 Implementar dominio y puertos del módulo `rental-tracking`
     - Máquina de estados: `PUBLISHED → CONTACT_INITIATED → CONTRACT_UPLOADED → CONTRACT_SIGNED → PAYMENT_RECEIVED`
     - Puerto de salida: `ITrackingRepository`, `INotificationPort`
     - _Requirements: 8.1, 8.2_
 
-  - [ ] 13.2 Implementar casos de uso de tracking
+  - [x] 13.2 Implementar casos de uso de tracking
     - `TransitionLeaseStateUseCase`: registra transición en `LeaseStatusHistory` con estado anterior, nuevo y timestamp; dispara notificación a ambas partes al transicionar a `CONTRACT_SIGNED` o `PAYMENT_RECEIVED`
     - `GetLeaseStatusUseCase`: retorna estado actual e historial; rechaza con 403 si usuario no es arrendador ni arrendatario del lease
     - `GetActiveLeasesSummaryUseCase`: retorna estado resumido de todos los leases activos del usuario (nombre inmueble, estado actual, fecha último cambio)
@@ -405,19 +405,19 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - **Validates: Requirements 8.7**
 
 
-- [-] 14. Módulo `notifications` — Sistema de notificaciones
-  - [ ] 14.1 Implementar dominio y puertos del módulo `notifications`
+- [x] 14. Módulo `notifications` — Sistema de notificaciones
+  - [x] 14.1 Implementar dominio y puertos del módulo `notifications`
     - Entidades: `NotificationType`, `NotificationPreference`
     - Puerto de salida: `INotificationRepository`, `IMessagingChannel`, `IAuditLogger`
     - Canales soportados: EMAIL, WHATSAPP
     - _Requirements: 9.1, 9.4_
 
-  - [ ] 14.2 Implementar casos de uso de notificaciones
+  - [x] 14.2 Implementar casos de uso de notificaciones
     - `SendNotificationUseCase`: determina canal preferido del usuario; envía por canal preferido; reintenta hasta 2 veces con backoff exponencial ante fallo del canal externo; persiste notificación con estado (SENT, FAILED, PENDING), canal, timestamp y evento origen; registra fallo definitivo en audit log sin interrumpir flujo principal
     - `UpdateNotificationPreferencesUseCase`: actualiza preferencias; aplica a notificaciones futuras sin afectar las ya encoladas
     - _Requirements: 9.2, 9.3, 9.4, 9.5, 9.6, 9.7_
 
-  - [ ] 14.3 Implementar `MessagingChannelAdapter`
+  - [x] 14.3 Implementar `MessagingChannelAdapter`
     - Circuit breaker con timeout 15s y 2 reintentos con backoff exponencial
     - Soporte para EMAIL y WHATSAPP
     - _Requirements: 9.3, 12.1, 12.3_
@@ -438,24 +438,24 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - **Propiedad 47: Cambio de preferencias aplica a notificaciones futuras**
     - **Validates: Requirements 9.7**
 
-- [ ] 15. Checkpoint — Módulos de tracking y notificaciones
+- [x] 15. Checkpoint — Módulos de tracking y notificaciones
   - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 16. ETL Cron Jobs — Transformación RAW → Curated por módulo
-  - [ ] 16.1 Implementar ETL job para módulo `users`
+- [x] 16. ETL Cron Jobs — Transformación RAW → Curated por módulo
+  - [x] 16.1 Implementar ETL job para módulo `users`
     - Cron job que selecciona registros `UsersRaw` con `processed = false`
     - Transforma payload JSONB a columnas tipadas en tablas curadas del esquema `users`
     - Marca registro como `processed = true` tras transformación exitosa; marca como `ETL_ERROR` con motivo si payload inválido
     - Continúa procesando demás registros ante errores individuales
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5_
 
-  - [ ] 16.2 Implementar ETL jobs para módulos `property-listings` y `landlord-portfolio`
+  - [x] 16.2 Implementar ETL jobs para módulos `property-listings` y `landlord-portfolio`
     - Misma lógica de transformación RAW → Curated para `PropertyListingsRaw` y `PortfolioRaw`
     - Garantizar que Curated_Tables sean la fuente de verdad para consultas de lectura
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5_
 
-  - [ ] 16.3 Implementar ETL jobs para módulos `payments`, `contracts`, `tracking_process`, `notifications`, `accounting`
+  - [x] 16.3 Implementar ETL jobs para módulos `payments`, `contracts`, `tracking_process`, `notifications`, `accounting`
     - ETL jobs para `PaymentsRaw`, `ContractsRaw`, `TrackingRaw`, `NotificationsRaw`, `AccountingRaw`
     - Garantizar separación de esquemas: ningún ETL realiza joins cross-schema
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 13.7_
@@ -465,29 +465,29 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - Usar `arbitraryRawPayload()` con 100 iteraciones por módulo
     - **Validates: Requirements 2.7, 10.2, 10.3, 10.6**
 
-- [ ] 17. Integración y cableado de módulos
-  - [ ] 17.1 Registrar todos los módulos en `AppModule` y configurar dependencias inter-módulo
+- [x] 17. Integración y cableado de módulos
+  - [x] 17.1 Registrar todos los módulos en `AppModule` y configurar dependencias inter-módulo
     - Registrar `UsersModule`, `PropertyListingsModule`, `LandlordPortfolioModule`, `ContractsModule`, `PaymentsModule`, `AccountingModule`, `RentalTrackingModule`, `NotificationsModule`
     - Configurar `INotificationPort` como adaptador compartido entre módulos que disparan notificaciones
     - Aplicar `JwtAuthGuard` y `ValidationInterceptor` globalmente
     - _Requirements: 11.1, 11.6_
 
-  - [ ] 17.2 Configurar controladores REST por módulo
+  - [x] 17.2 Configurar controladores REST por módulo
     - Controladores con decoradores `@UseGuards(JwtAuthGuard, RBACGuard)` por endpoint
     - Rutas: `/auth/*`, `/listings/*`, `/portfolio/*`, `/contracts/*`, `/payments/*`, `/accounting/*`, `/tracking/*`, `/notifications/*`
     - _Requirements: 11.1, 11.2_
 
-  - [ ] 17.3 Configurar seeds de base de datos
+  - [x] 17.3 Configurar seeds de base de datos
     - Seeds para roles (`LANDLORD`, `TENANT`), permisos por rol
     - Seeds para tipos de documento: `CC` (Cédula de Ciudadanía), `NIT` (Número de Identificación Tributaria), `CE` (Cédula de Extranjería), `PP` (Pasaporte), `TI` (Tarjeta de Identidad)
     - Seeds para estados de lease: `PUBLISHED`, `CONTACT_INITIATED`, `CONTRACT_UPLOADED`, `CONTRACT_SIGNED`, `PAYMENT_RECEIVED`
     - Seeds para estados de contrato: `PENDING`, `SIGNATURE_PENDING`, `SIGNED`
     - Seeds para estados de pago: `PENDING`, `PROCESSING`, `PAID`, `REJECTED`
     - Seeds para tipos de notificación: `NEW_INTEREST`, `CONTRACT_SIGNED`, `PAYMENT_RECEIVED`, `PAYMENT_DUE`
-    - Archivo en `db/seeds/`
+    - Archivo en `src/backend/db/seeds/`
     - _Requirements: 11.1, 8.1, 15.2_
 
-- [ ] 18. Checkpoint final — Integración completa
+- [x] 18. Checkpoint final — Integración completa
   - Ensure all tests pass, ask the user if questions arise.
 
 
