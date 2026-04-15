@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Auto Conventional Commit",
+  "description": "Stages all uncommitted changes and creates a conventional commit. Run this manually after completing a logical unit of work to avoid large uncommitted diffs.",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Run `git status --short` and `git diff --stat HEAD` to understand what has changed. Then group the changes by domain or concern (e.g. a module, config, docs). For each group, stage the relevant files and create a conventional commit using `git add <files> && git commit -m \"...\"`. Use conventional commit format: feat/fix/chore/docs/refactor/test(scope): description. Keep each commit focused on one concern. Do not create a single big commit for everything unless all changes are trivially related."
+  }
+}
