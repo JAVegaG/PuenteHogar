@@ -97,6 +97,7 @@ model UserRole {
   user User @relation(fields: [user_id], references: [id])
   role Role @relation(fields: [role_id], references: [id])
 
+  @@unique([user_id, role_id])
   @@schema("users")
 }
 
@@ -170,6 +171,7 @@ model Listing {
 
   photos Photo[]
 
+  @@unique([portfolio_unit_id, is_active])
   @@schema("property_listings")
 }
 
@@ -263,6 +265,7 @@ model Lease {
 
   portfolio_unit PortfolioUnit @relation(fields: [portfolio_unit_id], references: [id])
 
+  @@unique([portfolio_unit_id, end_date])
   @@schema("landlord_portfolio")
 }
 
