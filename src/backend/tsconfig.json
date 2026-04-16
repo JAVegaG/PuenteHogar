@@ -14,8 +14,10 @@
 	"skipLibCheck": true,
 	"noImplicitAny": false,
 	"removeComments": true,
+	"rootDir": ".",
 	"outDir": "./dist",
 	"isolatedModules": true,
+	"types": ["node", "jest"],
 	/* Linting */
 	"strict": true,
 	"strictNullChecks": true,
@@ -31,5 +33,5 @@
     }
   },
   "resolveJsonModule": true,
-  "include": ["modules", "src", "db"],
+  "include": ["modules", "src", "db", "jest.config.ts"],
 }
