@@ -34,7 +34,10 @@ src/backend/
 │       ├── decorators/         # @Roles(), @Public()
 │       ├── guards/             # JwtAuthGuard, RBACGuard
 │       ├── interceptors/       # ValidationInterceptor (XSS/SQL sanitization)
+│       │   └── validation-malicious-payload.spec.ts  # PBT Property 9: payloads maliciosos sanitizados
 │       ├── prisma/             # PrismaModule + PrismaService (singleton compartido)
+│       │   ├── prisma-migrations.spec.ts  # PBT Property 51: idempotencia de migraciones
+│       │   └── prisma-uniqueness.spec.ts  # PBT Property 50: restricciones de unicidad
 │       └── redis/              # RedisService (cache-aside con fallback)
 └── modules/
     ├── users/                  # Registro, login, RBAC
@@ -70,7 +73,6 @@ modules/{nombre}/
 | `CircuitBreakerFactory` | Instancia circuit breakers por tipo de integración externa |
 | `RedisService` | Cache-aside con fallback transparente a PostgreSQL |
 | `PrismaService` | Cliente Prisma singleton compartido entre módulos (`@src/shared/prisma/`) |
-| `PrismaService` | Cliente Prisma singleton compartido entre módulos (`@src/shared/prisma/`) |
 
 > Los módulos acceden a `shared/` mediante el alias `@src/shared/` (resuelto por `tsconfig.paths` como `@src/*` → `./src/*`).
 
@@ -103,6 +105,8 @@ modules/{nombre}/
 
 > **NodeNext import convention**: `"module": "NodeNext"` is set in `tsconfig.json` and the package has `"type": "module"`, so it runs as ESM. Relative imports **must** use `.js` extensions (e.g. `import './foo.js'`). Path-alias imports (`@src/...`, `@modules/...`) are resolved via `tsconfig.paths` as usual.
 
+> **`types`**: restricted to `["node", "jest"]` — only Node.js and Jest type definitions are included globally. This prevents ambient type pollution from other `@types/*` packages.
+
 > **`noImplicitAny`**: currently disabled in `tsconfig.json`. Parameters with implicit `any` types (e.g. Prisma transaction callbacks) are allowed but should be typed explicitly where possible.
 
 > **`strictPropertyInitialization`**: enabled. All class properties must be explicitly initialized in the constructor or marked with the definite assignment assertion (`!`). DTOs use `!` on decorated fields (e.g. `name!: string`) since `class-validator` decorators guarantee runtime presence.
@@ -115,12 +119,22 @@ Disponible en `http://localhost:{PORT}/api/docs` cuando el servidor está corrie
 - Todos los endpoints protegidos requieren `@ApiBearerAuth('JWT')`
 - Todos los controladores tienen `@ApiTags`, `@ApiOperation` y decoradores de respuesta por ruta
 
+## Testing
+
+Jest is configured in `jest.config.ts` with:
+- Roots: `src/` and `modules/`
+- Path aliases: `@src/*` → `./src/*`, `@modules/*` → `./modules/*` (mirrors `tsconfig.json`)
+- Transform: `ts-jest`
+- Test pattern: `*.spec.ts`
+
+Property-based tests use `fast-check` with `numRuns: 100` and traceability comments linking to spec requirements.
+
 ## Scripts
 
 ```bash
 npm run start:dev          # Servidor en modo desarrollo (watch)
 npm run build              # Build de producción
-npm run test               # Tests unitarios y de propiedades
+npm run test               # Tests unitarios y de propiedades (Jest)
 npm run lint               # ESLint
 npm run migration:run      # Aplica migraciones Prisma (desde src/backend/)
 npm run migration:generate # Genera nueva migración (desde src/backend/)

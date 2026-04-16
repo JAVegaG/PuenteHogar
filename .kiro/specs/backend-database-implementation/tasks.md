@@ -48,11 +48,11 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - `contracts`: `ContractStatus`, `Contract`, `ContractParty`, `FileType`, `FileStatus`, `File`, `SigningStatus`, `Signing`, `SigningLog`, `ContractsRaw`
     - _Requirements: 13.1, 13.3, 13.5, 14.4, 14.5, 14.7, 14.8_
 
-  - [ ]* 2.6 Test de propiedad: migraciones Prisma son idempotentes
+  - [x] 2.6 Test de propiedad: migraciones Prisma son idempotentes
     - **Propiedad 51: Migraciones Prisma son idempotentes**
     - **Validates: Requirements 13.7**
 
-  - [ ]* 2.7 Test de propiedad: restricciones de unicidad previenen duplicados
+  - [x] 2.7 Test de propiedad: restricciones de unicidad previenen duplicados
     - **Propiedad 50: Restricciones de unicidad en BD previenen duplicados**
     - **Validates: Requirements 13.4**
 
@@ -64,11 +64,11 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - Decoradores `@Roles()` y `@Public()` para configuración por endpoint
     - _Requirements: 1.8, 11.1_
 
-  - [ ]* 3.2 Test de propiedad: token JWT inválido retorna 401
+  - [x] 3.2 Test de propiedad: token JWT inválido retorna 401
     - **Propiedad 8: Token JWT inválido o expirado retorna 401 en endpoints protegidos**
     - **Validates: Requirements 1.8**
 
-  - [ ]* 3.3 Test de propiedad: rol incorrecto recibe 403
+  - [x] 3.3 Test de propiedad: rol incorrecto recibe 403
     - **Propiedad 11: RBAC — rol incorrecto recibe 403 en endpoints restringidos**
     - **Validates: Requirements 2.2, 7.5, 11.1**
 
@@ -78,7 +78,7 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - Formato de error consistente: `{ statusCode, message, errors? }`
     - _Requirements: 1.9, 11.6_
 
-  - [ ]* 3.5 Test de propiedad: payloads maliciosos son sanitizados o rechazados
+  - [x] 3.5 Test de propiedad: payloads maliciosos son sanitizados o rechazados
     - **Propiedad 9: Payloads maliciosos son sanitizados o rechazados en el boundary de la API**
     - Usar `arbitraryMaliciousPayload()` con patrones SQL injection y XSS
     - **Validates: Requirements 1.9, 11.6**
@@ -88,7 +88,7 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - Garantizar que los logs no contengan PII en texto plano (usar IDs anonimizados)
     - _Requirements: 11.7, 11.8_
 
-  - [ ]* 3.7 Test de propiedad: acción sensible registrada en log de auditoría sin PII
+  - [x] 3.7 Test de propiedad: acción sensible registrada en log de auditoría sin PII
     - **Propiedad 52: Acción sensible registrada en log de auditoría con usuario, acción, recurso y timestamp**
     - **Validates: Requirements 11.7, 11.8**
 
@@ -97,11 +97,11 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - `RedisService`: cliente Redis compartido con patrón cache-aside y fallback a PostgreSQL
     - _Requirements: 12.1, 12.2, 12.3_
 
-  - [ ]* 3.9 Test de propiedad: circuit breaker se abre ante fallos repetidos
+  - [x] 3.9 Test de propiedad: circuit breaker se abre ante fallos repetidos
     - **Propiedad 48: Circuit Breaker se abre ante fallos repetidos y retorna degradación controlada**
     - **Validates: Requirements 12.1, 12.2**
 
-  - [ ]* 3.10 Test de propiedad: llamadas a servicios externos canceladas al superar timeout
+  - [x] 3.10 Test de propiedad: llamadas a servicios externos canceladas al superar timeout
     - **Propiedad 49: Llamadas a servicios externos son canceladas al superar el timeout configurado**
     - **Validates: Requirements 12.3**
 
@@ -129,37 +129,37 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - Endpoint `GET /auth/document-types` expuesto públicamente en `UsersController`
     - _Requirements: 1.6, 1.7, 1.10, 1.11, 15.3_
 
-  - [ ]* 5.4 Test de propiedad: registro con datos válidos crea cuenta con rol asignado
+  - [x] 5.4 Test de propiedad: registro con datos válidos crea cuenta con rol asignado
     - **Propiedad 1: Registro de usuario con datos válidos crea cuenta con rol asignado**
     - Usar `arbitraryValidUser()` con 100 iteraciones
     - **Validates: Requirements 1.1**
 
-  - [ ]* 5.5 Test de propiedad: correo duplicado rechazado con 409
+  - [x] 5.5 Test de propiedad: correo duplicado rechazado con 409
     - **Propiedad 2: Correo duplicado es rechazado con 409**
     - **Validates: Requirements 1.2**
 
-  - [ ]* 5.6 Test de propiedad: campos inválidos retornan 400 con detalle
+  - [x] 5.6 Test de propiedad: campos inválidos retornan 400 con detalle
     - **Propiedad 3: Campos inválidos o ausentes retornan 400 con detalle**
     - Usar `arbitraryInvalidRegistrationDto()`
     - **Validates: Requirements 1.3**
 
-  - [ ]* 5.7 Test de propiedad: login con credenciales válidas retorna JWT con rol e id
+  - [x] 5.7 Test de propiedad: login con credenciales válidas retorna JWT con rol e id
     - **Propiedad 4: Login con credenciales válidas retorna JWT con rol e id**
     - **Validates: Requirements 1.4**
 
-  - [ ]* 5.8 Test de propiedad: credenciales incorrectas retornan 401 con mensaje genérico
+  - [x] 5.8 Test de propiedad: credenciales incorrectas retornan 401 con mensaje genérico
     - **Propiedad 5: Credenciales incorrectas retornan 401 con mensaje genérico**
     - **Validates: Requirements 1.5**
 
-  - [ ]* 5.9 Test de propiedad: contraseñas almacenadas como hash bcrypt
+  - [x] 5.9 Test de propiedad: contraseñas almacenadas como hash bcrypt
     - **Propiedad 6: Contraseñas almacenadas como hash bcrypt, nunca en texto plano**
     - **Validates: Requirements 1.6**
 
-  - [ ]* 5.10 Test de propiedad: campos PII cifrados en reposo
+  - [x] 5.10 Test de propiedad: campos PII cifrados en reposo
     - **Propiedad 7: Campos PII cifrados en reposo**
     - **Validates: Requirements 1.7, 11.5**
 
-  - [ ]* 5.11 Test de propiedad: log de auditoría de login fallido sin PII
+  - [x] 5.11 Test de propiedad: log de auditoría de login fallido sin PII
     - **Propiedad 10: Log de auditoría de login fallido contiene timestamp e IP sin PII**
     - **Validates: Requirements 1.10, 11.8**
 
@@ -181,16 +181,16 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - CRUD sobre esquema `landlord_portfolio`
     - _Requirements: 2.1, 2.4_
 
-  - [ ]* 6.4 Test de propiedad: resource ownership — usuario solo accede a sus propios recursos
+  - [x] 6.4 Test de propiedad: resource ownership — usuario solo accede a sus propios recursos
     - **Propiedad 12: Resource ownership — usuario solo accede a sus propios recursos**
     - Cubrir portafolio, contratos, pagos, leases
     - **Validates: Requirements 2.3, 2.5, 3.12, 5.3, 5.11, 6.9, 8.3, 8.4, 11.2, 11.3**
 
-  - [ ]* 6.5 Test de propiedad: actualización de unidad de portafolio persiste cambios (round-trip)
+  - [x] 6.5 Test de propiedad: actualización de unidad de portafolio persiste cambios (round-trip)
     - **Propiedad 13: Actualización de unidad de portafolio persiste cambios (round-trip)**
     - **Validates: Requirements 2.4**
 
-  - [ ]* 6.6 Test de propiedad: datos de entrada persisten en RAW_Table antes de transformación
+  - [x] 6.6 Test de propiedad: datos de entrada persisten en RAW_Table antes de transformación
     - **Propiedad 14: Datos de entrada se persisten en RAW_Table antes de transformación**
     - Usar `arbitraryRawPayload()`
     - **Validates: Requirements 2.6, 6.10, 10.1**
@@ -220,40 +220,40 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - `ObjectStorageAdapter`: upload de fotos, retorna URL de referencia
     - _Requirements: 3.3, 3.9, 3.10_
 
-  - [ ]* 7.5 Test de propiedad: publicación sin foto rechazada con 422
+  - [ ] 7.5 Test de propiedad: publicación sin foto rechazada con 422
     - **Propiedad 16: Publicación sin foto es rechazada con 422**
     - **Validates: Requirements 3.2**
 
-  - [ ]* 7.6 Test de propiedad: fotos almacenadas en object storage — BD contiene solo URLs
+  - [x] 7.6 Test de propiedad: fotos almacenadas en object storage — BD contiene solo URLs
     - **Propiedad 17: Fotos almacenadas en object storage — BD contiene solo URLs**
     - **Validates: Requirements 3.3**
 
-  - [ ]* 7.7 Test de propiedad: listado público retorna solo PUBLISHED con al menos una foto
+  - [x] 7.7 Test de propiedad: listado público retorna solo PUBLISHED con al menos una foto
     - **Propiedad 18: Listado público retorna solo publicaciones PUBLISHED con al menos una foto**
     - Usar `fc.array(arbitraryListing())`
     - **Validates: Requirements 3.1, 3.4, 3.8**
 
-  - [ ]* 7.8 Test de propiedad: filtro por zona retorna solo inmuebles de esa zona
+  - [x] 7.8 Test de propiedad: filtro por zona retorna solo inmuebles de esa zona
     - **Propiedad 19: Filtro por zona retorna solo inmuebles de esa zona**
     - **Validates: Requirements 3.5**
 
-  - [ ]* 7.9 Test de propiedad: detalle de inmueble contiene todos los campos requeridos
+  - [x] 7.9 Test de propiedad: detalle de inmueble contiene todos los campos requeridos
     - **Propiedad 20: Detalle de inmueble contiene todos los campos requeridos**
     - **Validates: Requirements 3.6, 3.7**
 
-  - [ ]* 7.10 Test de propiedad: despublicar inmueble lo remueve del listado público
+  - [x] 7.10 Test de propiedad: despublicar inmueble lo remueve del listado público
     - **Propiedad 21: Despublicar inmueble lo remueve del listado público (round-trip)**
     - **Validates: Requirements 3.11**
 
-  - [ ]* 7.11 Test de propiedad: caché Redis sirve listado con TTL 5 minutos
+  - [x] 7.11 Test de propiedad: caché Redis sirve listado con TTL 5 minutos
     - **Propiedad 22: Caché Redis sirve listado con TTL 5 minutos**
     - **Validates: Requirements 3.9**
 
-  - [ ]* 7.12 Test de propiedad: evento de contacto registra inmueble, arrendatario y timestamp
+  - [x] 7.12 Test de propiedad: evento de contacto registra inmueble, arrendatario y timestamp
     - **Propiedad 23: Evento de contacto registra inmueble, arrendatario y timestamp**
     - **Validates: Requirements 4.1**
 
-  - [ ]* 7.13 Test de propiedad: evento de contacto dispara notificación al arrendador
+  - [x] 7.13 Test de propiedad: evento de contacto dispara notificación al arrendador
     - **Propiedad 24: Evento de contacto dispara notificación al arrendador**
     - **Validates: Requirements 4.2**
 
@@ -280,31 +280,31 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - Estado intermedio `SIGNATURE_PENDING` ante circuit abierto
     - _Requirements: 5.7, 12.1, 12.3_
 
-  - [ ]* 9.4 Test de propiedad: contrato PDF almacenado en object storage con referencia en BD
+  - [x] 9.4 Test de propiedad: contrato PDF almacenado en object storage con referencia en BD
     - **Propiedad 25: Contrato PDF almacenado en object storage con referencia en BD (round-trip)**
     - **Validates: Requirements 5.1**
 
-  - [ ]* 9.5 Test de propiedad: archivo inválido rechazado con 422
+  - [x] 9.5 Test de propiedad: archivo inválido rechazado con 422
     - **Propiedad 26: Archivo inválido (no PDF o > 10MB) es rechazado con 422**
     - **Validates: Requirements 5.2**
 
-  - [ ]* 9.6 Test de propiedad: resumen de contrato contiene campos clave y URL
+  - [x] 9.6 Test de propiedad: resumen de contrato contiene campos clave y URL
     - **Propiedad 27: Resumen de contrato contiene campos clave y URL del documento**
     - **Validates: Requirements 5.4**
 
-  - [ ]* 9.7 Test de propiedad: firma exitosa actualiza estado a SIGNED con metadatos
+  - [x] 9.7 Test de propiedad: firma exitosa actualiza estado a SIGNED con metadatos
     - **Propiedad 28: Firma exitosa actualiza estado del contrato a SIGNED con metadatos**
     - **Validates: Requirements 5.6**
 
-  - [ ]* 9.8 Test de propiedad: contrato SIGNED dispara notificación a ambas partes
+  - [x] 9.8 Test de propiedad: contrato SIGNED dispara notificación a ambas partes
     - **Propiedad 29: Contrato SIGNED dispara notificación a ambas partes**
     - **Validates: Requirements 5.8**
 
-  - [ ]* 9.9 Test de propiedad: eventos de firma registrados en log de auditoría
+  - [x] 9.9 Test de propiedad: eventos de firma registrados en log de auditoría
     - **Propiedad 30: Eventos de firma registrados en log de auditoría**
     - **Validates: Requirements 5.9**
 
-  - [ ]* 9.10 Test de propiedad: contrato SIGNED es inmutable
+  - [x] 9.10 Test de propiedad: contrato SIGNED es inmutable
     - **Propiedad 31: Contrato SIGNED es inmutable — no permite modificaciones**
     - **Validates: Requirements 5.10**
 
@@ -327,28 +327,28 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - Estado intermedio `PROCESSING` ante circuit abierto
     - _Requirements: 6.1, 6.2, 6.5, 6.11, 12.1, 12.3_
 
-  - [ ]* 10.4 Test de propiedad: idempotency key única previene transacciones duplicadas
+  - [x] 10.4 Test de propiedad: idempotency key única previene transacciones duplicadas
     - **Propiedad 32: Idempotency Key única por transacción de pago previene duplicados**
     - **Validates: Requirements 6.1, 6.2**
 
-  - [ ]* 10.5 Test de propiedad: pago confirmado actualiza estado a PAID con metadatos
+  - [x] 10.5 Test de propiedad: pago confirmado actualiza estado a PAID con metadatos
     - **Propiedad 33: Pago confirmado actualiza estado a PAID con metadatos completos**
     - Usar `arbitraryPaymentEvent()`
     - **Validates: Requirements 6.3**
 
-  - [ ]* 10.6 Test de propiedad: pago rechazado mantiene estado PENDING
+  - [x] 10.6 Test de propiedad: pago rechazado mantiene estado PENDING
     - **Propiedad 34: Pago rechazado mantiene estado PENDING**
     - **Validates: Requirements 6.4**
 
-  - [ ]* 10.7 Test de propiedad: cada evento de pago genera registro en payment_logs
+  - [x] 10.7 Test de propiedad: cada evento de pago genera registro en payment_logs
     - **Propiedad 35: Cada evento de pago genera registro en payment_logs con campos requeridos**
     - **Validates: Requirements 6.6**
 
-  - [ ]* 10.8 Test de propiedad: pago confirmado dispara notificación al arrendador
+  - [x] 10.8 Test de propiedad: pago confirmado dispara notificación al arrendador
     - **Propiedad 36: Pago confirmado dispara notificación al arrendador**
     - **Validates: Requirements 6.7**
 
-  - [ ]* 10.9 Test de propiedad: historial de pagos retorna solo pagos del usuario solicitante
+  - [x] 10.9 Test de propiedad: historial de pagos retorna solo pagos del usuario solicitante
     - **Propiedad 37: Historial de pagos retorna solo pagos del usuario solicitante, ordenados por fecha desc**
     - **Validates: Requirements 6.8**
 
@@ -367,11 +367,11 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - Cache-aside con TTL 1h para reportes históricos
     - _Requirements: 7.2, 7.4_
 
-  - [ ]* 12.3 Test de propiedad: reporte contable agrega correctamente pagos PAID del periodo
+  - [x] 12.3 Test de propiedad: reporte contable agrega correctamente pagos PAID del periodo
     - **Propiedad 38: Reporte contable agrega correctamente pagos PAID del periodo**
     - **Validates: Requirements 7.1, 7.2**
 
-  - [ ]* 12.4 Test de propiedad: reportes históricos servidos desde caché Redis con TTL 1 hora
+  - [x] 12.4 Test de propiedad: reportes históricos servidos desde caché Redis con TTL 1 hora
     - **Propiedad 39: Reportes históricos servidos desde caché Redis con TTL 1 hora**
     - **Validates: Requirements 7.4**
 
@@ -387,20 +387,20 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - `GetActiveLeasesSummaryUseCase`: retorna estado resumido de todos los leases activos del usuario (nombre inmueble, estado actual, fecha último cambio)
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6_
 
-  - [ ]* 13.3 Test de propiedad: estado actual del Lease siempre es un valor válido del enum
+  - [x] 13.3 Test de propiedad: estado actual del Lease siempre es un valor válido del enum
     - **Propiedad 40: Estado actual del Lease siempre es un valor válido del enum**
     - Usar `arbitraryLeaseState()`
     - **Validates: Requirements 8.1**
 
-  - [ ]* 13.4 Test de propiedad: transición de estado registra estado anterior, nuevo y timestamp
+  - [x] 13.4 Test de propiedad: transición de estado registra estado anterior, nuevo y timestamp
     - **Propiedad 41: Transición de estado del Lease registra estado anterior, nuevo y timestamp**
     - **Validates: Requirements 8.2**
 
-  - [ ]* 13.5 Test de propiedad: transición a CONTRACT_SIGNED o PAYMENT_RECEIVED dispara notificación
+  - [x] 13.5 Test de propiedad: transición a CONTRACT_SIGNED o PAYMENT_RECEIVED dispara notificación
     - **Propiedad 42: Transición a CONTRACT_SIGNED o PAYMENT_RECEIVED dispara notificación a ambas partes**
     - **Validates: Requirements 8.5**
 
-  - [ ]* 13.6 Test de propiedad: estado curado del Lease coherente con último registro del historial
+  - [x] 13.6 Test de propiedad: estado curado del Lease coherente con último registro del historial
     - **Propiedad 43: Estado curado del Lease es coherente con el último registro del historial**
     - **Validates: Requirements 8.7**
 
@@ -422,19 +422,19 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - Soporte para EMAIL y WHATSAPP
     - _Requirements: 9.3, 12.1, 12.3_
 
-  - [ ]* 14.4 Test de propiedad: notificación enviada por el canal preferido del usuario
+  - [x] 14.4 Test de propiedad: notificación enviada por el canal preferido del usuario
     - **Propiedad 44: Notificación enviada por el canal preferido del usuario**
     - **Validates: Requirements 9.2**
 
-  - [ ]* 14.5 Test de propiedad: notificación persistida con estado, canal, timestamp y evento origen
+  - [x] 14.5 Test de propiedad: notificación persistida con estado, canal, timestamp y evento origen
     - **Propiedad 45: Notificación persistida con estado, canal, timestamp y evento origen**
     - **Validates: Requirements 9.4**
 
-  - [ ]* 14.6 Test de propiedad: preferencias desactivadas previenen envío por ese canal
+  - [x] 14.6 Test de propiedad: preferencias desactivadas previenen envío por ese canal
     - **Propiedad 46: Preferencias de notificación desactivadas previenen envío por ese canal**
     - **Validates: Requirements 9.6**
 
-  - [ ]* 14.7 Test de propiedad: cambio de preferencias aplica a notificaciones futuras
+  - [x] 14.7 Test de propiedad: cambio de preferencias aplica a notificaciones futuras
     - **Propiedad 47: Cambio de preferencias aplica a notificaciones futuras**
     - **Validates: Requirements 9.7**
 
@@ -460,7 +460,7 @@ Implementación incremental del monolito modular NestJS con arquitectura hexagon
     - Garantizar separación de esquemas: ningún ETL realiza joins cross-schema
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 13.7_
 
-  - [ ]* 16.4 Test de propiedad: ETL round-trip — contenido curado equivalente al RAW original
+  - [x] 16.4 Test de propiedad: ETL round-trip — contenido curado equivalente al RAW original
     - **Propiedad 15: ETL round-trip — contenido curado es equivalente al RAW original**
     - Usar `arbitraryRawPayload()` con 100 iteraciones por módulo
     - **Validates: Requirements 2.7, 10.2, 10.3, 10.6**
