@@ -38,4 +38,16 @@ export class ListingResponseDto {
 
   @ApiProperty({ type: [ListingPhotoDto] })
   photos!: ListingPhotoDto[];
+
+  @ApiPropertyOptional({ nullable: true })
+  numberOfRooms!: number | null;
+
+  @ApiPropertyOptional({ nullable: true })
+  numberOfBathrooms!: number | null;
+
+  @ApiPropertyOptional({ nullable: true })
+  propertyType!: string | null;
+
+  @ApiPropertyOptional({ nullable: true })
+  neighborhood!: string | null;
 }

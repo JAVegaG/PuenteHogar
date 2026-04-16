@@ -7,6 +7,7 @@ import {
   type IListingRepository,
   ListingDetail,
   ListingFilters,
+  PaginatedListings,
 } from '@modules/property-listings/domain/ports/listing-repository.port';
 
 @Injectable()
@@ -39,51 +40,159 @@ export class PrismaListingRepository implements IListingRepository {
     return this.toEntity(listing);
   }
 
-  async findPublished(filters: ListingFilters): Promise<ListingEntity[]> {
-    const hasAddressFilter = filters.city || filters.neighborhood;
+  async findPublished(filters: ListingFilters): Promise<PaginatedListings> {
+    const page = filters.page ?? 1;
+    const pageSize = filters.pageSize ?? 9;
 
-    if (hasAddressFilter) {
-      // Two-step query: find matching property IDs via Address, then find PortfolioUnit IDs,
-      // then filter listings by portfolio_unit_id
-      const addresses = await this.prisma.address.findMany({
-        where: {
-          ...(filters.city && { city: { contains: filters.city, mode: 'insensitive' } }),
-          ...(filters.neighborhood && { neighborhood: { contains: filters.neighborhood, mode: 'insensitive' } }),
-        },
-        select: { property_id: true },
+    // --- Step 1: Resolve property-level filters via cross-schema lookups ---
+    // Determine which portfolio_unit_ids satisfy property/address filters
+    let constrainedUnitIds: string[] | null = null; // null = no property-level constraint
+    const hasPropertyFilter =
+      filters.city ||
+      filters.neighborhood ||
+      filters.propertyType ||
+      filters.rooms !== undefined ||
+      filters.bathrooms !== undefined ||
+      filters.areaMin !== undefined ||
+      filters.areaMax !== undefined;
+
+    if (hasPropertyFilter) {
+      // Start from Address if city/neighborhood filters exist
+      let propertyIds: string[] | null = null;
+
+      if (filters.city || filters.neighborhood) {
+        const addresses = await this.prisma.address.findMany({
+          where: {
+            ...(filters.city && { city: { contains: filters.city, mode: 'insensitive' as const } }),
+            ...(filters.neighborhood && { neighborhood: { contains: filters.neighborhood, mode: 'insensitive' as const } }),
+          },
+          select: { property_id: true },
+        });
+        propertyIds = addresses.map((a) => a.property_id);
+        if (propertyIds.length === 0) return { data: [], total: 0 };
+      }
+
+      // Filter properties by type, rooms, bathrooms, area
+      const propertyWhere: Record<string, unknown> = {};
+      if (propertyIds) propertyWhere.id = { in: propertyIds };
+      if (filters.propertyType) propertyWhere.property_type = filters.propertyType;
+      if (filters.rooms !== undefined) propertyWhere.number_of_rooms = filters.rooms;
+      if (filters.bathrooms !== undefined) propertyWhere.number_of_bathrooms = filters.bathrooms;
+
+      const properties = await this.prisma.property.findMany({
+        where: propertyWhere,
+        select: { id: true, length: true, width: true },
       });
 
-      const propertyIds = addresses.map((a) => a.property_id);
+      // Apply area filter in memory (area = length × width)
+      let filteredPropertyIds = properties
+        .filter((p) => {
+          if (filters.areaMin !== undefined || filters.areaMax !== undefined) {
+            if (p.length === null || p.width === null) return false;
+            const area = Number(p.length) * Number(p.width);
+            if (filters.areaMin !== undefined && area < filters.areaMin) return false;
+            if (filters.areaMax !== undefined && area > filters.areaMax) return false;
+          }
+          return true;
+        })
+        .map((p) => p.id);
 
-      if (propertyIds.length === 0) return [];
+      if (filteredPropertyIds.length === 0) return { data: [], total: 0 };
 
-      // Find PortfolioUnits referencing those properties (cross-schema, no FK)
+      // Resolve PortfolioUnit IDs from the filtered properties
       const units = await this.prisma.portfolioUnit.findMany({
-        where: { property_id: { in: propertyIds } },
+        where: { property_id: { in: filteredPropertyIds } },
         select: { id: true },
       });
 
-      const unitIds = units.map((u) => u.id);
-      if (unitIds.length === 0) return [];
-
-      const listings = await this.prisma.listing.findMany({
-        where: {
-          is_active: true,
-          portfolio_unit_id: { in: unitIds },
-        },
-        include: { photos: true },
-      });
-
-      return listings.map((l) => this.toEntity(l));
+      constrainedUnitIds = units.map((u) => u.id);
+      if (constrainedUnitIds.length === 0) return { data: [], total: 0 };
     }
 
-    // No address filter — return all active listings
+    // --- Step 2: Build Listing query with remaining filters ---
+    const listingWhere: Record<string, unknown> = { is_active: true };
+
+    if (constrainedUnitIds) {
+      listingWhere.portfolio_unit_id = { in: constrainedUnitIds };
+    }
+
+    // Price filters
+    if (filters.priceMin !== undefined || filters.priceMax !== undefined) {
+      const priceFilter: Record<string, number> = {};
+      if (filters.priceMin !== undefined) priceFilter.gte = filters.priceMin;
+      if (filters.priceMax !== undefined) priceFilter.lte = filters.priceMax;
+      listingWhere.price = priceFilter;
+    }
+
+    // publishedWithin filter
+    if (filters.publishedWithin && filters.publishedWithin !== 'any') {
+      const now = new Date();
+      const thresholds: Record<string, number> = {
+        '24h': 24 * 60 * 60 * 1000,
+        '7d': 7 * 24 * 60 * 60 * 1000,
+        '30d': 30 * 24 * 60 * 60 * 1000,
+        '90d': 90 * 24 * 60 * 60 * 1000,
+      };
+      const ms = thresholds[filters.publishedWithin];
+      if (ms) {
+        listingWhere.listing_date = { gte: new Date(now.getTime() - ms) };
+      }
+    }
+
+    // --- Step 3: Get total count ---
+    const total = await this.prisma.listing.count({ where: listingWhere });
+
+    if (total === 0) return { data: [], total: 0 };
+
+    // --- Step 4: Sorting ---
+    const orderBy: Record<string, string> = {};
+    const sortBy = filters.sortBy ?? 'date';
+    const sortOrder = filters.sortOrder ?? 'desc';
+    if (sortBy === 'price') {
+      orderBy.price = sortOrder;
+    } else {
+      orderBy.listing_date = sortOrder;
+    }
+
+    // --- Step 5: Paginated query ---
+    const skip = (page - 1) * pageSize;
     const listings = await this.prisma.listing.findMany({
-      where: { is_active: true },
+      where: listingWhere,
       include: { photos: true },
+      orderBy,
+      skip,
+      take: pageSize,
     });
 
-    return listings.map((l) => this.toEntity(l));
+    // --- Step 6: Enrich each listing with Property + Address data ---
+    const unitIds = [...new Set(listings.map((l) => l.portfolio_unit_id))];
+    const units = await this.prisma.portfolioUnit.findMany({
+      where: { id: { in: unitIds } },
+      select: { id: true, property_id: true },
+    });
+    const unitToPropertyId = new Map(units.map((u) => [u.id, u.property_id]));
+
+    const propertyIds = [...new Set(units.map((u) => u.property_id))];
+    const propertiesWithAddr = await this.prisma.property.findMany({
+      where: { id: { in: propertyIds } },
+      include: { address: true },
+    });
+    const propertyMap = new Map(propertiesWithAddr.map((p) => [p.id, p]));
+
+    const enrichedListings = listings.map((listing) => {
+      const propertyId = unitToPropertyId.get(listing.portfolio_unit_id);
+      const property = propertyId ? propertyMap.get(propertyId) : undefined;
+
+      return this.toEntity(
+        listing,
+        property?.number_of_rooms ?? null,
+        property?.number_of_bathrooms ?? null,
+        property?.property_type ?? null,
+        property?.address?.neighborhood ?? null,
+      );
+    });
+
+    return { data: enrichedListings, total };
   }
 
   async findById(id: string): Promise<ListingEntity | null> {
@@ -213,6 +322,10 @@ export class PrismaListingRepository implements IListingRepository {
         is_main: boolean;
       }[];
     },
+    numberOfRooms: number | null = null,
+    numberOfBathrooms: number | null = null,
+    propertyType: string | null = null,
+    neighborhood: string | null = null,
   ): ListingEntity {
     const price =
       typeof listing.price === 'object' && 'toNumber' in listing.price
@@ -233,6 +346,10 @@ export class PrismaListingRepository implements IListingRepository {
       listing.currency,
       listing.is_active,
       photos,
+      numberOfRooms,
+      numberOfBathrooms,
+      propertyType,
+      neighborhood,
     );
   }
 }

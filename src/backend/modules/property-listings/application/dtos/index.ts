@@ -3,3 +3,4 @@ export * from './listing-filters.dto';
 export * from './listing-response.dto';
 export * from './listing-detail-response.dto';
 export * from './contact-event.dto';
+export * from './paginated-listings-response.dto';

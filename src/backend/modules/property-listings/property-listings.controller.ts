@@ -19,6 +19,7 @@ import { ContactEventDto } from './application/dtos/contact-event.dto';
 import { CreateListingDto } from './application/dtos/create-listing.dto';
 import { ListingFiltersDto } from './application/dtos/listing-filters.dto';
 import { ListingResponseDto } from './application/dtos/listing-response.dto';
+import { PaginatedListingsResponseDto } from './application/dtos/paginated-listings-response.dto';
 import { ListingDetailResponseDto } from './application/dtos/listing-detail-response.dto';
 import { CreateListingUseCase, UploadedFile } from './application/use-cases/create-listing.use-case';
 import { GetListingDetailUseCase } from './application/use-cases/get-listing-detail.use-case';
@@ -49,7 +50,7 @@ export class PropertyListingsController {
 
   @Get()
   @ApiOperation({ summary: 'Buscar inmuebles publicados', description: 'Retorna el listado de inmuebles activos. Accesible sin autenticación.' })
-  @ApiOkResponse({ description: 'Listado de inmuebles', type: [ListingResponseDto] })
+  @ApiOkResponse({ description: 'Listado paginado de inmuebles', type: PaginatedListingsResponseDto })
   search(@Query() filters: ListingFiltersDto) {
     return this.searchListingsUseCase.execute(filters);
   }

@@ -5,6 +5,7 @@ import type { IListingRepository } from '@modules/property-listings/domain/ports
 import { LISTING_CACHE, LISTING_REPOSITORY } from '@modules/property-listings/application/use-cases/create-listing.use-case';
 import { ListingFiltersDto } from '@modules/property-listings/application/dtos/listing-filters.dto';
 import { ListingResponseDto } from '@modules/property-listings/application/dtos/listing-response.dto';
+import { PaginatedListingsResponseDto } from '@modules/property-listings/application/dtos/paginated-listings-response.dto';
 
 const CACHE_TTL_SECONDS = 300;
 
@@ -17,20 +18,32 @@ export class SearchListingsUseCase {
     private readonly cache: IListingCache,
   ) {}
 
-  async execute(filters: ListingFiltersDto): Promise<ListingResponseDto[]> {
+  async execute(filters: ListingFiltersDto): Promise<PaginatedListingsResponseDto> {
+    const page = filters.page ?? 1;
+    const pageSize = filters.pageSize ?? 9;
     const cacheKey = 'listings:published:' + JSON.stringify(filters);
 
     const cached = await this.cache.getListings(cacheKey);
     if (cached) {
-      return cached.map((l) => this.toResponseDto(l));
+      const result = new PaginatedListingsResponseDto();
+      result.data = cached.map((l) => this.toResponseDto(l));
+      result.total = cached.length;
+      result.page = page;
+      result.pageSize = pageSize;
+      return result;
     }
 
-    const listings = await this.repository.findPublished(filters);
+    const { data, total } = await this.repository.findPublished(filters);
     // Req 3.4, 3.8: only listings with at least one photo
-    const withPhotos = listings.filter((l) => l.photos.length > 0);
+    const withPhotos = data.filter((l) => l.photos.length > 0);
     await this.cache.setListings(cacheKey, withPhotos, CACHE_TTL_SECONDS);
 
-    return withPhotos.map((l) => this.toResponseDto(l));
+    const result = new PaginatedListingsResponseDto();
+    result.data = withPhotos.map((l) => this.toResponseDto(l));
+    result.total = total;
+    result.page = page;
+    result.pageSize = pageSize;
+    return result;
   }
 
   private toResponseDto(entity: ListingEntity): ListingResponseDto {
@@ -48,6 +61,10 @@ export class SearchListingsUseCase {
       fileUrl: p.fileUrl,
       isMain: p.isMain,
     }));
+    dto.numberOfRooms = entity.numberOfRooms;
+    dto.numberOfBathrooms = entity.numberOfBathrooms;
+    dto.propertyType = entity.propertyType;
+    dto.neighborhood = entity.neighborhood;
     return dto;
   }
 }

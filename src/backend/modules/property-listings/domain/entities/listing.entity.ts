@@ -11,5 +11,9 @@ export class ListingEntity {
     public readonly currency: string,
     public readonly isActive: boolean,
     public readonly photos: PhotoEntity[],
+    public readonly numberOfRooms: number | null = null,
+    public readonly numberOfBathrooms: number | null = null,
+    public readonly propertyType: string | null = null,
+    public readonly neighborhood: string | null = null,
   ) {}
 }
