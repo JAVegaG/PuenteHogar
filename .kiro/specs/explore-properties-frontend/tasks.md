@@ -8,28 +8,28 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
 
 ## Tareas
 
-- [ ] 1. Ampliar el endpoint backend `GET /listings` con filtros, ordenamiento y paginación
+- [x] 1. Ampliar el endpoint backend `GET /listings` con filtros, ordenamiento y paginación
   - **Nota:** Cada modificación al backend debe ser revisada/aprobada antes de implementarse.
 
-  - [ ] 1.1 Actualizar `ListingFiltersDto` con nuevos parámetros de filtrado, ordenamiento y paginación
+  - [x] 1.1 Actualizar `ListingFiltersDto` con nuevos parámetros de filtrado, ordenamiento y paginación
     - Agregar campos: `propertyType`, `priceMin`, `priceMax`, `rooms`, `bathrooms`, `areaMin`, `areaMax`, `publishedWithin`, `sortBy`, `sortOrder`, `page`, `pageSize`
     - Incluir decoradores `@IsOptional`, `@IsString`, `@IsNumber`, `@IsIn`, `@Type(() => Number)` y `@ApiPropertyOptional` en cada campo
     - Archivo: `src/backend/modules/property-listings/application/dtos/listing-filters.dto.ts`
     - _Requisitos: 6.1, 6.2, 6.3, 6.4, 6.8_
 
-  - [ ] 1.2 Crear DTO `PaginatedListingsResponseDto` y enriquecer `ListingResponseDto`
+  - [x] 1.2 Crear DTO `PaginatedListingsResponseDto` y enriquecer `ListingResponseDto`
     - Agregar campos `numberOfRooms`, `numberOfBathrooms`, `propertyType`, `neighborhood` a `ListingResponseDto`
     - Crear `PaginatedListingsResponseDto` con `data: ListingResponseDto[]`, `total`, `page`, `pageSize`
     - Archivos: `src/backend/modules/property-listings/application/dtos/listing-response.dto.ts`, nuevo `paginated-listings-response.dto.ts`
     - _Requisitos: 6.5, 6.6, 6.7_
 
-  - [ ] 1.3 Actualizar la interfaz `IListingRepository` y el port `ListingFilters`
+  - [x] 1.3 Actualizar la interfaz `IListingRepository` y el port `ListingFilters`
     - Extender `ListingFilters` con los nuevos campos de filtrado, ordenamiento y paginación
     - Actualizar la firma de `findPublished` para retornar `{ data: ListingEntity[], total: number }` con datos enriquecidos de `Property` y `Address`
     - Archivo: `src/backend/modules/property-listings/domain/ports/listing-repository.port.ts`
     - _Requisitos: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7_
 
-  - [ ] 1.4 Implementar filtros avanzados, ordenamiento, paginación y datos enriquecidos en `PrismaListingRepository.findPublished`
+  - [x] 1.4 Implementar filtros avanzados, ordenamiento, paginación y datos enriquecidos en `PrismaListingRepository.findPublished`
     - Resolver `Property` y `Address` para cada listing vía `PortfolioUnit` (patrón cross-schema existente)
     - Aplicar filtros: `propertyType`, `priceMin`/`priceMax`, `rooms`, `bathrooms`, `areaMin`/`areaMax` (length × width), `publishedWithin` sobre `listing_date`
     - Aplicar ordenamiento por `date` o `price` con dirección `asc`/`desc`
@@ -38,7 +38,7 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - Archivo: `src/backend/modules/property-listings/infrastructure/repositories/prisma-listing.repository.ts`
     - _Requisitos: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7_
 
-  - [ ] 1.5 Actualizar `SearchListingsUseCase` y controlador para respuesta paginada enriquecida
+  - [x] 1.5 Actualizar `SearchListingsUseCase` y controlador para respuesta paginada enriquecida
     - Modificar `SearchListingsUseCase.execute` para retornar `PaginatedListingsResponseDto` en lugar de `ListingResponseDto[]`
     - Mapear los nuevos campos (`numberOfRooms`, `numberOfBathrooms`, `propertyType`, `neighborhood`) en `toResponseDto`
     - Actualizar el controlador `search()` para usar el tipo de respuesta paginada y documentar con `@ApiOkResponse({ type: PaginatedListingsResponseDto })`
@@ -66,19 +66,19 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - Generar listings vinculados a properties y verificar que `numberOfRooms`, `numberOfBathrooms`, `propertyType`, `neighborhood` reflejan los datos de `Property` y `Address`
     - **Valida: Requisitos 6.6, 6.7**
 
-- [ ] 2. Checkpoint — Verificar cambios backend
+- [x] 2. Checkpoint — Verificar cambios backend
   - Asegurar que todos los tests pasan, preguntar al usuario si surgen dudas.
   - Confirmar que `GET /listings` retorna la estructura paginada enriquecida correctamente.
 
-- [ ] 3. Inicializar proyecto Next.js y configurar sistema de diseño
-  - [ ] 3.1 Inicializar proyecto Next.js con App Router, TypeScript y Tailwind CSS en `src/frontend/`
+- [x] 3. Inicializar proyecto Next.js y configurar sistema de diseño
+  - [x] 3.1 Inicializar proyecto Next.js con App Router, TypeScript y Tailwind CSS en `src/frontend/`
     - Ejecutar inicialización de Next.js con App Router habilitado
     - Configurar `tsconfig.json` con path aliases
     - Crear `.env.local` con `NEXT_PUBLIC_API_URL`
     - Crear `next.config.ts` básico
     - _Requisitos: 1.1, 1.5_
 
-  - [ ] 3.2 Configurar `tailwind.config.ts` con tokens del sistema de diseño
+  - [x] 3.2 Configurar `tailwind.config.ts` con tokens del sistema de diseño
     - Definir paleta de colores: primario `#1d4ed8`, neutrales (`#111827`, `#4b5563`, `#d1d5db`, `#f3f4f6`, `#f9fafb`)
     - Definir escala tipográfica: h1 (32px Bold), h2 (24px Bold), h3 (20px SemiBold), body (16px Regular), caption (14px Regular), small (12px Regular)
     - Definir espaciado: `mobile-margin` (16px), `desktop-margin` (52px), `section-gap` (24px), `element-gap` (12px)
@@ -86,23 +86,23 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - Configurar fuente Inter como `fontFamily.sans`
     - _Requisitos: 1.2, 9.1, 9.2, 9.4, 9.5_
 
-  - [ ] 3.3 Crear layout raíz (`app/layout.tsx`) con fuente Inter, idioma español y metadatos
+  - [x] 3.3 Crear layout raíz (`app/layout.tsx`) con fuente Inter, idioma español y metadatos
     - Configurar `<html lang="es">` con fuente Inter de `next/font/google` (pesos 400, 600, 700)
     - Aplicar estructura HTML semántica (`<main>`, etc.)
     - Incluir metadatos básicos de la plataforma
     - _Requisitos: 1.3, 1.4, 8.1, 9.6, 9.8_
 
-  - [ ] 3.4 Crear `app/page.tsx` con redirect a `/explorar`
+  - [x] 3.4 Crear `app/page.tsx` con redirect a `/explorar`
     - Implementar redirect desde la raíz a `/explorar`
     - _Requisito: 2.1_
 
-- [ ] 4. Implementar componentes compartidos y utilidades
-  - [ ] 4.1 Crear interfaces TypeScript del módulo property-listings (`types.ts`)
+- [x] 4. Implementar componentes compartidos y utilidades
+  - [x] 4.1 Crear interfaces TypeScript del módulo property-listings (`types.ts`)
     - Definir: `Photo`, `Listing`, `ListingAddress`, `ListingDetail`, `ListingFilters`, `PaginatedListings`
     - Archivo: `src/frontend/modules/property-listings/types.ts`
     - _Requisitos: 7.3, 7.4, 7.5_
 
-  - [ ] 4.2 Implementar capa de servicio API (`shared/services/api.ts`)
+  - [x] 4.2 Implementar capa de servicio API (`shared/services/api.ts`)
     - Implementar `fetchListings(filters, signal?)` que construye query params y retorna `PaginatedListings`
     - Implementar `fetchListingDetail(id, signal?)` que retorna `ListingDetail`
     - Usar `fetch` nativo con soporte para `AbortSignal`
@@ -121,7 +121,7 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - Generar status codes HTTP entre 400-599 y verificar que `fetchListings` y `fetchListingDetail` lanzan errores con el código en el mensaje
     - **Valida: Requisito 7.6**
 
-  - [ ] 4.5 Implementar utilidades de formateo: `formatPrice` y `formatRelativeDate`
+  - [x] 4.5 Implementar utilidades de formateo: `formatPrice` y `formatRelativeDate`
     - `formatPrice`: Formatear número como COP con separador de miles punto (ej. "$4.200.000")
     - `formatRelativeDate`: Convertir fecha ISO a texto relativo en español ("Publicado hace X días/semanas/meses")
     - Archivos: `src/frontend/shared/utils/formatPrice.ts`, `src/frontend/shared/utils/formatRelativeDate.ts`
@@ -137,7 +137,7 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - Generar fechas en el pasado (1 min a 365 días) y verificar: cadena no vacía, comienza con "Publicado hace", contiene unidad de tiempo válida en español
     - **Valida: Requisito 4.6**
 
-  - [ ] 4.8 Implementar hook `useDebounce`
+  - [x] 4.8 Implementar hook `useDebounce`
     - Hook genérico que retorna un valor debounced después de un delay configurable (default 400ms)
     - Archivo: `src/frontend/shared/hooks/useDebounce.ts`
     - _Requisitos: Control de llamadas API (decisión de diseño)_
@@ -147,12 +147,12 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - Generar secuencias de N cambios de valor (N ≥ 2) dentro de un intervalo menor al delay y verificar con fake timers que solo el último valor se propaga
     - **Valida: Control de llamadas API**
 
-  - [ ] 4.10 Implementar hook `useBodyScrollLock`
+  - [x] 4.10 Implementar hook `useBodyScrollLock`
     - Bloquear/desbloquear scroll del body cuando hay modal o drawer abierto
     - Archivo: `src/frontend/shared/hooks/useBodyScrollLock.ts`
     - _Requisitos: 5.4, 11.1_
 
-  - [ ] 4.11 Implementar componentes compartidos de UI base
+  - [x] 4.11 Implementar componentes compartidos de UI base
     - `Button`: Botón reutilizable con variantes primary (fondo `#1d4ed8`, texto blanco, h-56px) y secondary (fondo blanco, borde `#d1d5db`, texto `#111827`, h-58px), border-radius 6px, ancho completo
     - `Skeleton`: Componente genérico de skeleton loader con `animate-pulse` (rectángulo, círculo, líneas de texto)
     - `EmptyState`: Mensaje de estado vacío con texto en español y sugerencia de ajustar filtros
@@ -160,11 +160,11 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - Archivos en: `src/frontend/shared/components/`
     - _Requisitos: 2.4, 2.5, 3.10, 3.11, 8.2, 8.7_
 
-- [ ] 5. Checkpoint — Verificar utilidades y componentes base
+- [x] 5. Checkpoint — Verificar utilidades y componentes base
   - Asegurar que todos los tests pasan, preguntar al usuario si surgen dudas.
 
 - [ ] 6. Implementar componentes del módulo property-listings
-  - [ ] 6.1 Implementar `Header` y `SideMenu` (menú lateral)
+  - [x] 6.1 Implementar `Header` y `SideMenu` (menú lateral)
     - `Header`: Encabezado fijo con borde inferior, botón hamburguesa a la izquierda, título centrado (H1 32px Bold `#111827`)
     - `SideMenu`: Drawer 320px desde la izquierda con animación de deslizamiento. Encabezado "Menú" (24px Bold) + botón cierre (X). Si autenticado: avatar, nombre, rol + enlaces completos. Si anónimo: "Explorar inmuebles" + opciones login/registro. Cierra con click fuera o botón X. Usar `React.lazy` + `Suspense` para carga diferida
     - Usar `useBodyScrollLock` cuando el menú esté abierto
@@ -172,7 +172,7 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - _Requisitos: 2.7, 11.1, 11.2, 11.3, 11.4, 11.5, 11.6_
 
 
-  - [ ] 6.2 Implementar `ListingCard` (tarjeta de inmueble)
+  - [x] 6.2 Implementar `ListingCard` (tarjeta de inmueble)
     - Contenedor con borde `#d1d5db`, border-radius 6px, sombra `0px 1px 2px rgba(0,0,0,0.05)`, fondo blanco
     - Foto principal con `next/image` (isMain: true, o primera foto, o placeholder si no hay fotos)
     - Título "Tipo · Barrio" (H2 24px Bold `#111827`), precio COP (H3 20px SemiBold `#1d4ed8`), badges habitaciones/baños (fondo `#f3f4f6`, caption 14px), fecha relativa
@@ -195,25 +195,25 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - Generar `id` (UUID) y `title` (string no vacío) y verificar: href === `/explorar/${id}`, alt contiene el title
     - **Valida: Requisitos 4.7, 4.8**
 
-  - [ ] 6.6 Implementar componentes skeleton: `ListingCardSkeleton`, `ListingGridSkeleton`, `ListingDetailSkeleton`
+  - [x] 6.6 Implementar componentes skeleton: `ListingCardSkeleton`, `ListingGridSkeleton`, `ListingDetailSkeleton`
     - `ListingCardSkeleton`: Réplica de la estructura de `ListingCard` con bloques `animate-pulse`
     - `ListingGridSkeleton`: Grid responsive de skeletons (6 en desktop, 3 en mobile)
     - `ListingDetailSkeleton`: Réplica de la página de detalle con bloques animados
     - Archivos en: `src/frontend/shared/components/`
     - _Requisitos: 2.3, 8.7_
 
-  - [ ] 6.7 Implementar `ListingGrid` (cuadrícula de tarjetas)
+  - [x] 6.7 Implementar `ListingGrid` (cuadrícula de tarjetas)
     - Grid responsive: 1 columna en mobile (< 768px), 2 columnas en ≥ 768px, gap 16px
     - Renderiza `ListingCard` por cada listing del arreglo
     - Archivo: `src/frontend/modules/property-listings/components/ListingGrid.tsx`
     - _Requisitos: 2.1, 2.6, 9.3_
 
-  - [ ] 6.8 Implementar `Pagination` (componente de paginación)
+  - [x] 6.8 Implementar `Pagination` (componente de paginación)
     - Texto "Mostrando X a Y de Z resultados", selector de items por página, botones anterior/siguiente y números de página
     - Archivo: `src/frontend/shared/components/Pagination.tsx`
     - _Requisito: 2.9_
 
-  - [ ] 6.9 Implementar hook `useFilters` para gestión de filtros vía URL
+  - [x] 6.9 Implementar hook `useFilters` para gestión de filtros vía URL
     - Leer/escribir query params con `useSearchParams` y `useRouter` de Next.js
     - Exponer: `filters`, `setFilter`, `clearFilters`, `setSort`, `setPage`, `setPageSize`
     - Archivo: `src/frontend/modules/property-listings/hooks/useFilters.ts`
@@ -229,7 +229,7 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - Generar filtros con uno o más valores definidos, ejecutar `clearFilters` y verificar que todos los campos son `undefined`
     - **Valida: Requisito 3.11**
 
-  - [ ] 6.12 Implementar `FilterPanel` (panel de filtros avanzados)
+  - [~] 6.12 Implementar `FilterPanel` (panel de filtros avanzados)
     - Client Component (`'use client'`), cargado con `React.lazy` + `Suspense`
     - Vista fullscreen en mobile con encabezado "Filtros" (32px Bold) y botón de retorno
     - Campos: ciudad (dropdown), barrio (dropdown, deshabilitado sin ciudad con texto "Primero selecciona una ciudad"), fecha publicación (dropdown), tipo propiedad (dropdown), precio min/max (inputs numéricos con `useDebounce`), habitaciones (dropdown), baños (dropdown), área min/max (inputs numéricos con `useDebounce`)
@@ -249,7 +249,7 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - Generar secuencias de cambios en campos del FilterPanel sin presionar "Aplicar filtros" y verificar que el número de llamadas HTTP es cero
     - **Valida: Control de llamadas API**
 
-  - [ ] 6.15 Implementar `SortPanel` (panel de ordenamiento)
+  - [~] 6.15 Implementar `SortPanel` (panel de ordenamiento)
     - Client Component con vista fullscreen, encabezado "Ordenar" (32px Bold) y botón de retorno
     - 4 opciones radio: "Más recientes primero", "Más antiguos primero", "Precio: menor a mayor", "Precio: mayor a menor" — cada una con título (20px SemiBold) y descripción (14px Regular `#4b5563`)
     - Check visual (color `#1d4ed8`) en opción seleccionada
@@ -262,7 +262,7 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - Generar opciones de ordenamiento con `fc.constantFrom(...)` y verificar que el texto del botón coincide con la etiqueta de la opción seleccionada
     - **Valida: Requisito 10.5**
 
-  - [ ] 6.17 Implementar `ActionBar` (barra de acciones: Filtros + Ordenar)
+  - [~] 6.17 Implementar `ActionBar` (barra de acciones: Filtros + Ordenar)
     - Barra debajo del encabezado con dos botones: "Filtros" (con icono) y botón de ordenamiento cuyo texto refleja la opción seleccionada (default "Más recientes")
     - Controla apertura/cierre de `FilterPanel` y `SortPanel`
     - Archivo: `src/frontend/modules/property-listings/components/ActionBar.tsx`
@@ -286,7 +286,7 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
 
 
 - [ ] 9. Implementar página de exploración (`/explorar`)
-  - [ ] 9.1 Crear `app/explorar/page.tsx` como Server Component
+  - [~] 9.1 Crear `app/explorar/page.tsx` como Server Component
     - Leer query params de la URL (filtros, ordenamiento, paginación)
     - Llamar a `fetchListings` con los parámetros del URL desde el servidor
     - Renderizar `ActionBar`, `ListingGrid` (o `ListingGridSkeleton` / `EmptyState` / `ErrorState` según estado), `Pagination`
@@ -301,7 +301,7 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - _Requisitos: 2.1, 2.3, 2.4, 2.5, 8.1, 8.7_
 
 - [ ] 10. Implementar componentes de detalle del inmueble
-  - [ ] 10.1 Implementar `PhotoGallery` (galería de fotos con navegación)
+  - [~] 10.1 Implementar `PhotoGallery` (galería de fotos con navegación)
     - Client Component con imagen principal ocupando ancho completo (márgenes 52px en desktop)
     - Botones de navegación izquierda/derecha (36×36px, fondo semitransparente) superpuestos sobre la imagen
     - Indicador de posición "X / Y" con fondo semitransparente
@@ -315,7 +315,7 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - Generar N (≥ 1) e I (1 ≤ I ≤ N) y verificar que el indicador muestra "I / N"
     - **Valida: Requisito 5.3**
 
-  - [ ] 10.3 Implementar `GalleryModal` (modal de imagen ampliada)
+  - [~] 10.3 Implementar `GalleryModal` (modal de imagen ampliada)
     - Client Component cargado con `React.lazy` + `Suspense`
     - Fullscreen con imagen ampliada, navegación izquierda/derecha (48×48px), miniaturas en la parte inferior, indicador "X / Y", botón cierre (X)
     - Cierra con tecla Escape y con click en botón X
@@ -323,14 +323,14 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - Archivo: `src/frontend/modules/property-listings/components/GalleryModal.tsx`
     - _Requisitos: 5.4, 8.6_
 
-  - [ ] 10.4 Implementar `PropertyInfoGrid` (grilla de habitaciones/baños/área)
+  - [~] 10.4 Implementar `PropertyInfoGrid` (grilla de habitaciones/baños/área)
     - Grilla de 3 columnas con tarjetas (fondo `#f3f4f6`, border-radius 6px, padding 12px)
     - Cada tarjeta: icono centrado, valor (16px Regular), etiqueta (12px Regular `#4b5563`)
     - Campos: Habitaciones, Baños, Área (m²)
     - Archivo: `src/frontend/modules/property-listings/components/PropertyInfoGrid.tsx`
     - _Requisito: 5.6_
 
-  - [ ] 10.5 Implementar `ListingDetailView` (vista completa del detalle)
+  - [~] 10.5 Implementar `ListingDetailView` (vista completa del detalle)
     - Precio "$X/mes" (H2 24px Bold `#1d4ed8`), título (H3 20px SemiBold `#111827`)
     - `PropertyInfoGrid` para habitaciones/baños/área
     - Sección "Descripción" (H3 + texto 16px Regular `#4b5563`)
@@ -341,7 +341,7 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - _Requisitos: 5.5, 5.6, 5.7, 5.8, 5.9, 5.10_
 
 - [ ] 11. Implementar página de detalle (`/explorar/[id]`)
-  - [ ] 11.1 Crear `app/explorar/[id]/page.tsx` como Server Component
+  - [~] 11.1 Crear `app/explorar/[id]/page.tsx` como Server Component
     - Llamar a `fetchListingDetail(id)` desde el servidor
     - Renderizar encabezado fijo con botón de retorno y título "Detalle del inmueble" (32px Bold `#111827`)
     - Renderizar `PhotoGallery` + `ListingDetailView` (o `ListingDetailSkeleton` / error state según estado)
@@ -360,12 +360,12 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
   - Verificar que la navegación entre listado y detalle funciona correctamente.
 
 - [ ] 13. Integración, accesibilidad y pulido final
-  - [ ] 13.1 Integrar Header con SideMenu en el layout raíz
+  - [~] 13.1 Integrar Header con SideMenu en el layout raíz
     - Cablear el Header en `app/layout.tsx` con apertura/cierre del SideMenu
     - Verificar que el botón hamburguesa abre el menú y el título se muestra centrado en ambas páginas
     - _Requisitos: 2.7, 11.1_
 
-  - [ ] 13.2 Verificar accesibilidad en todos los componentes
+  - [~] 13.2 Verificar accesibilidad en todos los componentes
     - Elementos HTML semánticos (`main`, `nav`, `article`, `section`, `header`, `h1`-`h6`)
     - Áreas táctiles mínimas 44×44px en botones y enlaces
     - Atributos `alt` descriptivos en español en todas las imágenes
@@ -375,7 +375,7 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - Atributos ARIA (`aria-live`, `aria-busy`, `role`) en estados dinámicos (carga, error)
     - _Requisitos: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7_
 
-  - [ ] 13.3 Verificar responsividad y sistema de diseño
+  - [~] 13.3 Verificar responsividad y sistema de diseño
     - Márgenes laterales: 16px mobile, 52px desktop
     - Grid de tarjetas: 1 columna mobile, 2 columnas ≥ 768px
     - Escala tipográfica aplicada correctamente
