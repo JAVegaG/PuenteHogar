@@ -50,7 +50,7 @@ const arbitraryListingDetail = fc.record({
 function makeRepositoryStub(detail: ListingDetail | null): IListingRepository {
   return {
     async create() { throw new Error('not implemented'); },
-    async findPublished() { return []; },
+    async findPublished() { return { data: [], total: 0 }; },
     async findById() { return null; },
     async findDetailById(): Promise<ListingDetail | null> { return detail; },
     async unpublish() { return; },

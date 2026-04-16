@@ -115,7 +115,8 @@ function makeHitSpyCache(stored: Map<string, ListingEntity[]>) {
 function makeRepositoryStub(listings: ListingEntity[]): IListingRepository {
   return {
     async findPublished(_filters: ListingFilters) {
-      return listings.filter((l) => l.isActive);
+      const data = listings.filter((l) => l.isActive);
+      return { data, total: data.length };
     },
     async create() { throw new Error('not implemented'); },
     async findById() { return null; },
@@ -131,7 +132,8 @@ function makeSpyRepository(listings: ListingEntity[]) {
   const repo: IListingRepository = {
     async findPublished(_filters: ListingFilters) {
       callCount++;
-      return listings.filter((l) => l.isActive);
+      const data = listings.filter((l) => l.isActive);
+      return { data, total: data.length };
     },
     async create() { throw new Error('not implemented'); },
     async findById() { return null; },
@@ -269,12 +271,12 @@ describe('SearchListingsUseCase — Property 22: Caché Redis sirve listado con 
           const cachedListings = setCalls[0].listings;
 
           // Cached count must match result count
-          if (cachedListings.length !== result.length) return false;
+          if (cachedListings.length !== result.data.length) return false;
 
           // Each cached listing must match the corresponding result by id
           for (let i = 0; i < cachedListings.length; i++) {
-            if (cachedListings[i].id !== result[i].id) return false;
-            if (cachedListings[i].photos.length !== result[i].photos.length) return false;
+            if (cachedListings[i].id !== result.data[i].id) return false;
+            if (cachedListings[i].photos.length !== result.data[i].photos.length) return false;
           }
 
           return true;
@@ -316,14 +318,14 @@ describe('SearchListingsUseCase — Property 22: Caché Redis sirve listado con 
           const hitResult = await uc2.execute(filters);
 
           // Both results must have the same length
-          if (missResult.length !== hitResult.length) return false;
+          if (missResult.data.length !== hitResult.data.length) return false;
 
           // Each DTO must match by id, title, price, and photo count
-          for (let i = 0; i < missResult.length; i++) {
-            if (missResult[i].id !== hitResult[i].id) return false;
-            if (missResult[i].title !== hitResult[i].title) return false;
-            if (missResult[i].price !== hitResult[i].price) return false;
-            if (missResult[i].photos.length !== hitResult[i].photos.length) return false;
+          for (let i = 0; i < missResult.data.length; i++) {
+            if (missResult.data[i].id !== hitResult.data[i].id) return false;
+            if (missResult.data[i].title !== hitResult.data[i].title) return false;
+            if (missResult.data[i].price !== hitResult.data[i].price) return false;
+            if (missResult.data[i].photos.length !== hitResult.data[i].photos.length) return false;
           }
 
           return true;

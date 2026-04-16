@@ -128,7 +128,7 @@ function makeRepositoryStub(): {
         photos,
       );
     },
-    async findPublished() { return []; },
+    async findPublished() { return { data: [], total: 0 }; },
     async findById() { return null; },
     async findDetailById() { return null; },
     async unpublish() { return; },

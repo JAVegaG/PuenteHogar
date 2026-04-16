@@ -73,11 +73,12 @@ function arbitraryListingWithNeighborhood(): fc.Arbitrary<ListingWithNeighborhoo
  */
 function makeRepositoryStub(items: ListingWithNeighborhood[]): IListingRepository {
   return {
-    async findPublished(filters: ListingFilters): Promise<ListingEntity[]> {
-      return items
+    async findPublished(filters: ListingFilters) {
+      const data = items
         .filter((item) => item.listing.isActive)
         .filter((item) => !filters.neighborhood || item.neighborhood === filters.neighborhood)
         .map((item) => item.listing);
+      return { data, total: data.length };
     },
     async create() { throw new Error('not implemented'); },
     async findById() { return null; },
@@ -123,7 +124,7 @@ describe('SearchListingsUseCase — Property 19: Filtro por zona retorna solo in
           // Build a map from listing id → neighborhood for quick lookup
           const neighborhoodById = new Map(items.map((i) => [i.listing.id, i.neighborhood]));
 
-          for (const dto of result) {
+          for (const dto of result.data) {
             const neighborhood = neighborhoodById.get(dto.id);
             if (neighborhood !== requestedNeighborhood) return false;
           }
@@ -154,7 +155,7 @@ describe('SearchListingsUseCase — Property 19: Filtro por zona retorna solo in
           filters.neighborhood = requestedNeighborhood;
 
           const result = await useCase.execute(filters);
-          const resultIds = new Set(result.map((r) => r.id));
+          const resultIds = new Set(result.data.map((r) => r.id));
 
           // IDs of listings that belong to a DIFFERENT neighborhood and are eligible
           const wrongNeighborhoodIds = items
@@ -187,7 +188,7 @@ describe('SearchListingsUseCase — Property 19: Filtro por zona retorna solo in
           filters.neighborhood = requestedNeighborhood;
 
           const result = await useCase.execute(filters);
-          const resultIds = new Set(result.map((r) => r.id));
+          const resultIds = new Set(result.data.map((r) => r.id));
 
           // Eligible: PUBLISHED + has photo + correct neighborhood
           const eligibleIds = items
@@ -231,7 +232,7 @@ describe('SearchListingsUseCase — Property 19: Filtro por zona retorna solo in
           filters.neighborhood = 'Granada'; // different from 'El Peñón'
 
           const result = await useCase.execute(filters);
-          return Array.isArray(result) && result.length === 0;
+          return Array.isArray(result.data) && result.data.length === 0;
         },
       ),
       { numRuns: 50 },

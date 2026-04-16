@@ -73,9 +73,10 @@ function arbitraryListing(isActiveOverride?: boolean): fc.Arbitrary<ListingEntit
  */
 function makeRepositoryStub(listings: ListingEntity[]): IListingRepository {
   return {
-    async findPublished(_filters: ListingFilters): Promise<ListingEntity[]> {
+    async findPublished(_filters: ListingFilters) {
       // DB already filters by isActive=true (PUBLISHED)
-      return listings.filter((l) => l.isActive);
+      const data = listings.filter((l) => l.isActive);
+      return { data, total: data.length };
     },
     async create() { throw new Error('not implemented'); },
     async findById() { return null; },
@@ -131,7 +132,7 @@ describe('SearchListingsUseCase — Property 18: Listado público retorna solo P
 
           const result = await useCase.execute(new ListingFiltersDto());
 
-          for (const dto of result) {
+          for (const dto of result.data) {
             // Must be PUBLISHED
             if (!dto.isActive) return false;
             // Must have at least one photo
@@ -160,7 +161,7 @@ describe('SearchListingsUseCase — Property 18: Listado público retorna solo P
           const useCase = new SearchListingsUseCase(repository, cacheMissStub);
 
           const result = await useCase.execute(new ListingFiltersDto());
-          const resultIds = new Set(result.map((r) => r.id));
+          const resultIds = new Set(result.data.map((r) => r.id));
 
           const unpublishedIds = listings
             .filter((l) => !l.isActive)
@@ -188,7 +189,7 @@ describe('SearchListingsUseCase — Property 18: Listado público retorna solo P
           const useCase = new SearchListingsUseCase(repository, cacheMissStub);
 
           const result = await useCase.execute(new ListingFiltersDto());
-          const resultIds = new Set(result.map((r) => r.id));
+          const resultIds = new Set(result.data.map((r) => r.id));
 
           const noPhotoIds = listings
             .filter((l) => l.photos.length === 0)
@@ -216,7 +217,7 @@ describe('SearchListingsUseCase — Property 18: Listado público retorna solo P
           const useCase = new SearchListingsUseCase(repository, cacheMissStub);
 
           const result = await useCase.execute(new ListingFiltersDto());
-          const resultIds = new Set(result.map((r) => r.id));
+          const resultIds = new Set(result.data.map((r) => r.id));
 
           const eligibleIds = listings
             .filter((l) => l.isActive && l.photos.length > 0)
@@ -244,7 +245,7 @@ describe('SearchListingsUseCase — Property 18: Listado público retorna solo P
           const useCase = new SearchListingsUseCase(repository, cacheMissStub);
 
           const result = await useCase.execute(new ListingFiltersDto());
-          return Array.isArray(result) && result.length === 0;
+          return Array.isArray(result.data) && result.data.length === 0;
         },
       ),
       { numRuns: 10 },
@@ -297,12 +298,12 @@ describe('SearchListingsUseCase — Property 18: Listado público retorna solo P
           const result = await useCase.execute(new ListingFiltersDto());
 
           // Result count must match cached listings count
-          if (result.length !== cachedListings.length) return false;
+          if (result.data.length !== cachedListings.length) return false;
 
           // Each result must have the correct id and isActive
-          for (let i = 0; i < result.length; i++) {
-            if (result[i].id !== cachedListings[i].id) return false;
-            if (!result[i].isActive) return false;
+          for (let i = 0; i < result.data.length; i++) {
+            if (result.data[i].id !== cachedListings[i].id) return false;
+            if (!result.data[i].isActive) return false;
           }
 
           return true;

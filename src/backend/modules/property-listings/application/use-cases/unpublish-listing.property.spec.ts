@@ -72,8 +72,9 @@ function makeMutableRepositoryStub(
   }
 
   return {
-    async findPublished(_filters: ListingFilters): Promise<ListingEntity[]> {
-      return [...store.values()].filter((l) => l.isActive);
+    async findPublished(_filters: ListingFilters) {
+      const data = [...store.values()].filter((l) => l.isActive);
+      return { data, total: data.length };
     },
     async unpublish(id: string): Promise<void> {
       const existing = store.get(id);
@@ -145,7 +146,7 @@ describe('UnpublishListingUseCase — Property 21: Despublicar inmueble lo remue
 
           // Before: target should be in results
           const before = await searchUseCase.execute(new ListingFiltersDto());
-          const beforeIds = new Set(before.map((r) => r.id));
+          const beforeIds = new Set(before.data.map((r) => r.id));
           if (!beforeIds.has(target.id)) return false;
 
           // Unpublish
@@ -153,7 +154,7 @@ describe('UnpublishListingUseCase — Property 21: Despublicar inmueble lo remue
 
           // After: target must NOT be in results
           const after = await searchUseCase.execute(new ListingFiltersDto());
-          const afterIds = new Set(after.map((r) => r.id));
+          const afterIds = new Set(after.data.map((r) => r.id));
           return !afterIds.has(target.id);
         },
       ),
@@ -187,7 +188,7 @@ describe('UnpublishListingUseCase — Property 21: Despublicar inmueble lo remue
 
           // All others must still be in results
           const after = await searchUseCase.execute(new ListingFiltersDto());
-          const afterIds = new Set(after.map((r) => r.id));
+          const afterIds = new Set(after.data.map((r) => r.id));
 
           const otherIds = others.map((l) => l.id);
           return otherIds.every((id) => afterIds.has(id));
@@ -219,12 +220,12 @@ describe('UnpublishListingUseCase — Property 21: Despublicar inmueble lo remue
           const searchUseCase = new SearchListingsUseCase(repository, cacheMissStub);
 
           const before = await searchUseCase.execute(new ListingFiltersDto());
-          const countBefore = before.length;
+          const countBefore = before.data.length;
 
           await unpublishUseCase.execute(target.id, ownerId);
 
           const after = await searchUseCase.execute(new ListingFiltersDto());
-          const countAfter = after.length;
+          const countAfter = after.data.length;
 
           return countAfter === countBefore - 1;
         },
@@ -267,7 +268,7 @@ describe('UnpublishListingUseCase — Property 21: Despublicar inmueble lo remue
 
           // Listing must still be visible
           const after = await searchUseCase.execute(new ListingFiltersDto());
-          return after.some((r) => r.id === target.id);
+          return after.data.some((r) => r.id === target.id);
         },
       ),
       { numRuns: 100 },

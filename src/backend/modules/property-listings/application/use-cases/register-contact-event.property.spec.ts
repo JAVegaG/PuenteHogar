@@ -55,7 +55,7 @@ function makeRepositoryStub(ownerUserId: string): {
       return ownerUserId;
     },
     async create() { throw new Error('not implemented'); },
-    async findPublished() { return []; },
+    async findPublished() { return { data: [], total: 0 }; },
     async findDetailById() { return null; },
     async unpublish() { return; },
   };
