@@ -11,6 +11,8 @@ API REST del sistema de gestión de arriendo de vivienda. Implementada como mono
 - **Autenticación**: JWT (`@nestjs/jwt`, `passport-jwt`)
 - **Validación**: `class-validator` + `class-transformer`
 - **Scheduling**: `@nestjs/schedule` (ETL cron jobs)
+- **HTTP Logging**: Morgan (piped through NestJS `Logger`)
+- **Security Hardening**: Helmet (HTTP security headers)
 - **Testing**: Jest + `ts-jest`
 
 ## Estructura
@@ -25,7 +27,7 @@ src/backend/
 │       └── seed.ts          # Seed de catálogos (roles, tipos de documento, estados)
 ├── src/
 │   ├── app.module.ts           # Módulo raíz
-│   ├── main.ts                 # Bootstrap: ValidationPipe, Swagger, CORS
+│   ├── main.ts                 # Bootstrap: NestExpressApplication, Helmet, trust proxy, ValidationPipe, Swagger, CORS, Morgan HTTP logging (format: 'dev' | 'combined' según NODE_ENV)
 │   ├── config/
 │   │   └── configuration.ts   # Variables de entorno tipadas
 │   └── shared/                 # Componentes transversales
@@ -83,6 +85,9 @@ modules/{nombre}/
 
 ## Seguridad
 
+- **Helmet**: cabeceras HTTP de seguridad habilitadas por defecto (`helmet()`)
+- **`x-powered-by` deshabilitado**: `app.disable('x-powered-by')`
+- **Trust proxy**: configurado como `'linklocal'` para entornos con proxy reverso en red local
 - **RBAC + resource ownership**: cada usuario solo accede a sus propios recursos
 - **PII cifrado en reposo**: `document_number` y `phone_number` con AES-256
 - **Contraseñas**: bcrypt con cost factor ≥ 12
@@ -155,4 +160,5 @@ npm run db:seed            # Seed de catálogos (roles, tipos de documento, esta
 | `OBJECT_STORAGE_ENDPOINT` | Endpoint del servicio de almacenamiento |
 | `PII_ENCRYPTION_KEY` | Clave AES-256 para cifrado de campos PII |
 | `PORT` | Puerto del servidor (default: `3000`) |
+| `NODE_ENV` | Entorno de ejecución (`development`, `production`) |
 | `CORS_ORIGINS` | Orígenes permitidos (separados por coma). Si no se define, acepta cualquier origen en desarrollo |

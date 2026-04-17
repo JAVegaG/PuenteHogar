@@ -1,10 +1,14 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import logger from 'morgan'
+import { NestExpressApplication } from '@nestjs/platform-express'
+import helmet from 'helmet'
+
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -13,6 +17,25 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  app.use(helmet())
+  app.disable('x-powered-by')
+  app.set('trust proxy', 'linklocal')
+
+  const IS_DEV = process.env.NODE_ENV ?? 'development' === 'development'
+  const LOGGER_FORMAT = IS_DEV ? 'dev' : 'combined'
+
+  const appLogger = new Logger('ApplicationServer')
+
+  app.use(
+    logger(LOGGER_FORMAT, {
+      stream: {
+        write: (str) => {
+          appLogger.log(str.trim())
+        }
+      }
+    })
+  )
 
   const config = new DocumentBuilder()
     .setTitle('Plataforma de Arriendo de Vivienda')
@@ -41,19 +64,21 @@ async function bootstrap() {
   });
 
   // CORS — allowed origins from env (comma-separated) or permissive in dev
-  const rawOrigins = process.env.CORS_ORIGINS;
-  if (rawOrigins) {
-    const origins = rawOrigins.split(',').map((o) => o.trim()).filter(Boolean);
+  const RAW_ORIGINS = process.env.CORS_ORIGINS;
+  if (!IS_DEV && RAW_ORIGINS) {
+    const origins = RAW_ORIGINS.split(',').map((o) => o.trim()).filter(Boolean);
     app.enableCors({ origin: origins, credentials: true });
   } else {
     // Development fallback: allow any origin
     app.enableCors({ origin: true, credentials: true });
   }
 
-  const port = process.env.PORT ?? 3000;
-  await app.listen(port);
-  console.log(`Application running on port ${port}`);
-  console.log(`Swagger docs available at http://localhost:${port}/api/docs`);
+  const APP_PORT = process.env.PORT ?? 3000;
+  await app.listen(APP_PORT, async () => {
+    const url = await app.getUrl();
+    appLogger.log(`Listening on ${url}`);
+    appLogger.log(`Swagger docs available at ${url}/api/docs`);
+  });
 }
 
 bootstrap();
