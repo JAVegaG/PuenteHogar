@@ -25,7 +25,7 @@ src/backend/
 │       └── seed.ts          # Seed de catálogos (roles, tipos de documento, estados)
 ├── src/
 │   ├── app.module.ts           # Módulo raíz
-│   ├── main.ts                 # Bootstrap con ValidationPipe global
+│   ├── main.ts                 # Bootstrap: ValidationPipe, Swagger, CORS
 │   ├── config/
 │   │   └── configuration.ts   # Variables de entorno tipadas
 │   └── shared/                 # Componentes transversales
@@ -47,7 +47,8 @@ src/backend/
     ├── payments/               # Pagos, pasarela, idempotencia (dominio, aplicación, infraestructura, controlador)
     ├── accounting/             # Reportes financieros (dominio, aplicación, infraestructura: PrismaAccountingRepository + RedisReportCache)
     ├── rental-tracking/        # Máquina de estados del arriendo (dominio, aplicación, infraestructura, controlador)
-    └── notifications/          # Notificaciones multicanal (dominio, aplicación, infraestructura, controlador)
+    ├── notifications/          # Notificaciones multicanal (dominio, aplicación, infraestructura, controlador)
+    └── shared/                 # Helpers compartidos entre módulos de dominio
 ```
 
 ## Arquitectura por módulo
@@ -154,3 +155,4 @@ npm run db:seed            # Seed de catálogos (roles, tipos de documento, esta
 | `OBJECT_STORAGE_ENDPOINT` | Endpoint del servicio de almacenamiento |
 | `PII_ENCRYPTION_KEY` | Clave AES-256 para cifrado de campos PII |
 | `PORT` | Puerto del servidor (default: `3000`) |
+| `CORS_ORIGINS` | Orígenes permitidos (separados por coma). Si no se define, acepta cualquier origen en desarrollo |
