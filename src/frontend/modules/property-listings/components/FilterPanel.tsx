@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useId } from 'react';
-import { useDebounce } from '@/shared/hooks/useDebounce';
 import { Button } from '@/shared/components/Button';
 import type { ListingFilters } from '../types';
 
@@ -27,6 +26,19 @@ const PROPERTY_TYPES = ['Apartamento', 'Casa', 'Estudio', 'Habitación'];
 
 const ROOM_OPTIONS = ['1', '2', '3', '4', '5+'];
 const BATHROOM_OPTIONS = ['1', '2', '3', '4+'];
+
+/** Format a raw numeric string as COP display: "120000" → "$120.000" */
+function formatCOP(raw: string): string {
+  if (!raw) return '';
+  const digits = raw.replace(/\D/g, '');
+  if (!digits) return '';
+  return '$' + Number(digits).toLocaleString('es-CO');
+}
+
+/** Strip formatting back to digits only */
+function stripCOP(display: string): string {
+  return display.replace(/\D/g, '');
+}
 
 function parseRoomValue(val: string): number | undefined {
   if (val === '') return undefined;
@@ -72,11 +84,10 @@ export default function FilterPanel({
   const [areaMinRaw, setAreaMinRaw] = useState(currentFilters.areaMin?.toString() ?? '');
   const [areaMaxRaw, setAreaMaxRaw] = useState(currentFilters.areaMax?.toString() ?? '');
 
-  // Debounce numeric inputs for smooth local state updates
-  const priceMin = useDebounce(priceMinRaw, 400);
-  const priceMax = useDebounce(priceMaxRaw, 400);
-  const areaMin = useDebounce(areaMinRaw, 400);
-  const areaMax = useDebounce(areaMaxRaw, 400);
+  // Note: Numeric inputs (price, area) use local state only.
+  // Since filters require explicit "Aplicar filtros" action,
+  // debounce is not needed here (no API calls on each keystroke).
+  // If reactive filtering is added later, wire useDebounce from @/shared/hooks/useDebounce.
 
   // Sync local state when currentFilters change externally
   useEffect(() => {
@@ -97,20 +108,31 @@ export default function FilterPanel({
     if (!city) setNeighborhood('');
   }, [city]);
 
+  // Close on Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   const handleApply = () => {
     const filters: ListingFilters = {};
     if (city) filters.city = city;
     if (neighborhood) filters.neighborhood = neighborhood;
     if (publishedWithin) filters.publishedWithin = publishedWithin as ListingFilters['publishedWithin'];
     if (propertyType) filters.propertyType = propertyType;
-    if (priceMin) filters.priceMin = Number(priceMin);
-    if (priceMax) filters.priceMax = Number(priceMax);
+    // Use raw values (not debounced) since this is an explicit user action
+    if (priceMinRaw) filters.priceMin = Number(priceMinRaw);
+    if (priceMaxRaw) filters.priceMax = Number(priceMaxRaw);
     const roomVal = parseRoomValue(rooms);
     if (roomVal !== undefined) filters.rooms = roomVal;
     const bathVal = parseBathroomValue(bathrooms);
     if (bathVal !== undefined) filters.bathrooms = bathVal;
-    if (areaMin) filters.areaMin = Number(areaMin);
-    if (areaMax) filters.areaMax = Number(areaMax);
+    if (areaMinRaw) filters.areaMin = Number(areaMinRaw);
+    if (areaMaxRaw) filters.areaMax = Number(areaMaxRaw);
     onApply(filters);
     onClose();
   };
@@ -131,13 +153,15 @@ export default function FilterPanel({
 
   if (!isOpen) return null;
 
-  const dropdownClass =
-    'bg-neutral-50 border border-neutral-300 rounded-card px-3 py-2 text-body text-neutral-900 w-full min-h-[44px]';
+  const selectClass =
+    'appearance-none bg-neutral-50 border border-neutral-300 rounded-card px-3 py-2 pr-10 text-body text-neutral-900 w-full min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary bg-[url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%3E%3Cpath%20d%3D%22M5%208l5%205%205-5%22%20stroke%3D%22%234B5563%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E")] bg-[length:20px_20px] bg-[right_12px_center] bg-no-repeat';
+  const textInputClass =
+    'bg-neutral-50 border border-neutral-300 rounded-card px-3 py-2 text-body text-neutral-900 w-full min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary';
   const priceInputClass =
-    'bg-white border border-neutral-300 rounded-card px-3 py-2 text-body text-neutral-900 w-full min-h-[44px]';
+    'bg-white border border-neutral-300 rounded-card px-3 py-2 text-body text-neutral-900 w-full min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary';
   const areaInputClass =
-    'bg-neutral-50 border border-neutral-300 rounded-card px-3 py-2 text-body text-neutral-900 w-full min-h-[44px]';
-  const labelClass = 'text-caption font-semibold text-neutral-900';
+    'bg-neutral-50 border border-neutral-300 rounded-card px-3 py-2 text-body text-neutral-900 w-full min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary';
+  const labelClass = 'text-body font-semibold text-neutral-900';
 
   const cityId = `${uid}-city`;
   const neighborhoodId = `${uid}-neighborhood`;
@@ -151,13 +175,13 @@ export default function FilterPanel({
   const areaMaxId = `${uid}-areaMax`;
 
   return (
-    <div className="fixed inset-0 z-50 bg-white flex flex-col">
+    <div className="fixed inset-0 z-50 bg-white flex flex-col h-[100dvh]">
       {/* Header */}
       <header className="flex items-center border-b border-neutral-300 px-mobile-margin py-3 shrink-0">
         <button
           type="button"
           onClick={onClose}
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center"
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-card"
           aria-label="Volver"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -170,13 +194,14 @@ export default function FilterPanel({
             />
           </svg>
         </button>
-        <h2 className="flex-1 text-center text-h1 text-neutral-900">Filtros</h2>
+        <h2 className="flex-1 text-center text-h1 font-bold text-neutral-900">Filtros</h2>
         {/* Spacer for centering */}
         <div className="min-w-[44px]" />
       </header>
 
       {/* Scrollable fields */}
-      <div className="flex-1 overflow-y-auto px-mobile-margin py-section-gap space-y-section-gap">
+      <div className="flex-1 overflow-y-auto overscroll-contain px-mobile-margin md:px-desktop-margin py-section-gap">
+        <div className="max-w-[416px] mx-auto space-y-section-gap">
         {/* Ciudad */}
         <div className="space-y-element-gap">
           <label htmlFor={cityId} className={labelClass}>Ciudad</label>
@@ -184,7 +209,7 @@ export default function FilterPanel({
             id={cityId}
             value={city}
             onChange={(e) => setCity(e.target.value)}
-            className={dropdownClass}
+            className={selectClass}
           >
             <option value="">Seleccionar ciudad</option>
             {CITIES.map((c) => (
@@ -203,7 +228,7 @@ export default function FilterPanel({
             onChange={(e) => setNeighborhood(e.target.value)}
             disabled={!city}
             placeholder={city ? 'Escribe un barrio' : ''}
-            className={`${dropdownClass} ${!city ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`${textInputClass} ${!city ? 'opacity-50 cursor-not-allowed' : ''}`}
           />
           {!city && (
             <p className="text-small text-neutral-600">Primero selecciona una ciudad</p>
@@ -217,7 +242,7 @@ export default function FilterPanel({
             id={publishedId}
             value={publishedWithin}
             onChange={(e) => setPublishedWithin(e.target.value)}
-            className={dropdownClass}
+            className={selectClass}
           >
             <option value="">Cualquier fecha</option>
             {PUBLISHED_OPTIONS.map((opt) => (
@@ -233,7 +258,7 @@ export default function FilterPanel({
             id={propertyTypeId}
             value={propertyType}
             onChange={(e) => setPropertyType(e.target.value)}
-            className={dropdownClass}
+            className={selectClass}
           >
             <option value="">Todos los tipos</option>
             {PROPERTY_TYPES.map((t) => (
@@ -250,12 +275,11 @@ export default function FilterPanel({
               <label htmlFor={priceMinId} className="sr-only">Precio mínimo</label>
               <input
                 id={priceMinId}
-                type="number"
+                type="text"
                 inputMode="numeric"
-                min="0"
-                placeholder="Mínimo"
-                value={priceMinRaw}
-                onChange={(e) => setPriceMinRaw(e.target.value)}
+                placeholder="$Mínimo"
+                value={formatCOP(priceMinRaw)}
+                onChange={(e) => setPriceMinRaw(stripCOP(e.target.value))}
                 className={priceInputClass}
               />
             </div>
@@ -263,12 +287,11 @@ export default function FilterPanel({
               <label htmlFor={priceMaxId} className="sr-only">Precio máximo</label>
               <input
                 id={priceMaxId}
-                type="number"
+                type="text"
                 inputMode="numeric"
-                min="0"
-                placeholder="Máximo"
-                value={priceMaxRaw}
-                onChange={(e) => setPriceMaxRaw(e.target.value)}
+                placeholder="$Máximo"
+                value={formatCOP(priceMaxRaw)}
+                onChange={(e) => setPriceMaxRaw(stripCOP(e.target.value))}
                 className={priceInputClass}
               />
             </div>
@@ -282,7 +305,7 @@ export default function FilterPanel({
             id={roomsId}
             value={rooms}
             onChange={(e) => setRooms(e.target.value)}
-            className={dropdownClass}
+            className={selectClass}
           >
             <option value="">Cualquiera</option>
             {ROOM_OPTIONS.map((r) => (
@@ -298,7 +321,7 @@ export default function FilterPanel({
             id={bathroomsId}
             value={bathrooms}
             onChange={(e) => setBathrooms(e.target.value)}
-            className={dropdownClass}
+            className={selectClass}
           >
             <option value="">Cualquiera</option>
             {BATHROOM_OPTIONS.map((b) => (
@@ -339,16 +362,19 @@ export default function FilterPanel({
             </div>
           </div>
         </div>
+        </div>
       </div>
 
       {/* Action buttons */}
-      <div className="shrink-0 px-mobile-margin pb-section-gap pt-element-gap space-y-element-gap border-t border-neutral-300">
-        <Button variant="primary" onClick={handleApply}>
-          Aplicar filtros
-        </Button>
-        <Button variant="secondary" onClick={handleClear}>
-          Limpiar filtros
-        </Button>
+      <div className="shrink-0 px-mobile-margin md:px-desktop-margin pb-section-gap pt-element-gap border-t border-neutral-300">
+        <div className="max-w-[416px] mx-auto space-y-element-gap">
+          <Button variant="primary" onClick={handleApply}>
+            Aplicar filtros
+          </Button>
+          <Button variant="secondary" onClick={handleClear}>
+            Limpiar filtros
+          </Button>
+        </div>
       </div>
     </div>
   );

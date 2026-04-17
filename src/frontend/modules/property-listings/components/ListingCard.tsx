@@ -33,7 +33,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
     <article className="border border-neutral-300 rounded-card shadow-card bg-white overflow-hidden">
       <Link
         href={`/explorar/${listing.id}`}
-        className="block min-h-[44px] min-w-[44px]"
+        className="block min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset rounded-card"
       >
         {mainPhoto ? (
           <div className="relative w-full aspect-[4/3]">
@@ -52,10 +52,10 @@ export default function ListingCard({ listing }: ListingCardProps) {
         )}
 
         <div className="p-4 space-y-2">
-          <h2 className="text-h2 text-neutral-900">{title}</h2>
+          <h2 className="text-h2 font-bold text-neutral-900">{title}</h2>
 
           <div className="flex items-center justify-between">
-            <h3 className="text-h3 text-primary">
+            <h3 className="text-h3 font-semibold text-primary">
               ${formatPrice(listing.price)}
             </h3>
 

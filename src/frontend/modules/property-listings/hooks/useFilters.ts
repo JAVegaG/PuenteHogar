@@ -79,5 +79,12 @@ export function useFilters() {
     [filters, updateURL],
   );
 
-  return { filters, setFilter, clearFilters, setSort, setPage, setPageSize };
+  const setFilters = useCallback(
+    (newFilters: ListingFilters) => {
+      updateURL({ ...newFilters, page: 1 });
+    },
+    [updateURL],
+  );
+
+  return { filters, setFilter, setFilters, clearFilters, setSort, setPage, setPageSize };
 }
