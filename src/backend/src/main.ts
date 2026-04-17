@@ -40,6 +40,16 @@ async function bootstrap() {
     swaggerOptions: { persistAuthorization: true },
   });
 
+  // CORS — allowed origins from env (comma-separated) or permissive in dev
+  const rawOrigins = process.env.CORS_ORIGINS;
+  if (rawOrigins) {
+    const origins = rawOrigins.split(',').map((o) => o.trim()).filter(Boolean);
+    app.enableCors({ origin: origins, credentials: true });
+  } else {
+    // Development fallback: allow any origin
+    app.enableCors({ origin: true, credentials: true });
+  }
+
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
   console.log(`Application running on port ${port}`);

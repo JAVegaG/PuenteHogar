@@ -26,6 +26,7 @@ import { GetListingDetailUseCase } from './application/use-cases/get-listing-det
 import { RegisterContactEventUseCase } from './application/use-cases/register-contact-event.use-case';
 import { SearchListingsUseCase } from './application/use-cases/search-listings.use-case';
 import { UnpublishListingUseCase } from './application/use-cases/unpublish-listing.use-case';
+import { Public } from '@src/shared';
 
 interface AuthenticatedRequest extends Request {
   user: { id: string; roles: string[] };
@@ -48,6 +49,7 @@ export class PropertyListingsController {
     private readonly registerContactEventUseCase: RegisterContactEventUseCase,
   ) {}
 
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Buscar inmuebles publicados', description: 'Retorna el listado de inmuebles activos. Accesible sin autenticación.' })
   @ApiOkResponse({ description: 'Listado paginado de inmuebles', type: PaginatedListingsResponseDto })
@@ -55,6 +57,7 @@ export class PropertyListingsController {
     return this.searchListingsUseCase.execute(filters);
   }
 
+  @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Obtener detalle de un inmueble' })
   @ApiOkResponse({ description: 'Detalle del inmueble', type: ListingDetailResponseDto })
