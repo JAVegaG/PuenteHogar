@@ -21,6 +21,7 @@ El diseño de referencia visual se encuentra en Figma: `https://www.figma.com/de
 | Protección de rutas con estado de carga | Evita flash de redirección mostrando un loader mientras se verifica la autenticación |
 | `fetch` nativo en AuthService | Consistente con el patrón establecido en `shared/services/api.ts` |
 | Interfaz en español | Requisito de la plataforma; todos los mensajes de error y labels en español |
+| Nombres de componentes en inglés, rutas en español | Los componentes, funciones y variables usan inglés para consistencia del código. Las rutas URL usan español (`/explorar`, `/mi-perfil`, `/auth/registro`) porque los usuarios finales hablan español |
 | Tokens de diseño de `tailwind.config.ts` | Fuente única de verdad para colores, tipografía y espaciado |
 
 ---
@@ -35,14 +36,14 @@ graph TB
         subgraph "App Router (app/)"
             Layout["layout.tsx<br/>AuthProvider wrapper"]
             LoginPage["auth/login/page.tsx<br/>(Client Component)"]
-            RegistroPage["auth/registro/page.tsx<br/>(Client Component)"]
+            RegisterPage["auth/registro/page.tsx<br/>(Client Component)"]
             PerfilPage["mi-perfil/page.tsx<br/>(Client Component)"]
         end
 
         subgraph "Módulo Users (modules/users)"
             subgraph "Componentes"
                 LoginForm["LoginForm"]
-                RegistroWizard["RegistroWizard"]
+                RegistrationWizard["RegistrationWizard"]
                 StepIndicator["StepIndicator"]
                 Step1UserType["Step1UserType"]
                 Step2PersonalData["Step2PersonalData"]
@@ -74,16 +75,16 @@ graph TB
     end
 
     LoginPage --> LoginForm
-    RegistroPage --> RegistroWizard
-    RegistroWizard --> StepIndicator
-    RegistroWizard --> Step1UserType
-    RegistroWizard --> Step2PersonalData
-    RegistroWizard --> Step3Credentials
+    RegisterPage --> RegistrationWizard
+    RegistrationWizard --> StepIndicator
+    RegistrationWizard --> Step1UserType
+    RegistrationWizard --> Step2PersonalData
+    RegistrationWizard --> Step3Credentials
     PerfilPage --> ProfileCard
     PerfilPage --> ProtectedRoute
 
     LoginForm -->|"login()"| AuthService
-    RegistroWizard -->|"register()"| AuthService
+    RegistrationWizard -->|"register()"| AuthService
     ProfileCard -->|"getProfile()"| AuthService
     Step2PersonalData -->|"getDocumentTypes()"| AuthService
 
@@ -93,7 +94,7 @@ graph TB
     AuthService -->|"GET"| DocTypesEndpoint
 
     AuthProvider -->|"provee contexto"| LoginForm
-    AuthProvider -->|"provee contexto"| RegistroWizard
+    AuthProvider -->|"provee contexto"| RegistrationWizard
     AuthProvider -->|"provee contexto"| ProfileCard
     AuthProvider -->|"provee contexto"| SharedUI
 ```
@@ -136,7 +137,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant U as Usuario
-    participant RW as RegistroWizard
+    participant RW as RegistrationWizard
     participant AS as AuthService
     participant B as Backend
 
@@ -182,7 +183,7 @@ src/frontend/
 │   └── users/
 │       ├── components/
 │       │   ├── LoginForm.tsx               # Formulario de login (Client)
-│       │   ├── RegistroWizard.tsx          # Orquestador multi-paso (Client)
+│       │   ├── RegistrationWizard.tsx          # Orquestador multi-paso (Client)
 │       │   ├── StepIndicator.tsx           # Indicador de progreso 1-2-3
 │       │   ├── Step1UserType.tsx           # Paso 1: tipo usuario + tipo persona
 │       │   ├── Step2PersonalData.tsx       # Paso 2: datos personales + documento
@@ -209,13 +210,13 @@ graph TD
     LoginPage --> Header["Header"]
     LoginPage --> LoginForm["LoginForm"]
 
-    Layout --> RegistroPage["RegistroPage"]
-    RegistroPage --> HeaderReg["Header (con botón retorno)"]
-    RegistroPage --> RegistroWizard["RegistroWizard"]
-    RegistroWizard --> StepIndicator["StepIndicator"]
-    RegistroWizard --> Step1["Step1UserType"]
-    RegistroWizard --> Step2["Step2PersonalData"]
-    RegistroWizard --> Step3["Step3Credentials"]
+    Layout --> RegisterPage["RegisterPage"]
+    RegisterPage --> HeaderReg["Header (con botón retorno)"]
+    RegisterPage --> RegistrationWizard["RegistrationWizard"]
+    RegistrationWizard --> StepIndicator["StepIndicator"]
+    RegistrationWizard --> Step1["Step1UserType"]
+    RegistrationWizard --> Step2["Step2PersonalData"]
+    RegistrationWizard --> Step3["Step3Credentials"]
 
     Layout --> PerfilPage["PerfilPage"]
     PerfilPage --> ProtectedRoute["ProtectedRoute"]
@@ -251,7 +252,7 @@ graph TD
 - **Submit**: Llama a `authService.login()`, en éxito invoca `login()` del AuthProvider y redirige a `/explorar`. En error 401 muestra "Correo electrónico o contraseña incorrectos" encima del formulario. En error de red muestra mensaje genérico.
 - **Accesibilidad**: Labels con `htmlFor`, errores con `aria-describedby`, botón deshabilitado durante submit, `aria-live="polite"` en zona de errores.
 
-#### `RegistroWizard`
+#### `RegistrationWizard`
 
 - **Props**: ninguna
 - **Tipo**: Client Component
@@ -507,7 +508,7 @@ Reglas de validación por campo:
 | Escenario | Componente | Comportamiento |
 |-----------|-----------|----------------|
 | Error de red (fetch falla) | LoginForm | Muestra "No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo." encima del formulario |
-| Error de red | RegistroWizard | Muestra mensaje de error preservando todos los datos del formulario |
+| Error de red | RegistrationWizard | Muestra mensaje de error preservando todos los datos del formulario |
 | Error de red | ProfileCard | Muestra ErrorState con botón "Reintentar" |
 | Error 5xx del servidor | Todos | Muestra "Error del servidor. Intenta de nuevo más tarde." |
 
@@ -517,8 +518,8 @@ Reglas de validación por campo:
 |-----------|-----------|----------------|
 | 401 en login | LoginForm | Muestra "Correo electrónico o contraseña incorrectos" encima del formulario, no borra campos |
 | 401 en endpoint protegido | AuthService | Invoca `logout()` del AuthProvider → redirige a `/auth/login` |
-| 409 en registro | RegistroWizard | Muestra "Este correo electrónico ya está registrado", preserva datos |
-| 400 en registro | RegistroWizard | Muestra mensajes de error del backend en español |
+| 409 en registro | RegistrationWizard | Muestra "Este correo electrónico ya está registrado", preserva datos |
+| 400 en registro | RegistrationWizard | Muestra mensajes de error del backend en español |
 
 ### Errores de Validación Client-Side
 
@@ -569,7 +570,7 @@ Este módulo se beneficia de property-based testing para las funciones de valida
 | Área | Archivo de Test | Cobertura |
 |------|----------------|-----------|
 | LoginForm | `modules/users/__tests__/LoginForm.test.tsx` | Renderizado, validación visual, submit exitoso, error 401, error de red, redirección de autenticados |
-| RegistroWizard | `modules/users/__tests__/RegistroWizard.test.tsx` | Navegación entre pasos, preservación de datos, campos condicionales, submit exitoso, errores 409/400/red |
+| RegistrationWizard | `modules/users/__tests__/RegistrationWizard.test.tsx` | Navegación entre pasos, preservación de datos, campos condicionales, submit exitoso, errores 409/400/red |
 | ProfileCard | `modules/users/__tests__/ProfileCard.test.tsx` | Renderizado de datos, skeleton, error con retry, logout |
 | ProtectedRoute | `modules/users/__tests__/ProtectedRoute.test.tsx` | Redirección de anónimos, loader durante verificación, renderizado de autenticados |
 | AuthService | `shared/services/__tests__/auth.test.ts` | Mapeo de errores 401/409/5xx, construcción de URLs |
