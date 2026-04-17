@@ -54,12 +54,12 @@ export function SideMenu({ isOpen, onClose, user }: SideMenuProps) {
       >
         {/* Header */}
         <div className="flex items-center justify-between h-[56px] px-mobile-margin border-b border-neutral-300">
-          <span className="text-h2 text-neutral-900">Menú</span>
+          <span className="text-h2 font-bold text-neutral-900">Menú</span>
           <button
             type="button"
             onClick={onClose}
             aria-label="Cerrar menú"
-            className="flex items-center justify-center w-[44px] h-[44px]"
+            className="flex items-center justify-center w-[44px] h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-card"
           >
             <svg
               width="24"
@@ -101,7 +101,7 @@ export function SideMenu({ isOpen, onClose, user }: SideMenuProps) {
                   <a
                     key={link.href}
                     href={link.href}
-                    className="flex items-center gap-element-gap px-mobile-margin py-3 text-body text-neutral-900 hover:bg-neutral-50 min-h-[44px]"
+                    className="flex items-center gap-element-gap px-mobile-margin py-3 text-body text-neutral-900 hover:bg-neutral-50 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
                   >
                     <link.icon />
                     <span>{link.label}</span>
@@ -113,7 +113,7 @@ export function SideMenu({ isOpen, onClose, user }: SideMenuProps) {
               <div className="border-t border-neutral-300 py-element-gap">
                 <a
                   href="/auth/login"
-                  className="flex items-center gap-element-gap px-mobile-margin py-3 text-body text-neutral-900 hover:bg-neutral-50 min-h-[44px]"
+                  className="flex items-center gap-element-gap px-mobile-margin py-3 text-body text-neutral-900 hover:bg-neutral-50 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
                 >
                   <LogoutIcon />
                   <span>Cerrar sesión</span>
@@ -126,7 +126,7 @@ export function SideMenu({ isOpen, onClose, user }: SideMenuProps) {
               <div className="flex-1 py-element-gap">
                 <a
                   href="/explorar"
-                  className="flex items-center gap-element-gap px-mobile-margin py-3 text-body text-neutral-900 hover:bg-neutral-50 min-h-[44px]"
+                  className="flex items-center gap-element-gap px-mobile-margin py-3 text-body text-neutral-900 hover:bg-neutral-50 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
                 >
                   <SearchIcon />
                   <span>Explorar inmuebles</span>
@@ -136,14 +136,14 @@ export function SideMenu({ isOpen, onClose, user }: SideMenuProps) {
               <div className="border-t border-neutral-300 py-element-gap">
                 <a
                   href="/auth/login"
-                  className="flex items-center gap-element-gap px-mobile-margin py-3 text-body text-neutral-900 hover:bg-neutral-50 min-h-[44px]"
+                  className="flex items-center gap-element-gap px-mobile-margin py-3 text-body text-neutral-900 hover:bg-neutral-50 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
                 >
                   <LoginIcon />
                   <span>Iniciar sesión</span>
                 </a>
                 <a
                   href="/auth/registro"
-                  className="flex items-center gap-element-gap px-mobile-margin py-3 text-body text-neutral-900 hover:bg-neutral-50 min-h-[44px]"
+                  className="flex items-center gap-element-gap px-mobile-margin py-3 text-body text-neutral-900 hover:bg-neutral-50 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
                 >
                   <RegisterIcon />
                   <span>Registrarse</span>

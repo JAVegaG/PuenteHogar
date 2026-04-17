@@ -37,7 +37,7 @@ export function Pagination({
           id="page-size-select"
           value={pageSize}
           onChange={(e) => onPageSizeChange(Number(e.target.value))}
-          className="text-caption text-neutral-900 bg-neutral-50 border border-neutral-300 rounded-card px-2 py-1 min-h-[44px] min-w-[44px]"
+          className="text-caption text-neutral-900 bg-neutral-50 border border-neutral-300 rounded-card px-2 py-1 min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
           <option value={9}>9</option>
           <option value={18}>18</option>
@@ -53,7 +53,7 @@ export function Pagination({
             onClick={() => onPageChange(page - 1)}
             disabled={page <= 1}
             aria-label="Página anterior"
-            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-card border border-neutral-300 text-caption text-neutral-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-card border border-neutral-300 text-caption text-neutral-600 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             ‹
           </button>
@@ -73,7 +73,7 @@ export function Pagination({
                 onClick={() => onPageChange(item as number)}
                 aria-label={`Página ${item}`}
                 aria-current={item === page ? 'page' : undefined}
-                className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-card text-caption ${
+                className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-card text-caption focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                   item === page
                     ? 'bg-primary text-white'
                     : 'border border-neutral-300 text-neutral-600'
@@ -89,7 +89,7 @@ export function Pagination({
             onClick={() => onPageChange(page + 1)}
             disabled={page >= totalPages}
             aria-label="Página siguiente"
-            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-card border border-neutral-300 text-caption text-neutral-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-card border border-neutral-300 text-caption text-neutral-600 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             ›
           </button>

@@ -10,7 +10,7 @@ export function ErrorState({ onRetry }: ErrorStateProps) {
       {onRetry && (
         <button
           onClick={onRetry}
-          className="mt-4 bg-primary text-white rounded-card h-[56px] px-6 min-w-[44px] min-h-[44px]"
+          className="mt-4 bg-primary text-white rounded-card h-[56px] px-6 min-w-[44px] min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
           Reintentar
         </button>

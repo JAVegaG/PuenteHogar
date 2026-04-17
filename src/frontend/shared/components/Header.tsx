@@ -9,14 +9,14 @@ interface HeaderProps {
 export function Header({ title, onMenuClick, leftAction }: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-neutral-300">
-      <div className="flex items-center justify-between h-[56px] px-mobile-margin md:px-desktop-margin">
+      <div className="flex items-center justify-between min-h-[56px] px-mobile-margin md:px-desktop-margin py-2">
         <div className="flex items-center min-w-[44px]">
           {leftAction ?? (
             <button
               type="button"
               onClick={onMenuClick}
               aria-label="Abrir menú"
-              className="flex items-center justify-center w-[44px] h-[44px] rounded-card"
+              className="flex items-center justify-center w-[44px] h-[44px] rounded-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <svg
                 width="24"
@@ -37,7 +37,7 @@ export function Header({ title, onMenuClick, leftAction }: HeaderProps) {
           )}
         </div>
 
-        <h1 className="text-h1 text-neutral-900 text-center flex-1 truncate">
+        <h1 className="text-h1 font-bold text-neutral-900 text-center flex-1">
           {title}
         </h1>
 
