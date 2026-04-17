@@ -103,6 +103,19 @@ modules/{name}/
 - Notification ports are stubbed per-module; real `notifications` module wires them in `AppModule`
 - All notifications are fire-and-forget (no `await`, no throw on failure)
 
+## Frontend Naming Convention
+
+| Aspect | Language | Examples |
+|--------|----------|----------|
+| Component names | English | `LoginForm`, `RegistrationWizard`, `ProfileCard`, `ProtectedRoute` |
+| Function/variable names | English | `handleSubmit`, `fetchProfile`, `translateRole` |
+| Page export names | English | `LoginPage`, `RegisterPage`, `ExplorePage`, `ProfilePage` |
+| URL routes/paths | Spanish | `/explorar`, `/mi-perfil`, `/auth/login`, `/auth/registro` |
+| UI text, labels, errors | Spanish | "Iniciar sesión", "Correo electrónico", "La contraseña es obligatoria" |
+| Module/folder names | English | `users/`, `property-listings/`, `shared/` |
+
+Routes are in Spanish because end users are Spanish-speaking. All code identifiers (components, functions, variables, types, interfaces) are in English for developer consistency.
+
 ## Key Design Decisions
 
 | ID | Decision |
