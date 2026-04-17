@@ -42,7 +42,7 @@ export default function Step2PersonalData({
             />
             <div aria-live="polite">
               {errors.firstName && (
-                <p id="step2-firstName-error" className="text-sm text-red-600">
+                <p id="step2-firstName-error" className="text-[14px] text-red-600">
                   {errors.firstName}
                 </p>
               )}
@@ -68,7 +68,7 @@ export default function Step2PersonalData({
             />
             <div aria-live="polite">
               {errors.lastName && (
-                <p id="step2-lastName-error" className="text-sm text-red-600">
+                <p id="step2-lastName-error" className="text-[14px] text-red-600">
                   {errors.lastName}
                 </p>
               )}
@@ -94,7 +94,7 @@ export default function Step2PersonalData({
             />
             <div aria-live="polite">
               {errors.preferredName && (
-                <p id="step2-preferredName-error" className="text-sm text-red-600">
+                <p id="step2-preferredName-error" className="text-[14px] text-red-600">
                   {errors.preferredName}
                 </p>
               )}
@@ -122,7 +122,7 @@ export default function Step2PersonalData({
           />
           <div aria-live="polite">
             {errors.businessName && (
-              <p id="step2-businessName-error" className="text-sm text-red-600">
+              <p id="step2-businessName-error" className="text-[14px] text-red-600">
                 {errors.businessName}
               </p>
             )}
@@ -161,7 +161,7 @@ export default function Step2PersonalData({
         )}
         <div aria-live="polite">
           {errors.documentTypeCode && (
-            <p id="step2-documentTypeCode-error" className="text-sm text-red-600">
+            <p id="step2-documentTypeCode-error" className="text-[14px] text-red-600">
               {errors.documentTypeCode}
             </p>
           )}
@@ -187,7 +187,7 @@ export default function Step2PersonalData({
         />
         <div aria-live="polite">
           {errors.documentNumber && (
-            <p id="step2-documentNumber-error" className="text-sm text-red-600">
+            <p id="step2-documentNumber-error" className="text-[14px] text-red-600">
               {errors.documentNumber}
             </p>
           )}
@@ -215,7 +215,7 @@ export default function Step2PersonalData({
         />
         <div aria-live="polite">
           {errors.phoneNumber && (
-            <p id="step2-phoneNumber-error" className="text-sm text-red-600">
+            <p id="step2-phoneNumber-error" className="text-[14px] text-red-600">
               {errors.phoneNumber}
             </p>
           )}

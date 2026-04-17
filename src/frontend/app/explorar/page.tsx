@@ -31,7 +31,7 @@ function ExploreContent() {
   const { user, logout } = useAuth();
 
   const sideMenuUser = user
-    ? { name: user.userId, role: translateRole(user.roles[0]) }
+    ? { name: user.displayName, role: translateRole(user.roles[0]) }
     : null;
 
   const currentSort = {

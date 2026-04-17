@@ -53,7 +53,7 @@ export default function LoginForm() {
 
     try {
       const response = await authService.login({ mail, password });
-      login(response.accessToken, response.userId, response.roles);
+      login(response.accessToken, response.userId, response.displayName, response.roles);
       router.push('/explorar');
     } catch (err) {
       const message = err instanceof Error ? err.message : '';
@@ -77,7 +77,7 @@ export default function LoginForm() {
       {/* Server error */}
       <div aria-live="polite" role="alert">
         {serverError && (
-          <div className="rounded-[6px] border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-600">
+          <div className="rounded-[6px] border border-red-300 bg-red-50 px-4 py-3 text-base text-red-600">
             {serverError}
           </div>
         )}
@@ -101,7 +101,7 @@ export default function LoginForm() {
         />
         <div aria-live="polite">
           {errors.mail && (
-            <p id="login-mail-error" className="text-sm text-red-600">
+            <p id="login-mail-error" className="text-[14px] text-red-600">
               {errors.mail}
             </p>
           )}
@@ -126,7 +126,7 @@ export default function LoginForm() {
         />
         <div aria-live="polite">
           {errors.password && (
-            <p id="login-password-error" className="text-sm text-red-600">
+            <p id="login-password-error" className="text-[14px] text-red-600">
               {errors.password}
             </p>
           )}

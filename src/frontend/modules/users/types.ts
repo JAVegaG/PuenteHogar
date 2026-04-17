@@ -1,5 +1,6 @@
 export interface AuthUser {
   userId: string;
+  displayName: string;
   roles: string[];
   accessToken: string;
 }
@@ -12,6 +13,7 @@ export interface LoginRequest {
 export interface LoginResponse {
   accessToken: string;
   userId: string;
+  displayName: string;
   roles: string[];
 }
 
@@ -42,6 +44,7 @@ export interface RegisterRequest {
 export interface UserProfile {
   id: string;
   mail: string;
+  displayName: string;
   roles: string[];
   isActive: boolean;
 }
@@ -76,6 +79,6 @@ export interface AuthContextValue {
   user: AuthUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (accessToken: string, userId: string, roles: string[]) => void;
+  login: (accessToken: string, userId: string, displayName: string, roles: string[]) => void;
   logout: () => void;
 }

@@ -152,16 +152,16 @@ export default function RegistrationWizard() {
   if (success) {
     return (
       <div
-        className="flex flex-col items-center gap-4 py-12"
+        className="flex flex-col items-center gap-6 py-16"
         role="status"
         aria-live="polite"
       >
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+        <div className="flex h-24 w-24 items-center justify-center rounded-full bg-green-100">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
             fill="currentColor"
-            className="h-8 w-8 text-green-600"
+            className="h-12 w-12 text-green-600"
             aria-hidden="true"
           >
             <path
@@ -171,10 +171,10 @@ export default function RegistrationWizard() {
             />
           </svg>
         </div>
-        <p className="text-lg font-semibold text-green-700">
+        <p className="text-2xl font-semibold text-green-700">
           ¡Cuenta creada exitosamente!
         </p>
-        <p className="text-sm text-neutral-600">
+        <p className="text-base text-neutral-600">
           Redirigiendo al inicio de sesión…
         </p>
       </div>
@@ -188,7 +188,7 @@ export default function RegistrationWizard() {
       {/* Server error banner */}
       {serverError && (
         <div
-          className="rounded-radius-card border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700"
+          className="rounded-radius-card border border-red-300 bg-red-50 px-4 py-3 text-base text-red-700"
           role="alert"
           aria-live="polite"
         >

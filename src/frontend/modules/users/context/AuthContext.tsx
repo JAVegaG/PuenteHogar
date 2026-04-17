@@ -28,8 +28,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = useCallback((accessToken: string, userId: string, roles: string[]) => {
-    const authUser: AuthUser = { accessToken, userId, roles };
+  const login = useCallback((accessToken: string, userId: string, displayName: string, roles: string[]) => {
+    const authUser: AuthUser = { accessToken, userId, displayName, roles };
     localStorage.setItem('auth_token', accessToken);
     localStorage.setItem('auth_user', JSON.stringify(authUser));
     setUser(authUser);

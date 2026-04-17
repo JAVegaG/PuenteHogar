@@ -34,7 +34,7 @@ export default function Step3Credentials({
         />
         <div aria-live="polite">
           {errors.mail && (
-            <p id="step3-mail-error" className="text-sm text-red-600">
+            <p id="step3-mail-error" className="text-[14px] text-red-600">
               {errors.mail}
             </p>
           )}
@@ -60,7 +60,7 @@ export default function Step3Credentials({
         />
         <div aria-live="polite">
           {errors.password && (
-            <p id="step3-password-error" className="text-sm text-red-600">
+            <p id="step3-password-error" className="text-[14px] text-red-600">
               {errors.password}
             </p>
           )}
@@ -86,7 +86,7 @@ export default function Step3Credentials({
         />
         <div aria-live="polite">
           {errors.confirmPassword && (
-            <p id="step3-confirmPassword-error" className="text-sm text-red-600">
+            <p id="step3-confirmPassword-error" className="text-[14px] text-red-600">
               {errors.confirmPassword}
             </p>
           )}

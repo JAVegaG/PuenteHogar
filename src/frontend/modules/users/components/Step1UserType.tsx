@@ -99,7 +99,7 @@ export default function Step1UserType({ data, errors, onChange }: Step1UserTypeP
         </div>
         <div aria-live="polite">
           {errors.userType && (
-            <p className="mt-2 text-sm text-red-600" role="alert">
+            <p className="mt-2 text-[14px] text-red-600" role="alert">
               {errors.userType}
             </p>
           )}
@@ -141,7 +141,7 @@ export default function Step1UserType({ data, errors, onChange }: Step1UserTypeP
         </div>
         <div aria-live="polite">
           {errors.personType && (
-            <p className="mt-2 text-sm text-red-600" role="alert">
+            <p className="mt-2 text-[14px] text-red-600" role="alert">
               {errors.personType}
             </p>
           )}
