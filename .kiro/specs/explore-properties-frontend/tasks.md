@@ -229,7 +229,7 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - Generar filtros con uno o más valores definidos, ejecutar `clearFilters` y verificar que todos los campos son `undefined`
     - **Valida: Requisito 3.11**
 
-  - [~] 6.12 Implementar `FilterPanel` (panel de filtros avanzados)
+  - [x] 6.12 Implementar `FilterPanel` (panel de filtros avanzados)
     - Client Component (`'use client'`), cargado con `React.lazy` + `Suspense`
     - Vista fullscreen en mobile con encabezado "Filtros" (32px Bold) y botón de retorno
     - Campos: ciudad (dropdown), barrio (dropdown, deshabilitado sin ciudad con texto "Primero selecciona una ciudad"), fecha publicación (dropdown), tipo propiedad (dropdown), precio min/max (inputs numéricos con `useDebounce`), habitaciones (dropdown), baños (dropdown), área min/max (inputs numéricos con `useDebounce`)
@@ -249,7 +249,7 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - Generar secuencias de cambios en campos del FilterPanel sin presionar "Aplicar filtros" y verificar que el número de llamadas HTTP es cero
     - **Valida: Control de llamadas API**
 
-  - [~] 6.15 Implementar `SortPanel` (panel de ordenamiento)
+  - [x] 6.15 Implementar `SortPanel` (panel de ordenamiento)
     - Client Component con vista fullscreen, encabezado "Ordenar" (32px Bold) y botón de retorno
     - 4 opciones radio: "Más recientes primero", "Más antiguos primero", "Precio: menor a mayor", "Precio: mayor a menor" — cada una con título (20px SemiBold) y descripción (14px Regular `#4b5563`)
     - Check visual (color `#1d4ed8`) en opción seleccionada
@@ -262,16 +262,16 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - Generar opciones de ordenamiento con `fc.constantFrom(...)` y verificar que el texto del botón coincide con la etiqueta de la opción seleccionada
     - **Valida: Requisito 10.5**
 
-  - [~] 6.17 Implementar `ActionBar` (barra de acciones: Filtros + Ordenar)
+  - [x] 6.17 Implementar `ActionBar` (barra de acciones: Filtros + Ordenar)
     - Barra debajo del encabezado con dos botones: "Filtros" (con icono) y botón de ordenamiento cuyo texto refleja la opción seleccionada (default "Más recientes")
     - Controla apertura/cierre de `FilterPanel` y `SortPanel`
     - Archivo: `src/frontend/modules/property-listings/components/ActionBar.tsx`
     - _Requisitos: 2.8, 10.5_
 
-- [ ] 7. Checkpoint — Verificar componentes del módulo
+- [x] 7. Checkpoint — Verificar componentes del módulo
   - Asegurar que todos los tests pasan, preguntar al usuario si surgen dudas.
 
-- [ ] 8. Implementar hook `useListings` con AbortController
+- [x] 8. Implementar hook `useListings` con AbortController
   - Implementar hook que gestiona fetch de listings con `AbortController` para cancelar requests en vuelo
   - Estados: `data` (`PaginatedListings | null`), `isLoading` (boolean), `error` (`Error | null`), `retry` (función)
   - Cancelar request anterior con `controller.abort()` cuando los filtros cambian antes de que la respuesta llegue
@@ -286,7 +286,7 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
 
 
 - [ ] 9. Implementar página de exploración (`/explorar`)
-  - [~] 9.1 Crear `app/explorar/page.tsx` como Server Component
+  - [x] 9.1 Crear `app/explorar/page.tsx` como Server Component
     - Leer query params de la URL (filtros, ordenamiento, paginación)
     - Llamar a `fetchListings` con los parámetros del URL desde el servidor
     - Renderizar `ActionBar`, `ListingGrid` (o `ListingGridSkeleton` / `EmptyState` / `ErrorState` según estado), `Pagination`
@@ -301,7 +301,7 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - _Requisitos: 2.1, 2.3, 2.4, 2.5, 8.1, 8.7_
 
 - [ ] 10. Implementar componentes de detalle del inmueble
-  - [~] 10.1 Implementar `PhotoGallery` (galería de fotos con navegación)
+  - [x] 10.1 Implementar `PhotoGallery` (galería de fotos con navegación)
     - Client Component con imagen principal ocupando ancho completo (márgenes 52px en desktop)
     - Botones de navegación izquierda/derecha (36×36px, fondo semitransparente) superpuestos sobre la imagen
     - Indicador de posición "X / Y" con fondo semitransparente
@@ -315,7 +315,7 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - Generar N (≥ 1) e I (1 ≤ I ≤ N) y verificar que el indicador muestra "I / N"
     - **Valida: Requisito 5.3**
 
-  - [~] 10.3 Implementar `GalleryModal` (modal de imagen ampliada)
+  - [x] 10.3 Implementar `GalleryModal` (modal de imagen ampliada)
     - Client Component cargado con `React.lazy` + `Suspense`
     - Fullscreen con imagen ampliada, navegación izquierda/derecha (48×48px), miniaturas en la parte inferior, indicador "X / Y", botón cierre (X)
     - Cierra con tecla Escape y con click en botón X
@@ -323,14 +323,14 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - Archivo: `src/frontend/modules/property-listings/components/GalleryModal.tsx`
     - _Requisitos: 5.4, 8.6_
 
-  - [~] 10.4 Implementar `PropertyInfoGrid` (grilla de habitaciones/baños/área)
+  - [x] 10.4 Implementar `PropertyInfoGrid` (grilla de habitaciones/baños/área)
     - Grilla de 3 columnas con tarjetas (fondo `#f3f4f6`, border-radius 6px, padding 12px)
     - Cada tarjeta: icono centrado, valor (16px Regular), etiqueta (12px Regular `#4b5563`)
     - Campos: Habitaciones, Baños, Área (m²)
     - Archivo: `src/frontend/modules/property-listings/components/PropertyInfoGrid.tsx`
     - _Requisito: 5.6_
 
-  - [~] 10.5 Implementar `ListingDetailView` (vista completa del detalle)
+  - [x] 10.5 Implementar `ListingDetailView` (vista completa del detalle)
     - Precio "$X/mes" (H2 24px Bold `#1d4ed8`), título (H3 20px SemiBold `#111827`)
     - `PropertyInfoGrid` para habitaciones/baños/área
     - Sección "Descripción" (H3 + texto 16px Regular `#4b5563`)
@@ -341,7 +341,7 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - _Requisitos: 5.5, 5.6, 5.7, 5.8, 5.9, 5.10_
 
 - [ ] 11. Implementar página de detalle (`/explorar/[id]`)
-  - [~] 11.1 Crear `app/explorar/[id]/page.tsx` como Server Component
+  - [x] 11.1 Crear `app/explorar/[id]/page.tsx` como Server Component
     - Llamar a `fetchListingDetail(id)` desde el servidor
     - Renderizar encabezado fijo con botón de retorno y título "Detalle del inmueble" (32px Bold `#111827`)
     - Renderizar `PhotoGallery` + `ListingDetailView` (o `ListingDetailSkeleton` / error state según estado)
@@ -355,17 +355,17 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - Verificar accesibilidad: estructura semántica, atributos ARIA
     - _Requisitos: 5.1, 5.11, 5.12, 8.1, 8.7_
 
-- [ ] 12. Checkpoint — Verificar páginas completas
+- [x] 12. Checkpoint — Verificar páginas completas
   - Asegurar que todos los tests pasan, preguntar al usuario si surgen dudas.
   - Verificar que la navegación entre listado y detalle funciona correctamente.
 
 - [ ] 13. Integración, accesibilidad y pulido final
-  - [~] 13.1 Integrar Header con SideMenu en el layout raíz
+  - [x] 13.1 Integrar Header con SideMenu en el layout raíz
     - Cablear el Header en `app/layout.tsx` con apertura/cierre del SideMenu
     - Verificar que el botón hamburguesa abre el menú y el título se muestra centrado en ambas páginas
     - _Requisitos: 2.7, 11.1_
 
-  - [~] 13.2 Verificar accesibilidad en todos los componentes
+  - [x] 13.2 Verificar accesibilidad en todos los componentes
     - Elementos HTML semánticos (`main`, `nav`, `article`, `section`, `header`, `h1`-`h6`)
     - Áreas táctiles mínimas 44×44px en botones y enlaces
     - Atributos `alt` descriptivos en español en todas las imágenes
@@ -375,7 +375,7 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - Atributos ARIA (`aria-live`, `aria-busy`, `role`) en estados dinámicos (carga, error)
     - _Requisitos: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7_
 
-  - [~] 13.3 Verificar responsividad y sistema de diseño
+  - [x] 13.3 Verificar responsividad y sistema de diseño
     - Márgenes laterales: 16px mobile, 52px desktop
     - Grid de tarjetas: 1 columna mobile, 2 columnas ≥ 768px
     - Escala tipográfica aplicada correctamente
@@ -387,7 +387,7 @@ El orden de implementación es: (1) cambios backend, (2) inicialización fronten
     - Verificar flujo completo: listado → filtros → aplicar → resultados actualizados → click tarjeta → detalle → volver
     - _Requisitos: 2.1, 3.12, 3.13, 5.1_
 
-- [ ] 14. Checkpoint final — Verificar implementación completa
+- [x] 14. Checkpoint final — Verificar implementación completa
   - Asegurar que todos los tests pasan, preguntar al usuario si surgen dudas.
   - Confirmar que todas las páginas, componentes y la integración con el backend funcionan correctamente.
 
