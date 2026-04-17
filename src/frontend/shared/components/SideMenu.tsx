@@ -7,6 +7,7 @@ interface SideMenuProps {
   isOpen: boolean;
   onClose: () => void;
   user?: { name: string; role: string } | null;
+  onLogout?: () => void;
 }
 
 const NAV_LINKS = [
@@ -17,7 +18,7 @@ const NAV_LINKS = [
   { label: 'Mi perfil', href: '/mi-perfil', icon: UserIcon },
 ];
 
-export function SideMenu({ isOpen, onClose, user }: SideMenuProps) {
+export function SideMenu({ isOpen, onClose, user, onLogout }: SideMenuProps) {
   useBodyScrollLock(isOpen);
   const drawerRef = useRef<HTMLDivElement>(null);
 
@@ -31,13 +32,13 @@ export function SideMenu({ isOpen, onClose, user }: SideMenuProps) {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
+  if (!isOpen) return null;
+
   return (
     <>
       {/* Overlay */}
       <div
-        className={`fixed inset-0 z-50 bg-black/50 transition-opacity duration-300 ${
-          isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}
+        className="fixed inset-0 z-50 bg-black/50"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -48,9 +49,7 @@ export function SideMenu({ isOpen, onClose, user }: SideMenuProps) {
         role="dialog"
         aria-modal="true"
         aria-label="Menú de navegación"
-        className={`fixed top-0 left-0 z-50 h-full w-[320px] bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className="fixed top-0 left-0 z-50 h-full w-[320px] bg-white shadow-lg"
       >
         {/* Header */}
         <div className="flex items-center justify-between h-[56px] px-mobile-margin border-b border-neutral-300">
@@ -111,13 +110,27 @@ export function SideMenu({ isOpen, onClose, user }: SideMenuProps) {
 
               {/* Logout */}
               <div className="border-t border-neutral-300 py-element-gap">
-                <a
-                  href="/auth/login"
-                  className="flex items-center gap-element-gap px-mobile-margin py-3 text-body text-neutral-900 hover:bg-neutral-50 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
-                >
-                  <LogoutIcon />
-                  <span>Cerrar sesión</span>
-                </a>
+                {onLogout ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      onLogout();
+                    }}
+                    className="flex items-center gap-element-gap px-mobile-margin py-3 text-body text-neutral-900 hover:bg-neutral-50 min-h-[44px] w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
+                  >
+                    <LogoutIcon />
+                    <span>Cerrar sesión</span>
+                  </button>
+                ) : (
+                  <a
+                    href="/auth/login"
+                    className="flex items-center gap-element-gap px-mobile-margin py-3 text-body text-neutral-900 hover:bg-neutral-50 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
+                  >
+                    <LogoutIcon />
+                    <span>Cerrar sesión</span>
+                  </a>
+                )}
               </div>
             </>
           ) : (

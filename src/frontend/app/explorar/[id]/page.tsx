@@ -18,7 +18,7 @@ type PageState =
   | { status: 'not_found' }
   | { status: 'error' };
 
-export default function DetalleInmueblePage() {
+export default function ListingDetailPage() {
   const params = useParams<{ id: string }>();
   const id = params.id;
 

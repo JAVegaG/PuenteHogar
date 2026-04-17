@@ -10,15 +10,29 @@ import { Pagination } from '@/shared/components/Pagination';
 import { Header } from '@/shared/components/Header';
 import { useFilters } from '@modules/property-listings/hooks/useFilters';
 import { useListings } from '@modules/property-listings/hooks/useListings';
+import { useAuth } from '@modules/users/context/AuthContext';
 
 const SideMenu = lazy(() =>
   import('@/shared/components/SideMenu').then((m) => ({ default: m.SideMenu }))
 );
 
-function ExplorarContent() {
+function translateRole(role: string): string {
+  const map: Record<string, string> = {
+    LANDLORD: 'Arrendador',
+    TENANT: 'Arrendatario',
+  };
+  return map[role] || role;
+}
+
+function ExploreContent() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { filters, setFilters, clearFilters, setSort, setPage, setPageSize } = useFilters();
   const { data, isLoading, error, retry } = useListings(filters);
+  const { user, logout } = useAuth();
+
+  const sideMenuUser = user
+    ? { name: user.userId, role: translateRole(user.roles[0]) }
+    : null;
 
   const currentSort = {
     sortBy: filters.sortBy ?? 'date',
@@ -31,7 +45,12 @@ function ExplorarContent() {
 
       <Suspense fallback={null}>
         {menuOpen && (
-          <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+          <SideMenu
+            isOpen={menuOpen}
+            onClose={() => setMenuOpen(false)}
+            user={sideMenuUser}
+            onLogout={user ? logout : undefined}
+          />
         )}
       </Suspense>
 
@@ -73,7 +92,7 @@ function ExplorarContent() {
   );
 }
 
-export default function ExplorarPage() {
+export default function ExplorePage() {
   return (
     <Suspense fallback={
       <>
@@ -83,7 +102,7 @@ export default function ExplorarPage() {
         </div>
       </>
     }>
-      <ExplorarContent />
+      <ExploreContent />
     </Suspense>
   );
 }
