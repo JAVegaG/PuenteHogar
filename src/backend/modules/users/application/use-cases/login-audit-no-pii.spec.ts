@@ -86,6 +86,7 @@ function buildMocksForFailedLogin(
     findRoleByName: async (name: string) => ({ id: 'role-id', name }),
     findDocumentTypeByCode: async (code: string) => ({ id: 'doc-id', code }),
     findAllDocumentTypes: async () => [],
+    findDisplayName: async () => null,
     create: async () => {
       throw new Error('should not be called');
     },

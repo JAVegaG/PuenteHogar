@@ -22,6 +22,7 @@ export interface CreateUserData {
 export interface IUserRepository {
   findByMail(mail: string): Promise<UserEntity | null>;
   findById(id: string): Promise<UserEntity | null>;
+  findDisplayName(userId: string): Promise<string | null>;
   create(data: CreateUserData): Promise<UserEntity>;
   findRoleByName(name: string): Promise<{ id: string; name: string } | null>;
   findDocumentTypeByCode(code: string): Promise<{ id: string; code: string } | null>;

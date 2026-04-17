@@ -40,6 +40,8 @@ export class LoginUseCase {
     const payload = { sub: user.id, roles: user.roles };
     const accessToken = this.jwtService.sign(payload);
 
-    return { accessToken, userId: user.id, roles: user.roles };
+    const displayName = await this.userRepository.findDisplayName(user.id);
+
+    return { accessToken, userId: user.id, displayName: displayName ?? user.mail, roles: user.roles };
   }
 }

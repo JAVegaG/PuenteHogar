@@ -146,6 +146,7 @@ describe('RegisterUserUseCase — Property 2: Correo duplicado es rechazado con 
           findRoleByName: async (name: string) => ({ id: 'role-id-1', name }),
           findDocumentTypeByCode: async (code: string) => ({ id: 'doc-type-id-1', code }),
           findAllDocumentTypes: async () => [],
+          findDisplayName: async () => null,
           create: async () => existingUser,
         };
 

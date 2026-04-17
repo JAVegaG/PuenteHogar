@@ -108,6 +108,7 @@ function buildMocks(dto: RegisterUserDto) {
     findRoleByName: async (name: string) => ({ id: 'role-id-1', name }),
     findDocumentTypeByCode: async (code: string) => ({ id: 'doc-type-id-1', code }),
     findAllDocumentTypes: async () => [],
+    findDisplayName: async () => null,
     create: async () => userEntity,
   };
 

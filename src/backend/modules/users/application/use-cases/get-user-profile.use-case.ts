@@ -15,9 +15,12 @@ export class GetUserProfileUseCase {
       throw new NotFoundException('Usuario no encontrado');
     }
 
+    const displayName = await this.userRepository.findDisplayName(userId);
+
     return {
       id: user.id,
       mail: user.mail,
+      displayName: displayName ?? user.mail,
       roles: user.roles,
       isActive: user.isActive,
     };

@@ -21,9 +21,29 @@ export class PrismaUserRepository implements IUserRepository {
   async findById(id: string): Promise<UserEntity | null> {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      include: { users_roles: { include: { role: true } } },
+      include: {
+        users_roles: { include: { role: true } },
+        natural_person: true,
+        legal_person: true,
+      },
     });
     return user ? this.toEntity(user) : null;
+  }
+
+  async findDisplayName(userId: string): Promise<string | null> {
+    const natural = await this.prisma.naturalPersonDetail.findUnique({
+      where: { user_id: userId },
+    });
+    if (natural) {
+      return natural.preferred_name || `${natural.first_name} ${natural.last_name}`;
+    }
+    const legal = await this.prisma.legalPersonDetail.findUnique({
+      where: { user_id: userId },
+    });
+    if (legal) {
+      return legal.business_name;
+    }
+    return null;
   }
 
   async create(data: CreateUserData): Promise<UserEntity> {

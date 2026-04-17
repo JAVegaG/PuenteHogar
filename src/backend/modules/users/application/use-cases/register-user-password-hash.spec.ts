@@ -38,6 +38,7 @@ function buildRepositoryMock(dto: RegisterUserDto, capturedHash: { value: string
     findRoleByName: async (name: string) => ({ id: 'role-id-1', name }),
     findDocumentTypeByCode: async (code: string) => ({ id: 'doc-type-id-1', code }),
     findAllDocumentTypes: async () => [],
+    findDisplayName: async () => null,
     create: async (data) => {
       capturedHash.value = data.hashedPassword;
       return new UserEntity(
