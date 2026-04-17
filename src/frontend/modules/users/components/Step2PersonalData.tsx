@@ -154,7 +154,7 @@ export default function Step2PersonalData({
             <option value="">Selecciona un tipo de documento</option>
             {documentTypes.map((dt) => (
               <option key={dt.code} value={dt.code}>
-                {dt.name}
+                {dt.description}
               </option>
             ))}
           </select>

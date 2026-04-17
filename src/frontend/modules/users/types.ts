@@ -47,8 +47,9 @@ export interface UserProfile {
 }
 
 export interface DocumentType {
+  id: string;
   code: string;
-  name: string;
+  description: string;
 }
 
 export interface RegistrationFormData {
