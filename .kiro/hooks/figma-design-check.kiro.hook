@@ -1,0 +1,15 @@
+{
+  "enabled": true,
+  "name": "Figma Design Validation",
+  "description": "When a frontend TSX or CSS file is edited, uses the Figma MCP to analyze the changes against the design system in the Figma library (OKw8eeohlS12SOQjjbfCGm) and the screen designs (Yw53CFbVdMWVX7bQ6MFefk). Checks typography, colors, spacing, border radius, shadows, and component patterns match the Figma specs.",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A frontend file was just edited. Use the Figma MCP power to validate the changes align with the established design system.\n\n1. Read the edited file content.\n2. Use the Figma MCP `get_variable_defs` or `get_design_context` tools against the design system library (fileKey: OKw8eeohlS12SOQjjbfCGm) and screen designs (fileKey: Yw53CFbVdMWVX7bQ6MFefk) to fetch the relevant design tokens and component specs.\n3. Check the following against the Figma design system:\n   - Typography: font sizes (H1=3.2rem, H2=2.4rem, H3=2rem, Body=1.6rem, Caption=1.4rem, Small=1.2rem), font weights (H1/H2=Bold 700, H3=Semibold 600, Body/Caption/Small=Regular 400), line heights, and font family (Inter)\n   - Colors: primary (#1D4ED8), primary-600 (#1E40AF), neutral-900 (#111827), neutral-600 (#4B5563), neutral-300 (#D1D5DB), neutral-100 (#F3F4F6), neutral-50 (#F9FAFB), secondary (#10B981), error (#EF4444), warning (#F59E0B), info (#3B82F6)\n   - Spacing: mobile-margin (1.6rem/16px), desktop-margin (5.2rem/52px), section-gap (2.4rem/24px), element-gap (1.2rem/12px)\n   - Border radius: card (0.6rem/6px), badge (0.4rem/4px)\n   - Shadows: card (0px 0.1rem 0.2rem rgba(0,0,0,0.05))\n   - Touch targets: minimum 44x44px on interactive elements\n   - Component patterns: buttons (primary h-56px, secondary h-58px), cards with border neutral-300 + shadow-card + rounded-card\n4. Report any mismatches between the code and the Figma design system. Be specific about what differs and what the correct Figma value should be.\n5. If everything aligns, confirm that the file follows the design system correctly.\n\nOnly flag real issues — don't report on files that don't contain visual/UI code (e.g., hooks, types, utils)."
+  },
+  "workspaceFolderName": "TrabajoGrado",
+  "shortName": "figma-design-check"
+}
