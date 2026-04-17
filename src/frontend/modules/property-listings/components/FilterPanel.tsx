@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useId } from 'react';
+import { useState, useEffect, useId, useMemo } from 'react';
 import { Button } from '@/shared/components/Button';
 import type { ListingFilters } from '../types';
 
@@ -38,6 +38,25 @@ function formatCOP(raw: string): string {
 /** Strip formatting back to digits only */
 function stripCOP(display: string): string {
   return display.replace(/\D/g, '');
+}
+
+/** Strip non-digit characters from area input */
+function stripNonDigits(value: string): string {
+  return value.replace(/\D/g, '');
+}
+
+/** Validate a numeric input string. Returns error message or null. */
+function validateNumericInput(value: string): string | null {
+  if (!value) return null;
+  if (/[^0-9]/.test(value)) return 'Solo se permiten números';
+  return null;
+}
+
+/** Validate that min is not greater than max. Returns error message or null. */
+function validateMinMax(min: string, max: string): string | null {
+  if (!min || !max) return null;
+  if (Number(min) > Number(max)) return 'El mínimo no puede ser mayor al máximo';
+  return null;
 }
 
 function parseRoomValue(val: string): number | undefined {
@@ -84,9 +103,28 @@ export default function FilterPanel({
   const [areaMinRaw, setAreaMinRaw] = useState(currentFilters.areaMin?.toString() ?? '');
   const [areaMaxRaw, setAreaMaxRaw] = useState(currentFilters.areaMax?.toString() ?? '');
 
-  // Note: Numeric inputs (price, area) use local state only.
-  // Since filters require explicit "Aplicar filtros" action,
-  // debounce is not needed here (no API calls on each keystroke).
+  // Track whether user typed invalid characters (for inline error display)
+  const [priceMinError, setPriceMinError] = useState<string | null>(null);
+  const [priceMaxError, setPriceMaxError] = useState<string | null>(null);
+  const [areaMinError, setAreaMinError] = useState<string | null>(null);
+  const [areaMaxError, setAreaMaxError] = useState<string | null>(null);
+
+  // Derived min > max errors
+  const priceRangeError = useMemo(
+    () => validateMinMax(priceMinRaw, priceMaxRaw),
+    [priceMinRaw, priceMaxRaw],
+  );
+  const areaRangeError = useMemo(
+    () => validateMinMax(areaMinRaw, areaMaxRaw),
+    [areaMinRaw, areaMaxRaw],
+  );
+
+  // API saturation protection review (task 12.2):
+  // ✅ Numeric inputs (price min/max, area min/max) use local state only — no API calls on keystroke.
+  // ✅ Explicit action pattern: filters are only applied when user clicks "Aplicar filtros" (handleApply).
+  // ✅ useDebounce is NOT needed here because no field change triggers an API call directly.
+  // ✅ useListings already uses AbortController to cancel in-flight requests on filter changes.
+  // ✅ Pagination rapid clicks are safe: AbortController cancels stale requests automatically.
   // If reactive filtering is added later, wire useDebounce from @/shared/hooks/useDebounce.
 
   // Sync local state when currentFilters change externally
@@ -101,6 +139,11 @@ export default function FilterPanel({
     setBathrooms(bathroomsToString(currentFilters.bathrooms));
     setAreaMinRaw(currentFilters.areaMin?.toString() ?? '');
     setAreaMaxRaw(currentFilters.areaMax?.toString() ?? '');
+    // Clear errors when filters are synced externally
+    setPriceMinError(null);
+    setPriceMaxError(null);
+    setAreaMinError(null);
+    setAreaMaxError(null);
   }, [currentFilters]);
 
   // Reset neighborhood when city is cleared
@@ -118,13 +161,46 @@ export default function FilterPanel({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
+  const handlePriceMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawInput = e.target.value;
+    const stripped = stripCOP(rawInput);
+    const error = validateNumericInput(rawInput.replace(/[$.,\s]/g, ''));
+    setPriceMinError(error);
+    setPriceMinRaw(stripped);
+  };
+
+  const handlePriceMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawInput = e.target.value;
+    const stripped = stripCOP(rawInput);
+    const error = validateNumericInput(rawInput.replace(/[$.,\s]/g, ''));
+    setPriceMaxError(error);
+    setPriceMaxRaw(stripped);
+  };
+
+  const handleAreaMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawInput = e.target.value;
+    const error = validateNumericInput(rawInput);
+    setAreaMinError(error);
+    setAreaMinRaw(stripNonDigits(rawInput));
+  };
+
+  const handleAreaMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawInput = e.target.value;
+    const error = validateNumericInput(rawInput);
+    setAreaMaxError(error);
+    setAreaMaxRaw(stripNonDigits(rawInput));
+  };
+
+  const hasErrors = !!(priceMinError || priceMaxError || areaMinError || areaMaxError || priceRangeError || areaRangeError);
+
   const handleApply = () => {
+    if (hasErrors) return;
+
     const filters: ListingFilters = {};
     if (city) filters.city = city;
     if (neighborhood) filters.neighborhood = neighborhood;
     if (publishedWithin) filters.publishedWithin = publishedWithin as ListingFilters['publishedWithin'];
     if (propertyType) filters.propertyType = propertyType;
-    // Use raw values (not debounced) since this is an explicit user action
     if (priceMinRaw) filters.priceMin = Number(priceMinRaw);
     if (priceMaxRaw) filters.priceMax = Number(priceMaxRaw);
     const roomVal = parseRoomValue(rooms);
@@ -148,6 +224,10 @@ export default function FilterPanel({
     setBathrooms('');
     setAreaMinRaw('');
     setAreaMaxRaw('');
+    setPriceMinError(null);
+    setPriceMaxError(null);
+    setAreaMinError(null);
+    setAreaMaxError(null);
     onClear();
   };
 
@@ -161,6 +241,7 @@ export default function FilterPanel({
     'bg-white border border-neutral-300 rounded-card px-3 py-2 text-body text-neutral-900 w-full min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary';
   const areaInputClass =
     'bg-neutral-50 border border-neutral-300 rounded-card px-3 py-2 text-body text-neutral-900 w-full min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary';
+  const inputErrorClass = '!border-error';
   const labelClass = 'text-body font-semibold text-neutral-900';
 
   const cityId = `${uid}-city`;
@@ -173,6 +254,13 @@ export default function FilterPanel({
   const bathroomsId = `${uid}-bathrooms`;
   const areaMinId = `${uid}-areaMin`;
   const areaMaxId = `${uid}-areaMax`;
+
+  const priceMinErrorId = `${uid}-priceMin-error`;
+  const priceMaxErrorId = `${uid}-priceMax-error`;
+  const priceRangeErrorId = `${uid}-priceRange-error`;
+  const areaMinErrorId = `${uid}-areaMin-error`;
+  const areaMaxErrorId = `${uid}-areaMax-error`;
+  const areaRangeErrorId = `${uid}-areaRange-error`;
 
   return (
     <div className="fixed inset-0 z-50 bg-white flex flex-col h-[100dvh]">
@@ -271,7 +359,7 @@ export default function FilterPanel({
         <div className="space-y-element-gap">
           <span className={labelClass}>Precio mensual</span>
           <div className="flex gap-element-gap">
-            <div className="flex-1">
+            <div className="flex-1 space-y-1">
               <label htmlFor={priceMinId} className="sr-only">Precio mínimo</label>
               <input
                 id={priceMinId}
@@ -279,11 +367,16 @@ export default function FilterPanel({
                 inputMode="numeric"
                 placeholder="$Mínimo"
                 value={formatCOP(priceMinRaw)}
-                onChange={(e) => setPriceMinRaw(stripCOP(e.target.value))}
-                className={priceInputClass}
+                onChange={handlePriceMinChange}
+                aria-invalid={!!(priceMinError || priceRangeError)}
+                aria-describedby={priceMinError ? priceMinErrorId : priceRangeError ? priceRangeErrorId : undefined}
+                className={`${priceInputClass} ${priceMinError || priceRangeError ? inputErrorClass : ''}`}
               />
+              {priceMinError && (
+                <p id={priceMinErrorId} className="text-caption text-error" role="alert">{priceMinError}</p>
+              )}
             </div>
-            <div className="flex-1">
+            <div className="flex-1 space-y-1">
               <label htmlFor={priceMaxId} className="sr-only">Precio máximo</label>
               <input
                 id={priceMaxId}
@@ -291,11 +384,19 @@ export default function FilterPanel({
                 inputMode="numeric"
                 placeholder="$Máximo"
                 value={formatCOP(priceMaxRaw)}
-                onChange={(e) => setPriceMaxRaw(stripCOP(e.target.value))}
-                className={priceInputClass}
+                onChange={handlePriceMaxChange}
+                aria-invalid={!!(priceMaxError || priceRangeError)}
+                aria-describedby={priceMaxError ? priceMaxErrorId : priceRangeError ? priceRangeErrorId : undefined}
+                className={`${priceInputClass} ${priceMaxError || priceRangeError ? inputErrorClass : ''}`}
               />
+              {priceMaxError && (
+                <p id={priceMaxErrorId} className="text-caption text-error" role="alert">{priceMaxError}</p>
+              )}
             </div>
           </div>
+          {priceRangeError && !priceMinError && !priceMaxError && (
+            <p id={priceRangeErrorId} className="text-caption text-error" role="alert">{priceRangeError}</p>
+          )}
         </div>
 
         {/* Habitaciones */}
@@ -334,33 +435,44 @@ export default function FilterPanel({
         <div className="space-y-element-gap">
           <span className={labelClass}>Área (m²)</span>
           <div className="flex gap-element-gap">
-            <div className="flex-1">
+            <div className="flex-1 space-y-1">
               <label htmlFor={areaMinId} className="sr-only">Área mínima</label>
               <input
                 id={areaMinId}
-                type="number"
+                type="text"
                 inputMode="numeric"
-                min="0"
                 placeholder="Mínimo"
                 value={areaMinRaw}
-                onChange={(e) => setAreaMinRaw(e.target.value)}
-                className={areaInputClass}
+                onChange={handleAreaMinChange}
+                aria-invalid={!!(areaMinError || areaRangeError)}
+                aria-describedby={areaMinError ? areaMinErrorId : areaRangeError ? areaRangeErrorId : undefined}
+                className={`${areaInputClass} ${areaMinError || areaRangeError ? inputErrorClass : ''}`}
               />
+              {areaMinError && (
+                <p id={areaMinErrorId} className="text-caption text-error" role="alert">{areaMinError}</p>
+              )}
             </div>
-            <div className="flex-1">
+            <div className="flex-1 space-y-1">
               <label htmlFor={areaMaxId} className="sr-only">Área máxima</label>
               <input
                 id={areaMaxId}
-                type="number"
+                type="text"
                 inputMode="numeric"
-                min="0"
                 placeholder="Máximo"
                 value={areaMaxRaw}
-                onChange={(e) => setAreaMaxRaw(e.target.value)}
-                className={areaInputClass}
+                onChange={handleAreaMaxChange}
+                aria-invalid={!!(areaMaxError || areaRangeError)}
+                aria-describedby={areaMaxError ? areaMaxErrorId : areaRangeError ? areaRangeErrorId : undefined}
+                className={`${areaInputClass} ${areaMaxError || areaRangeError ? inputErrorClass : ''}`}
               />
+              {areaMaxError && (
+                <p id={areaMaxErrorId} className="text-caption text-error" role="alert">{areaMaxError}</p>
+              )}
             </div>
           </div>
+          {areaRangeError && !areaMinError && !areaMaxError && (
+            <p id={areaRangeErrorId} className="text-caption text-error" role="alert">{areaRangeError}</p>
+          )}
         </div>
         </div>
       </div>
@@ -368,7 +480,7 @@ export default function FilterPanel({
       {/* Action buttons */}
       <div className="shrink-0 px-mobile-margin md:px-desktop-margin pb-section-gap pt-element-gap border-t border-neutral-300">
         <div className="max-w-[416px] mx-auto space-y-element-gap">
-          <Button variant="primary" onClick={handleApply}>
+          <Button variant="primary" onClick={handleApply} disabled={hasErrors}>
             Aplicar filtros
           </Button>
           <Button variant="secondary" onClick={handleClear}>
