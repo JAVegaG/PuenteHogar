@@ -1,41 +1,88 @@
 @import "tailwindcss";
 
 @theme {
-  /* Colors */
-  --color-primary: #1d4ed8;
+  /* ── Colors (from Figma Design System Library) ── */
+
+  /* Neutrals */
+  --color-neutral-50: #F9FAFB;
+  --color-neutral-100: #F3F4F6;
+  --color-neutral-300: #D1D5DB;
+  --color-neutral-600: #4B5563;
   --color-neutral-900: #111827;
-  --color-neutral-600: #4b5563;
-  --color-neutral-300: #d1d5db;
-  --color-neutral-100: #f3f4f6;
-  --color-neutral-50: #f9fafb;
 
-  /* Font Family */
-  --font-sans: "Inter", system-ui, sans-serif;
+  /* Primary (Blue) */
+  --color-primary-50: #EFF6FF;
+  --color-primary: #1D4ED8;
+  --color-primary-600: #1E40AF;
+  --color-primary-700: #1E3A8A;
 
-  /* Font Size — Typographic Scale */
-  --font-size-h1: 32px;
-  --font-size-h1--line-height: 1.2;
-  --font-size-h2: 24px;
-  --font-size-h2--line-height: 1.3;
-  --font-size-h3: 20px;
-  --font-size-h3--line-height: 1.4;
-  --font-size-body: 16px;
-  --font-size-body--line-height: 1.5;
-  --font-size-caption: 14px;
-  --font-size-caption--line-height: 1.5;
-  --font-size-small: 12px;
-  --font-size-small--line-height: 1.5;
+  /* Secondary (Green) */
+  --color-secondary: #10B981;
 
-  /* Spacing */
-  --spacing-mobile-margin: 16px;
-  --spacing-desktop-margin: 52px;
-  --spacing-section-gap: 24px;
-  --spacing-element-gap: 12px;
+  /* State colors */
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-info: #3B82F6;
 
-  /* Border Radius */
-  --radius-card: 6px;
-  --radius-badge: 4px;
+  /* ── Font Family ── */
+  --font-sans: var(--font-inter), system-ui, sans-serif;
 
-  /* Box Shadow */
-  --shadow-card: 0px 1px 2px rgba(0, 0, 0, 0.05);
+  /* ── Typography Scale (--text-* namespace for Tailwind v4) ── */
+  /* Usage: text-h1, text-h2, text-h3, text-body, text-caption, text-small */
+
+  /* H1: 32px / Bold / line-height 40px */
+  --text-h1: 3.2rem;
+  --text-h1--line-height: 4rem;
+  --text-h1--font-weight: 700;
+
+  /* H2: 24px / Bold / line-height 32px */
+  --text-h2: 2.4rem;
+  --text-h2--line-height: 3.2rem;
+  --text-h2--font-weight: 700;
+
+  /* H3: 20px / Semibold / line-height 28px */
+  --text-h3: 2rem;
+  --text-h3--line-height: 2.8rem;
+  --text-h3--font-weight: 600;
+
+  /* Body 1: 16px / Regular / line-height 24px */
+  --text-body: 1.6rem;
+  --text-body--line-height: 2.4rem;
+  --text-body--font-weight: 400;
+
+  /* Body 2 / Caption: 14px / Regular / line-height 20px */
+  --text-caption: 1.4rem;
+  --text-caption--line-height: 2rem;
+  --text-caption--font-weight: 400;
+
+  /* Small / Caption: 12px / Regular / line-height 16px */
+  --text-small: 1.2rem;
+  --text-small--line-height: 1.6rem;
+  --text-small--font-weight: 400;
+
+  /* ── Spacing (rem base = 10px) ── */
+  --spacing-mobile-margin: 1.6rem;
+  --spacing-desktop-margin: 5.2rem;
+  --spacing-section-gap: 2.4rem;
+  --spacing-element-gap: 1.2rem;
+
+  /* ── Border Radius ── */
+  --radius-card: 0.6rem;
+  --radius-badge: 0.4rem;
+
+  /* ── Box Shadow ── */
+  --shadow-card: 0px 0.1rem 0.2rem rgba(0, 0, 0, 0.05);
+}
+
+/*
+ * 1rem = 10px base.
+ * Unlayered rules override Tailwind Preflight's @layer base.
+ */
+html {
+  font-size: 62.5% !important;
+}
+
+body {
+  font-size: 1.6rem;
 }
