@@ -156,7 +156,8 @@ function PortfolioContent() {
         )}
       </Suspense>
 
-      <main className="px-mobile-margin md:px-desktop-margin py-section-gap">
+      <main className="flex justify-center px-mobile-margin md:px-desktop-margin py-section-gap">
+        <div className="w-full max-w-[560px]">
         <section aria-label="Información del portafolio">
           <h2 className="text-body text-neutral-600 mb-4">Gestión de propiedades</h2>
 
@@ -196,7 +197,7 @@ function PortfolioContent() {
               {createError && (
                 <div
                   role="alert"
-                  className="rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700"
+                  className="rounded-md bg-red-50 border border-red-200 p-3 text-caption text-red-700"
                 >
                   {createError}
                 </div>
@@ -204,7 +205,7 @@ function PortfolioContent() {
               <div>
                 <label
                   htmlFor="portfolio-name"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-caption font-medium text-gray-700 mb-1"
                 >
                   Nombre del portafolio
                 </label>
@@ -220,7 +221,7 @@ function PortfolioContent() {
               <div>
                 <label
                   htmlFor="portfolio-description"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-caption font-medium text-gray-700 mb-1"
                 >
                   Descripción (opcional)
                 </label>
@@ -290,6 +291,7 @@ function PortfolioContent() {
             </>
           ) : null}
         </section>
+        </div>
       </main>
     </>
   );

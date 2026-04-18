@@ -83,7 +83,7 @@ function AddUnitContent() {
       <>
         <Header
           title="Agregar unidad"
-          onMenuClick={() => {}}
+          onMenuClick={() => { }}
           leftAction={backArrow}
         />
         <main className="px-mobile-margin md:px-desktop-margin py-section-gap">
@@ -108,7 +108,7 @@ function AddUnitContent() {
       <>
         <Header
           title="Agregar unidad"
-          onMenuClick={() => {}}
+          onMenuClick={() => { }}
           leftAction={backArrow}
         />
         <main className="px-mobile-margin md:px-desktop-margin py-section-gap">
@@ -119,7 +119,7 @@ function AddUnitContent() {
             <p className="text-green-800 font-medium">
               ¡Unidad agregada exitosamente!
             </p>
-            <p className="text-green-700 text-sm mt-1">
+            <p className="text-green-700 text-caption mt-1">
               Redirigiendo al portafolio...
             </p>
           </div>
@@ -132,47 +132,49 @@ function AddUnitContent() {
     <>
       <Header
         title="Agregar unidad"
-        onMenuClick={() => {}}
+        onMenuClick={() => { }}
         leftAction={backArrow}
       />
 
-      <main className="px-mobile-margin md:px-desktop-margin py-section-gap">
-        <section aria-label="Información del portafolio">
-          <p className="text-body text-neutral-600 mb-4">
-            Agregando unidad a: {portfolioName ?? id}
-          </p>
-
-          {/* Informational banner */}
-          <div className="rounded-md bg-blue-50 border border-blue-200 p-4 mb-6">
-            <p className="text-sm text-blue-800">
-              Una unidad es una propiedad individual dentro de tu portafolio que
-              puede ser arrendada. Por ejemplo: Apartamento 301, Casa 5, Local
-              102, etc.
+      <main className="flex justify-center px-mobile-margin md:px-desktop-margin py-section-gap">
+        <div className="w-full max-w-[560px]">
+          <section aria-label="Información del portafolio">
+            <p className="text-body text-neutral-600 mb-4">
+              Agregando unidad a: {portfolioName ?? id}
             </p>
-          </div>
-        </section>
 
-        <section aria-label="Formulario de agregar unidad">
-          <AddUnitForm
-            portfolioId={id}
-            onSuccess={handleSuccess}
-            onCancel={handleCancel}
-          />
-        </section>
+            {/* Informational banner */}
+            <div className="rounded-md bg-blue-50 border border-blue-200 p-4 mb-6">
+              <p className="text-caption text-blue-800">
+                Una unidad es una propiedad individual dentro de tu portafolio que
+                puede ser arrendada. Por ejemplo: Apartamento 301, Casa 5, Local
+                102, etc.
+              </p>
+            </div>
+          </section>
 
-        {/* Próximos pasos */}
-        <section
-          aria-label="Próximos pasos"
-          className="mt-8 rounded-md bg-neutral-50 border border-neutral-200 p-4"
-        >
-          <h3 className="text-sm font-semibold text-neutral-900 mb-2">
-            Próximos pasos
-          </h3>
-          <p className="text-sm text-neutral-600">
-            Una vez agregada la unidad, podrás crear arriendos para ella,
-            gestionar contratos y realizar seguimiento de pagos.
-          </p>
-        </section>
+          <section aria-label="Formulario de agregar unidad">
+            <AddUnitForm
+              portfolioId={id}
+              onSuccess={handleSuccess}
+              onCancel={handleCancel}
+            />
+          </section>
+
+          {/* Próximos pasos */}
+          <section
+            aria-label="Próximos pasos"
+            className="mt-8 rounded-md bg-neutral-50 border border-neutral-200 p-4"
+          >
+            <h3 className="text-caption font-semibold text-neutral-900 mb-2">
+              Próximos pasos
+            </h3>
+            <p className="text-caption text-neutral-600">
+              Una vez agregada la unidad, podrás publicarla en clasificados, crear arriendos para ella,
+              gestionar contratos y realizar seguimiento de pagos.
+            </p>
+          </section>
+        </div>
       </main>
     </>
   );
