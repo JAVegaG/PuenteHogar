@@ -28,19 +28,24 @@ export class AccountingController {
     private readonly getIndividualReportUseCase: GetIndividualReportUseCase,
   ) {}
 
-  @Post('reports/aggregated')
-  @ApiOperation({ summary: 'Reporte agregado de ingresos del portafolio por periodo' })
+  @Post('reports/portfolio/:portfolioId/aggregated')
+  @ApiOperation({ summary: 'Reporte agregado de ingresos de un portafolio por periodo' })
   @ApiOkResponse({ description: 'Reporte de ingresos agregado', type: AggregatedReportResponseDto })
   @ApiForbiddenResponse({ description: 'Solo arrendadores pueden acceder a reportes contables' })
-  getAggregated(@Body() period: PeriodDto, @Req() req: AuthenticatedRequest) {
+  getAggregated(
+    @Param('portfolioId') _portfolioId: string,
+    @Body() period: PeriodDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
     return this.getAggregatedReportUseCase.execute(req.user.id, req.user.roles, period);
   }
 
-  @Post('reports/units/:unitId')
-  @ApiOperation({ summary: 'Reporte individual de ingresos por unidad de portafolio' })
+  @Post('reports/portfolio/:portfolioId/unit/:unitId')
+  @ApiOperation({ summary: 'Reporte individual de ingresos por unidad de un portafolio' })
   @ApiOkResponse({ description: 'Reporte de ingresos por unidad', type: IndividualReportResponseDto })
   @ApiForbiddenResponse({ description: 'Solo arrendadores pueden acceder a reportes contables' })
   getIndividual(
+    @Param('portfolioId') _portfolioId: string,
     @Param('unitId') unitId: string,
     @Body() period: PeriodDto,
     @Req() req: AuthenticatedRequest,
