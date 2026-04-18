@@ -9,6 +9,7 @@ import { Button } from '@/shared/components/Button';
 
 interface UnitFormProps {
   mode: 'create' | 'edit';
+  portfolioId: string;
   initialData?: PortfolioUnit;
   onSuccess: () => void;
 }
@@ -49,7 +50,7 @@ export function computeDiff(
   return diff;
 }
 
-export function UnitForm({ mode, initialData, onSuccess }: UnitFormProps) {
+export function UnitForm({ mode, portfolioId, initialData, onSuccess }: UnitFormProps) {
   const { user, logout } = useAuth();
   const [formData, setFormData] = useState<UnitFormData>(() =>
     buildInitialFormData(mode, initialData)
@@ -90,6 +91,7 @@ export function UnitForm({ mode, initialData, onSuccess }: UnitFormProps) {
     try {
       if (mode === 'create') {
         await portfolioService.createUnit(
+          portfolioId,
           {
             propertyId: formData.propertyId,
             leaseBaseAmount: Number(formData.leaseBaseAmount),
@@ -100,7 +102,7 @@ export function UnitForm({ mode, initialData, onSuccess }: UnitFormProps) {
         );
       } else {
         const diffPayload = computeDiff(initialData!, formData);
-        await portfolioService.updateUnit(initialData!.id, diffPayload, token);
+        await portfolioService.updateUnit(portfolioId, initialData!.id, diffPayload, token);
       }
       onSuccess();
     } catch (err) {
