@@ -137,6 +137,8 @@ describe('Property 14: Datos de entrada se persisten en RAW_Table antes de trans
               createPortfolio: jest.fn(),
               findPortfolioById: jest.fn(),
               createEnrichedUnit: jest.fn(),
+              findPropertyTypeByCode: jest.fn(),
+              findAllPropertyTypes: jest.fn(),
             };
 
             const useCase = new CreatePortfolioUnitUseCase(mockRepo);
@@ -192,6 +194,8 @@ describe('Property 14: Datos de entrada se persisten en RAW_Table antes de trans
               createPortfolio: jest.fn(),
               findPortfolioById: jest.fn(),
               createEnrichedUnit: jest.fn(),
+              findPropertyTypeByCode: jest.fn(),
+              findAllPropertyTypes: jest.fn(),
             };
 
             const useCase = new CreatePortfolioUnitUseCase(mockRepo);

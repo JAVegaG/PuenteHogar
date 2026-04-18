@@ -1,4 +1,4 @@
-import { ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { IPortfolioRepository } from '@modules/landlord-portfolio/domain/ports/portfolio-repository.port';
 import { CreateEnrichedUnitDto } from '@modules/landlord-portfolio/application/dtos/create-enriched-unit.dto';
 import { EnrichedUnitResponseDto } from '@modules/landlord-portfolio/application/dtos/enriched-unit-response.dto';
@@ -10,7 +10,7 @@ export class CreateEnrichedUnitUseCase {
   constructor(
     @Inject(PORTFOLIO_REPOSITORY)
     private readonly portfolioRepository: IPortfolioRepository,
-  ) {}
+  ) { }
 
   async execute(
     portfolioId: string,
@@ -30,6 +30,13 @@ export class CreateEnrichedUnitUseCase {
 
     if (portfolio.userId !== userId) {
       throw new NotFoundException('Portafolio no encontrado');
+    }
+
+    const propertyType = await this.portfolioRepository.findPropertyTypeByCode(dto.propertyType);
+    if (!propertyType) {
+      throw new BadRequestException(
+        `Tipo de propiedad no válido: "${dto.propertyType}". Consulte GET /portfolio/property-types para ver los tipos disponibles.`,
+      );
     }
 
     const unit = await this.portfolioRepository.createEnrichedUnit({

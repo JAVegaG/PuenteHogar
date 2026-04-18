@@ -14,7 +14,7 @@ import {
 
 @Injectable()
 export class PrismaPortfolioRepository implements IPortfolioRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async findOrCreatePortfolio(userId: string): Promise<{ id: string }> {
     const existing = await this.prisma.landlordPortfolio.findFirst({
@@ -323,6 +323,19 @@ export class PrismaPortfolioRepository implements IPortfolioRepository {
       unit.created_at,
       unit.updated_at,
     );
+  }
+
+  async findPropertyTypeByCode(code: string): Promise<{ id: string; code: string } | null> {
+    const pt = await this.prisma.propertyType.findUnique({ where: { code } });
+    return pt ? { id: pt.id, code: pt.code } : null;
+  }
+
+  async findAllPropertyTypes(): Promise<{ id: string; code: string; description: string }[]> {
+    const types = await this.prisma.propertyType.findMany({
+      where: { is_active: true },
+      orderBy: { code: 'asc' },
+    });
+    return types.map((t) => ({ id: t.id, code: t.code, description: t.description }));
   }
 
   private toEntity(unit: {

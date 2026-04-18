@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Inject,
   Param,
   Patch,
   Post,
@@ -10,6 +11,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiOkResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse } from '@nestjs/swagger';
+import { Public } from '@src/shared/decorators';
+import type { IPortfolioRepository } from './domain/ports/portfolio-repository.port';
+import { PORTFOLIO_REPOSITORY } from './application/use-cases/create-portfolio-unit.use-case';
+import { PropertyTypeResponseDto } from './application/dtos';
 import { Request } from 'express';
 import { JwtAuthGuard } from '@src/shared/guards/jwt-auth.guard';
 import { UpdatePortfolioUnitDto } from './application/dtos/update-portfolio-unit.dto';
@@ -36,12 +41,24 @@ interface AuthenticatedRequest extends Request {
 @Controller('portfolio')
 export class LandlordPortfolioController {
   constructor(
+    @Inject(PORTFOLIO_REPOSITORY) private readonly portfolioRepository: IPortfolioRepository,
     private readonly getPortfolioUseCase: GetPortfolioUseCase,
     private readonly updatePortfolioUnitUseCase: UpdatePortfolioUnitUseCase,
     private readonly listPortfoliosUseCase: ListPortfoliosUseCase,
     private readonly createPortfolioUseCase: CreatePortfolioUseCase,
     private readonly createEnrichedUnitUseCase: CreateEnrichedUnitUseCase,
-  ) {}
+  ) { }
+
+  @Public()
+  @Get('property-types')
+  @ApiOperation({
+    summary: 'Listar tipos de propiedad válidos',
+    description: 'Retorna el catálogo de tipos de propiedad activos para poblar dropdowns en el frontend.',
+  })
+  @ApiOkResponse({ description: 'Lista de tipos de propiedad activos', type: [PropertyTypeResponseDto] })
+  getPropertyTypes() {
+    return this.portfolioRepository.findAllPropertyTypes();
+  }
 
   @Get('')
   @ApiOperation({ summary: 'Listar portafolios del arrendador autenticado', description: 'Retorna un listado paginado de portafolios con estadísticas agregadas.' })

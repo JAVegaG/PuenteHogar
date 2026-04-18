@@ -23,7 +23,7 @@ export class CreateEnrichedUnitDto {
   @Length(1, 300)
   address!: string;
 
-  @ApiProperty({ example: 'Apartamento', description: 'Tipo de propiedad (texto libre)' })
+  @ApiProperty({ example: 'APARTAMENTO', description: 'Código del tipo de propiedad. Los valores válidos provienen del catálogo: GET /portfolio/property-types' })
   @IsString()
   @IsNotEmpty()
   propertyType!: string;

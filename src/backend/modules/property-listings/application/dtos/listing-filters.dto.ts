@@ -18,7 +18,10 @@ export class ListingFiltersDto {
   @IsString()
   search?: string;
 
-  @ApiPropertyOptional({ example: 'Apartamento', description: 'Filtrar por tipo de propiedad' })
+  @ApiPropertyOptional({
+    example: 'APARTAMENTO',
+    description: 'Filtrar por tipo de propiedad. Los valores válidos provienen del catálogo: GET /portfolio/property-types',
+  })
   @IsOptional()
   @IsString()
   propertyType?: string;

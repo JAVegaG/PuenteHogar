@@ -7,3 +7,4 @@ export * from './paginated-portfolios-response.dto';
 export * from './create-portfolio.dto';
 export * from './create-enriched-unit.dto';
 export * from './enriched-unit-response.dto';
+export * from './property-type-response.dto';

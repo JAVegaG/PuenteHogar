@@ -60,6 +60,8 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             createPortfolio: jest.fn(),
             findPortfolioById: jest.fn(),
             createEnrichedUnit: jest.fn(),
+            findPropertyTypeByCode: jest.fn(),
+            findAllPropertyTypes: jest.fn(),
           };
 
           const useCase = new GetPortfolioUseCase(mockRepo);
@@ -95,6 +97,8 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             createPortfolio: jest.fn(),
             findPortfolioById: jest.fn(),
             createEnrichedUnit: jest.fn(),
+            findPropertyTypeByCode: jest.fn(),
+            findAllPropertyTypes: jest.fn(),
           };
           const auditLogger = makeAuditLogger();
 
@@ -133,6 +137,8 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             createPortfolio: jest.fn(),
             findPortfolioById: jest.fn(),
             createEnrichedUnit: jest.fn(),
+            findPropertyTypeByCode: jest.fn(),
+            findAllPropertyTypes: jest.fn(),
           };
           const auditLogger = makeAuditLogger();
 
@@ -609,6 +615,8 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
               createPortfolio: jest.fn(),
               findPortfolioById: jest.fn(),
               createEnrichedUnit: jest.fn(),
+              findPropertyTypeByCode: jest.fn(),
+              findAllPropertyTypes: jest.fn(),
             };
             const auditLogger = makeAuditLogger();
             const portfolioUseCase = new UpdatePortfolioUnitUseCase(portfolioRepo, auditLogger);

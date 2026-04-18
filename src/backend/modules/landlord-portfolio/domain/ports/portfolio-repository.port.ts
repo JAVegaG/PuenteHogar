@@ -64,4 +64,6 @@ export interface IPortfolioRepository {
   createPortfolio(data: CreatePortfolioData): Promise<LandlordPortfolioEntity>;
   findPortfolioById(portfolioId: string): Promise<LandlordPortfolioEntity | null>;
   createEnrichedUnit(data: CreateEnrichedUnitData): Promise<EnrichedPortfolioUnitEntity>;
+  findPropertyTypeByCode(code: string): Promise<{ id: string; code: string } | null>;
+  findAllPropertyTypes(): Promise<{ id: string; code: string; description: string }[]>;
 }
