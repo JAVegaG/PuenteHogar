@@ -66,6 +66,7 @@ export const ModelName = {
   Photo: 'Photo',
   AdditionalFeature: 'AdditionalFeature',
   PropertyAdditionalFeature: 'PropertyAdditionalFeature',
+  PropertyType: 'PropertyType',
   PropertyListingsRaw: 'PropertyListingsRaw',
   LandlordPortfolio: 'LandlordPortfolio',
   PortfolioUnit: 'PortfolioUnit',
@@ -284,6 +285,16 @@ export const PropertyAdditionalFeatureScalarFieldEnum = {
 } as const
 
 export type PropertyAdditionalFeatureScalarFieldEnum = (typeof PropertyAdditionalFeatureScalarFieldEnum)[keyof typeof PropertyAdditionalFeatureScalarFieldEnum]
+
+
+export const PropertyTypeScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  description: 'description',
+  is_active: 'is_active'
+} as const
+
+export type PropertyTypeScalarFieldEnum = (typeof PropertyTypeScalarFieldEnum)[keyof typeof PropertyTypeScalarFieldEnum]
 
 
 export const PropertyListingsRawScalarFieldEnum = {

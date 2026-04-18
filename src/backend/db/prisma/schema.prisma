@@ -211,6 +211,15 @@ model PropertyAdditionalFeature {
   @@schema("property_listings")
 }
 
+model PropertyType {
+  id          String  @id @default(uuid())
+  code        String  @unique
+  description String
+  is_active   Boolean @default(true)
+
+  @@schema("property_listings")
+}
+
 model PropertyListingsRaw {
   id         String   @id @default(uuid())
   payload    Json

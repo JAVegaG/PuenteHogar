@@ -115,6 +115,11 @@ export type AdditionalFeature = Prisma.AdditionalFeatureModel
  */
 export type PropertyAdditionalFeature = Prisma.PropertyAdditionalFeatureModel
 /**
+ * Model PropertyType
+ * 
+ */
+export type PropertyType = Prisma.PropertyTypeModel
+/**
  * Model PropertyListingsRaw
  * 
  */

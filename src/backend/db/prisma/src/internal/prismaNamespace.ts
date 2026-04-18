@@ -399,6 +399,7 @@ export const ModelName = {
   Photo: 'Photo',
   AdditionalFeature: 'AdditionalFeature',
   PropertyAdditionalFeature: 'PropertyAdditionalFeature',
+  PropertyType: 'PropertyType',
   PropertyListingsRaw: 'PropertyListingsRaw',
   LandlordPortfolio: 'LandlordPortfolio',
   PortfolioUnit: 'PortfolioUnit',
@@ -447,7 +448,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "documentType" | "naturalPersonDetail" | "legalPersonDetail" | "role" | "permission" | "userRole" | "rolePermission" | "usersRaw" | "property" | "address" | "listing" | "photo" | "additionalFeature" | "propertyAdditionalFeature" | "propertyListingsRaw" | "landlordPortfolio" | "portfolioUnit" | "lease" | "portfolioRaw" | "leaseStatus" | "leaseStatusHistory" | "leaseCurrentStatus" | "listingStatus" | "listingStatusHistory" | "listingCurrentStatus" | "trackingRaw" | "scheduledPayment" | "payment" | "paymentStatus" | "paymentLog" | "paymentsRaw" | "aggregatedPaymentReport" | "individualPaymentReport" | "accountingRaw" | "notificationType" | "notificationPreference" | "notificationsRaw" | "contractStatus" | "contract" | "contractParty" | "fileType" | "fileStatus" | "file" | "signingStatus" | "signing" | "signingLog" | "contractsRaw"
+    modelProps: "user" | "documentType" | "naturalPersonDetail" | "legalPersonDetail" | "role" | "permission" | "userRole" | "rolePermission" | "usersRaw" | "property" | "address" | "listing" | "photo" | "additionalFeature" | "propertyAdditionalFeature" | "propertyType" | "propertyListingsRaw" | "landlordPortfolio" | "portfolioUnit" | "lease" | "portfolioRaw" | "leaseStatus" | "leaseStatusHistory" | "leaseCurrentStatus" | "listingStatus" | "listingStatusHistory" | "listingCurrentStatus" | "trackingRaw" | "scheduledPayment" | "payment" | "paymentStatus" | "paymentLog" | "paymentsRaw" | "aggregatedPaymentReport" | "individualPaymentReport" | "accountingRaw" | "notificationType" | "notificationPreference" | "notificationsRaw" | "contractStatus" | "contract" | "contractParty" | "fileType" | "fileStatus" | "file" | "signingStatus" | "signing" | "signingLog" | "contractsRaw"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1558,6 +1559,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PropertyAdditionalFeatureCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PropertyAdditionalFeatureCountAggregateOutputType> | number
+        }
+      }
+    }
+    PropertyType: {
+      payload: Prisma.$PropertyTypePayload<ExtArgs>
+      fields: Prisma.PropertyTypeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PropertyTypeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PropertyTypePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PropertyTypeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PropertyTypePayload>
+        }
+        findFirst: {
+          args: Prisma.PropertyTypeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PropertyTypePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PropertyTypeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PropertyTypePayload>
+        }
+        findMany: {
+          args: Prisma.PropertyTypeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PropertyTypePayload>[]
+        }
+        create: {
+          args: Prisma.PropertyTypeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PropertyTypePayload>
+        }
+        createMany: {
+          args: Prisma.PropertyTypeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PropertyTypeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PropertyTypePayload>[]
+        }
+        delete: {
+          args: Prisma.PropertyTypeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PropertyTypePayload>
+        }
+        update: {
+          args: Prisma.PropertyTypeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PropertyTypePayload>
+        }
+        deleteMany: {
+          args: Prisma.PropertyTypeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PropertyTypeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PropertyTypeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PropertyTypePayload>[]
+        }
+        upsert: {
+          args: Prisma.PropertyTypeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PropertyTypePayload>
+        }
+        aggregate: {
+          args: Prisma.PropertyTypeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePropertyType>
+        }
+        groupBy: {
+          args: Prisma.PropertyTypeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PropertyTypeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PropertyTypeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PropertyTypeCountAggregateOutputType> | number
         }
       }
     }
@@ -4211,6 +4286,16 @@ export const PropertyAdditionalFeatureScalarFieldEnum = {
 export type PropertyAdditionalFeatureScalarFieldEnum = (typeof PropertyAdditionalFeatureScalarFieldEnum)[keyof typeof PropertyAdditionalFeatureScalarFieldEnum]
 
 
+export const PropertyTypeScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  description: 'description',
+  is_active: 'is_active'
+} as const
+
+export type PropertyTypeScalarFieldEnum = (typeof PropertyTypeScalarFieldEnum)[keyof typeof PropertyTypeScalarFieldEnum]
+
+
 export const PropertyListingsRawScalarFieldEnum = {
   id: 'id',
   payload: 'payload',
@@ -4846,6 +4931,7 @@ export type GlobalOmitConfig = {
   photo?: Prisma.PhotoOmit
   additionalFeature?: Prisma.AdditionalFeatureOmit
   propertyAdditionalFeature?: Prisma.PropertyAdditionalFeatureOmit
+  propertyType?: Prisma.PropertyTypeOmit
   propertyListingsRaw?: Prisma.PropertyListingsRawOmit
   landlordPortfolio?: Prisma.LandlordPortfolioOmit
   portfolioUnit?: Prisma.PortfolioUnitOmit
