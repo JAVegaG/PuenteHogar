@@ -44,11 +44,6 @@ export function validateUnitForm(data: UnitFormData): Record<string, string> {
     errors.leaseBaseAmount = leaseBaseAmountError;
   }
 
-  const leaseBaseCurrencyError = validateLeaseBaseCurrency(data.leaseBaseCurrency);
-  if (leaseBaseCurrencyError) {
-    errors.leaseBaseCurrency = leaseBaseCurrencyError;
-  }
-
   return errors;
 }
 
@@ -136,11 +131,6 @@ export function validateEnrichedUnitForm(data: EnrichedUnitFormData): Record<str
   const leaseBaseAmountError = validateLeaseBaseAmount(data.leaseBaseAmount);
   if (leaseBaseAmountError) {
     errors.leaseBaseAmount = leaseBaseAmountError;
-  }
-
-  const leaseBaseCurrencyError = validateLeaseBaseCurrency(data.leaseBaseCurrency);
-  if (leaseBaseCurrencyError) {
-    errors.leaseBaseCurrency = leaseBaseCurrencyError;
   }
 
   return errors;

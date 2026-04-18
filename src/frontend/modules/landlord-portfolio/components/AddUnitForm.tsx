@@ -13,6 +13,25 @@ interface AddUnitFormProps {
   onCancel: () => void;
 }
 
+/** Format a raw numeric string as COP display: "120000" → "$120.000" */
+function formatCOP(raw: string): string {
+  if (!raw) return '';
+  const digits = raw.replace(/\D/g, '');
+  if (!digits) return '';
+  return '$' + Number(digits).toLocaleString('es-CO');
+}
+
+/** Strip formatting back to digits only */
+function stripCOP(display: string): string {
+  return display.replace(/\D/g, '');
+}
+
+interface AddUnitFormProps {
+  portfolioId: string;
+  onSuccess: () => void;
+  onCancel: () => void;
+}
+
 const initialFormData: EnrichedUnitFormData = {
   name: '',
   address: '',
@@ -41,6 +60,11 @@ export function AddUnitForm({ portfolioId, onSuccess, onCancel }: AddUnitFormPro
       delete next[field];
       return next;
     });
+  };
+
+  const handleLeaseAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const stripped = stripCOP(e.target.value);
+    handleChange('leaseBaseAmount', stripped);
   };
 
   const computedArea = (): string | null => {
@@ -82,7 +106,7 @@ export function AddUnitForm({ portfolioId, onSuccess, onCancel }: AddUnitFormPro
         numberOfBathrooms: formData.numberOfBathrooms ? parseInt(formData.numberOfBathrooms, 10) : undefined,
         description: formData.description || undefined,
         leaseBaseAmount: parseFloat(formData.leaseBaseAmount),
-        leaseBaseCurrency: formData.leaseBaseCurrency,
+        leaseBaseCurrency: 'COP',
       };
 
       await portfolioService.createEnrichedUnit(portfolioId, request, token);
@@ -111,7 +135,7 @@ export function AddUnitForm({ portfolioId, onSuccess, onCancel }: AddUnitFormPro
       {serverError && (
         <div
           role="alert"
-          className="rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700"
+          className="rounded-md bg-red-50 border border-red-200 p-3 text-caption text-red-700"
         >
           {serverError}
         </div>
@@ -119,12 +143,12 @@ export function AddUnitForm({ portfolioId, onSuccess, onCancel }: AddUnitFormPro
 
       {/* Sección: Información básica */}
       <section>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Información básica</h3>
+        <h3 className="text-h3 font-semibold text-gray-900 mb-4">Información básica</h3>
         <div className="flex flex-col gap-4">
           <div>
             <label
               htmlFor="name"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-caption font-medium text-gray-700 mb-1"
             >
               Nombre / Identificación
             </label>
@@ -151,7 +175,7 @@ export function AddUnitForm({ portfolioId, onSuccess, onCancel }: AddUnitFormPro
           <div>
             <label
               htmlFor="address"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-caption font-medium text-gray-700 mb-1"
             >
               Dirección
             </label>
@@ -178,7 +202,7 @@ export function AddUnitForm({ portfolioId, onSuccess, onCancel }: AddUnitFormPro
           <div>
             <label
               htmlFor="propertyType"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-caption font-medium text-gray-700 mb-1"
             >
               Tipo de propiedad
             </label>
@@ -206,13 +230,13 @@ export function AddUnitForm({ portfolioId, onSuccess, onCancel }: AddUnitFormPro
 
       {/* Sección: Detalles de la propiedad */}
       <section>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Detalles de la propiedad</h3>
+        <h3 className="text-h3 font-semibold text-gray-900 mb-4">Detalles de la propiedad</h3>
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label
                 htmlFor="length"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-caption font-medium text-gray-700 mb-1"
               >
                 Largo (m)
               </label>
@@ -240,7 +264,7 @@ export function AddUnitForm({ portfolioId, onSuccess, onCancel }: AddUnitFormPro
             <div>
               <label
                 htmlFor="width"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-caption font-medium text-gray-700 mb-1"
               >
                 Ancho (m)
               </label>
@@ -267,7 +291,7 @@ export function AddUnitForm({ portfolioId, onSuccess, onCancel }: AddUnitFormPro
           </div>
 
           {area && (
-            <div className="rounded-[10px] bg-gray-50 border border-gray-200 px-3 py-3 text-sm text-gray-700">
+            <div className="rounded-[10px] bg-gray-50 border border-gray-200 px-3 py-3 text-caption text-gray-700">
               Área calculada: <span className="font-medium">{area} m²</span>
             </div>
           )}
@@ -276,7 +300,7 @@ export function AddUnitForm({ portfolioId, onSuccess, onCancel }: AddUnitFormPro
             <div>
               <label
                 htmlFor="numberOfRooms"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-caption font-medium text-gray-700 mb-1"
               >
                 Habitaciones
               </label>
@@ -304,7 +328,7 @@ export function AddUnitForm({ portfolioId, onSuccess, onCancel }: AddUnitFormPro
             <div>
               <label
                 htmlFor="numberOfBathrooms"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-caption font-medium text-gray-700 mb-1"
               >
                 Baños
               </label>
@@ -333,7 +357,7 @@ export function AddUnitForm({ portfolioId, onSuccess, onCancel }: AddUnitFormPro
           <div>
             <label
               htmlFor="description"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-caption font-medium text-gray-700 mb-1"
             >
               Descripción adicional (opcional)
             </label>
@@ -350,22 +374,22 @@ export function AddUnitForm({ portfolioId, onSuccess, onCancel }: AddUnitFormPro
 
       {/* Sección: Datos de arriendo */}
       <section>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Datos de arriendo</h3>
+        <h3 className="text-h3 font-semibold text-gray-900 mb-4">Datos de arriendo</h3>
         <div className="flex flex-col gap-4">
           <div>
             <label
               htmlFor="leaseBaseAmount"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-caption font-medium text-gray-700 mb-1"
             >
-              Canon base de arrendamiento
+              Canon base de arrendamiento (COP)
             </label>
             <input
               id="leaseBaseAmount"
               type="text"
-              inputMode="decimal"
-              value={formData.leaseBaseAmount}
-              onChange={(e) => handleChange('leaseBaseAmount', e.target.value)}
-              placeholder="Ej: 1200000"
+              inputMode="numeric"
+              value={formatCOP(formData.leaseBaseAmount)}
+              onChange={handleLeaseAmountChange}
+              placeholder="$0"
               aria-describedby={errors.leaseBaseAmount ? 'leaseBaseAmount-error' : undefined}
               className={`w-full h-[48px] min-h-[44px] rounded-[10px] border px-3 text-body focus:outline-none focus:ring-2 transition-colors ${fieldBorderClass('leaseBaseAmount')}`}
             />
@@ -376,33 +400,6 @@ export function AddUnitForm({ portfolioId, onSuccess, onCancel }: AddUnitFormPro
                 className="mt-1 text-[14px] text-red-600"
               >
                 {errors.leaseBaseAmount}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="leaseBaseCurrency"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Moneda
-            </label>
-            <input
-              id="leaseBaseCurrency"
-              type="text"
-              value={formData.leaseBaseCurrency}
-              onChange={(e) => handleChange('leaseBaseCurrency', e.target.value)}
-              placeholder="COP"
-              aria-describedby={errors.leaseBaseCurrency ? 'leaseBaseCurrency-error' : undefined}
-              className={`w-full h-[48px] min-h-[44px] rounded-[10px] border px-3 text-body focus:outline-none focus:ring-2 transition-colors ${fieldBorderClass('leaseBaseCurrency')}`}
-            />
-            {errors.leaseBaseCurrency && (
-              <p
-                id="leaseBaseCurrency-error"
-                aria-live="polite"
-                className="mt-1 text-[14px] text-red-600"
-              >
-                {errors.leaseBaseCurrency}
               </p>
             )}
           </div>

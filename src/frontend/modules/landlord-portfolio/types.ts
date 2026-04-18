@@ -2,6 +2,7 @@ export interface PortfolioUnit {
   id: string;
   portfolioId: string;
   propertyId: string;
+  name: string;
   conditions: string | null;
   leaseBaseAmount: number;
   leaseBaseCurrency: string;

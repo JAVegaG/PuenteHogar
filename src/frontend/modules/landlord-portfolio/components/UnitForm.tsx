@@ -7,6 +7,19 @@ import { portfolioService } from '@/shared/services/portfolio';
 import type { PortfolioUnit, UnitFormData, UpdatePortfolioUnitRequest } from '../types';
 import { Button } from '@/shared/components/Button';
 
+/** Format a raw numeric string as COP display: "120000" → "$120.000" */
+function formatCOP(raw: string): string {
+  if (!raw) return '';
+  const digits = raw.replace(/\D/g, '');
+  if (!digits) return '';
+  return '$' + Number(digits).toLocaleString('es-CO');
+}
+
+/** Strip formatting back to digits only */
+function stripCOP(display: string): string {
+  return display.replace(/\D/g, '');
+}
+
 interface UnitFormProps {
   mode: 'create' | 'edit';
   portfolioId: string;
@@ -40,9 +53,6 @@ export function computeDiff(
   if (formData.leaseBaseAmount !== String(initialData.leaseBaseAmount)) {
     diff.leaseBaseAmount = Number(formData.leaseBaseAmount);
   }
-  if (formData.leaseBaseCurrency !== initialData.leaseBaseCurrency) {
-    diff.leaseBaseCurrency = formData.leaseBaseCurrency;
-  }
   if (formData.conditions !== (initialData.conditions ?? '')) {
     diff.conditions = formData.conditions;
   }
@@ -67,6 +77,11 @@ export function UnitForm({ mode, portfolioId, initialData, onSuccess }: UnitForm
       delete next[field];
       return next;
     });
+  };
+
+  const handleLeaseAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const stripped = stripCOP(e.target.value);
+    handleChange('leaseBaseAmount', stripped);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -95,7 +110,7 @@ export function UnitForm({ mode, portfolioId, initialData, onSuccess }: UnitForm
           {
             propertyId: formData.propertyId,
             leaseBaseAmount: Number(formData.leaseBaseAmount),
-            leaseBaseCurrency: formData.leaseBaseCurrency,
+            leaseBaseCurrency: 'COP',
             conditions: formData.conditions || undefined,
           },
           token
@@ -127,7 +142,7 @@ export function UnitForm({ mode, portfolioId, initialData, onSuccess }: UnitForm
       {serverError && (
         <div
           role="alert"
-          className="rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700"
+          className="rounded-md bg-red-50 border border-red-200 p-3 text-caption text-red-700"
         >
           {serverError}
         </div>
@@ -136,7 +151,7 @@ export function UnitForm({ mode, portfolioId, initialData, onSuccess }: UnitForm
       <div>
         <label
           htmlFor="propertyId"
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-caption font-medium text-gray-700 mb-1"
         >
           ID del inmueble
         </label>
@@ -163,16 +178,17 @@ export function UnitForm({ mode, portfolioId, initialData, onSuccess }: UnitForm
       <div>
         <label
           htmlFor="leaseBaseAmount"
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-caption font-medium text-gray-700 mb-1"
         >
-          Canon base de arrendamiento
+          Canon base de arrendamiento (COP)
         </label>
         <input
           id="leaseBaseAmount"
           type="text"
-          inputMode="decimal"
-          value={formData.leaseBaseAmount}
-          onChange={(e) => handleChange('leaseBaseAmount', e.target.value)}
+          inputMode="numeric"
+          value={formatCOP(formData.leaseBaseAmount)}
+          onChange={handleLeaseAmountChange}
+          placeholder="$0"
           aria-describedby={errors.leaseBaseAmount ? 'leaseBaseAmount-error' : undefined}
           className={`w-full h-[48px] min-h-[44px] rounded-[10px] border px-3 text-body focus:outline-none focus:ring-2 transition-colors ${fieldBorderClass('leaseBaseAmount')}`}
         />
@@ -189,34 +205,8 @@ export function UnitForm({ mode, portfolioId, initialData, onSuccess }: UnitForm
 
       <div>
         <label
-          htmlFor="leaseBaseCurrency"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Moneda
-        </label>
-        <input
-          id="leaseBaseCurrency"
-          type="text"
-          value={formData.leaseBaseCurrency}
-          onChange={(e) => handleChange('leaseBaseCurrency', e.target.value)}
-          aria-describedby={errors.leaseBaseCurrency ? 'leaseBaseCurrency-error' : undefined}
-          className={`w-full h-[48px] min-h-[44px] rounded-[10px] border px-3 text-body focus:outline-none focus:ring-2 transition-colors ${fieldBorderClass('leaseBaseCurrency')}`}
-        />
-        {errors.leaseBaseCurrency && (
-          <p
-            id="leaseBaseCurrency-error"
-            aria-live="polite"
-            className="mt-1 text-[14px] text-red-600"
-          >
-            {errors.leaseBaseCurrency}
-          </p>
-        )}
-      </div>
-
-      <div>
-        <label
           htmlFor="conditions"
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-caption font-medium text-gray-700 mb-1"
         >
           Condiciones especiales (opcional)
         </label>
