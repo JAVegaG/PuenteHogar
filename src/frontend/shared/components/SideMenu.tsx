@@ -12,7 +12,7 @@ interface SideMenuProps {
 
 const NAV_LINKS = [
   { label: 'Explorar inmuebles', href: '/explorar', icon: SearchIcon },
-  { label: 'Mis arriendos', href: '/mis-arriendos', icon: HomeIcon },
+  { label: 'Mis arriendos', href: '/mi-portafolio', icon: HomeIcon },
   { label: 'Mis ingresos', href: '/mis-ingresos', icon: WalletIcon },
   { label: 'Mis contratos', href: '/mis-contratos', icon: FileIcon },
   { label: 'Mi perfil', href: '/mi-perfil', icon: UserIcon },
