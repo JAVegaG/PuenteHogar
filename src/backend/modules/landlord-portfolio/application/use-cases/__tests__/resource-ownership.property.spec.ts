@@ -55,6 +55,11 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             findUnitById: jest.fn(),
             updateUnit: jest.fn(),
             getPortfolioOwnerUserId: jest.fn(),
+            findPortfoliosByUserId: jest.fn(),
+            getGlobalStats: jest.fn(),
+            createPortfolio: jest.fn(),
+            findPortfolioById: jest.fn(),
+            createEnrichedUnit: jest.fn(),
           };
 
           const useCase = new GetPortfolioUseCase(mockRepo);
@@ -85,6 +90,11 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             findUnitsByUserId: jest.fn(),
             findUnitById: jest.fn(),
             updateUnit: jest.fn(),
+            findPortfoliosByUserId: jest.fn(),
+            getGlobalStats: jest.fn(),
+            createPortfolio: jest.fn(),
+            findPortfolioById: jest.fn(),
+            createEnrichedUnit: jest.fn(),
           };
           const auditLogger = makeAuditLogger();
 
@@ -118,6 +128,11 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             findUnitsByUserId: jest.fn(),
             findUnitById: jest.fn(),
             updateUnit: jest.fn(),
+            findPortfoliosByUserId: jest.fn(),
+            getGlobalStats: jest.fn(),
+            createPortfolio: jest.fn(),
+            findPortfolioById: jest.fn(),
+            createEnrichedUnit: jest.fn(),
           };
           const auditLogger = makeAuditLogger();
 
@@ -589,6 +604,11 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
               findUnitsByUserId: jest.fn(),
               findUnitById: jest.fn(),
               updateUnit: jest.fn(),
+              findPortfoliosByUserId: jest.fn(),
+              getGlobalStats: jest.fn(),
+              createPortfolio: jest.fn(),
+              findPortfolioById: jest.fn(),
+              createEnrichedUnit: jest.fn(),
             };
             const auditLogger = makeAuditLogger();
             const portfolioUseCase = new UpdatePortfolioUnitUseCase(portfolioRepo, auditLogger);

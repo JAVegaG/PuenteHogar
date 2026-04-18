@@ -74,6 +74,11 @@ function buildMocks(unit: PortfolioUnitEntity, ownerId: string) {
     findUnitById: jest.fn().mockResolvedValue(unit),
     updateUnit,
     getPortfolioOwnerUserId: jest.fn().mockResolvedValue(ownerId),
+    findPortfoliosByUserId: jest.fn(),
+    getGlobalStats: jest.fn(),
+    createPortfolio: jest.fn(),
+    findPortfolioById: jest.fn(),
+    createEnrichedUnit: jest.fn(),
   };
 
   const auditLogger = {
@@ -146,6 +151,11 @@ describe('UpdatePortfolioUnitUseCase — Property 13: round-trip update persists
             findUnitById: jest.fn().mockResolvedValue(null),
             updateUnit: jest.fn(),
             getPortfolioOwnerUserId: jest.fn().mockResolvedValue(null),
+            findPortfoliosByUserId: jest.fn(),
+            getGlobalStats: jest.fn(),
+            createPortfolio: jest.fn(),
+            findPortfolioById: jest.fn(),
+            createEnrichedUnit: jest.fn(),
           };
           const auditLogger = { log: jest.fn() } as unknown as AuditLoggerService;
           const useCase = new UpdatePortfolioUnitUseCase(repo, auditLogger);
