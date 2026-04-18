@@ -35,6 +35,28 @@ async function main() {
   }
   console.log('✅ Document types seeded');
 
+  // ── Property Types ──────────────────────────────────────────────────────────
+  const propertyTypes = [
+    { code: 'APARTAMENTO', description: 'Apartamento' },
+    { code: 'CASA', description: 'Casa' },
+    { code: 'LOCAL', description: 'Local comercial' },
+    { code: 'OFICINA', description: 'Oficina' },
+    { code: 'BODEGA', description: 'Bodega' },
+    { code: 'LOTE', description: 'Lote' },
+    { code: 'FINCA', description: 'Finca' },
+    { code: 'HABITACION', description: 'Habitación' },
+    { code: 'ESTUDIO', description: 'Estudio' },
+  ];
+
+  for (const pt of propertyTypes) {
+    await prisma.propertyType.upsert({
+      where: { code: pt.code },
+      update: { description: pt.description, is_active: true },
+      create: { code: pt.code, description: pt.description, is_active: true },
+    });
+  }
+  console.log('✅ Property types seeded');
+
   // ── Roles ────────────────────────────────────────────────────────────────────
   const roles = [
     { name: 'LANDLORD', description: 'Arrendador — gestiona inmuebles y contratos' },
