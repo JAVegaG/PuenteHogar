@@ -27,8 +27,14 @@ function EditUnitContent() {
     setNotFound(false);
 
     try {
-      const units = await portfolioService.getUnits(token);
-      const found = units.find((u) => u.id === id);
+      // Fetch all portfolios, then search units across them
+      const portfolios = await portfolioService.getPortfolios(token, 1, 50);
+      let found: PortfolioUnit | undefined;
+      for (const p of portfolios.data) {
+        const units = await portfolioService.getUnits(p.id, token);
+        found = units.find((u) => u.id === id);
+        if (found) break;
+      }
       if (!found) {
         setNotFound(true);
       } else {
@@ -119,6 +125,7 @@ function EditUnitContent() {
         {!isLoading && !notFound && unit && (
           <UnitForm
             mode="edit"
+            portfolioId={unit.portfolioId}
             initialData={unit}
             onSuccess={() => router.push(`/mi-portafolio/${id}`)}
           />
