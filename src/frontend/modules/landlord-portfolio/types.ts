@@ -82,6 +82,12 @@ export interface EnrichedUnitFormData {
   leaseBaseCurrency: string;
 }
 
+export interface PropertyType {
+  id: string;
+  code: string;
+  description: string;
+}
+
 export interface EnrichedUnitResponse {
   id: string;
   portfolioId: string;

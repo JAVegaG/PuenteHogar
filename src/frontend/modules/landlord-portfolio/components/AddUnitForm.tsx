@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@modules/users/context/AuthContext';
 import { validateEnrichedUnitForm } from '../validation';
 import { portfolioService } from '@/shared/services/portfolio';
-import type { EnrichedUnitFormData, CreateUnitRequest } from '../types';
+import type { EnrichedUnitFormData, CreateUnitRequest, PropertyType } from '../types';
 import { Button } from '@/shared/components/Button';
+import { Skeleton } from '@/shared/components/Skeleton';
 
 interface AddUnitFormProps {
   portfolioId: string;
@@ -51,6 +52,24 @@ export function AddUnitForm({ portfolioId, onSuccess, onCancel }: AddUnitFormPro
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [propertyTypes, setPropertyTypes] = useState<PropertyType[]>([]);
+  const [isLoadingPropertyTypes, setIsLoadingPropertyTypes] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    portfolioService
+      .getPropertyTypes()
+      .then((types) => {
+        if (!cancelled) setPropertyTypes(types);
+      })
+      .catch(() => {
+        /* graceful degradation — dropdown will have no options */
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingPropertyTypes(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   const handleChange = (field: keyof EnrichedUnitFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -206,15 +225,24 @@ export function AddUnitForm({ portfolioId, onSuccess, onCancel }: AddUnitFormPro
             >
               Tipo de propiedad
             </label>
-            <input
-              id="propertyType"
-              type="text"
-              value={formData.propertyType}
-              onChange={(e) => handleChange('propertyType', e.target.value)}
-              placeholder="Ej: Apartamento, Casa, Local"
-              aria-describedby={errors.propertyType ? 'propertyType-error' : undefined}
-              className={`w-full h-[48px] min-h-[44px] rounded-[10px] border px-3 text-body focus:outline-none focus:ring-2 transition-colors ${fieldBorderClass('propertyType')}`}
-            />
+            {isLoadingPropertyTypes ? (
+              <div role="status" aria-busy="true" aria-label="Cargando tipos de propiedad">
+                <Skeleton className="h-[48px] w-full rounded-[10px]" />
+              </div>
+            ) : (
+              <select
+                id="propertyType"
+                value={formData.propertyType}
+                onChange={(e) => handleChange('propertyType', e.target.value)}
+                aria-describedby={errors.propertyType ? 'propertyType-error' : undefined}
+                className={`w-full h-[48px] min-h-[44px] rounded-[10px] border px-3 text-body focus:outline-none focus:ring-2 transition-colors ${fieldBorderClass('propertyType')}`}
+              >
+                <option value="" disabled>Selecciona un tipo de propiedad</option>
+                {propertyTypes.map((pt) => (
+                  <option key={pt.code} value={pt.code}>{pt.description}</option>
+                ))}
+              </select>
+            )}
             {errors.propertyType && (
               <p
                 id="propertyType-error"

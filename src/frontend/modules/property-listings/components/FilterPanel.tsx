@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useId, useMemo } from 'react';
 import { Button } from '@/shared/components/Button';
+import { portfolioService } from '@/shared/services/portfolio';
+import type { PropertyType } from '@/modules/landlord-portfolio/types';
 import type { ListingFilters } from '../types';
 
 export interface FilterPanelProps {
@@ -21,8 +23,6 @@ const PUBLISHED_OPTIONS: { label: string; value: ListingFilters['publishedWithin
   { label: 'Últimos 3 meses', value: '90d' },
   { label: 'Cualquier fecha', value: 'any' },
 ];
-
-const PROPERTY_TYPES = ['Apartamento', 'Casa', 'Estudio', 'Habitación'];
 
 const ROOM_OPTIONS = ['1', '2', '3', '4', '5+'];
 const BATHROOM_OPTIONS = ['1', '2', '3', '4+'];
@@ -102,6 +102,21 @@ export default function FilterPanel({
   const [bathrooms, setBathrooms] = useState(bathroomsToString(currentFilters.bathrooms));
   const [areaMinRaw, setAreaMinRaw] = useState(currentFilters.areaMin?.toString() ?? '');
   const [areaMaxRaw, setAreaMaxRaw] = useState(currentFilters.areaMax?.toString() ?? '');
+
+  const [propertyTypes, setPropertyTypes] = useState<PropertyType[]>([]);
+
+  // Fetch property types from catalog on mount
+  useEffect(() => {
+    let cancelled = false;
+    portfolioService.getPropertyTypes()
+      .then((types) => {
+        if (!cancelled) setPropertyTypes(types);
+      })
+      .catch(() => {
+        // Graceful degradation — leave propertyTypes as empty array
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   // Track whether user typed invalid characters (for inline error display)
   const [priceMinError, setPriceMinError] = useState<string | null>(null);
@@ -290,190 +305,190 @@ export default function FilterPanel({
       {/* Scrollable fields */}
       <div className="flex-1 overflow-y-auto overscroll-contain px-mobile-margin md:px-desktop-margin py-section-gap">
         <div className="max-w-[416px] mx-auto space-y-section-gap">
-        {/* Ciudad */}
-        <div className="space-y-element-gap">
-          <label htmlFor={cityId} className={labelClass}>Ciudad</label>
-          <select
-            id={cityId}
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            className={selectClass}
-          >
-            <option value="">Seleccionar ciudad</option>
-            {CITIES.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Zona / Barrio */}
-        <div className="space-y-element-gap">
-          <label htmlFor={neighborhoodId} className={labelClass}>Zona / Barrio</label>
-          <input
-            id={neighborhoodId}
-            type="text"
-            value={neighborhood}
-            onChange={(e) => setNeighborhood(e.target.value)}
-            disabled={!city}
-            placeholder={city ? 'Escribe un barrio' : ''}
-            className={`${textInputClass} ${!city ? 'opacity-50 cursor-not-allowed' : ''}`}
-          />
-          {!city && (
-            <p className="text-small text-neutral-600">Primero selecciona una ciudad</p>
-          )}
-        </div>
-
-        {/* Fecha de publicación */}
-        <div className="space-y-element-gap">
-          <label htmlFor={publishedId} className={labelClass}>Fecha de publicación</label>
-          <select
-            id={publishedId}
-            value={publishedWithin}
-            onChange={(e) => setPublishedWithin(e.target.value)}
-            className={selectClass}
-          >
-            <option value="">Cualquier fecha</option>
-            {PUBLISHED_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Tipo de propiedad */}
-        <div className="space-y-element-gap">
-          <label htmlFor={propertyTypeId} className={labelClass}>Tipo de propiedad</label>
-          <select
-            id={propertyTypeId}
-            value={propertyType}
-            onChange={(e) => setPropertyType(e.target.value)}
-            className={selectClass}
-          >
-            <option value="">Todos los tipos</option>
-            {PROPERTY_TYPES.map((t) => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Precio mensual */}
-        <div className="space-y-element-gap">
-          <span className={labelClass}>Precio mensual</span>
-          <div className="flex gap-element-gap">
-            <div className="flex-1 space-y-1">
-              <label htmlFor={priceMinId} className="sr-only">Precio mínimo</label>
-              <input
-                id={priceMinId}
-                type="text"
-                inputMode="numeric"
-                placeholder="$Mínimo"
-                value={formatCOP(priceMinRaw)}
-                onChange={handlePriceMinChange}
-                aria-invalid={!!(priceMinError || priceRangeError)}
-                aria-describedby={priceMinError ? priceMinErrorId : priceRangeError ? priceRangeErrorId : undefined}
-                className={`${priceInputClass} ${priceMinError || priceRangeError ? inputErrorClass : ''}`}
-              />
-              {priceMinError && (
-                <p id={priceMinErrorId} className="text-caption text-error" role="alert">{priceMinError}</p>
-              )}
-            </div>
-            <div className="flex-1 space-y-1">
-              <label htmlFor={priceMaxId} className="sr-only">Precio máximo</label>
-              <input
-                id={priceMaxId}
-                type="text"
-                inputMode="numeric"
-                placeholder="$Máximo"
-                value={formatCOP(priceMaxRaw)}
-                onChange={handlePriceMaxChange}
-                aria-invalid={!!(priceMaxError || priceRangeError)}
-                aria-describedby={priceMaxError ? priceMaxErrorId : priceRangeError ? priceRangeErrorId : undefined}
-                className={`${priceInputClass} ${priceMaxError || priceRangeError ? inputErrorClass : ''}`}
-              />
-              {priceMaxError && (
-                <p id={priceMaxErrorId} className="text-caption text-error" role="alert">{priceMaxError}</p>
-              )}
-            </div>
+          {/* Ciudad */}
+          <div className="space-y-element-gap">
+            <label htmlFor={cityId} className={labelClass}>Ciudad</label>
+            <select
+              id={cityId}
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              className={selectClass}
+            >
+              <option value="">Seleccionar ciudad</option>
+              {CITIES.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
           </div>
-          {priceRangeError && !priceMinError && !priceMaxError && (
-            <p id={priceRangeErrorId} className="text-caption text-error" role="alert">{priceRangeError}</p>
-          )}
-        </div>
 
-        {/* Habitaciones */}
-        <div className="space-y-element-gap">
-          <label htmlFor={roomsId} className={labelClass}>Número de habitaciones</label>
-          <select
-            id={roomsId}
-            value={rooms}
-            onChange={(e) => setRooms(e.target.value)}
-            className={selectClass}
-          >
-            <option value="">Cualquiera</option>
-            {ROOM_OPTIONS.map((r) => (
-              <option key={r} value={r}>{r}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Baños */}
-        <div className="space-y-element-gap">
-          <label htmlFor={bathroomsId} className={labelClass}>Número de baños</label>
-          <select
-            id={bathroomsId}
-            value={bathrooms}
-            onChange={(e) => setBathrooms(e.target.value)}
-            className={selectClass}
-          >
-            <option value="">Cualquiera</option>
-            {BATHROOM_OPTIONS.map((b) => (
-              <option key={b} value={b}>{b}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Área (m²) */}
-        <div className="space-y-element-gap">
-          <span className={labelClass}>Área (m²)</span>
-          <div className="flex gap-element-gap">
-            <div className="flex-1 space-y-1">
-              <label htmlFor={areaMinId} className="sr-only">Área mínima</label>
-              <input
-                id={areaMinId}
-                type="text"
-                inputMode="numeric"
-                placeholder="Mínimo"
-                value={areaMinRaw}
-                onChange={handleAreaMinChange}
-                aria-invalid={!!(areaMinError || areaRangeError)}
-                aria-describedby={areaMinError ? areaMinErrorId : areaRangeError ? areaRangeErrorId : undefined}
-                className={`${areaInputClass} ${areaMinError || areaRangeError ? inputErrorClass : ''}`}
-              />
-              {areaMinError && (
-                <p id={areaMinErrorId} className="text-caption text-error" role="alert">{areaMinError}</p>
-              )}
-            </div>
-            <div className="flex-1 space-y-1">
-              <label htmlFor={areaMaxId} className="sr-only">Área máxima</label>
-              <input
-                id={areaMaxId}
-                type="text"
-                inputMode="numeric"
-                placeholder="Máximo"
-                value={areaMaxRaw}
-                onChange={handleAreaMaxChange}
-                aria-invalid={!!(areaMaxError || areaRangeError)}
-                aria-describedby={areaMaxError ? areaMaxErrorId : areaRangeError ? areaRangeErrorId : undefined}
-                className={`${areaInputClass} ${areaMaxError || areaRangeError ? inputErrorClass : ''}`}
-              />
-              {areaMaxError && (
-                <p id={areaMaxErrorId} className="text-caption text-error" role="alert">{areaMaxError}</p>
-              )}
-            </div>
+          {/* Zona / Barrio */}
+          <div className="space-y-element-gap">
+            <label htmlFor={neighborhoodId} className={labelClass}>Zona / Barrio</label>
+            <input
+              id={neighborhoodId}
+              type="text"
+              value={neighborhood}
+              onChange={(e) => setNeighborhood(e.target.value)}
+              disabled={!city}
+              placeholder={city ? 'Escribe un barrio' : ''}
+              className={`${textInputClass} ${!city ? 'opacity-50 cursor-not-allowed' : ''}`}
+            />
+            {!city && (
+              <p className="text-small text-neutral-600">Primero selecciona una ciudad</p>
+            )}
           </div>
-          {areaRangeError && !areaMinError && !areaMaxError && (
-            <p id={areaRangeErrorId} className="text-caption text-error" role="alert">{areaRangeError}</p>
-          )}
-        </div>
+
+          {/* Fecha de publicación */}
+          <div className="space-y-element-gap">
+            <label htmlFor={publishedId} className={labelClass}>Fecha de publicación</label>
+            <select
+              id={publishedId}
+              value={publishedWithin}
+              onChange={(e) => setPublishedWithin(e.target.value)}
+              className={selectClass}
+            >
+              <option value="">Cualquier fecha</option>
+              {PUBLISHED_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Tipo de propiedad */}
+          <div className="space-y-element-gap">
+            <label htmlFor={propertyTypeId} className={labelClass}>Tipo de propiedad</label>
+            <select
+              id={propertyTypeId}
+              value={propertyType}
+              onChange={(e) => setPropertyType(e.target.value)}
+              className={selectClass}
+            >
+              <option value="">Todos los tipos</option>
+              {propertyTypes.map((pt) => (
+                <option key={pt.code} value={pt.code}>{pt.description}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Precio mensual */}
+          <div className="space-y-element-gap">
+            <span className={labelClass}>Precio mensual</span>
+            <div className="flex gap-element-gap">
+              <div className="flex-1 space-y-1">
+                <label htmlFor={priceMinId} className="sr-only">Precio mínimo</label>
+                <input
+                  id={priceMinId}
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="$Mínimo"
+                  value={formatCOP(priceMinRaw)}
+                  onChange={handlePriceMinChange}
+                  aria-invalid={!!(priceMinError || priceRangeError)}
+                  aria-describedby={priceMinError ? priceMinErrorId : priceRangeError ? priceRangeErrorId : undefined}
+                  className={`${priceInputClass} ${priceMinError || priceRangeError ? inputErrorClass : ''}`}
+                />
+                {priceMinError && (
+                  <p id={priceMinErrorId} className="text-caption text-error" role="alert">{priceMinError}</p>
+                )}
+              </div>
+              <div className="flex-1 space-y-1">
+                <label htmlFor={priceMaxId} className="sr-only">Precio máximo</label>
+                <input
+                  id={priceMaxId}
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="$Máximo"
+                  value={formatCOP(priceMaxRaw)}
+                  onChange={handlePriceMaxChange}
+                  aria-invalid={!!(priceMaxError || priceRangeError)}
+                  aria-describedby={priceMaxError ? priceMaxErrorId : priceRangeError ? priceRangeErrorId : undefined}
+                  className={`${priceInputClass} ${priceMaxError || priceRangeError ? inputErrorClass : ''}`}
+                />
+                {priceMaxError && (
+                  <p id={priceMaxErrorId} className="text-caption text-error" role="alert">{priceMaxError}</p>
+                )}
+              </div>
+            </div>
+            {priceRangeError && !priceMinError && !priceMaxError && (
+              <p id={priceRangeErrorId} className="text-caption text-error" role="alert">{priceRangeError}</p>
+            )}
+          </div>
+
+          {/* Habitaciones */}
+          <div className="space-y-element-gap">
+            <label htmlFor={roomsId} className={labelClass}>Número de habitaciones</label>
+            <select
+              id={roomsId}
+              value={rooms}
+              onChange={(e) => setRooms(e.target.value)}
+              className={selectClass}
+            >
+              <option value="">Cualquiera</option>
+              {ROOM_OPTIONS.map((r) => (
+                <option key={r} value={r}>{r}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Baños */}
+          <div className="space-y-element-gap">
+            <label htmlFor={bathroomsId} className={labelClass}>Número de baños</label>
+            <select
+              id={bathroomsId}
+              value={bathrooms}
+              onChange={(e) => setBathrooms(e.target.value)}
+              className={selectClass}
+            >
+              <option value="">Cualquiera</option>
+              {BATHROOM_OPTIONS.map((b) => (
+                <option key={b} value={b}>{b}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Área (m²) */}
+          <div className="space-y-element-gap">
+            <span className={labelClass}>Área (m²)</span>
+            <div className="flex gap-element-gap">
+              <div className="flex-1 space-y-1">
+                <label htmlFor={areaMinId} className="sr-only">Área mínima</label>
+                <input
+                  id={areaMinId}
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="Mínimo"
+                  value={areaMinRaw}
+                  onChange={handleAreaMinChange}
+                  aria-invalid={!!(areaMinError || areaRangeError)}
+                  aria-describedby={areaMinError ? areaMinErrorId : areaRangeError ? areaRangeErrorId : undefined}
+                  className={`${areaInputClass} ${areaMinError || areaRangeError ? inputErrorClass : ''}`}
+                />
+                {areaMinError && (
+                  <p id={areaMinErrorId} className="text-caption text-error" role="alert">{areaMinError}</p>
+                )}
+              </div>
+              <div className="flex-1 space-y-1">
+                <label htmlFor={areaMaxId} className="sr-only">Área máxima</label>
+                <input
+                  id={areaMaxId}
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="Máximo"
+                  value={areaMaxRaw}
+                  onChange={handleAreaMaxChange}
+                  aria-invalid={!!(areaMaxError || areaRangeError)}
+                  aria-describedby={areaMaxError ? areaMaxErrorId : areaRangeError ? areaRangeErrorId : undefined}
+                  className={`${areaInputClass} ${areaMaxError || areaRangeError ? inputErrorClass : ''}`}
+                />
+                {areaMaxError && (
+                  <p id={areaMaxErrorId} className="text-caption text-error" role="alert">{areaMaxError}</p>
+                )}
+              </div>
+            </div>
+            {areaRangeError && !areaMinError && !areaMaxError && (
+              <p id={areaRangeErrorId} className="text-caption text-error" role="alert">{areaRangeError}</p>
+            )}
+          </div>
         </div>
       </div>
 
