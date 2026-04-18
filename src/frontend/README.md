@@ -1,6 +1,6 @@
 # Frontend — Plataforma de Arriendo
 
-Aplicación Next.js (App Router) con Tailwind CSS y TypeScript para la plataforma de arriendo de vivienda urbana. Incluye los módulos de exploración de inmuebles y autenticación/perfil de usuarios.
+Aplicación Next.js (App Router) con Tailwind CSS y TypeScript para la plataforma de arriendo de vivienda urbana. Incluye los módulos de exploración de inmuebles, autenticación/perfil de usuarios y portafolio del arrendador.
 
 ## Stack
 
@@ -27,9 +27,29 @@ src/frontend/
 │   │   ├── page.tsx          # Página de listado (Server Component)
 │   │   └── [id]/
 │   │       └── page.tsx      # Página de detalle (Server Component)
-│   └── mi-perfil/
-│       └── page.tsx          # Página de perfil (Client Component, protegida)
+│   ├── mi-perfil/
+│   │   └── page.tsx          # Página de perfil (Client Component, protegida)
+│   └── mi-portafolio/
+│       ├── page.tsx              # Listado de unidades de portafolio (Client Component, LANDLORD)
+│       ├── nueva-unidad/
+│       │   └── page.tsx          # Crear nueva unidad (Client Component, LANDLORD)
+│       └── [id]/
+│           ├── page.tsx          # Detalle de unidad (Client Component, LANDLORD)
+│           └── editar/
+│               └── page.tsx      # Editar unidad (Client Component, LANDLORD)
 ├── modules/
+│   ├── landlord-portfolio/
+│   │   ├── components/
+│   │   │   ├── LandlordRoute.tsx      # Protección auth + rol LANDLORD
+│   │   │   ├── PortfolioList.tsx      # Lista vertical de tarjetas de unidades
+│   │   │   ├── UnitCard.tsx           # Tarjeta individual de unidad de portafolio
+│   │   │   ├── UnitDetailView.tsx     # Vista de detalle de unidad
+│   │   │   └── UnitForm.tsx           # Formulario crear/editar (reutilizable)
+│   │   ├── __tests__/
+│   │   │   └── validation.test.ts
+│   │   ├── types.ts                   # Interfaces: PortfolioUnit, CreatePortfolioUnitRequest, etc.
+│   │   ├── utils.ts                   # formatPortfolioDate (wrapper de formatRelativeDate)
+│   │   └── validation.ts             # Validación pura: propertyId, leaseBaseAmount, leaseBaseCurrency
 │   ├── property-listings/
 │   │   ├── components/
 │   │   │   ├── ActionBar.tsx          # Barra de acciones (Filtros + Ordenar)
@@ -80,7 +100,8 @@ src/frontend/
 │   │   └── useDebounce.ts        # Debounce genérico (default 400ms)
 │   ├── services/
 │   │   ├── api.ts                 # Servicio HTTP listings (fetchListings, fetchListingDetail)
-│   │   └── auth.ts               # Servicio HTTP auth (login, register, getProfile, getDocumentTypes)
+│   │   ├── auth.ts               # Servicio HTTP auth (login, register, getProfile, getDocumentTypes)
+│   │   └── portfolio.ts          # Servicio HTTP portafolio (getUnits, createUnit, updateUnit)
 │   └── utils/
 │       ├── formatPrice.ts         # Formato COP ($X.XXX.XXX)
 │       └── formatRelativeDate.ts  # Fecha relativa en español
@@ -116,6 +137,10 @@ npm run lint       # Linting
 | `/auth/login` | Client Component | No | Inicio de sesión (email + contraseña) |
 | `/auth/registro` | Client Component | No | Registro multi-paso (rol, datos personales, credenciales) |
 | `/mi-perfil` | Client Component | Sí | Perfil del usuario autenticado (solo lectura) |
+| `/mi-portafolio` | Client Component | LANDLORD | Listado de unidades del portafolio del arrendador |
+| `/mi-portafolio/nueva-unidad` | Client Component | LANDLORD | Crear nueva unidad de portafolio |
+| `/mi-portafolio/[id]` | Client Component | LANDLORD | Detalle de unidad con info completa |
+| `/mi-portafolio/[id]/editar` | Client Component | LANDLORD | Editar unidad de portafolio existente |
 
 ## Módulos
 
@@ -127,6 +152,10 @@ Exploración pública de inmuebles: listado con filtros avanzados (ciudad, barri
 
 Autenticación y perfil de usuario: login con email/contraseña, registro multi-paso (3 pasos: tipo de usuario, datos personales, credenciales), perfil de solo lectura, gestión de sesión JWT (AuthProvider), protección de rutas y catálogo de tipos de documento desde el backend.
 
+### landlord-portfolio
+
+Portafolio del arrendador: listado de unidades de portafolio, creación y edición de unidades (canon base, moneda, condiciones), detalle de unidad, protección de rutas por rol LANDLORD (LandlordRoute), validación client-side de formularios y servicio de integración con API backend (PortfolioService).
+
 ## API Backend
 
 El frontend consume los endpoints REST del backend NestJS:
@@ -137,6 +166,9 @@ El frontend consume los endpoints REST del backend NestJS:
 - `POST /auth/register` — Registro de usuario
 - `GET /auth/profile` — Perfil del usuario autenticado (requiere JWT)
 - `GET /auth/document-types` — Catálogo de tipos de documento
+- `GET /portfolio/units` — Listado de unidades del portafolio (requiere JWT, rol LANDLORD)
+- `POST /portfolio/units` — Crear unidad de portafolio (requiere JWT, rol LANDLORD)
+- `PATCH /portfolio/units/:id` — Actualizar unidad de portafolio (requiere JWT, rol LANDLORD)
 
 ## Diseño
 
