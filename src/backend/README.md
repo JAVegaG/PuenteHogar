@@ -44,7 +44,7 @@ src/backend/
 └── modules/
     ├── users/                  # Registro, login, RBAC
     ├── property-listings/      # Publicaciones, búsqueda, fotos
-    ├── landlord-portfolio/     # Portafolio, unidades, leases
+    ├── landlord-portfolio/     # Portafolios (CRUD, paginación, estadísticas agregadas), unidades enriquecidas (cross-schema Property+Address+PortfolioUnit), leases
     ├── contracts/              # Contratos, firma electrónica, almacenamiento de documentos
     ├── payments/               # Pagos, pasarela, idempotencia (dominio, aplicación, infraestructura, controlador)
     ├── accounting/             # Reportes financieros (dominio, aplicación, infraestructura: PrismaAccountingRepository + RedisReportCache)

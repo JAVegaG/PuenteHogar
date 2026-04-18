@@ -32,7 +32,7 @@ src/frontend/
 │   └── mi-portafolio/
 │       ├── page.tsx              # Listado de unidades de portafolio (Client Component, LANDLORD)
 │       ├── nueva-unidad/
-│       │   └── page.tsx          # Crear nueva unidad (Client Component, LANDLORD)
+│       │   └── page.tsx          # Redirige a /mi-portafolio (reemplazada por /mi-portafolio/[portfolioId]/agregar-unidad)
 │       └── [id]/
 │           ├── page.tsx          # Detalle de unidad (Client Component, LANDLORD)
 │           └── editar/
@@ -138,7 +138,7 @@ npm run lint       # Linting
 | `/auth/registro` | Client Component | No | Registro multi-paso (rol, datos personales, credenciales) |
 | `/mi-perfil` | Client Component | Sí | Perfil del usuario autenticado (solo lectura) |
 | `/mi-portafolio` | Client Component | LANDLORD | Listado de unidades del portafolio del arrendador |
-| `/mi-portafolio/nueva-unidad` | Client Component | LANDLORD | Crear nueva unidad de portafolio |
+| `/mi-portafolio/nueva-unidad` | Client Component | LANDLORD | Redirige a `/mi-portafolio` (reemplazada por `/mi-portafolio/[portfolioId]/agregar-unidad`) |
 | `/mi-portafolio/[id]` | Client Component | LANDLORD | Detalle de unidad con info completa |
 | `/mi-portafolio/[id]/editar` | Client Component | LANDLORD | Editar unidad de portafolio existente |
 
@@ -166,9 +166,11 @@ El frontend consume los endpoints REST del backend NestJS:
 - `POST /auth/register` — Registro de usuario
 - `GET /auth/profile` — Perfil del usuario autenticado (requiere JWT)
 - `GET /auth/document-types` — Catálogo de tipos de documento
-- `GET /portfolio/units` — Listado de unidades del portafolio (requiere JWT, rol LANDLORD)
-- `POST /portfolio/units` — Crear unidad de portafolio (requiere JWT, rol LANDLORD)
-- `PATCH /portfolio/units/:id` — Actualizar unidad de portafolio (requiere JWT, rol LANDLORD)
+- `GET /portfolio` — Listado paginado de portafolios con estadísticas (requiere JWT, rol LANDLORD)
+- `POST /portfolio` — Crear portafolio (requiere JWT, rol LANDLORD)
+- `GET /portfolio/:portfolioId/units` — Listado de unidades de un portafolio (requiere JWT, rol LANDLORD)
+- `POST /portfolio/:portfolioId/units` — Crear unidad enriquecida en un portafolio (requiere JWT, rol LANDLORD)
+- `PATCH /portfolio/:portfolioId/units/:id` — Actualizar unidad de portafolio (requiere JWT, rol LANDLORD)
 
 ## Diseño
 

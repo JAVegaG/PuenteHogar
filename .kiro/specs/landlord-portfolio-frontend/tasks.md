@@ -44,9 +44,9 @@ Implement the Landlord Portfolio frontend module for the Next.js App Router appl
 
 - [x] 2. Implement PortfolioService and utility functions
   - [x] 2.1 Create `src/frontend/shared/services/portfolio.ts` with `portfolioService` object
-    - `getUnits(token: string): Promise<PortfolioUnit[]>` — GET /portfolio/units with Bearer token
-    - `createUnit(data: CreatePortfolioUnitRequest, token: string): Promise<PortfolioUnit>` — POST /portfolio/units with Bearer token
-    - `updateUnit(id: string, data: UpdatePortfolioUnitRequest, token: string): Promise<PortfolioUnit>` — PATCH /portfolio/units/:id with Bearer token
+    - `getUnits(portfolioId: string, token: string): Promise<PortfolioUnit[]>` — GET /portfolio/:portfolioId/units with Bearer token
+    - `createUnit(portfolioId: string, data: CreatePortfolioUnitRequest, token: string): Promise<PortfolioUnit>` — POST /portfolio/:portfolioId/units with Bearer token
+    - `updateUnit(portfolioId: string, id: string, data: UpdatePortfolioUnitRequest, token: string): Promise<PortfolioUnit>` — PATCH /portfolio/:portfolioId/units/:id with Bearer token
     - Use `fetch` nativo, `NEXT_PUBLIC_API_URL` env var, `Content-Type: application/json`
     - Error handling: 401 → "Sesión expirada", 403 → "No tienes permiso para realizar esta acción", 404 → "Unidad de portafolio no encontrada", 5xx → "Error del servidor. Intenta de nuevo más tarde.", network error → "No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo."
     - Follow the pattern established in `src/frontend/shared/services/auth.ts`
@@ -115,8 +115,8 @@ Implement the Landlord Portfolio frontend module for the Next.js App Router appl
     - Fields: propertyId (text, read-only in edit mode), leaseBaseAmount (number input), leaseBaseCurrency (text, default "COP"), conditions (textarea, optional)
     - On submit: call `validateUnitForm(formData)`, show errors below fields in Caption (14px, error color), highlight field borders with error color
     - Errors disappear on `onChange` when user corrects value
-    - Create mode: call `portfolioService.createUnit(payload, token)`, show confirmation, call `onSuccess()`
-    - Edit mode: compute diff between `initialData` and current formData, send only modified fields via `portfolioService.updateUnit(id, diffPayload, token)`, show confirmation, call `onSuccess()`
+    - Create mode: call `portfolioService.createUnit(portfolioId, payload, token)`, show confirmation, call `onSuccess()`
+    - Edit mode: compute diff between `initialData` and current formData, send only modified fields via `portfolioService.updateUnit(portfolioId, id, diffPayload, token)`, show confirmation, call `onSuccess()`
     - Button text: "Guardar unidad" (create) / "Guardar cambios" (edit), full-width primary style
     - Disable button + show spinner during submit with `aria-busy`
     - Handle 401 → logout, 403 → show permission error preserving data, 404 → show not found, network/5xx → show error preserving data
@@ -136,8 +136,8 @@ Implement the Landlord Portfolio frontend module for the Next.js App Router appl
     - Client Component wrapping content in `LandlordRoute`
     - Header with hamburger menu button + "Mi portafolio" title (H1, 32px Bold)
     - SideMenu integration (open/close state)
-    - "Agregar unidad" primary button below header, navigates to `/mi-portafolio/nueva-unidad`
-    - Fetch units via `portfolioService.getUnits(token)` on mount
+    - "Agregar unidad" primary button below header, navigates to `/mi-portafolio/[portfolioId]/agregar-unidad`
+    - Fetch units via `portfolioService.getUnits(portfolioId, token)` on mount
     - Loading state: Skeleton loader (3 card placeholders)
     - Empty state: message "No tienes unidades en tu portafolio" with suggestion to add one
     - Error state: ErrorState component with retry button
@@ -146,9 +146,9 @@ Implement the Landlord Portfolio frontend module for the Next.js App Router appl
     - Semantic `<main>` wrapper
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9_
 
-  - [x] 7.2 Create `src/frontend/app/mi-portafolio/nueva-unidad/page.tsx` — Create unit page
-    - Client Component wrapping content in `LandlordRoute`
-    - Header with back arrow (navigates to `/mi-portafolio`) + "Agregar unidad" title (H1)
+  - [x] 7.2 Create `src/frontend/app/mi-portafolio/nueva-unidad/page.tsx` — Redirect page
+    - Client Component that redirects to `/mi-portafolio`
+    - The old flat unit creation page is replaced by the enriched flow at `/mi-portafolio/[portfolioId]/agregar-unidad`
     - Render `UnitForm` with `mode='create'`
     - `onSuccess`: redirect to `/mi-portafolio` via `router.push`
     - _Requirements: 4.1, 4.2, 4.9, 4.12_
@@ -156,7 +156,7 @@ Implement the Landlord Portfolio frontend module for the Next.js App Router appl
   - [x] 7.3 Create `src/frontend/app/mi-portafolio/[id]/page.tsx` — Unit detail page
     - Client Component wrapping content in `LandlordRoute`
     - Header with back arrow (navigates to `/mi-portafolio`) + "Detalle de unidad" title (H1)
-    - Fetch unit data from `portfolioService.getUnits(token)` and find by id param
+    - Fetch unit data from `portfolioService.getUnits(portfolioId, token)` and find by id param
     - Loading state: Skeleton loader replicating UnitDetailView structure
     - 404 handling: "Unidad de portafolio no encontrada" with link to `/mi-portafolio`
     - Error state: ErrorState with retry

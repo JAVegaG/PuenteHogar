@@ -4,13 +4,13 @@
 
 Este documento especifica los requisitos para la implementación del módulo frontend del Portafolio del Arrendador de la plataforma de gestión de arriendo de vivienda urbana en Colombia (Valle del Cauca). El módulo permite a arrendadores autenticados visualizar su portafolio de inmuebles, agregar nuevas unidades de portafolio, editar unidades existentes y consultar los arriendos (leases) asociados a cada unidad.
 
-El frontend se implementa como parte de la aplicación Next.js (App Router) existente en `src/frontend/`, con Tailwind CSS y TypeScript, siguiendo un enfoque mobile-first y cumpliendo con los criterios de accesibilidad WCAG 2.1 AA. La interfaz se presenta en idioma español y consume los endpoints REST del backend NestJS existente (`GET /portfolio/units`, `POST /portfolio/units`, `PATCH /portfolio/units/:id`).
+El frontend se implementa como parte de la aplicación Next.js (App Router) existente en `src/frontend/`, con Tailwind CSS y TypeScript, siguiendo un enfoque mobile-first y cumpliendo con los criterios de accesibilidad WCAG 2.1 AA. La interfaz se presenta en idioma español y consume los endpoints REST del backend NestJS existente (`GET /portfolio/:portfolioId/units`, `POST /portfolio/:portfolioId/units`, `PATCH /portfolio/:portfolioId/units/:id`, `GET /portfolio`, `POST /portfolio`).
 
 El módulo se integra con la estructura frontend ya implementada por los specs `explore-properties-frontend` y `users-auth-frontend`, reutilizando el Sistema_Diseño (tokens de color, tipografía, espaciado), componentes compartidos (Header, SideMenu, Button, Skeleton, EmptyState, ErrorState, Pagination), el AuthProvider y el AuthService.
 
 El diseño visual de referencia se encuentra en Figma: `https://www.figma.com/design/Yw53CFbVdMWVX7bQ6MFefk/properties_rental_platform_design`
 
-**Alcance:** Página de listado de unidades de portafolio (`/mi-portafolio`), página de creación de unidad de portafolio (`/mi-portafolio/nueva-unidad`), página de edición de unidad de portafolio (`/mi-portafolio/[id]/editar`), página de detalle de unidad de portafolio (`/mi-portafolio/[id]`), servicio de integración con API backend (PortfolioService), tipos TypeScript del módulo, validación client-side de formularios, protección de rutas por rol LANDLORD e integración con el Menú_Lateral existente.
+**Alcance:** Página de listado de portafolios (`/mi-portafolio`), página de creación de unidad enriquecida (`/mi-portafolio/[portfolioId]/agregar-unidad`), página de edición de unidad de portafolio (`/mi-portafolio/[id]/editar`), página de detalle de unidad de portafolio (`/mi-portafolio/[id]`), servicio de integración con API backend (PortfolioService), tipos TypeScript del módulo, validación client-side de formularios, protección de rutas por rol LANDLORD e integración con el Menú_Lateral existente.
 
 **Fuera de alcance:** Creación de inmuebles (Property) en el esquema `property_listings` (se asume que el `propertyId` ya existe), gestión de fotos de inmuebles, publicación de listings, gestión de contratos, gestión de pagos, notificaciones.
 
@@ -21,13 +21,13 @@ El diseño visual de referencia se encuentra en Figma: `https://www.figma.com/de
 - **App_Frontend**: La aplicación Next.js (App Router) existente en `src/frontend/` que implementa la interfaz de usuario de la plataforma.
 - **Módulo_Portafolio**: Conjunto de páginas, componentes, servicios y tipos ubicados en `src/frontend/modules/landlord-portfolio/` y `src/frontend/app/mi-portafolio/`.
 - **Página_Portafolio**: Página protegida accesible en la ruta `/mi-portafolio` que muestra el listado de unidades de portafolio del arrendador autenticado.
-- **Página_Nueva_Unidad**: Página protegida accesible en la ruta `/mi-portafolio/nueva-unidad` que permite al arrendador agregar una nueva unidad a su portafolio.
+- **Página_Nueva_Unidad**: La antigua página `/mi-portafolio/nueva-unidad` fue reemplazada por la página de creación enriquecida en `/mi-portafolio/[portfolioId]/agregar-unidad`. La ruta antigua redirige a `/mi-portafolio`.
 - **Página_Editar_Unidad**: Página protegida accesible en la ruta `/mi-portafolio/[id]/editar` que permite al arrendador modificar los datos de una unidad de portafolio existente.
 - **Página_Detalle_Unidad**: Página protegida accesible en la ruta `/mi-portafolio/[id]` que muestra la información completa de una unidad de portafolio, incluyendo los arriendos asociados.
 - **Tarjeta_Unidad**: Componente visual que representa una unidad de portafolio en el listado, mostrando el identificador del inmueble, el canon base, la moneda y las condiciones.
 - **Formulario_Unidad**: Formulario reutilizable para crear y editar unidades de portafolio con campos: ID del inmueble, canon base, moneda y condiciones.
 - **PortfolioService**: Capa de abstracción en `src/frontend/shared/services/` que encapsula las llamadas HTTP a los endpoints del portafolio del API_Backend.
-- **API_Backend**: El servidor NestJS que expone los endpoints REST `GET /portfolio/units`, `POST /portfolio/units` y `PATCH /portfolio/units/:id`.
+- **API_Backend**: El servidor NestJS que expone los endpoints REST `GET /portfolio` (listar portafolios), `POST /portfolio` (crear portafolio), `GET /portfolio/:portfolioId/units`, `POST /portfolio/:portfolioId/units` y `PATCH /portfolio/:portfolioId/units/:id`.
 - **Token_JWT**: Token de acceso JSON Web Token utilizado para autenticar peticiones protegidas.
 - **AuthProvider**: Componente React Context existente que gestiona el estado de autenticación global.
 - **Menú_Lateral**: Componente SideMenu existente que muestra navegación contextual según el estado de autenticación del usuario.
@@ -47,7 +47,7 @@ El diseño visual de referencia se encuentra en Figma: `https://www.figma.com/de
 
 #### Criterios de Aceptación
 
-1. THE PortfolioService SHALL encapsular las llamadas HTTP al API_Backend en funciones tipadas con TypeScript para los endpoints `GET /portfolio/units`, `POST /portfolio/units` y `PATCH /portfolio/units/:id`.
+1. THE PortfolioService SHALL encapsular las llamadas HTTP al API_Backend en funciones tipadas con TypeScript para los endpoints `GET /portfolio` (listar portafolios), `POST /portfolio` (crear portafolio), `GET /portfolio/:portfolioId/units`, `POST /portfolio/:portfolioId/units` y `PATCH /portfolio/:portfolioId/units/:id`.
 2. THE PortfolioService SHALL utilizar la variable de entorno `NEXT_PUBLIC_API_URL` como URL base para todas las solicitudes al API_Backend.
 3. THE PortfolioService SHALL adjuntar el header `Authorization: Bearer <token>` en todas las peticiones HTTP, obteniendo el token desde `localStorage` bajo la clave `auth_token`.
 4. THE PortfolioService SHALL definir interfaces TypeScript que reflejen la estructura de las peticiones y respuestas: `PortfolioUnit` (id, portfolioId, propertyId, conditions, leaseBaseAmount, leaseBaseCurrency, createdAt, updatedAt), `CreatePortfolioUnitRequest` (propertyId, leaseBaseAmount, leaseBaseCurrency, conditions) y `UpdatePortfolioUnitRequest` (conditions, leaseBaseAmount, leaseBaseCurrency), todos los campos de actualización opcionales.
@@ -65,9 +65,9 @@ El diseño visual de referencia se encuentra en Figma: `https://www.figma.com/de
 
 #### Criterios de Aceptación
 
-1. WHEN un Arrendador accede a la ruta `/mi-portafolio`, THE Página_Portafolio SHALL solicitar el listado de unidades de portafolio al API_Backend mediante `GET /portfolio/units` con el Token_JWT en el header de autorización y mostrar los resultados como una lista de Tarjeta_Unidad.
+1. WHEN un Arrendador accede a la ruta `/mi-portafolio`, THE Página_Portafolio SHALL solicitar el listado de portafolios al API_Backend mediante `GET /portfolio` con el Token_JWT en el header de autorización y mostrar los resultados como una lista de tarjetas de portafolio.
 2. THE Página_Portafolio SHALL incluir un encabezado fijo con borde inferior que contenga un botón de menú hamburguesa a la izquierda y el título "Mi portafolio" centrado, siguiendo la jerarquía tipográfica H1 (32px Bold, color `#111827`) del Sistema_Diseño.
-3. THE Página_Portafolio SHALL incluir un botón primario "Agregar unidad" debajo del encabezado que navegue a la Página_Nueva_Unidad (`/mi-portafolio/nueva-unidad`).
+3. THE Página_Portafolio SHALL incluir un botón primario "+ Crear nuevo portafolio" debajo del encabezado que muestre un formulario inline para crear un nuevo portafolio con nombre y descripción.
 4. WHILE el listado de unidades se está cargando desde el API_Backend, THE Página_Portafolio SHALL mostrar un indicador de carga visual (skeleton) que comunique al usuario que los datos están siendo obtenidos.
 5. IF el API_Backend retorna un listado vacío, THEN THE Página_Portafolio SHALL mostrar un mensaje claro en español indicando que el arrendador no tiene unidades en su portafolio, junto con una sugerencia de agregar una nueva unidad.
 6. IF la solicitud al API_Backend falla por error de red o error del servidor, THEN THE Página_Portafolio SHALL mostrar un mensaje de error comprensible en español con una opción para reintentar la carga.
@@ -99,13 +99,13 @@ El diseño visual de referencia se encuentra en Figma: `https://www.figma.com/de
 
 #### Criterios de Aceptación
 
-1. WHEN un Arrendador accede a la ruta `/mi-portafolio/nueva-unidad`, THE Página_Nueva_Unidad SHALL mostrar el Formulario_Unidad con los campos: ID del inmueble (propertyId), canon base de arrendamiento (leaseBaseAmount), moneda (leaseBaseCurrency, valor por defecto "COP") y condiciones especiales (conditions, opcional).
+1. WHEN un Arrendador accede a la ruta `/mi-portafolio/nueva-unidad`, THE Página_Nueva_Unidad SHALL redirigir automáticamente a la Página_Portafolio (`/mi-portafolio`). La creación de unidades se realiza ahora desde la ruta `/mi-portafolio/[portfolioId]/agregar-unidad` con el formulario enriquecido.
 2. THE Página_Nueva_Unidad SHALL incluir un encabezado con el título "Agregar unidad" centrado, siguiendo la jerarquía tipográfica H1 (32px Bold, color `#111827`) del Sistema_Diseño, y un botón de retorno (flecha izquierda) que navegue a la Página_Portafolio.
 3. THE Formulario_Unidad SHALL validar en el cliente que el campo ID del inmueble (propertyId) no esté vacío; IF el campo está vacío, THEN SHALL mostrar el mensaje "El ID del inmueble es obligatorio" debajo del campo.
 4. THE Formulario_Unidad SHALL validar en el cliente que el campo canon base (leaseBaseAmount) no esté vacío, sea un número y sea mayor o igual a cero; IF el campo está vacío, THEN SHALL mostrar "El canon base es obligatorio"; IF el valor no es un número válido, THEN SHALL mostrar "Ingresa un valor numérico válido"; IF el valor es negativo, THEN SHALL mostrar "El canon base debe ser mayor o igual a cero".
 5. THE Formulario_Unidad SHALL validar en el cliente que el campo moneda (leaseBaseCurrency) no esté vacío y contenga exactamente 3 caracteres alfabéticos (código ISO 4217); IF el campo está vacío, THEN SHALL mostrar "La moneda es obligatoria"; IF no tiene exactamente 3 caracteres, THEN SHALL mostrar "La moneda debe tener exactamente 3 caracteres (ej. COP)".
 6. THE Formulario_Unidad SHALL validar en el cliente todos los campos requeridos antes de enviar la solicitud al API_Backend, mostrando mensajes de error descriptivos en español debajo de cada campo afectado (tipografía Caption 14px, color de estado error), resaltando visualmente el borde del campo con color de error. Los mensajes de error SHALL desaparecer cuando el usuario corrige el valor del campo correspondiente.
-7. THE Formulario_Unidad SHALL incluir un botón primario "Guardar unidad" (fondo `#1d4ed8`, texto blanco, ancho completo) que envíe los datos al API_Backend mediante `POST /portfolio/units`.
+7. THE Formulario_Unidad SHALL incluir un botón primario "Guardar unidad" (fondo `#1d4ed8`, texto blanco, ancho completo) que envíe los datos al API_Backend mediante `POST /portfolio/:portfolioId/units`.
 8. WHILE la solicitud de creación se está procesando, THE Formulario_Unidad SHALL deshabilitar el botón "Guardar unidad" y mostrar un indicador de carga para comunicar al usuario que la operación está en progreso.
 9. WHEN el API_Backend retorna una respuesta exitosa de creación, THE Página_Nueva_Unidad SHALL mostrar un mensaje de confirmación en español y redirigir al arrendador a la Página_Portafolio.
 10. IF el API_Backend retorna un error 403 (acceso denegado), THEN THE Página_Nueva_Unidad SHALL mostrar un mensaje de error "No tienes permiso para realizar esta acción" y preservar los datos del formulario.
@@ -124,7 +124,7 @@ El diseño visual de referencia se encuentra en Figma: `https://www.figma.com/de
 2. THE Página_Editar_Unidad SHALL incluir un encabezado con el título "Editar unidad" centrado, siguiendo la jerarquía tipográfica H1 (32px Bold, color `#111827`) del Sistema_Diseño, y un botón de retorno (flecha izquierda) que navegue a la Página_Detalle_Unidad.
 3. THE Formulario_Unidad en modo edición SHALL mostrar el campo ID del inmueble (propertyId) como solo lectura, ya que el inmueble asociado no puede cambiarse después de la creación.
 4. THE Formulario_Unidad en modo edición SHALL aplicar las mismas reglas de validación client-side que en modo creación para los campos editables (leaseBaseAmount, leaseBaseCurrency, conditions).
-5. THE Formulario_Unidad en modo edición SHALL incluir un botón primario "Guardar cambios" que envíe únicamente los campos modificados al API_Backend mediante `PATCH /portfolio/units/:id`.
+5. THE Formulario_Unidad en modo edición SHALL incluir un botón primario "Guardar cambios" que envíe únicamente los campos modificados al API_Backend mediante `PATCH /portfolio/:portfolioId/units/:id`.
 6. WHILE la solicitud de actualización se está procesando, THE Formulario_Unidad SHALL deshabilitar el botón "Guardar cambios" y mostrar un indicador de carga.
 7. WHEN el API_Backend retorna una respuesta exitosa de actualización, THE Página_Editar_Unidad SHALL mostrar un mensaje de confirmación en español y redirigir al arrendador a la Página_Detalle_Unidad.
 8. IF el API_Backend retorna un error 404 (unidad no encontrada), THEN THE Página_Editar_Unidad SHALL mostrar un mensaje de error "Unidad de portafolio no encontrada" con un enlace para regresar a la Página_Portafolio.

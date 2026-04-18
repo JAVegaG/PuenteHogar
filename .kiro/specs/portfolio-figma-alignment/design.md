@@ -4,7 +4,7 @@
 
 Este diseño detalla los cambios de backend y frontend necesarios para alinear el módulo de Portafolio del Arrendador con los diseños de Figma. El enfoque simplificado reutiliza las tablas existentes `Property` y `Address` del esquema `property_listings` en lugar de duplicar campos en `PortfolioUnit`.
 
-1. **Backend**: Solo dos cambios al esquema Prisma (`description` en `LandlordPortfolio`, `name` en `PortfolioUnit`). Tres nuevos endpoints (`GET /portfolio` con paginación y estadísticas agregadas, `POST /portfolio` para crear portafolios, `POST /portfolio/:portfolioId/units` para crear unidades enriquecidas con creación cross-schema de `Property` + `Address` + `PortfolioUnit`). Los datos físicos del inmueble (tipo, dimensiones, habitaciones, baños) se almacenan en `Property`, y la dirección en `Address`, ambos ya existentes.
+1. **Backend**: Solo dos cambios al esquema Prisma (`description` en `LandlordPortfolio`, `name` en `PortfolioUnit`). Tres nuevos endpoints (`GET /portfolio` con paginación y estadísticas agregadas, `POST /portfolio` para crear portafolios, `POST /portfolio/:portfolioId/units` para crear unidades enriquecidas con creación cross-schema de `Property` + `Address` + `PortfolioUnit`). Los endpoints existentes de unidades fueron migrados a rutas con alcance de portafolio (`GET /portfolio/:portfolioId/units`, `PATCH /portfolio/:portfolioId/units/:id`). Los datos físicos del inmueble (tipo, dimensiones, habitaciones, baños) se almacenan en `Property`, y la dirección en `Address`, ambos ya existentes.
 
 2. **Frontend**: Nuevas interfaces TypeScript (`PortfolioSummary`, `PaginatedPortfolios`, `CreatePortfolioRequest`, `CreateUnitRequest`), servicio actualizado (`portfolioService`), funciones de validación puras para el formulario de unidades, página de listado de portafolios con tarjetas y paginación, y página de creación de unidades con formulario de tres secciones (información básica, detalles de propiedad, datos de arriendo).
 
@@ -210,13 +210,15 @@ interface IPortfolioRepository {
 }
 ```
 
-### Backend — Controller Endpoints Nuevos
+### Backend — Controller Endpoints
 
 | Método | Ruta | DTO Input | DTO Output | Guards |
 |--------|------|-----------|------------|--------|
 | `GET` | `/portfolio` | `ListPortfoliosQueryDto` (query) | `PaginatedPortfoliosResponseDto` | `JwtAuthGuard` |
 | `POST` | `/portfolio` | `CreatePortfolioDto` (body) | `PortfolioSummaryResponseDto` | `JwtAuthGuard` |
 | `POST` | `/portfolio/:portfolioId/units` | `CreateEnrichedUnitDto` (body) | `EnrichedUnitResponseDto` | `JwtAuthGuard` |
+| `GET` | `/portfolio/:portfolioId/units` | — | `PortfolioUnitResponseDto[]` | `JwtAuthGuard` |
+| `PATCH` | `/portfolio/:portfolioId/units/:id` | `UpdatePortfolioUnitDto` (body) | `PortfolioUnitResponseDto` | `JwtAuthGuard` |
 
 ### Frontend — Nuevas Interfaces TypeScript
 

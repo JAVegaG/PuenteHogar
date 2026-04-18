@@ -4,7 +4,7 @@
 
 Este diseño cubre la implementación del módulo frontend del Portafolio del Arrendador de la plataforma de arriendo de vivienda. El módulo permite a arrendadores autenticados (rol LANDLORD) visualizar su portafolio de unidades, agregar nuevas unidades, editar unidades existentes y consultar el detalle de cada una.
 
-La solución se implementa dentro de la aplicación Next.js (App Router) existente en `src/frontend/`, con Tailwind CSS y TypeScript, siguiendo un enfoque mobile-first. Consume los endpoints REST del backend NestJS existente (`GET /portfolio/units`, `POST /portfolio/units`, `PATCH /portfolio/units/:id`).
+La solución se implementa dentro de la aplicación Next.js (App Router) existente en `src/frontend/`, con Tailwind CSS y TypeScript, siguiendo un enfoque mobile-first. Consume los endpoints REST del backend NestJS (`GET /portfolio` para listar portafolios, `POST /portfolio` para crear portafolios, `GET /portfolio/:portfolioId/units`, `POST /portfolio/:portfolioId/units`, `PATCH /portfolio/:portfolioId/units/:id`).
 
 El diseño de referencia visual se encuentra en Figma: `https://www.figma.com/design/Yw53CFbVdMWVX7bQ6MFefk/properties_rental_platform_design`
 
@@ -14,7 +14,7 @@ El diseño de referencia visual se encuentra en Figma: `https://www.figma.com/de
 |----------|---------------|
 | Todas las páginas como Client Components | Requieren acceso al AuthProvider (token JWT, roles), estado de formularios, redirecciones programáticas y `localStorage` |
 | Componente `LandlordRoute` para protección por rol | Extiende el patrón de `ProtectedRoute` existente verificando además el rol LANDLORD, evitando duplicar lógica en cada página |
-| `PortfolioService` en `shared/services/portfolio.ts` | Sigue el patrón de `authService` — capa de abstracción con `fetch` nativo, manejo de errores tipado, token desde `localStorage` |
+| `PortfolioService` en `shared/services/portfolio.ts` | Sigue el patrón de `authService` — capa de abstracción con `fetch` nativo, manejo de errores tipado, token desde `localStorage`. Los métodos `getUnits`, `createUnit` y `updateUnit` ahora requieren `portfolioId` como primer parámetro |
 | Formulario reutilizable `UnitForm` para crear y editar | Evita duplicación; recibe `mode: 'create' | 'edit'` y `initialData` opcional para pre-poblar campos en edición |
 | Validación client-side con funciones puras en `validation.ts` | Retroalimentación inmediata, reduce llamadas innecesarias al backend, testeable con property-based testing |
 | Reutilización de componentes compartidos (Header, Button, Skeleton, EmptyState, ErrorState) | Consistencia visual, menor código, tokens de diseño centralizados |
@@ -34,7 +34,7 @@ graph TB
         subgraph "App Router (app/)"
             Layout["layout.tsx<br/>AuthProvider wrapper"]
             PortfolioPage["mi-portafolio/page.tsx<br/>(Client Component)"]
-            NewUnitPage["mi-portafolio/nueva-unidad/page.tsx<br/>(Client Component)"]
+            NewUnitPage["mi-portafolio/[portfolioId]/agregar-unidad/page.tsx<br/>(Client Component)"]
             EditUnitPage["mi-portafolio/[id]/editar/page.tsx<br/>(Client Component)"]
             DetailPage["mi-portafolio/[id]/page.tsx<br/>(Client Component)"]
         end
@@ -64,9 +64,9 @@ graph TB
     end
 
     subgraph "Backend NestJS"
-        GetUnits["GET /portfolio/units"]
-        CreateUnit["POST /portfolio/units"]
-        UpdateUnit["PATCH /portfolio/units/:id"]
+        GetUnits["GET /portfolio/:portfolioId/units"]
+        CreateUnit["POST /portfolio/:portfolioId/units"]
+        UpdateUnit["PATCH /portfolio/:portfolioId/units/:id"]
     end
 
     PortfolioPage --> LandlordRoute
@@ -79,9 +79,9 @@ graph TB
     DetailPage --> LandlordRoute
     DetailPage --> UnitDetail
 
-    PortfolioList -->|"getUnits()"| PortfolioService
-    UnitForm -->|"createUnit() / updateUnit()"| PortfolioService
-    UnitDetail -->|"getUnits()"| PortfolioService
+    PortfolioList -->|"getUnits(portfolioId)"| PortfolioService
+    UnitForm -->|"createUnit(portfolioId) / updateUnit(portfolioId)"| PortfolioService
+    UnitDetail -->|"getUnits(portfolioId)"| PortfolioService
 
     PortfolioService -->|"GET + Bearer"| GetUnits
     PortfolioService -->|"POST + Bearer"| CreateUnit
@@ -98,7 +98,7 @@ graph TB
 | Página | Tipo | Razón |
 |--------|------|-------|
 | `/mi-portafolio` | Client Component | Requiere token JWT para fetch, acceso a AuthProvider para verificar rol y logout |
-| `/mi-portafolio/nueva-unidad` | Client Component | Formulario interactivo con validación, estado de carga, envío autenticado |
+| `/mi-portafolio/nueva-unidad` | Client Component | Redirige a `/mi-portafolio` (la creación de unidades se hace ahora desde `/mi-portafolio/[portfolioId]/agregar-unidad`) |
 | `/mi-portafolio/[id]/editar` | Client Component | Formulario pre-poblado con datos del backend, envío autenticado |
 | `/mi-portafolio/[id]` | Client Component | Requiere token JWT para fetch, acceso a AuthProvider |
 
@@ -126,8 +126,8 @@ sequenceDiagram
     else Autenticado + LANDLORD
         LR->>LP: Renderiza children
         LP->>LS: localStorage.getItem('auth_token')
-        LP->>PS: portfolioService.getUnits(token)
-        PS->>B: GET /portfolio/units (Bearer token)
+        LP->>PS: portfolioService.getUnits(portfolioId, token)
+        PS->>B: GET /portfolio/:portfolioId/units (Bearer token)
         B-->>PS: PortfolioUnit[]
         PS-->>LP: PortfolioUnit[]
         LP->>LP: Renderiza lista de UnitCard
@@ -145,7 +145,7 @@ sequenceDiagram
     participant PS as PortfolioService
     participant B as Backend
 
-    U->>NP: Navega a /mi-portafolio/nueva-unidad
+    U->>NP: Navega a /mi-portafolio/[portfolioId]/agregar-unidad
     NP->>UF: Renderiza formulario vacío (mode='create')
     U->>UF: Completa campos y presiona "Guardar unidad"
     UF->>V: validateUnitForm(formData)
@@ -153,8 +153,8 @@ sequenceDiagram
         V-->>UF: Record<string, string> con errores
         UF->>UF: Muestra errores debajo de cada campo
     else Sin errores
-        UF->>PS: portfolioService.createUnit(payload, token)
-        PS->>B: POST /portfolio/units (Bearer token)
+        UF->>PS: portfolioService.createUnit(portfolioId, payload, token)
+        PS->>B: POST /portfolio/:portfolioId/units (Bearer token)
         alt Éxito (201)
             B-->>PS: PortfolioUnit creada
             PS-->>UF: Success
@@ -183,7 +183,7 @@ src/frontend/
 │   └── mi-portafolio/
 │       ├── page.tsx                            # Página de listado
 │       ├── nueva-unidad/
-│       │   └── page.tsx                        # Página de creación
+│       │   └── page.tsx                        # Redirige a /mi-portafolio
 │       └── [id]/
 │           ├── page.tsx                        # Página de detalle
 │           └── editar/
@@ -279,8 +279,8 @@ graph TD
   - `leaseBaseCurrency` (text input, valor por defecto "COP")
   - `conditions` (textarea, opcional)
 - **Validación**: Al hacer submit, llama a `validateUnitForm(formData)`. Errores se muestran debajo de cada campo en Caption (14px, color error). Errores desaparecen al corregir (`onChange`).
-- **Submit (create)**: Llama a `portfolioService.createUnit(payload, token)`. En éxito muestra confirmación y ejecuta `onSuccess()`.
-- **Submit (edit)**: Construye payload solo con campos modificados respecto a `initialData`. Llama a `portfolioService.updateUnit(id, payload, token)`. En éxito muestra confirmación y ejecuta `onSuccess()`.
+- **Submit (create)**: Llama a `portfolioService.createUnit(portfolioId, payload, token)`. En éxito muestra confirmación y ejecuta `onSuccess()`.
+- **Submit (edit)**: Construye payload solo con campos modificados respecto a `initialData`. Llama a `portfolioService.updateUnit(portfolioId, id, payload, token)`. En éxito muestra confirmación y ejecuta `onSuccess()`.
 - **Accesibilidad**: Labels con `htmlFor`, errores con `aria-describedby`, `aria-live="polite"` en zona de errores, botón deshabilitado durante submit con `aria-busy`, navegación por teclado (Tab/Shift+Tab/Enter).
 
 #### `UnitDetailView` (modules/landlord-portfolio/components/UnitDetailView.tsx)
@@ -351,16 +351,17 @@ Estas interfaces reflejan la estructura de `PortfolioUnitResponseDto` del backen
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export const portfolioService = {
-  async getUnits(token: string): Promise<PortfolioUnit[]> { ... },
-  async createUnit(data: CreatePortfolioUnitRequest, token: string): Promise<PortfolioUnit> { ... },
-  async updateUnit(id: string, data: UpdatePortfolioUnitRequest, token: string): Promise<PortfolioUnit> { ... },
+  async getUnits(portfolioId: string, token: string): Promise<PortfolioUnit[]> { ... },
+  async createUnit(portfolioId: string, data: CreatePortfolioUnitRequest, token: string): Promise<PortfolioUnit> { ... },
+  async updateUnit(portfolioId: string, id: string, data: UpdatePortfolioUnitRequest, token: string): Promise<PortfolioUnit> { ... },
 };
 ```
 
-Cada método:
-- Usa `fetch` nativo con `Content-Type: application/json`
-- Adjunta `Authorization: Bearer <token>` en todas las peticiones
-- Manejo de errores HTTP:
+Each method:
+- Uses `fetch` nativo with `Content-Type: application/json`
+- Adjunts `Authorization: Bearer <token>` in all requests
+- Methods `getUnits`, `createUnit`, and `updateUnit` require `portfolioId` as first parameter, constructing URLs like `/portfolio/${portfolioId}/units`
+- Error handling HTTP:
   - 401 → propaga error con mensaje "Sesión expirada"
   - 403 → propaga error con mensaje "No tienes permiso para realizar esta acción"
   - 404 → propaga error con mensaje "Unidad de portafolio no encontrada"

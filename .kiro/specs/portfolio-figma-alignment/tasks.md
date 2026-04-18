@@ -6,74 +6,74 @@ This plan implements the backend and frontend changes to align the Landlord Port
 
 ## Tasks
 
-- [ ] 1. Database schema migration
-  - [ ] 1.1 Add minimal new fields to Prisma schema
+- [x] 1. Database schema migration
+  - [x] 1.1 Add minimal new fields to Prisma schema
     - Add `description String?` to `LandlordPortfolio` model
     - Add `name String @default('')` to `PortfolioUnit` model
     - Only two columns added — all property data reuses existing `Property` and `Address` tables
     - File: `src/backend/db/prisma/schema.prisma`
     - _Requirements: 4.1, 4.2, 4.4_
 
-  - [ ] 1.2 Generate and apply Prisma migration
+  - [x] 1.2 Generate and apply Prisma migration
     - Run `npx prisma migrate dev --name add_portfolio_description_unit_name` from `src/backend/`
     - Verify migration SQL is incremental and non-destructive (ALTER TABLE ADD COLUMN with defaults)
     - _Requirements: 4.3_
 
-- [ ] 2. Backend domain layer updates
-  - [ ] 2.1 Update LandlordPortfolioEntity to include description field
+- [x] 2. Backend domain layer updates
+  - [x] 2.1 Update LandlordPortfolioEntity to include description field
     - Add `description: string | null` parameter to constructor
     - File: `src/backend/modules/landlord-portfolio/domain/entities/landlord-portfolio.entity.ts`
     - _Requirements: 4.1_
 
-  - [ ] 2.2 Create EnrichedPortfolioUnitEntity
+  - [x] 2.2 Create EnrichedPortfolioUnitEntity
     - New entity class with fields: id, portfolioId, name, propertyType, address, area (number | null, computed from length × width), numberOfRooms, numberOfBathrooms, description, leaseBaseAmount, leaseBaseCurrency, createdAt, updatedAt
     - File: `src/backend/modules/landlord-portfolio/domain/entities/enriched-portfolio-unit.entity.ts`
     - _Requirements: 3.11_
 
-  - [ ] 2.3 Create domain types for portfolio stats and enriched unit creation
+  - [x] 2.3 Create domain types for portfolio stats and enriched unit creation
     - Define `PortfolioWithStats` (includes propertyType: string | null), `CreatePortfolioData`, `CreateEnrichedUnitData` (includes propertyType, address, length?, width?, numberOfRooms, numberOfBathrooms, leaseBaseAmount, leaseBaseCurrency) interfaces
     - File: `src/backend/modules/landlord-portfolio/domain/ports/portfolio-repository.port.ts`
     - _Requirements: 1.2, 1.7, 2.1, 3.1_
 
-  - [ ] 2.4 Extend IPortfolioRepository port with new methods
+  - [x] 2.4 Extend IPortfolioRepository port with new methods
     - Add `findPortfoliosByUserId(userId, page, limit)`, `getGlobalStats(userId)`, `createPortfolio(data)`, `findPortfolioById(portfolioId)`, `createEnrichedUnit(data)` to the port interface
     - File: `src/backend/modules/landlord-portfolio/domain/ports/portfolio-repository.port.ts`
     - _Requirements: 1.1, 1.7, 2.1, 3.1_
 
-- [ ] 3. Backend application layer — DTOs
-  - [ ] 3.1 Create ListPortfoliosQueryDto
+- [x] 3. Backend application layer — DTOs
+  - [x] 3.1 Create ListPortfoliosQueryDto
     - Fields: `page?` (default 1, min 1), `limit?` (default 6, min 1, max 50) with class-validator decorators and Swagger annotations
     - File: `src/backend/modules/landlord-portfolio/application/dtos/list-portfolios-query.dto.ts`
     - _Requirements: 1.5_
 
-  - [ ] 3.2 Create PortfolioSummaryResponseDto
+  - [x] 3.2 Create PortfolioSummaryResponseDto
     - Fields: id, name, description, propertyType, creationDate, totalUnits, activeLeases, occupancyPercentage with Swagger annotations
     - File: `src/backend/modules/landlord-portfolio/application/dtos/portfolio-summary-response.dto.ts`
     - _Requirements: 1.2, 2.5_
 
-  - [ ] 3.3 Create PaginatedPortfoliosResponseDto
+  - [x] 3.3 Create PaginatedPortfoliosResponseDto
     - Fields: data (PortfolioSummaryResponseDto[]), total, page, limit, totalPages, globalTotalUnits, globalActiveLeases with Swagger annotations
     - File: `src/backend/modules/landlord-portfolio/application/dtos/paginated-portfolios-response.dto.ts`
     - _Requirements: 1.6, 1.7_
 
-  - [ ] 3.4 Create CreatePortfolioDto
+  - [x] 3.4 Create CreatePortfolioDto
     - Fields: name (@IsNotEmpty, @Length(1,200)), description? (@IsOptional, @MaxLength(500)) with Swagger annotations
     - File: `src/backend/modules/landlord-portfolio/application/dtos/create-portfolio.dto.ts`
     - _Requirements: 2.2, 2.3_
 
-  - [ ] 3.5 Create CreateEnrichedUnitDto
+  - [x] 3.5 Create CreateEnrichedUnitDto
     - Fields: name (@IsNotEmpty, @Length(1,200)), address (@IsNotEmpty, @Length(1,300)), propertyType (@IsNotEmpty), length? (@IsOptional, @IsNumber, @IsPositive), width? (@IsOptional, @IsNumber, @IsPositive), numberOfRooms? (@IsOptional, @IsInt, @Min(0), default 0), numberOfBathrooms? (@IsOptional, @IsInt, @Min(0), default 0), description? (@IsOptional), leaseBaseAmount (@IsNumber, @Min(0)), leaseBaseCurrency? (@IsOptional, @Length(3,3), default "COP")
     - No unitType field, no VALID_UNIT_TYPES constant — propertyType is a free-text string
     - File: `src/backend/modules/landlord-portfolio/application/dtos/create-enriched-unit.dto.ts`
     - _Requirements: 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8_
 
-  - [ ] 3.6 Create EnrichedUnitResponseDto
+  - [x] 3.6 Create EnrichedUnitResponseDto
     - Fields: id, portfolioId, name, propertyType, address, area (number | null — computed from length × width), numberOfRooms, numberOfBathrooms, description, leaseBaseAmount, leaseBaseCurrency, createdAt, updatedAt with Swagger annotations
     - File: `src/backend/modules/landlord-portfolio/application/dtos/enriched-unit-response.dto.ts`
     - _Requirements: 3.11_
 
-- [ ] 4. Backend application layer — Use cases
-  - [ ] 4.1 Create ListPortfoliosUseCase
+- [x] 4. Backend application layer — Use cases
+  - [x] 4.1 Create ListPortfoliosUseCase
     - Inject IPortfolioRepository, accept userId + ListPortfoliosQueryDto
     - Call `findPortfoliosByUserId` for paginated portfolios with stats (including propertyType from first Property), call `getGlobalStats` for global counters
     - Map to PaginatedPortfoliosResponseDto with totalPages = ceil(total/limit)
@@ -86,7 +86,7 @@ This plan implements the backend and frontend changes to align the Landlord Port
     - Test page exceeding totalPages returns empty data array
     - _Requirements: 1.8, 1.9_
 
-  - [ ] 4.3 Create CreatePortfolioUseCase
+  - [x] 4.3 Create CreatePortfolioUseCase
     - Inject IPortfolioRepository, accept CreatePortfolioDto + userId + userRoles
     - Validate LANDLORD role (throw ForbiddenException if missing)
     - Call `createPortfolio`, return PortfolioSummaryResponseDto with stats at zero and propertyType null
@@ -98,7 +98,7 @@ This plan implements the backend and frontend changes to align the Landlord Port
     - Test rejection with 403 when user lacks LANDLORD role
     - _Requirements: 2.4, 2.5_
 
-  - [ ] 4.5 Create CreateEnrichedUnitUseCase
+  - [x] 4.5 Create CreateEnrichedUnitUseCase
     - Inject IPortfolioRepository, accept portfolioId + CreateEnrichedUnitDto + userId + userRoles
     - Validate LANDLORD role (throw ForbiddenException)
     - Call `findPortfolioById`, verify exists and userId matches (throw NotFoundException otherwise)
@@ -113,11 +113,11 @@ This plan implements the backend and frontend changes to align the Landlord Port
     - Test rejection with 403 when user lacks LANDLORD role
     - _Requirements: 3.9, 3.10_
 
-- [ ] 5. Checkpoint — Backend application layer
+- [x] 5. Checkpoint — Backend application layer
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 6. Backend infrastructure layer — Repository extension
-  - [ ] 6.1 Implement findPortfoliosByUserId in PrismaPortfolioRepository
+- [x] 6. Backend infrastructure layer — Repository extension
+  - [x] 6.1 Implement findPortfoliosByUserId in PrismaPortfolioRepository
     - Query LandlordPortfolio with pagination (skip/take), include `_count` of units and active leases (Lease where end_date is null or > now())
     - Calculate occupancyPercentage per portfolio: round((units with active lease / totalUnits) * 100), 0 if totalUnits is 0
     - Resolve propertyType by querying the first PortfolioUnit's Property.property_type via cross-schema lookup (PortfolioUnit.property_id → Property.property_type)
@@ -125,23 +125,23 @@ This plan implements the backend and frontend changes to align the Landlord Port
     - File: `src/backend/modules/landlord-portfolio/infrastructure/repositories/prisma-portfolio.repository.ts`
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
-  - [ ] 6.2 Implement getGlobalStats in PrismaPortfolioRepository
+  - [x] 6.2 Implement getGlobalStats in PrismaPortfolioRepository
     - Aggregate totalUnits and activeLeases across all portfolios for the user
     - File: `src/backend/modules/landlord-portfolio/infrastructure/repositories/prisma-portfolio.repository.ts`
     - _Requirements: 1.7_
 
-  - [ ] 6.3 Implement createPortfolio in PrismaPortfolioRepository
+  - [x] 6.3 Implement createPortfolio in PrismaPortfolioRepository
     - Create LandlordPortfolio record with name, description, user_id
     - Return LandlordPortfolioEntity (with description field)
     - File: `src/backend/modules/landlord-portfolio/infrastructure/repositories/prisma-portfolio.repository.ts`
     - _Requirements: 2.1_
 
-  - [ ] 6.4 Implement findPortfolioById in PrismaPortfolioRepository
+  - [x] 6.4 Implement findPortfolioById in PrismaPortfolioRepository
     - Find LandlordPortfolio by id, return LandlordPortfolioEntity or null
     - File: `src/backend/modules/landlord-portfolio/infrastructure/repositories/prisma-portfolio.repository.ts`
     - _Requirements: 3.9_
 
-  - [ ] 6.5 Implement createEnrichedUnit in PrismaPortfolioRepository
+  - [x] 6.5 Implement createEnrichedUnit in PrismaPortfolioRepository
     - Use `prisma.$transaction` for atomicity across schemas
     - Create Property in property_listings schema (property_type from dto.propertyType, length, width, number_of_rooms, number_of_bathrooms)
     - Create Address in property_listings schema (address string from dto.address, property_id)
@@ -152,36 +152,37 @@ This plan implements the backend and frontend changes to align the Landlord Port
     - File: `src/backend/modules/landlord-portfolio/infrastructure/repositories/prisma-portfolio.repository.ts`
     - _Requirements: 3.1, 3.11_
 
-- [ ] 7. Backend controller — New endpoints
-  - [ ] 7.1 Add GET /portfolio endpoint to LandlordPortfolioController
+- [x] 7. Backend controller — New endpoints
+  - [x] 7.1 Add GET /portfolio endpoint to LandlordPortfolioController
     - Accept ListPortfoliosQueryDto as @Query, extract userId from request
     - Call ListPortfoliosUseCase, return PaginatedPortfoliosResponseDto
     - Add Swagger decorators (@ApiOperation, @ApiOkResponse)
     - File: `src/backend/modules/landlord-portfolio/landlord-portfolio.controller.ts`
     - _Requirements: 1.1_
 
-  - [ ] 7.2 Add POST /portfolio endpoint to LandlordPortfolioController
+  - [x] 7.2 Add POST /portfolio endpoint to LandlordPortfolioController
     - Accept CreatePortfolioDto as @Body, extract userId and roles from request
     - Call CreatePortfolioUseCase, return PortfolioSummaryResponseDto with 201 status
     - Add Swagger decorators
     - File: `src/backend/modules/landlord-portfolio/landlord-portfolio.controller.ts`
     - _Requirements: 2.1_
 
-  - [ ] 7.3 Add POST /portfolio/:portfolioId/units endpoint to LandlordPortfolioController
+  - [x] 7.3 Add POST /portfolio/:portfolioId/units endpoint to LandlordPortfolioController
     - Accept CreateEnrichedUnitDto as @Body, portfolioId as @Param, extract userId and roles from request
     - Call CreateEnrichedUnitUseCase, return EnrichedUnitResponseDto with 201 status
     - Add Swagger decorators
     - File: `src/backend/modules/landlord-portfolio/landlord-portfolio.controller.ts`
     - _Requirements: 3.1_
 
-  - [ ] 7.4 Register new use cases in LandlordPortfolioModule
+  - [x] 7.4 Register new use cases in LandlordPortfolioModule
     - Add ListPortfoliosUseCase, CreatePortfolioUseCase, CreateEnrichedUnitUseCase to providers and exports
     - Inject them in the controller constructor
     - File: `src/backend/modules/landlord-portfolio/landlord-portfolio.module.ts`
     - _Requirements: 1.1, 2.1, 3.1_
 
-- [ ] 8. Checkpoint — Backend complete
+- [x] 8. Checkpoint — Backend complete
   - Ensure all tests pass, ask the user if questions arise.
+  - Ensure linting and formatting pass.
 
 - [ ]* 9. Backend property-based tests
   - [ ]* 9.1 Write property test for pagination correctness (Property 3)
@@ -216,16 +217,16 @@ This plan implements the backend and frontend changes to align the Landlord Port
     - Generate valid enriched unit data (valid name, non-empty address, non-empty propertyType, optional positive length/width, non-negative integers for rooms/bathrooms, non-negative leaseBaseAmount), create unit, verify all fields match and area = length × width when both present
     - **Validates: Requirements 3.1, 3.11**
 
-- [ ] 10. Frontend types and constants
-  - [ ] 10.1 Add new TypeScript interfaces to frontend types
+- [x] 10. Frontend types and constants
+  - [x] 10.1 Add new TypeScript interfaces to frontend types
     - Add `PortfolioSummary` (with propertyType: string | null), `PaginatedPortfolios`, `CreatePortfolioRequest`, `CreateUnitRequest` (with name, address, propertyType, length?, width?, numberOfRooms?, numberOfBathrooms?, description?, leaseBaseAmount, leaseBaseCurrency?), `EnrichedUnitFormData` interfaces
     - Keep existing interfaces (PortfolioUnit, CreatePortfolioUnitRequest, etc.) for backward compatibility
     - No VALID_UNIT_TYPES constant — propertyType is free-text
     - File: `src/frontend/modules/landlord-portfolio/types.ts`
     - _Requirements: 8.2_
 
-- [ ] 11. Frontend validation functions
-  - [ ] 11.1 Add enriched unit validation functions
+- [x] 11. Frontend validation functions
+  - [x] 11.1 Add enriched unit validation functions
     - Implement `validateUnitName`, `validateUnitAddress`, `validatePropertyType`, `validatePositiveDecimal`, `validateNonNegativeInteger`, `validateEnrichedUnitForm`
     - Reuse existing `validateLeaseBaseAmount` and `validateLeaseBaseCurrency`
     - Each returns `null` if valid, or a Spanish error message string if invalid
@@ -254,8 +255,8 @@ This plan implements the backend and frontend changes to align the Landlord Port
     - Generate random strings (non-negative integers, negative, decimal, text, empty), verify validateNonNegativeInteger returns null for non-negative integers, error message otherwise
     - **Validates: Requirements 9.7**
 
-- [ ] 13. Frontend service layer
-  - [ ] 13.1 Add new methods to portfolioService
+- [x] 13. Frontend service layer
+  - [x] 13.1 Add new methods to portfolioService
     - Add `getPortfolios(token, page?, limit?): Promise<PaginatedPortfolios>` → `GET /portfolio?page=X&limit=Y`
     - Add `createPortfolio(data, token): Promise<PortfolioSummary>` → `POST /portfolio`
     - Add `createEnrichedUnit(portfolioId, data, token): Promise<EnrichedUnitResponse>` → `POST /portfolio/:portfolioId/units`
@@ -268,11 +269,11 @@ This plan implements the backend and frontend changes to align the Landlord Port
     - File: `src/frontend/shared/services/__tests__/portfolio.test.ts`
     - _Requirements: 8.4, 8.5, 8.6, 8.7_
 
-- [ ] 14. Checkpoint — Frontend foundation complete
+- [x] 14. Checkpoint — Frontend foundation complete
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 15. Frontend components — PortfolioCard
-  - [ ] 15.1 Create PortfolioCard component
+- [x] 15. Frontend components — PortfolioCard
+  - [x] 15.1 Create PortfolioCard component
     - Props: `portfolio: PortfolioSummary`
     - Render: portfolio name with building icon, description (if exists), propertyType badge (if not null), stats (totalUnits, activeLeases), occupancy progress bar with `role="progressbar"` and `aria-valuenow`/`aria-valuemin`/`aria-valuemax`, "Ver unidades" button
     - Use semantic HTML (`article`), ensure 44x44px touch targets
@@ -286,8 +287,8 @@ This plan implements the backend and frontend changes to align the Landlord Port
     - Test accessibility: progressbar role, aria attributes
     - _Requirements: 6.2, 6.3, 6.4, 6.5, 10.4_
 
-- [ ] 16. Frontend components — AddUnitForm
-  - [ ] 16.1 Create AddUnitForm component for enriched unit creation
+- [x] 16. Frontend components — AddUnitForm
+  - [x] 16.1 Create AddUnitForm component for enriched unit creation
     - Three sections: "Información básica" (name, address, propertyType), "Detalles de la propiedad" (length, width, computed area display, numberOfRooms, numberOfBathrooms, description), "Datos de arriendo" (leaseBaseAmount, leaseBaseCurrency)
     - Client-side validation using enriched validation functions on submit
     - Inline error messages with `aria-describedby` and `aria-live="polite"`
@@ -298,8 +299,8 @@ This plan implements the backend and frontend changes to align the Landlord Port
     - File: `src/frontend/modules/landlord-portfolio/components/AddUnitForm.tsx`
     - _Requirements: 7.3, 7.4, 7.5, 7.6, 7.7, 7.8, 7.9, 7.10, 7.11, 7.12, 7.13, 7.16, 10.1, 10.2_
 
-- [ ] 17. Frontend pages — Portfolio listing page
-  - [ ] 17.1 Create updated portfolio listing page at /mi-portafolio
+- [x] 17. Frontend pages — Portfolio listing page
+  - [x] 17.1 Create updated portfolio listing page at /mi-portafolio
     - Create new route at `src/frontend/app/mi-portafolio/page.tsx`
     - Header with title "Mis arriendos" and subtitle "Gestión de propiedades"
     - Global counters showing total units and active leases
@@ -313,8 +314,8 @@ This plan implements the backend and frontend changes to align the Landlord Port
     - File: `src/frontend/app/mi-portafolio/page.tsx`
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 5.10, 10.5, 10.6, 10.7_
 
-- [ ] 18. Frontend pages — Add unit page
-  - [ ] 18.1 Create add unit page at /mi-portafolio/[portfolioId]/agregar-unidad
+- [x] 18. Frontend pages — Add unit page
+  - [x] 18.1 Create add unit page at /mi-portafolio/[portfolioId]/agregar-unidad
     - Create route directory and page file
     - Header with back arrow and title "Agregar unidad"
     - Subtitle "Agregando unidad a: [portfolio name]" (fetch portfolio name)
@@ -327,7 +328,7 @@ This plan implements the backend and frontend changes to align the Landlord Port
     - File: `src/frontend/app/mi-portafolio/[portfolioId]/agregar-unidad/page.tsx`
     - _Requirements: 7.1, 7.2, 7.14, 7.15, 7.16, 7.17, 7.18_
 
-- [ ] 19. Final checkpoint — All tests pass
+- [x] 19. Final checkpoint — All tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
@@ -340,6 +341,6 @@ This plan implements the backend and frontend changes to align the Landlord Port
 - Backend tasks follow hexagonal architecture: schema → domain → application → infrastructure → controller
 - Frontend tasks follow: types → validation → service → components → pages
 - Cross-schema unit creation uses Prisma `$transaction` for atomicity: creates Property + Address in property_listings, PortfolioUnit in landlord_portfolio
-- Existing endpoints (GET /portfolio/units, POST /portfolio/units, PATCH /portfolio/units/:id) remain unchanged for backward compatibility
+- Old flat endpoints (GET /portfolio/units, POST /portfolio/units, PATCH /portfolio/units/:id) were migrated to portfolio-scoped paths (GET /portfolio/:portfolioId/units, POST /portfolio/:portfolioId/units, PATCH /portfolio/:portfolioId/units/:id)
 - **Simplified approach**: No `unit_type` field, no `floor` field, no `parking_spaces` field, no `area` field on PortfolioUnit — all physical property data lives in existing Property/Address tables
 - **Deferred for future iterations**: Tipo de unidad dropdown, Piso/Nivel field, Parqueaderos field
