@@ -86,6 +86,12 @@ graph TB
 
 8. **Campos diferidos para MVP**: `unit_type` (dropdown "Tipo de unidad"), `floor`/piso, y `parkingSpaces`/parqueaderos se difieren para iteraciones futuras.
 
+9. **Moneda fija COP para MVP**: El campo `leaseBaseCurrency` no se expone al usuario en el frontend. Se envía siempre `"COP"` al backend. En una futura iteración se agregará un endpoint para obtener monedas disponibles y se mostrará un dropdown.
+
+10. **Tipografía con tokens del sistema de diseño**: Las etiquetas de formulario usan `text-caption` (14px) y los encabezados de sección usan `text-h3` (20px) del sistema de diseño. No se usa `text-sm` de Tailwind porque con la base `font-size: 62.5%` (1rem = 10px), `text-sm` resuelve a ~8.75px, que es ilegible.
+
+11. **Contenedor centrado para desktop**: Las páginas de formularios y listados del portafolio envuelven su contenido en un contenedor `max-w-[560px]` centrado con `flex justify-center`, siguiendo el patrón de las páginas de autenticación (`max-w-[448px]`). Esto evita que los formularios se estiren a todo el ancho del viewport en desktop.
+
 ---
 
 ## Components and Interfaces
@@ -295,6 +301,7 @@ validateLeaseBaseAmount(value: string): string | null   // reuses existing
 validatePositiveDecimal(value: string, fieldLabel: string): string | null  // for length/width
 validateNonNegativeInteger(value: string, fieldLabel: string): string | null
 validateEnrichedUnitForm(data: EnrichedUnitFormData): Record<string, string>
+// Note: validateLeaseBaseCurrency exists but is not called from form validators (MVP hardcodes "COP")
 ```
 
 Each function returns `null` if valid, or a Spanish error message string if invalid.
@@ -304,6 +311,7 @@ Each function returns `null` if valid, or a Spanish error message string if inva
 #### `PortfolioListPage` (`/mi-portafolio`)
 - Usa `useAuth()` para obtener token
 - Llama a `portfolioService.getPortfolios(token, page, limit)`
+- Contenido envuelto en contenedor `max-w-[560px]` centrado para desktop
 - Renderiza: Header ("Mis arriendos"), contadores globales, botón "+ Crear nuevo portafolio", lista de `PortfolioCard`, `Pagination`
 - Estados: loading (Skeleton), error (ErrorState), empty (EmptyState)
 
@@ -313,10 +321,23 @@ Each function returns `null` if valid, or a Spanish error message string if inva
 
 #### `AddUnitPage` (`/mi-portafolio/[portfolioId]/agregar-unidad`)
 - Usa `useAuth()` para obtener token
-- Formulario de tres secciones: "Información básica" (name, address, propertyType), "Detalles de la propiedad" (length, width, área calculada, numberOfRooms, numberOfBathrooms, description), "Datos de arriendo" (leaseBaseAmount, leaseBaseCurrency)
-- Validación client-side con funciones puras
-- Submit → `portfolioService.createEnrichedUnit(portfolioId, data, token)`
+- Contenido envuelto en contenedor `max-w-[560px]` centrado para desktop
+- Formulario de tres secciones: "Información básica" (name, address, propertyType), "Detalles de la propiedad" (length, width, área calculada, numberOfRooms, numberOfBathrooms, description), "Datos de arriendo" (leaseBaseAmount con formato COP — sin campo de moneda, se envía "COP" fijo)
+- Input de canon base usa `formatCOP`/`stripCOP` para mostrar formato `$1.200.000` mientras el estado interno guarda solo dígitos
+- Validación client-side con funciones puras (sin validación de moneda)
+- Submit → `portfolioService.createEnrichedUnit(portfolioId, data, token)` con `leaseBaseCurrency: 'COP'` hardcoded
 - Botones: "Agregar unidad" (primario), "Cancelar" (secundario)
+
+#### `PortfolioUnitsPage` (`/mi-portafolio/[portfolioId]/unidades`)
+- Usa `useAuth()` para obtener token
+- Llama a `portfolioService.getUnits(portfolioId, token)` para obtener las unidades del portafolio
+- Obtiene el nombre del portafolio via `portfolioService.getPortfolios(token)` y busca el match por ID
+- Contenido envuelto en contenedor `max-w-[560px]` centrado para desktop
+- Renderiza: Header con flecha de retorno + "Unidades del portafolio", nombre del portafolio, resumen (cantidad de unidades, arriendos activos), botón "+ Agregar unidad" que navega a `/mi-portafolio/[portfolioId]/agregar-unidad`
+- Renderiza cada unidad como tarjeta con: nombre, canon base formateado en COP
+- Estados: loading (Skeleton), error (ErrorState con retry), empty ("Este portafolio no tiene unidades" con botón para agregar), 404 ("Portafolio no encontrado" con enlace a `/mi-portafolio`)
+- Handle 401 → logout, wrap en LandlordRoute para auth/role guard
+- Layout single-column mobile-first
 
 ---
 
@@ -579,10 +600,12 @@ sequenceDiagram
 | Nombre/Identificación | Vacío o solo espacios | "El nombre de la unidad es obligatorio" |
 | Dirección | Vacío o solo espacios | "La dirección es obligatoria" |
 | Tipo de propiedad | Vacío o solo espacios | "El tipo de propiedad es obligatorio" |
-| Canon base | Vacío | "El canon base es obligatorio" |
-| Canon base | No numérico o negativo | "Ingresa un valor numérico válido" |
+| Canon base (COP) | Vacío | "El canon base es obligatorio" |
+| Canon base (COP) | No numérico o negativo | "Ingresa un valor numérico válido" |
 | Largo/Ancho | No numérico o ≤ 0 (cuando se proporciona) | "Ingresa un valor válido mayor a cero" |
 | Habitaciones/Baños | Negativo | "El valor debe ser cero o mayor" |
+
+> **Nota MVP**: El campo Moneda no se muestra al usuario. Se envía `"COP"` fijo al backend.
 
 ---
 
@@ -645,7 +668,7 @@ Cada test referencia su propiedad del documento de diseño:
 ### Unit Tests (Frontend)
 
 - `portfolioService`: Verifica cada método con fetch mockeado (respuesta exitosa, 401, 403, 404, 5xx, error de red)
-- Componentes: Render tests para `PortfolioCard`, `PortfolioListPage` (estados: loading, error, empty, data), `AddUnitPage` (formulario, submit, errores)
+- Componentes: Render tests para `PortfolioCard`, `PortfolioListPage` (estados: loading, error, empty, data), `PortfolioUnitsPage` (estados: loading, error, empty, data, 404), `AddUnitPage` (formulario, submit, errores)
 - Validación: Ejemplos específicos para cada función de validación (complementan los property tests)
 
 ### Configuración de Property Tests

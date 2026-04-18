@@ -26,10 +26,12 @@ El API anterior exponía endpoints planos de unidades (`GET /portfolio/units`, `
 - **Página_Listado_Portafolios**: Página frontend accesible en `/mi-portafolio` que muestra las tarjetas de portafolios del arrendador autenticado con datos agregados.
 - **Tarjeta_Portafolio**: Componente visual que representa un portafolio en el listado, mostrando nombre, descripción, tipo de propiedad, conteo de unidades, arriendos activos, barra de ocupación y botón "Ver unidades".
 - **Página_Agregar_Unidad**: Página frontend accesible en `/mi-portafolio/[portfolioId]/agregar-unidad` que permite al arrendador agregar una nueva unidad a un portafolio específico.
+- **Página_Unidades_Portafolio**: Página frontend accesible en `/mi-portafolio/[portfolioId]/unidades` que muestra el listado de unidades de un portafolio específico, con estadísticas del portafolio y un botón para agregar nuevas unidades.
 - **Formulario_Unidad**: Formulario de creación de unidad con secciones: Información básica (nombre, dirección), Detalles de la propiedad (área vía largo×ancho, habitaciones, baños, descripción), y Datos de arriendo (canon base, moneda).
 - **Arrendador**: Usuario autenticado con rol LANDLORD que gestiona portafolios de inmuebles.
-- **Sistema_Diseño**: Tokens de diseño configurados en `tailwind.config.ts` y componentes compartidos (Header, Button, Skeleton, EmptyState, ErrorState, Pagination).
+- **Sistema_Diseño**: Tokens de diseño configurados en `tailwind.config.ts` y componentes compartidos (Header, Button, Skeleton, EmptyState, ErrorState, Pagination). Tipografía: `text-h1` (32px), `text-h2` (24px), `text-h3` (20px), `text-body` (16px), `text-caption` (14px), `text-small` (12px). No usar `text-sm`/`text-lg` de Tailwind por incompatibilidad con la base `font-size: 62.5%`.
 - **Paginación**: Mecanismo de navegación que divide el listado de portafolios en páginas, mostrando un subconjunto de resultados con controles para avanzar/retroceder.
+- **Moneda_MVP**: Para el MVP, toda moneda es "COP" (Peso Colombiano). El campo `leaseBaseCurrency` no se expone al usuario en formularios; se envía `"COP"` fijo al backend. En futuras iteraciones se agregará un endpoint para obtener monedas disponibles.
 
 ---
 
@@ -115,7 +117,7 @@ El API anterior exponía endpoints planos de unidades (`GET /portfolio/units`, `
 7. IF el Token_JWT es inválido o ha expirado (error 401), THEN THE Página_Listado_Portafolios SHALL invocar la función `logout` del AuthProvider, redirigiendo al usuario a la página de login.
 8. THE Página_Listado_Portafolios SHALL mostrar controles de paginación en la parte inferior con el texto "Mostrando X a Y de Z resultados" y botones para navegar entre páginas.
 9. THE Página_Listado_Portafolios SHALL ser accesible únicamente para usuarios autenticados con rol LANDLORD; IF un usuario sin rol LANDLORD accede a la ruta, THEN SHALL mostrar un mensaje indicando que no tiene permisos.
-10. THE Página_Listado_Portafolios SHALL utilizar un layout de una sola columna en dispositivos móviles, siguiendo el enfoque mobile-first del Sistema_Diseño.
+10. THE Página_Listado_Portafolios SHALL utilizar un layout de una sola columna en dispositivos móviles, siguiendo el enfoque mobile-first del Sistema_Diseño, y envolver el contenido en un contenedor centrado de ancho máximo en desktop (siguiendo el patrón de las páginas de autenticación).
 
 ---
 
@@ -130,7 +132,7 @@ El API anterior exponía endpoints planos de unidades (`GET /portfolio/units`, `
 3. THE Tarjeta_Portafolio SHALL mostrar un badge con el tipo de propiedad predominante del portafolio (obtenido del campo `propertyType` de la respuesta del API, ej: "Apartamento", "Casa"), o no mostrar badge si `propertyType` es `null`.
 4. THE Tarjeta_Portafolio SHALL mostrar las estadísticas "Unidades totales" y "Arriendos activos" con sus respectivos valores numéricos.
 5. THE Tarjeta_Portafolio SHALL mostrar una barra de progreso visual que represente el porcentaje de ocupación del portafolio, acompañada del valor porcentual.
-6. THE Tarjeta_Portafolio SHALL incluir un botón "Ver unidades" que navegue a la vista de unidades del portafolio correspondiente.
+6. THE Tarjeta_Portafolio SHALL incluir un botón "Ver unidades" que navegue a la Página_Unidades_Portafolio correspondiente (`/mi-portafolio/[portfolioId]/unidades`).
 7. THE Tarjeta_Portafolio SHALL tener un área táctil mínima de 44x44 píxeles en todos los elementos interactivos para cumplir con los criterios de accesibilidad WCAG 2.1 AA.
 
 ---
@@ -145,7 +147,7 @@ El API anterior exponía endpoints planos de unidades (`GET /portfolio/units`, `
 2. THE Página_Agregar_Unidad SHALL mostrar un banner informativo que explique qué es una unidad inmobiliaria: "Una unidad es una propiedad individual dentro de tu portafolio que puede ser arrendada. Por ejemplo: Apartamento 301, Casa 5, Local 102, etc."
 3. THE Formulario_Unidad SHALL incluir una sección "Información básica" con los campos: Nombre/Identificación (obligatorio, texto, placeholder "Ej: Apartamento 301, Casa 5, Local 102"), Dirección (obligatorio, texto, placeholder "Ej: Carrera 7 #58-32"), y Tipo de propiedad (obligatorio, texto, placeholder "Ej: Apartamento, Casa, Local").
 4. THE Formulario_Unidad SHALL incluir una sección "Detalles de la propiedad" con los campos: Largo (opcional, numérico, metros), Ancho (opcional, numérico, metros), Área calculada (display de largo × ancho si ambos están presentes), Habitaciones (numérico, por defecto 0), Baños (numérico, por defecto 0), y Descripción adicional (opcional, textarea).
-5. THE Formulario_Unidad SHALL incluir una sección "Datos de arriendo" con los campos: Canon base (obligatorio, numérico), y Moneda (texto, por defecto "COP").
+5. THE Formulario_Unidad SHALL incluir una sección "Datos de arriendo" con los campos: Canon base (obligatorio, numérico, con formato COP `$X.XXX.XXX` en el input). La moneda se fija en "COP" para el MVP y no se muestra como campo editable al usuario.
 6. THE Formulario_Unidad SHALL validar en el cliente que el campo Nombre/Identificación no esté vacío; IF está vacío, THEN SHALL mostrar "El nombre de la unidad es obligatorio".
 7. THE Formulario_Unidad SHALL validar en el cliente que el campo Dirección no esté vacío; IF está vacío, THEN SHALL mostrar "La dirección es obligatoria".
 8. THE Formulario_Unidad SHALL validar en el cliente que el campo Tipo de propiedad no esté vacío; IF está vacío, THEN SHALL mostrar "El tipo de propiedad es obligatorio".
@@ -209,3 +211,24 @@ El API anterior exponía endpoints planos de unidades (`GET /portfolio/units`, `
 5. THE Módulo_Portafolio SHALL aplicar la paleta de colores del Sistema_Diseño garantizando un contraste mínimo de 4.5:1 entre texto y fondo para texto normal, y de 3:1 para texto grande.
 6. THE Módulo_Portafolio SHALL utilizar elementos HTML semánticos (`main`, `section`, `article`, `h1`-`h3`, `nav`) para estructurar el contenido de cada página.
 7. THE Módulo_Portafolio SHALL garantizar que la paginación sea navegable por teclado y que el estado actual de la página sea comunicado a tecnologías asistivas mediante `aria-current="page"`.
+
+---
+
+### Requisito 11: Página de Unidades de un Portafolio (Frontend)
+
+**User Story:** Como arrendador autenticado, quiero ver el listado de unidades de un portafolio específico al hacer clic en "Ver unidades", para gestionar las propiedades dentro de ese portafolio y poder agregar nuevas unidades.
+
+#### Criterios de Aceptación
+
+1. WHEN un Arrendador accede a la ruta `/mi-portafolio/[portfolioId]/unidades`, THE Página_Unidades_Portafolio SHALL solicitar el listado de unidades del portafolio al API_Backend mediante `GET /portfolio/:portfolioId/units` y mostrar los resultados.
+2. THE Página_Unidades_Portafolio SHALL mostrar un encabezado con flecha de retorno (que navegue a `/mi-portafolio`) y el título "Unidades del portafolio", seguido del nombre del portafolio obtenido del API.
+3. THE Página_Unidades_Portafolio SHALL mostrar un resumen del portafolio con el nombre, la cantidad de unidades y la cantidad de arriendos activos.
+4. THE Página_Unidades_Portafolio SHALL incluir un botón primario "+ Agregar unidad" que navegue a `/mi-portafolio/[portfolioId]/agregar-unidad`.
+5. IF el portafolio no tiene unidades, THEN THE Página_Unidades_Portafolio SHALL mostrar un estado vacío con el mensaje "Este portafolio no tiene unidades" y una sugerencia de agregar la primera unidad, junto con un botón que navegue a la página de agregar unidad.
+6. THE Página_Unidades_Portafolio SHALL renderizar cada unidad como una tarjeta mostrando: nombre de la unidad, dirección (si disponible), canon base formateado, y moneda.
+7. WHILE el listado de unidades se está cargando desde el API_Backend, THE Página_Unidades_Portafolio SHALL mostrar un indicador de carga visual (skeleton).
+8. IF la solicitud al API_Backend falla por error de red o error del servidor, THEN THE Página_Unidades_Portafolio SHALL mostrar un mensaje de error comprensible en español con una opción para reintentar la carga.
+9. IF el Token_JWT es inválido o ha expirado (error 401), THEN THE Página_Unidades_Portafolio SHALL invocar la función `logout` del AuthProvider, redirigiendo al usuario a la página de login.
+10. IF el portafolio no existe o no pertenece al usuario (error 404), THEN THE Página_Unidades_Portafolio SHALL mostrar "Portafolio no encontrado" con un enlace para regresar a `/mi-portafolio`.
+11. THE Página_Unidades_Portafolio SHALL ser accesible únicamente para usuarios autenticados con rol LANDLORD.
+12. THE Página_Unidades_Portafolio SHALL utilizar un layout de una sola columna en dispositivos móviles, siguiendo el enfoque mobile-first del Sistema_Diseño, y envolver el contenido en un contenedor centrado de ancho máximo en desktop.

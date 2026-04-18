@@ -328,7 +328,22 @@ This plan implements the backend and frontend changes to align the Landlord Port
     - File: `src/frontend/app/mi-portafolio/[portfolioId]/agregar-unidad/page.tsx`
     - _Requirements: 7.1, 7.2, 7.14, 7.15, 7.16, 7.17, 7.18_
 
-- [x] 19. Final checkpoint — All tests pass
+- [x] 19. Frontend pages — Portfolio units listing page
+  - [x] 19.1 Create portfolio units page at /mi-portafolio/[portfolioId]/unidades
+    - Create route at `src/frontend/app/mi-portafolio/[id]/unidades/page.tsx`
+    - Header with back arrow (to `/mi-portafolio`) and title "Unidades del portafolio"
+    - Show portfolio name and summary (unit count, active leases)
+    - "+ Agregar unidad" primary button linking to `/mi-portafolio/[portfolioId]/agregar-unidad`
+    - Fetch units via `portfolioService.getUnits(portfolioId, token)`
+    - Render each unit as a card showing: name, canon base formatted, currency badge
+    - States: loading (skeleton), error (ErrorState with retry), empty ("Este portafolio no tiene unidades" with add unit button/suggestion)
+    - Handle 401 → logout, 404 → "Portafolio no encontrado" with link to /mi-portafolio
+    - Wrap in LandlordRoute for auth/role guard
+    - Single-column layout on mobile (mobile-first)
+    - File: `src/frontend/app/mi-portafolio/[id]/unidades/page.tsx`
+    - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 11.7, 11.8, 11.9, 11.10, 11.11, 11.12_
+
+- [x] 20. Final checkpoint — All tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
@@ -344,3 +359,6 @@ This plan implements the backend and frontend changes to align the Landlord Port
 - Old flat endpoints (GET /portfolio/units, POST /portfolio/units, PATCH /portfolio/units/:id) were migrated to portfolio-scoped paths (GET /portfolio/:portfolioId/units, POST /portfolio/:portfolioId/units, PATCH /portfolio/:portfolioId/units/:id)
 - **Simplified approach**: No `unit_type` field, no `floor` field, no `parking_spaces` field, no `area` field on PortfolioUnit — all physical property data lives in existing Property/Address tables
 - **Deferred for future iterations**: Tipo de unidad dropdown, Piso/Nivel field, Parqueaderos field
+- **MVP currency**: All currency is hardcoded as "COP" in the frontend. The `leaseBaseCurrency` input field is not shown to users. Money inputs use `formatCOP`/`stripCOP` helpers to display `$1.200.000` format while storing raw digits. A future iteration will add a backend endpoint for available currencies and a dropdown in the frontend.
+- **Typography**: All form labels use `text-caption` (14px) and section headings use `text-h3` (20px) from the design system. Tailwind's `text-sm`/`text-lg` are NOT used because the project's `font-size: 62.5%` base makes them resolve to incorrect sizes (~8.75px / ~11.25px).
+- **Desktop layout**: All portfolio pages (`/mi-portafolio`, `/mi-portafolio/[id]/agregar-unidad`, `/mi-portafolio/[id]/unidades`) wrap their main content in a `max-w-[560px]` centered container for desktop, following the auth pages pattern.
