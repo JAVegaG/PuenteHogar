@@ -1,4 +1,37 @@
+import { EnrichedPortfolioUnitEntity } from '../entities/enriched-portfolio-unit.entity';
+import { LandlordPortfolioEntity } from '../entities/landlord-portfolio.entity';
 import { PortfolioUnitEntity } from '../entities/portfolio-unit.entity';
+
+export interface PortfolioWithStats {
+  id: string;
+  name: string;
+  description: string | null;
+  propertyType: string | null;
+  creationDate: Date;
+  totalUnits: number;
+  activeLeases: number;
+  occupancyPercentage: number;
+}
+
+export interface CreatePortfolioData {
+  userId: string;
+  name: string;
+  description?: string;
+}
+
+export interface CreateEnrichedUnitData {
+  portfolioId: string;
+  name: string;
+  propertyType: string;
+  address: string;
+  length?: number;
+  width?: number;
+  numberOfRooms: number;
+  numberOfBathrooms: number;
+  description?: string;
+  leaseBaseAmount: number;
+  leaseBaseCurrency: string;
+}
 
 export interface CreatePortfolioUnitData {
   portfolioId: string;
@@ -22,4 +55,13 @@ export interface IPortfolioRepository {
   findUnitById(unitId: string): Promise<PortfolioUnitEntity | null>;
   updateUnit(unitId: string, data: UpdatePortfolioUnitData): Promise<PortfolioUnitEntity>;
   getPortfolioOwnerUserId(unitId: string): Promise<string | null>;
+  findPortfoliosByUserId(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<{ portfolios: PortfolioWithStats[]; total: number }>;
+  getGlobalStats(userId: string): Promise<{ totalUnits: number; activeLeases: number }>;
+  createPortfolio(data: CreatePortfolioData): Promise<LandlordPortfolioEntity>;
+  findPortfolioById(portfolioId: string): Promise<LandlordPortfolioEntity | null>;
+  createEnrichedUnit(data: CreateEnrichedUnitData): Promise<EnrichedPortfolioUnitEntity>;
 }
