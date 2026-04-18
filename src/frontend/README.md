@@ -30,26 +30,32 @@ src/frontend/
 │   ├── mi-perfil/
 │   │   └── page.tsx          # Página de perfil (Client Component, protegida)
 │   └── mi-portafolio/
-│       ├── page.tsx              # Listado de unidades de portafolio (Client Component, LANDLORD)
+│       ├── page.tsx              # Listado de portafolios con estadísticas (Client Component, LANDLORD)
 │       ├── nueva-unidad/
-│       │   └── page.tsx          # Redirige a /mi-portafolio (reemplazada por /mi-portafolio/[portfolioId]/agregar-unidad)
+│       │   └── page.tsx          # Redirige a /mi-portafolio (legacy)
 │       └── [id]/
 │           ├── page.tsx          # Detalle de unidad (Client Component, LANDLORD)
-│           └── editar/
-│               └── page.tsx      # Editar unidad (Client Component, LANDLORD)
+│           ├── editar/
+│           │   └── page.tsx      # Editar unidad (Client Component, LANDLORD)
+│           ├── agregar-unidad/
+│           │   └── page.tsx      # Agregar unidad enriquecida a portafolio (Client Component, LANDLORD)
+│           └── unidades/
+│               └── page.tsx      # Listado de unidades de un portafolio (Client Component, LANDLORD)
 ├── modules/
 │   ├── landlord-portfolio/
 │   │   ├── components/
+│   │   │   ├── AddUnitForm.tsx         # Formulario enriquecido de creación de unidad (3 secciones)
 │   │   │   ├── LandlordRoute.tsx      # Protección auth + rol LANDLORD
+│   │   │   ├── PortfolioCard.tsx      # Tarjeta de portafolio con estadísticas y ocupación
 │   │   │   ├── PortfolioList.tsx      # Lista vertical de tarjetas de unidades
 │   │   │   ├── UnitCard.tsx           # Tarjeta individual de unidad de portafolio
 │   │   │   ├── UnitDetailView.tsx     # Vista de detalle de unidad
 │   │   │   └── UnitForm.tsx           # Formulario crear/editar (reutilizable)
 │   │   ├── __tests__/
 │   │   │   └── validation.test.ts
-│   │   ├── types.ts                   # Interfaces: PortfolioUnit, CreatePortfolioUnitRequest, etc.
+│   │   ├── types.ts                   # Interfaces: PortfolioUnit, PortfolioSummary, PaginatedPortfolios, CreateUnitRequest, etc.
 │   │   ├── utils.ts                   # formatPortfolioDate (wrapper de formatRelativeDate)
-│   │   └── validation.ts             # Validación pura: propertyId, leaseBaseAmount, leaseBaseCurrency
+│   │   └── validation.ts             # Validación pura: propertyId, leaseBaseAmount, leaseBaseCurrency, unitName, address, propertyType, positiveDecimal, nonNegativeInteger
 │   ├── property-listings/
 │   │   ├── components/
 │   │   │   ├── ActionBar.tsx          # Barra de acciones (Filtros + Ordenar)
@@ -101,7 +107,7 @@ src/frontend/
 │   ├── services/
 │   │   ├── api.ts                 # Servicio HTTP listings (fetchListings, fetchListingDetail)
 │   │   ├── auth.ts               # Servicio HTTP auth (login, register, getProfile, getDocumentTypes)
-│   │   └── portfolio.ts          # Servicio HTTP portafolio (getUnits, createUnit, updateUnit)
+│   │   └── portfolio.ts          # Servicio HTTP portafolio (getPortfolios, createPortfolio, getUnits, createUnit, createEnrichedUnit, updateUnit)
 │   └── utils/
 │       ├── formatPrice.ts         # Formato COP ($X.XXX.XXX)
 │       └── formatRelativeDate.ts  # Fecha relativa en español
@@ -137,10 +143,12 @@ npm run lint       # Linting
 | `/auth/login` | Client Component | No | Inicio de sesión (email + contraseña) |
 | `/auth/registro` | Client Component | No | Registro multi-paso (rol, datos personales, credenciales) |
 | `/mi-perfil` | Client Component | Sí | Perfil del usuario autenticado (solo lectura) |
-| `/mi-portafolio` | Client Component | LANDLORD | Listado de unidades del portafolio del arrendador |
-| `/mi-portafolio/nueva-unidad` | Client Component | LANDLORD | Redirige a `/mi-portafolio` (reemplazada por `/mi-portafolio/[portfolioId]/agregar-unidad`) |
+| `/mi-portafolio` | Client Component | LANDLORD | Listado de portafolios con estadísticas, paginación y creación de portafolios |
+| `/mi-portafolio/nueva-unidad` | Client Component | LANDLORD | Redirige a `/mi-portafolio` (legacy) |
 | `/mi-portafolio/[id]` | Client Component | LANDLORD | Detalle de unidad con info completa |
 | `/mi-portafolio/[id]/editar` | Client Component | LANDLORD | Editar unidad de portafolio existente |
+| `/mi-portafolio/[id]/agregar-unidad` | Client Component | LANDLORD | Agregar unidad enriquecida a un portafolio (formulario de 3 secciones) |
+| `/mi-portafolio/[id]/unidades` | Client Component | LANDLORD | Listado de unidades de un portafolio con resumen y estadísticas |
 
 ## Módulos
 
@@ -154,7 +162,7 @@ Autenticación y perfil de usuario: login con email/contraseña, registro multi-
 
 ### landlord-portfolio
 
-Portafolio del arrendador: listado de unidades de portafolio, creación y edición de unidades (canon base, moneda, condiciones), detalle de unidad, protección de rutas por rol LANDLORD (LandlordRoute), validación client-side de formularios y servicio de integración con API backend (PortfolioService).
+Portafolio del arrendador: listado de portafolios con tarjetas de estadísticas (unidades, arriendos activos, ocupación), creación de portafolios, listado de unidades por portafolio, creación de unidades enriquecidas (nombre, dirección, tipo de propiedad, dimensiones, habitaciones, baños, canon base), edición de unidades, detalle de unidad, protección de rutas por rol LANDLORD (LandlordRoute), validación client-side de formularios y servicio de integración con API backend (PortfolioService).
 
 ## API Backend
 
