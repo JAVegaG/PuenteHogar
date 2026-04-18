@@ -300,6 +300,7 @@ export const LandlordPortfolioScalarFieldEnum = {
   id: 'id',
   user_id: 'user_id',
   name: 'name',
+  description: 'description',
   creation_date: 'creation_date',
   created_at: 'created_at',
   updated_at: 'updated_at'
@@ -312,6 +313,7 @@ export const PortfolioUnitScalarFieldEnum = {
   id: 'id',
   portfolio_id: 'portfolio_id',
   property_id: 'property_id',
+  name: 'name',
   conditions: 'conditions',
   lease_base_amount: 'lease_base_amount',
   lease_base_currency: 'lease_base_currency',

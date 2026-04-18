@@ -228,6 +228,7 @@ model LandlordPortfolio {
   id            String   @id @default(uuid())
   user_id       String   // cross-schema ref — no FK
   name          String
+  description   String?
   creation_date DateTime @default(now())
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
@@ -241,6 +242,7 @@ model PortfolioUnit {
   id                  String   @id @default(uuid())
   portfolio_id        String
   property_id         String   // cross-schema ref — no FK
+  name                String   @default("")
   conditions          String?
   lease_base_amount   Decimal
   lease_base_currency String   @default("COP")

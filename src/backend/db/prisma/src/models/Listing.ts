@@ -275,6 +275,7 @@ export type ListingOrderByWithRelationInput = {
 
 export type ListingWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  portfolio_unit_id_is_active?: Prisma.ListingPortfolio_unit_idIs_activeCompoundUniqueInput
   AND?: Prisma.ListingWhereInput | Prisma.ListingWhereInput[]
   OR?: Prisma.ListingWhereInput[]
   NOT?: Prisma.ListingWhereInput | Prisma.ListingWhereInput[]
@@ -288,7 +289,7 @@ export type ListingWhereUniqueInput = Prisma.AtLeast<{
   created_at?: Prisma.DateTimeFilter<"Listing"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Listing"> | Date | string
   photos?: Prisma.PhotoListRelationFilter
-}, "id">
+}, "id" | "portfolio_unit_id_is_active">
 
 export type ListingOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -417,6 +418,11 @@ export type ListingUncheckedUpdateManyInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ListingPortfolio_unit_idIs_activeCompoundUniqueInput = {
+  portfolio_unit_id: string
+  is_active: boolean
 }
 
 export type ListingCountOrderByAggregateInput = {

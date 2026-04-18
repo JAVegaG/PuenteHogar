@@ -28,6 +28,7 @@ export type LandlordPortfolioMinAggregateOutputType = {
   id: string | null
   user_id: string | null
   name: string | null
+  description: string | null
   creation_date: Date | null
   created_at: Date | null
   updated_at: Date | null
@@ -37,6 +38,7 @@ export type LandlordPortfolioMaxAggregateOutputType = {
   id: string | null
   user_id: string | null
   name: string | null
+  description: string | null
   creation_date: Date | null
   created_at: Date | null
   updated_at: Date | null
@@ -46,6 +48,7 @@ export type LandlordPortfolioCountAggregateOutputType = {
   id: number
   user_id: number
   name: number
+  description: number
   creation_date: number
   created_at: number
   updated_at: number
@@ -57,6 +60,7 @@ export type LandlordPortfolioMinAggregateInputType = {
   id?: true
   user_id?: true
   name?: true
+  description?: true
   creation_date?: true
   created_at?: true
   updated_at?: true
@@ -66,6 +70,7 @@ export type LandlordPortfolioMaxAggregateInputType = {
   id?: true
   user_id?: true
   name?: true
+  description?: true
   creation_date?: true
   created_at?: true
   updated_at?: true
@@ -75,6 +80,7 @@ export type LandlordPortfolioCountAggregateInputType = {
   id?: true
   user_id?: true
   name?: true
+  description?: true
   creation_date?: true
   created_at?: true
   updated_at?: true
@@ -157,6 +163,7 @@ export type LandlordPortfolioGroupByOutputType = {
   id: string
   user_id: string
   name: string
+  description: string | null
   creation_date: Date
   created_at: Date
   updated_at: Date
@@ -187,6 +194,7 @@ export type LandlordPortfolioWhereInput = {
   id?: Prisma.StringFilter<"LandlordPortfolio"> | string
   user_id?: Prisma.StringFilter<"LandlordPortfolio"> | string
   name?: Prisma.StringFilter<"LandlordPortfolio"> | string
+  description?: Prisma.StringNullableFilter<"LandlordPortfolio"> | string | null
   creation_date?: Prisma.DateTimeFilter<"LandlordPortfolio"> | Date | string
   created_at?: Prisma.DateTimeFilter<"LandlordPortfolio"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"LandlordPortfolio"> | Date | string
@@ -197,6 +205,7 @@ export type LandlordPortfolioOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   creation_date?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -210,6 +219,7 @@ export type LandlordPortfolioWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.LandlordPortfolioWhereInput | Prisma.LandlordPortfolioWhereInput[]
   user_id?: Prisma.StringFilter<"LandlordPortfolio"> | string
   name?: Prisma.StringFilter<"LandlordPortfolio"> | string
+  description?: Prisma.StringNullableFilter<"LandlordPortfolio"> | string | null
   creation_date?: Prisma.DateTimeFilter<"LandlordPortfolio"> | Date | string
   created_at?: Prisma.DateTimeFilter<"LandlordPortfolio"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"LandlordPortfolio"> | Date | string
@@ -220,6 +230,7 @@ export type LandlordPortfolioOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   creation_date?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -235,6 +246,7 @@ export type LandlordPortfolioScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"LandlordPortfolio"> | string
   user_id?: Prisma.StringWithAggregatesFilter<"LandlordPortfolio"> | string
   name?: Prisma.StringWithAggregatesFilter<"LandlordPortfolio"> | string
+  description?: Prisma.StringNullableWithAggregatesFilter<"LandlordPortfolio"> | string | null
   creation_date?: Prisma.DateTimeWithAggregatesFilter<"LandlordPortfolio"> | Date | string
   created_at?: Prisma.DateTimeWithAggregatesFilter<"LandlordPortfolio"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"LandlordPortfolio"> | Date | string
@@ -244,6 +256,7 @@ export type LandlordPortfolioCreateInput = {
   id?: string
   user_id: string
   name: string
+  description?: string | null
   creation_date?: Date | string
   created_at?: Date | string
   updated_at?: Date | string
@@ -254,6 +267,7 @@ export type LandlordPortfolioUncheckedCreateInput = {
   id?: string
   user_id: string
   name: string
+  description?: string | null
   creation_date?: Date | string
   created_at?: Date | string
   updated_at?: Date | string
@@ -264,6 +278,7 @@ export type LandlordPortfolioUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   creation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -274,6 +289,7 @@ export type LandlordPortfolioUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   creation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -284,6 +300,7 @@ export type LandlordPortfolioCreateManyInput = {
   id?: string
   user_id: string
   name: string
+  description?: string | null
   creation_date?: Date | string
   created_at?: Date | string
   updated_at?: Date | string
@@ -293,6 +310,7 @@ export type LandlordPortfolioUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   creation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -302,6 +320,7 @@ export type LandlordPortfolioUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   creation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -311,6 +330,7 @@ export type LandlordPortfolioCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   creation_date?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -320,6 +340,7 @@ export type LandlordPortfolioMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   creation_date?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -329,6 +350,7 @@ export type LandlordPortfolioMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   creation_date?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -357,6 +379,7 @@ export type LandlordPortfolioCreateWithoutUnitsInput = {
   id?: string
   user_id: string
   name: string
+  description?: string | null
   creation_date?: Date | string
   created_at?: Date | string
   updated_at?: Date | string
@@ -366,6 +389,7 @@ export type LandlordPortfolioUncheckedCreateWithoutUnitsInput = {
   id?: string
   user_id: string
   name: string
+  description?: string | null
   creation_date?: Date | string
   created_at?: Date | string
   updated_at?: Date | string
@@ -391,6 +415,7 @@ export type LandlordPortfolioUpdateWithoutUnitsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   creation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -400,6 +425,7 @@ export type LandlordPortfolioUncheckedUpdateWithoutUnitsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   creation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -440,6 +466,7 @@ export type LandlordPortfolioSelect<ExtArgs extends runtime.Types.Extensions.Int
   id?: boolean
   user_id?: boolean
   name?: boolean
+  description?: boolean
   creation_date?: boolean
   created_at?: boolean
   updated_at?: boolean
@@ -451,6 +478,7 @@ export type LandlordPortfolioSelectCreateManyAndReturn<ExtArgs extends runtime.T
   id?: boolean
   user_id?: boolean
   name?: boolean
+  description?: boolean
   creation_date?: boolean
   created_at?: boolean
   updated_at?: boolean
@@ -460,6 +488,7 @@ export type LandlordPortfolioSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   id?: boolean
   user_id?: boolean
   name?: boolean
+  description?: boolean
   creation_date?: boolean
   created_at?: boolean
   updated_at?: boolean
@@ -469,12 +498,13 @@ export type LandlordPortfolioSelectScalar = {
   id?: boolean
   user_id?: boolean
   name?: boolean
+  description?: boolean
   creation_date?: boolean
   created_at?: boolean
   updated_at?: boolean
 }
 
-export type LandlordPortfolioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "name" | "creation_date" | "created_at" | "updated_at", ExtArgs["result"]["landlordPortfolio"]>
+export type LandlordPortfolioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "name" | "description" | "creation_date" | "created_at" | "updated_at", ExtArgs["result"]["landlordPortfolio"]>
 export type LandlordPortfolioInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   units?: boolean | Prisma.LandlordPortfolio$unitsArgs<ExtArgs>
   _count?: boolean | Prisma.LandlordPortfolioCountOutputTypeDefaultArgs<ExtArgs>
@@ -491,6 +521,7 @@ export type $LandlordPortfolioPayload<ExtArgs extends runtime.Types.Extensions.I
     id: string
     user_id: string
     name: string
+    description: string | null
     creation_date: Date
     created_at: Date
     updated_at: Date
@@ -921,6 +952,7 @@ export interface LandlordPortfolioFieldRefs {
   readonly id: Prisma.FieldRef<"LandlordPortfolio", 'String'>
   readonly user_id: Prisma.FieldRef<"LandlordPortfolio", 'String'>
   readonly name: Prisma.FieldRef<"LandlordPortfolio", 'String'>
+  readonly description: Prisma.FieldRef<"LandlordPortfolio", 'String'>
   readonly creation_date: Prisma.FieldRef<"LandlordPortfolio", 'DateTime'>
   readonly created_at: Prisma.FieldRef<"LandlordPortfolio", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"LandlordPortfolio", 'DateTime'>

@@ -180,6 +180,7 @@ export type UserRoleOrderByWithRelationInput = {
 
 export type UserRoleWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  user_id_role_id?: Prisma.UserRoleUser_idRole_idCompoundUniqueInput
   AND?: Prisma.UserRoleWhereInput | Prisma.UserRoleWhereInput[]
   OR?: Prisma.UserRoleWhereInput[]
   NOT?: Prisma.UserRoleWhereInput | Prisma.UserRoleWhereInput[]
@@ -187,7 +188,7 @@ export type UserRoleWhereUniqueInput = Prisma.AtLeast<{
   role_id?: Prisma.StringFilter<"UserRole"> | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   role?: Prisma.XOR<Prisma.RoleScalarRelationFilter, Prisma.RoleWhereInput>
-}, "id">
+}, "id" | "user_id_role_id">
 
 export type UserRoleOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -255,6 +256,11 @@ export type UserRoleListRelationFilter = {
 
 export type UserRoleOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type UserRoleUser_idRole_idCompoundUniqueInput = {
+  user_id: string
+  role_id: string
 }
 
 export type UserRoleCountOrderByAggregateInput = {

@@ -223,6 +223,7 @@ export type LeaseOrderByWithRelationInput = {
 
 export type LeaseWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  portfolio_unit_id_end_date?: Prisma.LeasePortfolio_unit_idEnd_dateCompoundUniqueInput
   AND?: Prisma.LeaseWhereInput | Prisma.LeaseWhereInput[]
   OR?: Prisma.LeaseWhereInput[]
   NOT?: Prisma.LeaseWhereInput | Prisma.LeaseWhereInput[]
@@ -234,7 +235,7 @@ export type LeaseWhereUniqueInput = Prisma.AtLeast<{
   created_at?: Prisma.DateTimeFilter<"Lease"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Lease"> | Date | string
   portfolio_unit?: Prisma.XOR<Prisma.PortfolioUnitScalarRelationFilter, Prisma.PortfolioUnitWhereInput>
-}, "id">
+}, "id" | "portfolio_unit_id_end_date">
 
 export type LeaseOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -348,6 +349,11 @@ export type LeaseListRelationFilter = {
 
 export type LeaseOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type LeasePortfolio_unit_idEnd_dateCompoundUniqueInput = {
+  portfolio_unit_id: string
+  end_date: Date | string
 }
 
 export type LeaseCountOrderByAggregateInput = {

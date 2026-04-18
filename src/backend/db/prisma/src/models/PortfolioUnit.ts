@@ -38,6 +38,7 @@ export type PortfolioUnitMinAggregateOutputType = {
   id: string | null
   portfolio_id: string | null
   property_id: string | null
+  name: string | null
   conditions: string | null
   lease_base_amount: runtime.Decimal | null
   lease_base_currency: string | null
@@ -49,6 +50,7 @@ export type PortfolioUnitMaxAggregateOutputType = {
   id: string | null
   portfolio_id: string | null
   property_id: string | null
+  name: string | null
   conditions: string | null
   lease_base_amount: runtime.Decimal | null
   lease_base_currency: string | null
@@ -60,6 +62,7 @@ export type PortfolioUnitCountAggregateOutputType = {
   id: number
   portfolio_id: number
   property_id: number
+  name: number
   conditions: number
   lease_base_amount: number
   lease_base_currency: number
@@ -81,6 +84,7 @@ export type PortfolioUnitMinAggregateInputType = {
   id?: true
   portfolio_id?: true
   property_id?: true
+  name?: true
   conditions?: true
   lease_base_amount?: true
   lease_base_currency?: true
@@ -92,6 +96,7 @@ export type PortfolioUnitMaxAggregateInputType = {
   id?: true
   portfolio_id?: true
   property_id?: true
+  name?: true
   conditions?: true
   lease_base_amount?: true
   lease_base_currency?: true
@@ -103,6 +108,7 @@ export type PortfolioUnitCountAggregateInputType = {
   id?: true
   portfolio_id?: true
   property_id?: true
+  name?: true
   conditions?: true
   lease_base_amount?: true
   lease_base_currency?: true
@@ -201,6 +207,7 @@ export type PortfolioUnitGroupByOutputType = {
   id: string
   portfolio_id: string
   property_id: string
+  name: string
   conditions: string | null
   lease_base_amount: runtime.Decimal
   lease_base_currency: string
@@ -235,6 +242,7 @@ export type PortfolioUnitWhereInput = {
   id?: Prisma.StringFilter<"PortfolioUnit"> | string
   portfolio_id?: Prisma.StringFilter<"PortfolioUnit"> | string
   property_id?: Prisma.StringFilter<"PortfolioUnit"> | string
+  name?: Prisma.StringFilter<"PortfolioUnit"> | string
   conditions?: Prisma.StringNullableFilter<"PortfolioUnit"> | string | null
   lease_base_amount?: Prisma.DecimalFilter<"PortfolioUnit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   lease_base_currency?: Prisma.StringFilter<"PortfolioUnit"> | string
@@ -248,6 +256,7 @@ export type PortfolioUnitOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   portfolio_id?: Prisma.SortOrder
   property_id?: Prisma.SortOrder
+  name?: Prisma.SortOrder
   conditions?: Prisma.SortOrderInput | Prisma.SortOrder
   lease_base_amount?: Prisma.SortOrder
   lease_base_currency?: Prisma.SortOrder
@@ -264,6 +273,7 @@ export type PortfolioUnitWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.PortfolioUnitWhereInput | Prisma.PortfolioUnitWhereInput[]
   portfolio_id?: Prisma.StringFilter<"PortfolioUnit"> | string
   property_id?: Prisma.StringFilter<"PortfolioUnit"> | string
+  name?: Prisma.StringFilter<"PortfolioUnit"> | string
   conditions?: Prisma.StringNullableFilter<"PortfolioUnit"> | string | null
   lease_base_amount?: Prisma.DecimalFilter<"PortfolioUnit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   lease_base_currency?: Prisma.StringFilter<"PortfolioUnit"> | string
@@ -277,6 +287,7 @@ export type PortfolioUnitOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   portfolio_id?: Prisma.SortOrder
   property_id?: Prisma.SortOrder
+  name?: Prisma.SortOrder
   conditions?: Prisma.SortOrderInput | Prisma.SortOrder
   lease_base_amount?: Prisma.SortOrder
   lease_base_currency?: Prisma.SortOrder
@@ -296,6 +307,7 @@ export type PortfolioUnitScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"PortfolioUnit"> | string
   portfolio_id?: Prisma.StringWithAggregatesFilter<"PortfolioUnit"> | string
   property_id?: Prisma.StringWithAggregatesFilter<"PortfolioUnit"> | string
+  name?: Prisma.StringWithAggregatesFilter<"PortfolioUnit"> | string
   conditions?: Prisma.StringNullableWithAggregatesFilter<"PortfolioUnit"> | string | null
   lease_base_amount?: Prisma.DecimalWithAggregatesFilter<"PortfolioUnit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   lease_base_currency?: Prisma.StringWithAggregatesFilter<"PortfolioUnit"> | string
@@ -306,6 +318,7 @@ export type PortfolioUnitScalarWhereWithAggregatesInput = {
 export type PortfolioUnitCreateInput = {
   id?: string
   property_id: string
+  name?: string
   conditions?: string | null
   lease_base_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   lease_base_currency?: string
@@ -319,6 +332,7 @@ export type PortfolioUnitUncheckedCreateInput = {
   id?: string
   portfolio_id: string
   property_id: string
+  name?: string
   conditions?: string | null
   lease_base_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   lease_base_currency?: string
@@ -330,6 +344,7 @@ export type PortfolioUnitUncheckedCreateInput = {
 export type PortfolioUnitUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   property_id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   conditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lease_base_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lease_base_currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -343,6 +358,7 @@ export type PortfolioUnitUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   portfolio_id?: Prisma.StringFieldUpdateOperationsInput | string
   property_id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   conditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lease_base_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lease_base_currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -355,6 +371,7 @@ export type PortfolioUnitCreateManyInput = {
   id?: string
   portfolio_id: string
   property_id: string
+  name?: string
   conditions?: string | null
   lease_base_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   lease_base_currency?: string
@@ -365,6 +382,7 @@ export type PortfolioUnitCreateManyInput = {
 export type PortfolioUnitUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   property_id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   conditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lease_base_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lease_base_currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -376,6 +394,7 @@ export type PortfolioUnitUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   portfolio_id?: Prisma.StringFieldUpdateOperationsInput | string
   property_id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   conditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lease_base_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lease_base_currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -397,6 +416,7 @@ export type PortfolioUnitCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   portfolio_id?: Prisma.SortOrder
   property_id?: Prisma.SortOrder
+  name?: Prisma.SortOrder
   conditions?: Prisma.SortOrder
   lease_base_amount?: Prisma.SortOrder
   lease_base_currency?: Prisma.SortOrder
@@ -412,6 +432,7 @@ export type PortfolioUnitMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   portfolio_id?: Prisma.SortOrder
   property_id?: Prisma.SortOrder
+  name?: Prisma.SortOrder
   conditions?: Prisma.SortOrder
   lease_base_amount?: Prisma.SortOrder
   lease_base_currency?: Prisma.SortOrder
@@ -423,6 +444,7 @@ export type PortfolioUnitMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   portfolio_id?: Prisma.SortOrder
   property_id?: Prisma.SortOrder
+  name?: Prisma.SortOrder
   conditions?: Prisma.SortOrder
   lease_base_amount?: Prisma.SortOrder
   lease_base_currency?: Prisma.SortOrder
@@ -498,6 +520,7 @@ export type PortfolioUnitUpdateOneRequiredWithoutLeasesNestedInput = {
 export type PortfolioUnitCreateWithoutPortfolioInput = {
   id?: string
   property_id: string
+  name?: string
   conditions?: string | null
   lease_base_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   lease_base_currency?: string
@@ -509,6 +532,7 @@ export type PortfolioUnitCreateWithoutPortfolioInput = {
 export type PortfolioUnitUncheckedCreateWithoutPortfolioInput = {
   id?: string
   property_id: string
+  name?: string
   conditions?: string | null
   lease_base_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   lease_base_currency?: string
@@ -550,6 +574,7 @@ export type PortfolioUnitScalarWhereInput = {
   id?: Prisma.StringFilter<"PortfolioUnit"> | string
   portfolio_id?: Prisma.StringFilter<"PortfolioUnit"> | string
   property_id?: Prisma.StringFilter<"PortfolioUnit"> | string
+  name?: Prisma.StringFilter<"PortfolioUnit"> | string
   conditions?: Prisma.StringNullableFilter<"PortfolioUnit"> | string | null
   lease_base_amount?: Prisma.DecimalFilter<"PortfolioUnit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   lease_base_currency?: Prisma.StringFilter<"PortfolioUnit"> | string
@@ -560,6 +585,7 @@ export type PortfolioUnitScalarWhereInput = {
 export type PortfolioUnitCreateWithoutLeasesInput = {
   id?: string
   property_id: string
+  name?: string
   conditions?: string | null
   lease_base_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   lease_base_currency?: string
@@ -572,6 +598,7 @@ export type PortfolioUnitUncheckedCreateWithoutLeasesInput = {
   id?: string
   portfolio_id: string
   property_id: string
+  name?: string
   conditions?: string | null
   lease_base_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   lease_base_currency?: string
@@ -598,6 +625,7 @@ export type PortfolioUnitUpdateToOneWithWhereWithoutLeasesInput = {
 export type PortfolioUnitUpdateWithoutLeasesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   property_id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   conditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lease_base_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lease_base_currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -610,6 +638,7 @@ export type PortfolioUnitUncheckedUpdateWithoutLeasesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   portfolio_id?: Prisma.StringFieldUpdateOperationsInput | string
   property_id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   conditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lease_base_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lease_base_currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -620,6 +649,7 @@ export type PortfolioUnitUncheckedUpdateWithoutLeasesInput = {
 export type PortfolioUnitCreateManyPortfolioInput = {
   id?: string
   property_id: string
+  name?: string
   conditions?: string | null
   lease_base_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   lease_base_currency?: string
@@ -630,6 +660,7 @@ export type PortfolioUnitCreateManyPortfolioInput = {
 export type PortfolioUnitUpdateWithoutPortfolioInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   property_id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   conditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lease_base_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lease_base_currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -641,6 +672,7 @@ export type PortfolioUnitUpdateWithoutPortfolioInput = {
 export type PortfolioUnitUncheckedUpdateWithoutPortfolioInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   property_id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   conditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lease_base_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lease_base_currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -652,6 +684,7 @@ export type PortfolioUnitUncheckedUpdateWithoutPortfolioInput = {
 export type PortfolioUnitUncheckedUpdateManyWithoutPortfolioInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   property_id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   conditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lease_base_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lease_base_currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -694,6 +727,7 @@ export type PortfolioUnitSelect<ExtArgs extends runtime.Types.Extensions.Interna
   id?: boolean
   portfolio_id?: boolean
   property_id?: boolean
+  name?: boolean
   conditions?: boolean
   lease_base_amount?: boolean
   lease_base_currency?: boolean
@@ -708,6 +742,7 @@ export type PortfolioUnitSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   id?: boolean
   portfolio_id?: boolean
   property_id?: boolean
+  name?: boolean
   conditions?: boolean
   lease_base_amount?: boolean
   lease_base_currency?: boolean
@@ -720,6 +755,7 @@ export type PortfolioUnitSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   id?: boolean
   portfolio_id?: boolean
   property_id?: boolean
+  name?: boolean
   conditions?: boolean
   lease_base_amount?: boolean
   lease_base_currency?: boolean
@@ -732,6 +768,7 @@ export type PortfolioUnitSelectScalar = {
   id?: boolean
   portfolio_id?: boolean
   property_id?: boolean
+  name?: boolean
   conditions?: boolean
   lease_base_amount?: boolean
   lease_base_currency?: boolean
@@ -739,7 +776,7 @@ export type PortfolioUnitSelectScalar = {
   updated_at?: boolean
 }
 
-export type PortfolioUnitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "portfolio_id" | "property_id" | "conditions" | "lease_base_amount" | "lease_base_currency" | "created_at" | "updated_at", ExtArgs["result"]["portfolioUnit"]>
+export type PortfolioUnitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "portfolio_id" | "property_id" | "name" | "conditions" | "lease_base_amount" | "lease_base_currency" | "created_at" | "updated_at", ExtArgs["result"]["portfolioUnit"]>
 export type PortfolioUnitInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   portfolio?: boolean | Prisma.LandlordPortfolioDefaultArgs<ExtArgs>
   leases?: boolean | Prisma.PortfolioUnit$leasesArgs<ExtArgs>
@@ -762,6 +799,7 @@ export type $PortfolioUnitPayload<ExtArgs extends runtime.Types.Extensions.Inter
     id: string
     portfolio_id: string
     property_id: string
+    name: string
     conditions: string | null
     lease_base_amount: runtime.Decimal
     lease_base_currency: string
@@ -1195,6 +1233,7 @@ export interface PortfolioUnitFieldRefs {
   readonly id: Prisma.FieldRef<"PortfolioUnit", 'String'>
   readonly portfolio_id: Prisma.FieldRef<"PortfolioUnit", 'String'>
   readonly property_id: Prisma.FieldRef<"PortfolioUnit", 'String'>
+  readonly name: Prisma.FieldRef<"PortfolioUnit", 'String'>
   readonly conditions: Prisma.FieldRef<"PortfolioUnit", 'String'>
   readonly lease_base_amount: Prisma.FieldRef<"PortfolioUnit", 'Decimal'>
   readonly lease_base_currency: Prisma.FieldRef<"PortfolioUnit", 'String'>
