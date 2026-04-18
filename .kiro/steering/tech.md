@@ -262,6 +262,26 @@ Use these in imports when referencing across the module/src boundary.
 - 0 duplicate transactions
 - 100% of unauthorized access attempts blocked and logged
 
+## Frontend Conventions
+
+### Typography
+- The project uses `font-size: 62.5%` on `<html>` (1rem = 10px), with custom Tailwind tokens defined in `globals.css`
+- **NEVER use Tailwind's default text sizes** (`text-sm`, `text-lg`, `text-xl`, etc.) — they resolve to incorrect pixel values with the 62.5% base
+- Use the design system tokens instead: `text-h1` (32px), `text-h2` (24px), `text-h3` (20px), `text-body` (16px), `text-caption` (14px), `text-small` (12px)
+- Form labels: `text-caption font-medium`
+- Section headings in forms: `text-h3 font-semibold`
+- Body text: `text-body`
+
+### Desktop Layout for Form Pages
+- Form pages and listing pages wrap their `<main>` content in a centered container: `<main className="flex justify-center ..."><div className="w-full max-w-[560px]">...</div></main>`
+- This follows the auth pages pattern (`max-w-[448px]`) to prevent forms from stretching across the full viewport on desktop
+
+### Currency (MVP)
+- All currency is "COP" (Colombian Peso) for the MVP
+- Currency input fields are NOT shown to users — `leaseBaseCurrency: 'COP'` is hardcoded in the request payload
+- Money input fields use `formatCOP`/`stripCOP` helpers (same pattern as FilterPanel in property-listings) to display `$1.200.000` format while storing raw digits
+- In a future iteration, a backend endpoint will provide available currencies and the frontend will show a dropdown
+
 ## Common Commands
 
 ```bash
