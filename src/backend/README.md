@@ -24,7 +24,7 @@ src/backend/
 │   │   ├── schema.prisma    # Schema Prisma completo (8 esquemas PostgreSQL)
 │   │   └── migrations/      # Migraciones generadas por Prisma
 │   └── seeds/
-│       └── seed.ts          # Seed de catálogos (roles, tipos de documento, estados)
+│       └── seed.ts          # Seed de catálogos (roles, tipos de documento, tipos de propiedad, estados)
 ├── src/
 │   ├── app.module.ts           # Módulo raíz
 │   ├── main.ts                 # Bootstrap: NestExpressApplication, Helmet, trust proxy, ValidationPipe, Swagger, CORS, Morgan HTTP logging (format: 'dev' | 'combined' según NODE_ENV)
@@ -145,7 +145,7 @@ npm run lint               # ESLint
 npm run migration:run      # Aplica migraciones Prisma (desde src/backend/)
 npm run migration:generate # Genera nueva migración (desde src/backend/)
 npm run db:studio          # Prisma Studio
-npm run db:seed            # Seed de catálogos (roles, tipos de documento, estados)
+npm run db:seed            # Seed de catálogos (roles, tipos de documento, tipos de propiedad, estados)
 ```
 
 ## Variables de entorno
