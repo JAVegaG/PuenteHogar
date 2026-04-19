@@ -1,6 +1,6 @@
 # Frontend — Plataforma de Arriendo
 
-Aplicación Next.js (App Router) con Tailwind CSS y TypeScript para la plataforma de arriendo de vivienda urbana. Incluye los módulos de exploración de inmuebles, autenticación/perfil de usuarios y portafolio del arrendador.
+Aplicación Next.js (App Router) con Tailwind CSS y TypeScript para la plataforma de arriendo de vivienda urbana. Incluye los módulos de exploración de inmuebles, autenticación/perfil de usuarios, portafolio del arrendador, contabilidad, gestión de arriendos, creación de contratos y publicación de unidades.
 
 ## Stack
 
@@ -29,19 +29,65 @@ src/frontend/
 │   │       └── page.tsx      # Página de detalle (Server Component)
 │   ├── mi-perfil/
 │   │   └── page.tsx          # Página de perfil (Client Component, protegida)
-│   └── mi-portafolio/
-│       ├── page.tsx              # Listado de portafolios con estadísticas (Client Component, LANDLORD)
-│       ├── nueva-unidad/
-│       │   └── page.tsx          # Redirige a /mi-portafolio (legacy)
-│       └── [id]/
-│           ├── page.tsx          # Detalle de unidad (Client Component, LANDLORD)
-│           ├── editar/
-│           │   └── page.tsx      # Editar unidad (Client Component, LANDLORD)
-│           ├── agregar-unidad/
-│           │   └── page.tsx      # Agregar unidad enriquecida a portafolio (Client Component, LANDLORD)
-│           └── unidades/
-│               └── page.tsx      # Listado de unidades de un portafolio (Client Component, LANDLORD)
+│   ├── mi-portafolio/
+│   │   ├── page.tsx              # Listado de portafolios con estadísticas (Client Component, LANDLORD)
+│   │   ├── nueva-unidad/
+│   │   │   └── page.tsx          # Redirige a /mi-portafolio (legacy)
+│   │   └── [id]/
+│   │       ├── page.tsx          # Detalle de unidad (Client Component, LANDLORD)
+│   │       ├── editar/
+│   │       │   └── page.tsx      # Editar unidad (Client Component, LANDLORD)
+│   │       ├── agregar-unidad/
+│   │       │   └── page.tsx      # Agregar unidad enriquecida a portafolio (Client Component, LANDLORD)
+│   │       └── unidades/
+│   │           ├── page.tsx      # Listado de unidades de un portafolio (Client Component, LANDLORD)
+│   │           └── [unitId]/
+│   │               ├── arriendos/
+│   │               │   ├── page.tsx          # Historial de arriendos de la unidad (Client Component, LANDLORD)
+│   │               │   ├── crear/
+│   │               │   │   └── page.tsx      # Crear arriendo (Client Component, LANDLORD)
+│   │               │   └── [leaseId]/
+│   │               │       ├── page.tsx      # Detalle del arriendo (Client Component, LANDLORD)
+│   │               │       └── crear-contrato/
+│   │               │           └── page.tsx  # Wizard de creación de contrato (Client Component, LANDLORD)
+│   │               └── publicar/
+│   │                   └── page.tsx          # Publicar unidad en Explorar (Client Component, LANDLORD)
+│   └── mis-ingresos/
+│       ├── page.tsx              # Dashboard de ingresos del arrendador (Client Component, LANDLORD)
+│       └── portafolio/
+│           └── [portfolioId]/
+│               ├── page.tsx      # Reporte agregado de portafolio (Client Component, LANDLORD)
+│               └── unidad/
+│                   └── [unitId]/
+│                       └── page.tsx  # Reporte individual de unidad (Client Component, LANDLORD)
 ├── modules/
+│   ├── landlord-accounting/
+│   │   ├── components/
+│   │   │   ├── PeriodFilter.tsx         # Selector de periodo por tabs (1m, 3m, 6m, 12m)
+│   │   │   ├── SummaryCard.tsx          # Tarjeta de métrica (label + valor formateado)
+│   │   │   ├── PortfolioIncomeCard.tsx  # Tarjeta de portafolio para overview de ingresos
+│   │   │   └── PropertyDetailTable.tsx  # Tabla de detalle por propiedad
+│   │   ├── __tests__/
+│   │   │   └── utils.test.ts
+│   │   ├── types.ts                     # Interfaces: PeriodRequest, AggregatedReportResponse, IndividualReportResponse, etc.
+│   │   └── utils.ts                     # computePeriod helper
+│   ├── landlord-contracts/
+│   │   ├── components/
+│   │   │   ├── ContractWizard.tsx       # Orquestador del wizard de 3 pasos
+│   │   │   ├── WizardProgress.tsx       # Indicador visual de progreso (1-2-3)
+│   │   │   ├── StepTenant.tsx           # Paso 1: datos del arrendatario
+│   │   │   ├── StepTerms.tsx            # Paso 2: términos del contrato
+│   │   │   └── StepDocument.tsx         # Paso 3: carga de PDF
+│   │   ├── types.ts                     # Interfaces: ContractFormData, UploadContractRequest, ContractSummary, etc.
+│   │   └── validation.ts               # Validación por paso: step1, step2, step3
+│   ├── landlord-leases/
+│   │   ├── components/
+│   │   │   ├── LeaseCard.tsx            # Tarjeta de arriendo con estado y acciones contextuales
+│   │   │   ├── LeaseCreateForm.tsx      # Formulario de creación de arriendo
+│   │   │   ├── LeaseDetailView.tsx      # Vista de detalle de arriendo (solo lectura)
+│   │   │   └── UnitInfoHeader.tsx       # Encabezado con info de la unidad
+│   │   ├── types.ts                     # Interfaces: LeaseListItem, LeaseDetail, UnitInfo, CreateLeaseRequest
+│   │   └── validation.ts               # Validación de formulario de arriendo
 │   ├── landlord-portfolio/
 │   │   ├── components/
 │   │   │   ├── AddUnitForm.tsx         # Formulario enriquecido de creación de unidad (3 secciones)
@@ -56,6 +102,13 @@ src/frontend/
 │   │   ├── types.ts                   # Interfaces: PortfolioUnit, PortfolioSummary, PaginatedPortfolios, CreateUnitRequest, etc.
 │   │   ├── utils.ts                   # formatPortfolioDate (wrapper de formatRelativeDate)
 │   │   └── validation.ts             # Validación pura: propertyId, leaseBaseAmount, leaseBaseCurrency, unitName, address, propertyType, positiveDecimal, nonNegativeInteger
+│   ├── landlord-publish/
+│   │   ├── components/
+│   │   │   ├── PublishForm.tsx          # Formulario de publicación de listing
+│   │   │   ├── PhotoUploader.tsx        # Carga de fotos con previews
+│   │   │   └── PhotoThumbnail.tsx       # Preview individual de foto
+│   │   ├── types.ts                     # Interfaces: PhotoFile, PublishFormData, CreateListingRequest
+│   │   └── validation.ts               # Validación de formulario de publicación
 │   ├── property-listings/
 │   │   ├── components/
 │   │   │   ├── ActionBar.tsx          # Barra de acciones (Filtros + Ordenar)
@@ -77,6 +130,7 @@ src/frontend/
 │       │   ├── ProfileCard.tsx        # Tarjeta de perfil (solo lectura) + logout
 │       │   ├── ProtectedRoute.tsx     # Wrapper de protección de rutas autenticadas
 │       │   ├── RegistrationWizard.tsx     # Orquestador del formulario multi-paso (3 pasos)
+│       │   ├── RegistroWizard.tsx         # Wizard de registro alternativo (mismo flujo, naming en español)
 │       │   ├── Step1UserType.tsx      # Paso 1: selección de rol y tipo de persona
 │       │   ├── Step2PersonalData.tsx  # Paso 2: datos personales + documento + teléfono
 │       │   ├── Step3Credentials.tsx   # Paso 3: email + contraseña + confirmación
@@ -100,14 +154,19 @@ src/frontend/
 │   │   ├── ListingGridSkeleton.tsx
 │   │   ├── Pagination.tsx         # Paginación con selector de items/página
 │   │   ├── SideMenu.tsx           # Menú lateral (drawer 320px, auth-aware)
-│   │   └── Skeleton.tsx           # Skeleton loader genérico
+│   │   ├── Skeleton.tsx           # Skeleton loader genérico
+│   │   ├── StatusBadge.tsx        # Badge de estado reutilizable (variantes: lease, unit, payment)
+│   │   └── Toast.tsx              # Notificación temporal (auto-hide, role="status")
 │   ├── hooks/
 │   │   ├── useBodyScrollLock.ts   # Bloqueo de scroll para modales/drawers
 │   │   └── useDebounce.ts        # Debounce genérico (default 400ms)
 │   ├── services/
-│   │   ├── api.ts                 # Servicio HTTP listings (fetchListings, fetchListingDetail)
+│   │   ├── accounting.ts         # AccountingService (getAggregatedReport, getIndividualReport)
+│   │   ├── api.ts                # Servicio HTTP listings (fetchListings, fetchListingDetail, createListing)
 │   │   ├── auth.ts               # Servicio HTTP auth (login, register, getProfile, getDocumentTypes)
-│   │   └── portfolio.ts          # Servicio HTTP portafolio (getPortfolios, createPortfolio, getUnits, createUnit, createEnrichedUnit, updateUnit)
+│   │   ├── contract.ts           # ContractService (createContract, getContract, signContract)
+│   │   ├── lease.ts              # LeaseService (getUnitLeases, getLeaseDetail, createLease)
+│   │   └── portfolio.ts          # PortfolioService (getPortfolios, createPortfolio, getUnits, createUnit, createEnrichedUnit, updateUnit, getDepartments, getCitiesByDepartment, getPropertyTypes)
 │   └── utils/
 │       ├── formatPrice.ts         # Formato COP ($X.XXX.XXX)
 │       └── formatRelativeDate.ts  # Fecha relativa en español
@@ -143,12 +202,20 @@ npm run lint       # Linting
 | `/auth/login` | Client Component | No | Inicio de sesión (email + contraseña) |
 | `/auth/registro` | Client Component | No | Registro multi-paso (rol, datos personales, credenciales) |
 | `/mi-perfil` | Client Component | Sí | Perfil del usuario autenticado (solo lectura) |
-| `/mi-portafolio` | Client Component | LANDLORD | Listado de portafolios con estadísticas, paginación y creación de portafolios |
+| `/mi-portafolio` | Client Component | LANDLORD | Listado de portafolios con estadísticas, paginación y creación |
 | `/mi-portafolio/nueva-unidad` | Client Component | LANDLORD | Redirige a `/mi-portafolio` (legacy) |
 | `/mi-portafolio/[id]` | Client Component | LANDLORD | Detalle de unidad con info completa |
 | `/mi-portafolio/[id]/editar` | Client Component | LANDLORD | Editar unidad de portafolio existente |
-| `/mi-portafolio/[id]/agregar-unidad` | Client Component | LANDLORD | Agregar unidad enriquecida a un portafolio (formulario de 3 secciones) |
-| `/mi-portafolio/[id]/unidades` | Client Component | LANDLORD | Listado de unidades de un portafolio con resumen y estadísticas |
+| `/mi-portafolio/[id]/agregar-unidad` | Client Component | LANDLORD | Agregar unidad enriquecida a un portafolio |
+| `/mi-portafolio/[id]/unidades` | Client Component | LANDLORD | Listado de unidades de un portafolio |
+| `/mi-portafolio/[id]/unidades/[unitId]/arriendos` | Client Component | LANDLORD | Historial de arriendos de una unidad |
+| `/mi-portafolio/[id]/unidades/[unitId]/arriendos/crear` | Client Component | LANDLORD | Crear nuevo arriendo para una unidad |
+| `/mi-portafolio/[id]/unidades/[unitId]/arriendos/[leaseId]` | Client Component | LANDLORD | Detalle de un arriendo específico |
+| `/mi-portafolio/[id]/unidades/[unitId]/arriendos/[leaseId]/crear-contrato` | Client Component | LANDLORD | Wizard de creación de contrato (3 pasos) |
+| `/mi-portafolio/[id]/unidades/[unitId]/publicar` | Client Component | LANDLORD | Publicar unidad como listing en Explorar |
+| `/mis-ingresos` | Client Component | LANDLORD | Dashboard de ingresos del arrendador |
+| `/mis-ingresos/portafolio/[portfolioId]` | Client Component | LANDLORD | Reporte agregado de ingresos por portafolio |
+| `/mis-ingresos/portafolio/[portfolioId]/unidad/[unitId]` | Client Component | LANDLORD | Reporte individual de ingresos por unidad |
 
 ## Módulos
 
@@ -162,7 +229,53 @@ Autenticación y perfil de usuario: login con email/contraseña, registro multi-
 
 ### landlord-portfolio
 
-Portafolio del arrendador: listado de portafolios con tarjetas de estadísticas (unidades, arriendos activos, ocupación), creación de portafolios, listado de unidades por portafolio, creación de unidades enriquecidas (nombre, dirección, tipo de propiedad, dimensiones, habitaciones, baños, canon base), edición de unidades, detalle de unidad, protección de rutas por rol LANDLORD (LandlordRoute), validación client-side de formularios y servicio de integración con API backend (PortfolioService).
+Portafolio del arrendador: listado de portafolios con tarjetas de estadísticas (unidades, arriendos activos, ocupación), creación de portafolios, listado de unidades por portafolio, creación de unidades enriquecidas (nombre, dirección, tipo de propiedad, dimensiones, habitaciones, baños, canon base, departamento, ciudad), edición de unidades, detalle de unidad, badges de estado por unidad (Ocupado, Disponible, Mantenimiento), acciones contextuales (publicar, ver historial), protección de rutas por rol LANDLORD (LandlordRoute), validación client-side de formularios y servicio de integración con API backend (PortfolioService).
+
+### landlord-accounting
+
+Contabilidad del arrendador: dashboard de ingresos con resumen mensual (ingresos, total inmuebles, arriendos activos), tarjetas de portafolio con ingresos, reporte agregado por portafolio con filtro de periodo (1m, 3m, 6m, 12m), tarjetas de resumen (ingresos recibidos/esperados), tabla de detalle por propiedad con estado de pago, reporte individual por unidad con historial de arriendos. Componentes reutilizables: PeriodFilter, SummaryCard, PortfolioIncomeCard, PropertyDetailTable.
+
+### landlord-leases
+
+Gestión de arriendos: historial de arriendos por unidad con tarjetas de estado y acciones contextuales (ver detalle, generar/ver contrato), vista de detalle de arriendo (inmueble, arrendatario, acuerdo), creación de arriendo (email del arrendatario, fechas), encabezado de info de unidad. Componentes: LeaseCard, LeaseDetailView, LeaseCreateForm, UnitInfoHeader.
+
+### landlord-contracts
+
+Creación de contratos: wizard de 3 pasos (arrendatario, términos, documento PDF) con indicador de progreso, validación por paso, pre-población desde datos del arriendo, carga de archivo PDF, y envío al backend. Componentes: ContractWizard, WizardProgress, StepTenant, StepTerms, StepDocument.
+
+### landlord-publish
+
+Publicación de unidades: formulario para publicar una unidad del portafolio como listing en Explorar, con carga de fotos (JPEG/PNG/WebP, mín. 3, máx. 10), título, descripción, precio en COP, y previews de fotos. Componentes: PublishForm, PhotoUploader, PhotoThumbnail.
+
+## Componentes Compartidos
+
+| Componente | Descripción |
+|------------|-------------|
+| `Button` | Botón primary/secondary reutilizable |
+| `EmptyState` | Estado vacío (sin resultados) |
+| `ErrorState` | Estado de error con retry |
+| `Header` | Encabezado fijo (hamburguesa/back + título) |
+| `ListingCardSkeleton` | Skeleton para tarjeta de listing |
+| `ListingDetailSkeleton` | Skeleton para detalle de listing |
+| `ListingGridSkeleton` | Skeleton para grilla de listings |
+| `Pagination` | Paginación con selector de items/página |
+| `SideMenu` | Menú lateral (drawer 320px, auth-aware) |
+| `Skeleton` | Skeleton loader genérico |
+| `StatusBadge` | Badge de estado con variantes: lease (Vigente/Acordado/Finalizado), unit (Ocupado/Disponible/Mantenimiento), payment (Al día/Pendiente) |
+| `Toast` | Notificación temporal auto-hide (`role="status"`, `aria-live="polite"`) |
+
+## Servicios
+
+| Servicio | Archivo | Descripción |
+|----------|---------|-------------|
+| Listings | `api.ts` | fetchListings, fetchListingDetail, createListing |
+| Auth | `auth.ts` | login, register, getProfile, getDocumentTypes |
+| Portfolio | `portfolio.ts` | getPortfolios, createPortfolio, getUnits, createUnit, createEnrichedUnit, updateUnit, getDepartments, getCitiesByDepartment, getPropertyTypes |
+| Accounting | `accounting.ts` | getAggregatedReport, getIndividualReport |
+| Contract | `contract.ts` | createContract, getContract, signContract |
+| Lease | `lease.ts` | getUnitLeases, getLeaseDetail, createLease |
+
+Todos los servicios usan `fetch` nativo, `Authorization: Bearer <token>` desde `localStorage`, y manejo de errores tipado con mensajes en español.
 
 ## API Backend
 
@@ -170,6 +283,7 @@ El frontend consume los endpoints REST del backend NestJS:
 
 - `GET /listings` — Listado paginado con filtros
 - `GET /listings/:id` — Detalle completo del inmueble
+- `POST /listings` — Crear listing (publicar unidad, requiere JWT, rol LANDLORD)
 - `POST /auth/login` — Inicio de sesión (retorna JWT)
 - `POST /auth/register` — Registro de usuario
 - `GET /auth/profile` — Perfil del usuario autenticado (requiere JWT)
@@ -177,8 +291,18 @@ El frontend consume los endpoints REST del backend NestJS:
 - `GET /portfolio` — Listado paginado de portafolios con estadísticas (requiere JWT, rol LANDLORD)
 - `POST /portfolio` — Crear portafolio (requiere JWT, rol LANDLORD)
 - `GET /portfolio/:portfolioId/units` — Listado de unidades de un portafolio (requiere JWT, rol LANDLORD)
-- `POST /portfolio/:portfolioId/units` — Crear unidad enriquecida en un portafolio (requiere JWT, rol LANDLORD)
-- `PATCH /portfolio/:portfolioId/units/:id` — Actualizar unidad de portafolio (requiere JWT, rol LANDLORD)
+- `POST /portfolio/:portfolioId/units` — Crear unidad enriquecida (requiere JWT, rol LANDLORD)
+- `PATCH /portfolio/:portfolioId/units/:id` — Actualizar unidad (requiere JWT, rol LANDLORD)
+- `GET /portfolio/departments` — Catálogo de departamentos (público)
+- `GET /portfolio/departments/:departmentCode/cities` — Ciudades por departamento (público)
+- `GET /portfolio/:portfolioId/units/:unitId/leases` — Arriendos de una unidad (requiere JWT, rol LANDLORD)
+- `GET /portfolio/:portfolioId/units/:unitId/leases/:leaseId` — Detalle de arriendo (requiere JWT, rol LANDLORD)
+- `POST /portfolio/:portfolioId/units/:unitId/leases` — Crear arriendo (requiere JWT, rol LANDLORD)
+- `POST /accounting/reports/portfolio/:portfolioId/aggregated` — Reporte agregado de ingresos (requiere JWT, rol LANDLORD)
+- `POST /accounting/reports/portfolio/:portfolioId/unit/:unitId` — Reporte individual de ingresos (requiere JWT, rol LANDLORD)
+- `POST /contracts` — Crear contrato (requiere JWT, rol LANDLORD)
+- `GET /contracts/:id` — Resumen de contrato (requiere JWT, rol LANDLORD)
+- `POST /contracts/:id/sign` — Iniciar firma digital (requiere JWT, rol LANDLORD)
 
 ## Diseño
 
