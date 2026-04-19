@@ -41,7 +41,8 @@ src/backend/
 │       ├── prisma/             # PrismaModule + PrismaService (singleton compartido)
 │       │   ├── prisma-migrations.spec.ts  # PBT Property 51: idempotencia de migraciones
 │       │   └── prisma-uniqueness.spec.ts  # PBT Property 50: restricciones de unicidad
-│       └── redis/              # RedisService (cache-aside con fallback)
+│       ├── redis/              # RedisService (cache-aside con fallback)
+│       └── s3/                 # S3ClientFactory, object-key utils, custom exceptions (ObjectStorage*)
 └── modules/
     ├── users/                  # Registro, login, RBAC
     ├── property-listings/      # Publicaciones, búsqueda, fotos
@@ -77,6 +78,7 @@ modules/{nombre}/
 | `CircuitBreakerFactory` | Instancia circuit breakers por tipo de integración externa |
 | `RedisService` | Cache-aside con fallback transparente a PostgreSQL |
 | `PrismaService` | Cliente Prisma singleton compartido entre módulos (`@src/shared/prisma/`) |
+| `S3ClientFactory` | Crea y cachea una instancia de `S3Client` (AWS SDK v3); soporta endpoint personalizado para LocalStack/MinIO |
 
 > Los módulos acceden a `shared/` mediante el alias `@src/shared/` (resuelto por `tsconfig.paths` como `@src/*` → `./src/*`).
 
@@ -158,7 +160,8 @@ npm run db:seed            # Seed de catálogos (roles, tipos de documento, tipo
 | `JWT_SECRET` | Secreto para firmar tokens JWT |
 | `JWT_EXPIRES_IN` | Expiración del token (ej. `1d`) |
 | `OBJECT_STORAGE_BUCKET` | Bucket para fotos y contratos |
-| `OBJECT_STORAGE_ENDPOINT` | Endpoint del servicio de almacenamiento |
+| `OBJECT_STORAGE_ENDPOINT` | Endpoint del servicio de almacenamiento (opcional; para LocalStack/MinIO) |
+| `OBJECT_STORAGE_REGION` | Región del servicio S3 (default: `us-east-1`) |
 | `PII_ENCRYPTION_KEY` | Clave AES-256 para cifrado de campos PII |
 | `PORT` | Puerto del servidor (default: `3000`) |
 | `NODE_ENV` | Entorno de ejecución (`development`, `production`) |
