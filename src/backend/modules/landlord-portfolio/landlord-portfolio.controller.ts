@@ -10,7 +10,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiOkResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiOkResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiConflictResponse, ApiParam } from '@nestjs/swagger';
 import { Public } from '@src/shared/decorators';
 import type { IPortfolioRepository } from './domain/ports/portfolio-repository.port';
 import { PORTFOLIO_REPOSITORY } from './application/use-cases/create-portfolio-unit.use-case';
@@ -25,11 +25,17 @@ import { CreateEnrichedUnitDto } from './application/dtos/create-enriched-unit.d
 import { PaginatedPortfoliosResponseDto } from './application/dtos/paginated-portfolios-response.dto';
 import { PortfolioSummaryResponseDto } from './application/dtos/portfolio-summary-response.dto';
 import { EnrichedUnitResponseDto } from './application/dtos/enriched-unit-response.dto';
+import { LeaseListItemDto } from './application/dtos/lease-list-item.dto';
+import { LeaseDetailDto } from './application/dtos/lease-detail.dto';
+import { CreateLeaseDto } from './application/dtos/create-lease.dto';
 import { GetPortfolioUseCase } from './application/use-cases/get-portfolio.use-case';
 import { UpdatePortfolioUnitUseCase } from './application/use-cases/update-portfolio-unit.use-case';
 import { ListPortfoliosUseCase } from './application/use-cases/list-portfolios.use-case';
 import { CreatePortfolioUseCase } from './application/use-cases/create-portfolio.use-case';
 import { CreateEnrichedUnitUseCase } from './application/use-cases/create-enriched-unit.use-case';
+import { GetUnitLeasesUseCase } from './application/use-cases/get-unit-leases.use-case';
+import { GetLeaseDetailUseCase } from './application/use-cases/get-lease-detail.use-case';
+import { CreateLeaseUseCase } from './application/use-cases/create-lease.use-case';
 
 interface AuthenticatedRequest extends Request {
   user: { id: string; roles: string[] };
@@ -47,6 +53,9 @@ export class LandlordPortfolioController {
     private readonly listPortfoliosUseCase: ListPortfoliosUseCase,
     private readonly createPortfolioUseCase: CreatePortfolioUseCase,
     private readonly createEnrichedUnitUseCase: CreateEnrichedUnitUseCase,
+    private readonly getUnitLeasesUseCase: GetUnitLeasesUseCase,
+    private readonly getLeaseDetailUseCase: GetLeaseDetailUseCase,
+    private readonly createLeaseUseCase: CreateLeaseUseCase,
   ) { }
 
   @Public()
@@ -134,5 +143,47 @@ export class LandlordPortfolioController {
     @Req() req: AuthenticatedRequest,
   ) {
     return this.updatePortfolioUnitUseCase.execute(id, dto, req.user.id);
+  }
+
+  @Get(':portfolioId/units/:unitId/leases')
+  @ApiOperation({ summary: 'Listar arriendos de una unidad', description: 'Retorna los arriendos asociados a una unidad del portafolio.' })
+  @ApiOkResponse({ description: 'Lista de arriendos', type: [LeaseListItemDto] })
+  @ApiForbiddenResponse({ description: 'No tienes permiso para ver los arriendos de esta unidad' })
+  @ApiNotFoundResponse({ description: 'Portafolio o unidad no encontrada' })
+  getUnitLeases(
+    @Param('portfolioId') portfolioId: string,
+    @Param('unitId') unitId: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.getUnitLeasesUseCase.execute(portfolioId, unitId, req.user.id);
+  }
+
+  @Get(':portfolioId/units/:unitId/leases/:leaseId')
+  @ApiOperation({ summary: 'Obtener detalle de un arriendo', description: 'Retorna el detalle completo de un arriendo incluyendo datos del arrendatario e inmueble.' })
+  @ApiOkResponse({ description: 'Detalle del arriendo', type: LeaseDetailDto })
+  @ApiForbiddenResponse({ description: 'No tienes permiso para ver este arriendo' })
+  @ApiNotFoundResponse({ description: 'Arriendo no encontrado' })
+  getLeaseDetail(
+    @Param('portfolioId') portfolioId: string,
+    @Param('unitId') unitId: string,
+    @Param('leaseId') leaseId: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.getLeaseDetailUseCase.execute(portfolioId, unitId, leaseId, req.user.id);
+  }
+
+  @Post(':portfolioId/units/:unitId/leases')
+  @ApiOperation({ summary: 'Crear un arriendo para una unidad', description: 'Crea un nuevo arriendo asociando un arrendatario por email.' })
+  @ApiCreatedResponse({ description: 'Arriendo creado', type: LeaseListItemDto })
+  @ApiForbiddenResponse({ description: 'No tienes permiso para crear arriendos en esta unidad' })
+  @ApiNotFoundResponse({ description: 'Arrendatario no encontrado' })
+  @ApiConflictResponse({ description: 'La unidad ya tiene un arriendo activo' })
+  createLease(
+    @Param('portfolioId') portfolioId: string,
+    @Param('unitId') unitId: string,
+    @Body() dto: CreateLeaseDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.createLeaseUseCase.execute(portfolioId, unitId, dto, req.user.id);
   }
 }

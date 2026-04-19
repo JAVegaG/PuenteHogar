@@ -7,6 +7,9 @@ import { UpdatePortfolioUnitUseCase } from './application/use-cases/update-portf
 import { ListPortfoliosUseCase } from './application/use-cases/list-portfolios.use-case';
 import { CreatePortfolioUseCase } from './application/use-cases/create-portfolio.use-case';
 import { CreateEnrichedUnitUseCase } from './application/use-cases/create-enriched-unit.use-case';
+import { GetUnitLeasesUseCase } from './application/use-cases/get-unit-leases.use-case';
+import { GetLeaseDetailUseCase } from './application/use-cases/get-lease-detail.use-case';
+import { CreateLeaseUseCase } from './application/use-cases/create-lease.use-case';
 import { LandlordPortfolioEtlService } from './infrastructure/etl/landlord-portfolio-etl.service';
 import { PrismaPortfolioRepository } from './infrastructure/repositories/prisma-portfolio.repository';
 import { LandlordPortfolioController } from './landlord-portfolio.controller';
@@ -23,11 +26,14 @@ import { LandlordPortfolioController } from './landlord-portfolio.controller';
     ListPortfoliosUseCase,
     CreatePortfolioUseCase,
     CreateEnrichedUnitUseCase,
+    GetUnitLeasesUseCase,
+    GetLeaseDetailUseCase,
+    CreateLeaseUseCase,
     {
       provide: PORTFOLIO_REPOSITORY,
       useClass: PrismaPortfolioRepository,
     },
   ],
-  exports: [CreatePortfolioUnitUseCase, GetPortfolioUseCase, UpdatePortfolioUnitUseCase, ListPortfoliosUseCase, CreatePortfolioUseCase, CreateEnrichedUnitUseCase],
+  exports: [CreatePortfolioUnitUseCase, GetPortfolioUseCase, UpdatePortfolioUnitUseCase, ListPortfoliosUseCase, CreatePortfolioUseCase, CreateEnrichedUnitUseCase, GetUnitLeasesUseCase, GetLeaseDetailUseCase, CreateLeaseUseCase],
 })
-export class LandlordPortfolioModule {}
+export class LandlordPortfolioModule { }

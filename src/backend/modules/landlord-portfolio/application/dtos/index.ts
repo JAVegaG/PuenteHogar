@@ -10,3 +10,6 @@ export * from './enriched-unit-response.dto';
 export * from './property-type-response.dto';
 export * from './department-response.dto';
 export * from './city-response.dto';
+export * from './lease-list-item.dto';
+export * from './lease-detail.dto';
+export * from './create-lease.dto';

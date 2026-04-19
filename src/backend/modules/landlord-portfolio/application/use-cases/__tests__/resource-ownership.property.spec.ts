@@ -68,7 +68,11 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             findCityByCode: jest.fn(),
           };
 
-          const useCase = new GetPortfolioUseCase(mockRepo);
+          const mockPrisma = {
+            property: { findUnique: jest.fn().mockResolvedValue(null) },
+          } as any;
+
+          const useCase = new GetPortfolioUseCase(mockRepo, mockPrisma);
           await useCase.execute(userId);
 
           // Repository must be called with exactly the requesting userId

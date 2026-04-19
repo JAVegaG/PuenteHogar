@@ -4,3 +4,6 @@ export * from './update-portfolio-unit.use-case';
 export * from './list-portfolios.use-case';
 export * from './create-portfolio.use-case';
 export * from './create-enriched-unit.use-case';
+export * from './get-unit-leases.use-case';
+export * from './get-lease-detail.use-case';
+export * from './create-lease.use-case';
