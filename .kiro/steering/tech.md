@@ -282,6 +282,12 @@ Use these in imports when referencing across the module/src boundary.
 - Money input fields use `formatCOP`/`stripCOP` helpers (same pattern as FilterPanel in property-listings) to display `$1.200.000` format while storing raw digits
 - In a future iteration, a backend endpoint will provide available currencies and the frontend will show a dropdown
 
+### Back Button Pattern
+- Back buttons use `<Link>` from `next/link` (not `<button>` with `router.push()`) for standard link behavior (right-click, open in new tab)
+- Back buttons use the `rounded-card` CSS class for border radius
+- Back buttons use the left-arrow SVG icon: `<line x1="19" y1="12" x2="5" y2="12" />` + `<polyline points="12 19 5 12 12 5" />` — NOT the chevron (`<polyline points="15 18 9 12 15 6" />`)
+- This pattern is established in `mi-portafolio/[id]/page.tsx` and `mi-portafolio/[id]/agregar-unidad/page.tsx`
+
 ## Common Commands
 
 ```bash

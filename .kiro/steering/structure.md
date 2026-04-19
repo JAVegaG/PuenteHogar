@@ -95,6 +95,7 @@ modules/{name}/
 - Modules communicate only through defined API interfaces, never direct DB joins across schemas
 - Cross-schema references are plain `String` fields — no Prisma `@relation` across schemas
 - Cross-schema lookups use multi-step queries (e.g. `Lease → PortfolioUnit → LandlordPortfolio`)
+- `GetPortfolioUseCase` resolves property details (propertyType, address, rooms, bathrooms, area) cross-schema from `Property` + `Address` tables via `prisma.property.findUnique({ include: { address: true } })`
 - RAW tables store incoming JSON/JSONB; curated tables are read-optimized typed columns
 - ETL cron jobs handle raw → curated transformation
 - All external service calls go through adapters with circuit breaker logic
