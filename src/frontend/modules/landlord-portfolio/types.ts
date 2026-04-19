@@ -65,6 +65,8 @@ export interface CreateUnitRequest {
   numberOfRooms?: number;
   numberOfBathrooms?: number;
   description?: string;
+  departmentCode: string;
+  cityCode: string;
   leaseBaseAmount: number;
   leaseBaseCurrency?: string;
 }
@@ -78,6 +80,8 @@ export interface EnrichedUnitFormData {
   numberOfRooms: string;
   numberOfBathrooms: string;
   description: string;
+  departmentCode: string;
+  cityCode: string;
   leaseBaseAmount: string; // string for form input
   leaseBaseCurrency: string;
 }
@@ -86,6 +90,19 @@ export interface PropertyType {
   id: string;
   code: string;
   description: string;
+}
+
+export interface Department {
+  id: string;
+  code: string;
+  name: string;
+}
+
+export interface City {
+  id: string;
+  code: string;
+  departmentCode: string;
+  name: string;
 }
 
 export interface EnrichedUnitResponse {
@@ -100,6 +117,8 @@ export interface EnrichedUnitResponse {
   description: string | null;
   leaseBaseAmount: number;
   leaseBaseCurrency: string;
+  departmentCode: string;
+  cityCode: string;
   createdAt: string;
   updatedAt: string;
 }

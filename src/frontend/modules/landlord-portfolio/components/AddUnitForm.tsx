@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@modules/users/context/AuthContext';
 import { validateEnrichedUnitForm } from '../validation';
 import { portfolioService } from '@/shared/services/portfolio';
-import type { EnrichedUnitFormData, CreateUnitRequest, PropertyType } from '../types';
+import type { EnrichedUnitFormData, CreateUnitRequest, PropertyType, Department, City } from '../types';
 import { Button } from '@/shared/components/Button';
 import { Skeleton } from '@/shared/components/Skeleton';
 
@@ -42,6 +42,8 @@ const initialFormData: EnrichedUnitFormData = {
   numberOfRooms: '0',
   numberOfBathrooms: '0',
   description: '',
+  departmentCode: '',
+  cityCode: '',
   leaseBaseAmount: '',
   leaseBaseCurrency: 'COP',
 };
@@ -54,6 +56,10 @@ export function AddUnitForm({ portfolioId, onSuccess, onCancel }: AddUnitFormPro
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [propertyTypes, setPropertyTypes] = useState<PropertyType[]>([]);
   const [isLoadingPropertyTypes, setIsLoadingPropertyTypes] = useState(true);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [isLoadingDepartments, setIsLoadingDepartments] = useState(true);
+  const [cities, setCities] = useState<City[]>([]);
+  const [isLoadingCities, setIsLoadingCities] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -71,6 +77,43 @@ export function AddUnitForm({ portfolioId, onSuccess, onCancel }: AddUnitFormPro
     return () => { cancelled = true; };
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+    portfolioService
+      .getDepartments()
+      .then((depts) => {
+        if (!cancelled) setDepartments(depts);
+      })
+      .catch(() => {
+        /* graceful degradation — dropdown will have no options */
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingDepartments(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    if (!formData.departmentCode) {
+      setCities([]);
+      return;
+    }
+    let cancelled = false;
+    setIsLoadingCities(true);
+    portfolioService
+      .getCitiesByDepartment(formData.departmentCode)
+      .then((c) => {
+        if (!cancelled) setCities(c);
+      })
+      .catch(() => {
+        /* graceful degradation — dropdown will have no options */
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingCities(false);
+      });
+    return () => { cancelled = true; };
+  }, [formData.departmentCode]);
+
   const handleChange = (field: keyof EnrichedUnitFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => {
@@ -79,6 +122,11 @@ export function AddUnitForm({ portfolioId, onSuccess, onCancel }: AddUnitFormPro
       delete next[field];
       return next;
     });
+  };
+
+  const handleDepartmentChange = (value: string) => {
+    handleChange('departmentCode', value);
+    handleChange('cityCode', '');
   };
 
   const handleLeaseAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,6 +172,8 @@ export function AddUnitForm({ portfolioId, onSuccess, onCancel }: AddUnitFormPro
         numberOfRooms: formData.numberOfRooms ? parseInt(formData.numberOfRooms, 10) : undefined,
         numberOfBathrooms: formData.numberOfBathrooms ? parseInt(formData.numberOfBathrooms, 10) : undefined,
         description: formData.description || undefined,
+        departmentCode: formData.departmentCode,
+        cityCode: formData.cityCode,
         leaseBaseAmount: parseFloat(formData.leaseBaseAmount),
         leaseBaseCurrency: 'COP',
       };
@@ -214,6 +264,79 @@ export function AddUnitForm({ portfolioId, onSuccess, onCancel }: AddUnitFormPro
                 className="mt-1 text-[14px] text-red-600"
               >
                 {errors.address}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="departmentCode"
+              className="block text-caption font-medium text-gray-700 mb-1"
+            >
+              Departamento
+            </label>
+            {isLoadingDepartments ? (
+              <div role="status" aria-busy="true" aria-label="Cargando departamentos">
+                <Skeleton className="h-[48px] w-full rounded-[10px]" />
+              </div>
+            ) : (
+              <select
+                id="departmentCode"
+                value={formData.departmentCode}
+                onChange={(e) => handleDepartmentChange(e.target.value)}
+                aria-describedby={errors.departmentCode ? 'departmentCode-error' : undefined}
+                className={`w-full h-[48px] min-h-[44px] rounded-[10px] border px-3 text-body focus:outline-none focus:ring-2 transition-colors ${fieldBorderClass('departmentCode')}`}
+              >
+                <option value="" disabled>Selecciona un departamento</option>
+                {departments.map((d) => (
+                  <option key={d.code} value={d.code}>{d.name}</option>
+                ))}
+              </select>
+            )}
+            {errors.departmentCode && (
+              <p
+                id="departmentCode-error"
+                aria-live="polite"
+                className="mt-1 text-[14px] text-red-600"
+              >
+                {errors.departmentCode}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="cityCode"
+              className="block text-caption font-medium text-gray-700 mb-1"
+            >
+              Ciudad
+            </label>
+            {isLoadingCities ? (
+              <div role="status" aria-busy="true" aria-label="Cargando ciudades">
+                <Skeleton className="h-[48px] w-full rounded-[10px]" />
+              </div>
+            ) : (
+              <select
+                id="cityCode"
+                value={formData.cityCode}
+                onChange={(e) => handleChange('cityCode', e.target.value)}
+                disabled={!formData.departmentCode}
+                aria-describedby={errors.cityCode ? 'cityCode-error' : undefined}
+                className={`w-full h-[48px] min-h-[44px] rounded-[10px] border px-3 text-body focus:outline-none focus:ring-2 transition-colors ${fieldBorderClass('cityCode')} ${!formData.departmentCode ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+              >
+                <option value="" disabled>Selecciona una ciudad</option>
+                {cities.map((c) => (
+                  <option key={c.code} value={c.code}>{c.name}</option>
+                ))}
+              </select>
+            )}
+            {errors.cityCode && (
+              <p
+                id="cityCode-error"
+                aria-live="polite"
+                className="mt-1 text-[14px] text-red-600"
+              >
+                {errors.cityCode}
               </p>
             )}
           </div>

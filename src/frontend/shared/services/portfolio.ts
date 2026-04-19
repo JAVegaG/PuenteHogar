@@ -8,6 +8,8 @@ import type {
   CreateUnitRequest,
   EnrichedUnitResponse,
   PropertyType,
+  Department,
+  City,
 } from '@modules/landlord-portfolio/types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
@@ -171,6 +173,44 @@ export const portfolioService = {
     let res: Response;
     try {
       res = await fetch(`${API_URL}/portfolio/property-types`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+    } catch {
+      throw new Error('No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo.');
+    }
+
+    if (!res.ok) {
+      if (res.status >= 500) throw new Error('Error del servidor. Intenta de nuevo más tarde.');
+      throw new Error('Error del servidor. Intenta de nuevo más tarde.');
+    }
+
+    return res.json();
+  },
+
+  async getDepartments(): Promise<Department[]> {
+    let res: Response;
+    try {
+      res = await fetch(`${API_URL}/portfolio/departments`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+    } catch {
+      throw new Error('No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo.');
+    }
+
+    if (!res.ok) {
+      if (res.status >= 500) throw new Error('Error del servidor. Intenta de nuevo más tarde.');
+      throw new Error('Error del servidor. Intenta de nuevo más tarde.');
+    }
+
+    return res.json();
+  },
+
+  async getCitiesByDepartment(departmentCode: string): Promise<City[]> {
+    let res: Response;
+    try {
+      res = await fetch(`${API_URL}/portfolio/departments/${departmentCode}/cities`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });

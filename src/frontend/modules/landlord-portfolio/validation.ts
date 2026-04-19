@@ -68,7 +68,7 @@ export function validatePropertyType(value: string): string | null {
   return null;
 }
 
-export function validatePositiveDecimal(value: string, fieldLabel: string): string | null {
+export function validatePositiveDecimal(value: string, _fieldLabel: string): string | null {
   if (value.trim() === '') {
     return null;
   }
@@ -79,7 +79,7 @@ export function validatePositiveDecimal(value: string, fieldLabel: string): stri
   return null;
 }
 
-export function validateNonNegativeInteger(value: string, fieldLabel: string): string | null {
+export function validateNonNegativeInteger(value: string, _fieldLabel: string): string | null {
   if (value.trim() === '') {
     return null;
   }
@@ -126,6 +126,14 @@ export function validateEnrichedUnitForm(data: EnrichedUnitFormData): Record<str
   const bathroomsError = validateNonNegativeInteger(data.numberOfBathrooms, 'Baños');
   if (bathroomsError) {
     errors.numberOfBathrooms = bathroomsError;
+  }
+
+  if (!data.departmentCode || data.departmentCode.trim() === '') {
+    errors.departmentCode = 'El departamento es obligatorio';
+  }
+
+  if (!data.cityCode || data.cityCode.trim() === '') {
+    errors.cityCode = 'La ciudad es obligatoria';
   }
 
   const leaseBaseAmountError = validateLeaseBaseAmount(data.leaseBaseAmount);
