@@ -7,6 +7,7 @@ import {
   IsString,
   Min,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateListingDto {
@@ -26,6 +27,7 @@ export class CreateListingDto {
   description?: string;
 
   @ApiProperty({ example: 1200000, description: 'Canon de arrendamiento', minimum: 0 })
+  @Transform(({ value }) => Number(value))
   @IsNumber()
   @Min(0)
   price!: number;

@@ -4,7 +4,7 @@ import { IObjectStorage } from '../../domain/ports/object-storage.port';
 
 @Injectable()
 export class ContractObjectStorageAdapter implements IObjectStorage {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(private readonly configService: ConfigService) { }
 
   async uploadFile(
     fileBuffer: Buffer,
@@ -12,7 +12,7 @@ export class ContractObjectStorageAdapter implements IObjectStorage {
     mimeType: string,
   ): Promise<string> {
     const bucket =
-      this.configService.get<string>('objectStorage.bucket') ?? 'local';
+      this.configService.get<string>('objectStorage.bucket') || 'mvp-placeholder-bucket';
     return `https://${bucket}.s3.amazonaws.com/contracts/${Date.now()}-${filename}`;
   }
 }
