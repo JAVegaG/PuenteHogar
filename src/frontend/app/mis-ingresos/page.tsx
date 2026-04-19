@@ -89,7 +89,7 @@ function IncomeOverviewContent() {
         setError(null);
 
         try {
-            const data = await portfolioService.getPortfolios(token, 1, 100);
+            const data = await portfolioService.getPortfolios(token, 1, 50);
             setPortfolioData(data);
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Error desconocido';
