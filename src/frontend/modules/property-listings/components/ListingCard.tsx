@@ -12,7 +12,15 @@ interface ListingCardProps {
 
 export function getMainPhoto(photos: Photo[]): Photo | null {
   if (photos.length === 0) return null;
-  return photos.find((p) => p.isMain) ?? photos[0];
+  const candidate = photos.find((p) => p.isMain) ?? photos[0];
+  // Validate the URL has a proper hostname (MVP stubs may produce malformed URLs)
+  try {
+    const url = new URL(candidate.fileUrl);
+    if (!url.hostname || url.hostname.startsWith('.')) return null;
+  } catch {
+    return null;
+  }
+  return candidate;
 }
 
 export function formatTitle(
@@ -27,7 +35,7 @@ export function formatTitle(
 
 export default function ListingCard({ listing }: ListingCardProps) {
   const mainPhoto = getMainPhoto(listing.photos);
-  const title = formatTitle(listing.propertyType, listing.neighborhood);
+  const displayTitle = listing.title || formatTitle(listing.propertyType, listing.neighborhood);
 
   return (
     <article className="border border-neutral-300 rounded-card shadow-card bg-white overflow-hidden">
@@ -39,7 +47,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
           <div className="relative w-full aspect-[4/3]">
             <Image
               src={mainPhoto.fileUrl}
-              alt={title}
+              alt={displayTitle}
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
@@ -52,11 +60,11 @@ export default function ListingCard({ listing }: ListingCardProps) {
         )}
 
         <div className="p-4 space-y-2">
-          <h2 className="text-h2 font-bold text-neutral-900">{title}</h2>
+          <h2 className="text-h2 font-bold text-neutral-900">{displayTitle}</h2>
 
           <div className="flex items-center justify-between">
             <h3 className="text-h3 font-semibold text-primary">
-              ${formatPrice(listing.price)}
+              {formatPrice(listing.price)}
             </h3>
 
             <div className="flex gap-1.5">

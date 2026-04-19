@@ -14,15 +14,15 @@ export default function ListingDetailView({ listing }: ListingDetailViewProps) {
 
   const addressText = listing.address
     ? [listing.address.address, listing.address.neighborhood, listing.address.city, listing.address.state]
-        .filter(Boolean)
-        .join(', ')
+      .filter(Boolean)
+      .join(', ')
     : null;
 
   return (
     <div className="px-mobile-margin md:px-desktop-margin space-y-section-gap">
       {/* Price + Title */}
       <section>
-        <h2 className="text-h2 font-bold text-primary">${formatPrice(listing.price)}/mes</h2>
+        <h2 className="text-h2 font-bold text-primary">{formatPrice(listing.price)}/mes</h2>
         <h3 className="text-h3 font-semibold text-neutral-900 mt-1">{listing.title}</h3>
       </section>
 

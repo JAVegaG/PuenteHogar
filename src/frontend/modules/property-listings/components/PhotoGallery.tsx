@@ -12,15 +12,26 @@ interface PhotoGalleryProps {
 }
 
 export default function PhotoGallery({ photos }: PhotoGalleryProps) {
+  const validPhotos = useMemo(() => {
+    return photos.filter((p) => {
+      try {
+        const url = new URL(p.fileUrl);
+        return url.hostname && !url.hostname.startsWith('.');
+      } catch {
+        return false;
+      }
+    });
+  }, [photos]);
+
   const sortedPhotos = useMemo(() => {
-    if (photos.length === 0) return [];
-    const mainIndex = photos.findIndex((p) => p.isMain);
-    if (mainIndex <= 0) return photos;
-    const reordered = [...photos];
+    if (validPhotos.length === 0) return [];
+    const mainIndex = validPhotos.findIndex((p) => p.isMain);
+    if (mainIndex <= 0) return validPhotos;
+    const reordered = [...validPhotos];
     const [main] = reordered.splice(mainIndex, 1);
     reordered.unshift(main);
     return reordered;
-  }, [photos]);
+  }, [validPhotos]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -150,11 +161,10 @@ export default function PhotoGallery({ photos }: PhotoGalleryProps) {
               className="min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full"
             >
               <span
-                className={`w-2.5 h-2.5 rounded-full transition-colors ${
-                  index === currentIndex
+                className={`w-2.5 h-2.5 rounded-full transition-colors ${index === currentIndex
                     ? 'bg-primary'
                     : 'bg-neutral-300'
-                }`}
+                  }`}
                 aria-hidden="true"
               />
             </button>
