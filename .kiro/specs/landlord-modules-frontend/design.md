@@ -1173,3 +1173,15 @@ Páginas actualizadas: publicar, arriendos, arriendos/crear, arriendos/[leaseId]
 ### A5. mapPortfolioUnitToUnitInfo — Datos Reales del Backend
 
 La función `mapPortfolioUnitToUnitInfo` en 3 páginas (publicar, arriendos, arriendos/crear) fue actualizada para usar los datos reales de propiedad del response mejorado del backend en lugar de hardcodear ceros para rooms, baths, address, y propertyType.
+
+### A6. Eliminación de Badge de Tipo de Propiedad en Tarjeta de Portafolio
+
+Se eliminó el badge de `propertyType` del componente `PortfolioCard` (`src/frontend/modules/landlord-portfolio/components/PortfolioCard.tsx`). El tipo de propiedad es un atributo por unidad, no por portafolio — un portafolio puede contener unidades de diferentes tipos. El campo `PortfolioSummary.propertyType` permanece en el tipo pero ya no se muestra en la UI.
+
+### A7. Corrección de Rutas de Botón de Retroceso (Publicar + Arriendos)
+
+Se corrigieron las rutas de los botones de retroceso en las páginas de "Publicar en arriendo" y "Arriendos de la unidad":
+- Publicar: `/mi-portafolio/${portfolioId}` → `/mi-portafolio/${portfolioId}/unidades`
+- Arriendos: `/mi-portafolio/${portfolioId}/unidades/${unitId}` → `/mi-portafolio/${portfolioId}/unidades`
+
+Las rutas anteriores apuntaban a páginas inexistentes, causando errores "no encontrado". Ambas ahora navegan correctamente a la lista de unidades del portafolio.

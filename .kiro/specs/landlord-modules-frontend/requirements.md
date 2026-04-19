@@ -397,3 +397,14 @@ The Figma design reference: `https://www.figma.com/design/Yw53CFbVdMWVX7bQ6MFefk
 2. ALL back buttons SHALL use the `rounded-card` CSS class for border radius, consistent with the existing design system.
 3. ALL back buttons SHALL use the left-arrow SVG icon consisting of a horizontal line (`<line x1="19" y1="12" x2="5" y2="12" />`) and an arrowhead polyline (`<polyline points="12 19 5 12 12 5" />`), NOT the chevron icon (`<polyline points="15 18 9 12 15 6" />`).
 4. This pattern SHALL be consistent with the back buttons already used in `mi-portafolio/[id]/page.tsx` and `mi-portafolio/[id]/agregar-unidad/page.tsx`.
+
+---
+
+### Requirement 18: Portfolio Card Does Not Show Property Type (Post-Implementation)
+
+**User Story:** As an authenticated landlord, I want the portfolio card to show only portfolio-level information, so that I'm not confused by a single property type label when my portfolio contains units of different types.
+
+#### Acceptance Criteria
+
+1. THE PortfolioCard component SHALL NOT display a property type badge or label, since property type is a per-unit attribute and a portfolio may contain units of different property types.
+2. THE PortfolioCard SHALL display: portfolio name, description (if available), total units count, active leases count, occupancy percentage with progress bar, and a "Ver unidades" link.

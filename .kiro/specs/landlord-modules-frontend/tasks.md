@@ -471,3 +471,14 @@ The following changes were made during and after implementation, deviating from 
 - **Pages updated:** publicar, arriendos, arriendos/crear
 - The `mapPortfolioUnitToUnitInfo` function was updated to use real property data from the enhanced backend response instead of hardcoding zeros for rooms, baths, address, and propertyType.
 - _New requirements: 16.6_
+
+### PI-6. Removed Property Type Badge from Portfolio Card
+- **File changed:** `src/frontend/modules/landlord-portfolio/components/PortfolioCard.tsx`
+- Removed the `propertyType` badge from the portfolio card. Property type is a per-unit attribute, not per-portfolio. A portfolio can contain units of different types.
+- The `PortfolioSummary.propertyType` field remains in the type but is no longer displayed.
+
+### PI-7. Fixed Back Button Paths (Publicar + Arriendos)
+- **Files changed:** `src/frontend/app/mi-portafolio/[id]/unidades/[unitId]/publicar/page.tsx`, `src/frontend/app/mi-portafolio/[id]/unidades/[unitId]/arriendos/page.tsx`
+- Publicar back button: `/mi-portafolio/${portfolioId}` → `/mi-portafolio/${portfolioId}/unidades`
+- Arriendos back button: `/mi-portafolio/${portfolioId}/unidades/${unitId}` → `/mi-portafolio/${portfolioId}/unidades`
+- The old paths pointed to non-existent routes, causing "not found" errors.
