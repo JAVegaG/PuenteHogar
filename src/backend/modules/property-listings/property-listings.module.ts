@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaService } from '@src/shared/prisma/prisma.service';
 import { RedisService } from '@src/shared/redis/redis.service';
+import { S3ClientFactory } from '@src/shared/s3';
 import { PropertyListingsEtlService } from './infrastructure/etl/property-listings-etl.service';
 import { CreateListingUseCase, LISTING_CACHE, LISTING_REPOSITORY, NOTIFICATION_PORT, OBJECT_STORAGE } from './application/use-cases/create-listing.use-case';
 import { GetListingDetailUseCase } from './application/use-cases/get-listing-detail.use-case';
@@ -19,6 +20,7 @@ import { PropertyListingsController } from './property-listings.controller';
   providers: [
     PrismaService,
     RedisService,
+    S3ClientFactory,
     PropertyListingsEtlService,
     CreateListingUseCase,
     SearchListingsUseCase,
@@ -54,4 +56,4 @@ import { PropertyListingsController } from './property-listings.controller';
     RegisterContactEventUseCase,
   ],
 })
-export class PropertyListingsModule {}
+export class PropertyListingsModule { }
