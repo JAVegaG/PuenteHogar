@@ -128,8 +128,8 @@ function PortfolioReportContent() {
         </Link>
     );
 
-    const totalAmountFormatted = '$' + formatPrice(report?.totalAmount ?? 0);
-    const expectedAmountFormatted = '$' + formatPrice(report?.expectedAmount ?? 0);
+    const totalAmountFormatted = formatPrice(report?.totalAmount ?? 0);
+    const expectedAmountFormatted = formatPrice(report?.expectedAmount ?? 0);
 
     return (
         <>
