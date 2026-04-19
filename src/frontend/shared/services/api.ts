@@ -28,3 +28,30 @@ export async function fetchListingDetail(
   }
   return res.json();
 }
+
+export async function createListing(
+  formData: FormData,
+  token: string
+): Promise<{ id: string }> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}/listings`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+  } catch {
+    throw new Error('No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo.');
+  }
+
+  if (!res.ok) {
+    if (res.status === 401) throw new Error('Sesión expirada');
+    if (res.status === 403) throw new Error('No tienes permiso para publicar este inmueble');
+    if (res.status >= 500) throw new Error('Error del servidor. Intenta de nuevo más tarde.');
+    throw new Error('Error del servidor. Intenta de nuevo más tarde.');
+  }
+
+  return res.json();
+}
