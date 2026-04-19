@@ -8,6 +8,7 @@ export interface AppConfig {
   objectStorage: {
     bucket: string;
     endpoint: string;
+    region: string;
   };
 }
 
@@ -21,5 +22,6 @@ export default (): AppConfig => ({
   objectStorage: {
     bucket: process.env.OBJECT_STORAGE_BUCKET ?? '',
     endpoint: process.env.OBJECT_STORAGE_ENDPOINT ?? '',
+    region: process.env.OBJECT_STORAGE_REGION ?? 'us-east-1',
   },
 });
