@@ -64,6 +64,7 @@ function makePortfolioUnit(portfolioId: string, propertyId: string): PortfolioUn
     'unit-id',
     portfolioId,
     propertyId,
+    'Test Unit',
     null,
     1_000_000,
     'COP',
@@ -139,6 +140,10 @@ describe('Property 14: Datos de entrada se persisten en RAW_Table antes de trans
               createEnrichedUnit: jest.fn(),
               findPropertyTypeByCode: jest.fn(),
               findAllPropertyTypes: jest.fn(),
+              findAllDepartments: jest.fn(),
+              findCitiesByDepartmentCode: jest.fn(),
+              findDepartmentByCode: jest.fn(),
+              findCityByCode: jest.fn(),
             };
 
             const useCase = new CreatePortfolioUnitUseCase(mockRepo);
@@ -196,6 +201,10 @@ describe('Property 14: Datos de entrada se persisten en RAW_Table antes de trans
               createEnrichedUnit: jest.fn(),
               findPropertyTypeByCode: jest.fn(),
               findAllPropertyTypes: jest.fn(),
+              findAllDepartments: jest.fn(),
+              findCitiesByDepartmentCode: jest.fn(),
+              findDepartmentByCode: jest.fn(),
+              findCityByCode: jest.fn(),
             };
 
             const useCase = new CreatePortfolioUnitUseCase(mockRepo);

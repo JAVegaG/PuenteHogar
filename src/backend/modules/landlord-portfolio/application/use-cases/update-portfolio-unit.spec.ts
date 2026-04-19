@@ -16,6 +16,7 @@ function arbitraryPortfolioUnit(): fc.Arbitrary<PortfolioUnitEntity> {
     id: fc.uuid(),
     portfolioId: fc.uuid(),
     propertyId: fc.uuid(),
+    name: fc.string({ minLength: 1, maxLength: 200 }),
     conditions: fc.option(fc.string({ minLength: 1, maxLength: 200 }), { nil: null }),
     leaseBaseAmount: fc.float({ min: 0, max: 10_000_000, noNaN: true }),
     leaseBaseCurrency: fc.constantFrom('COP', 'USD', 'EUR'),
@@ -27,6 +28,7 @@ function arbitraryPortfolioUnit(): fc.Arbitrary<PortfolioUnitEntity> {
         r.id,
         r.portfolioId,
         r.propertyId,
+        r.name,
         r.conditions,
         r.leaseBaseAmount,
         r.leaseBaseCurrency,
@@ -57,6 +59,7 @@ function buildMocks(unit: PortfolioUnitEntity, ownerId: string) {
         unit.id,
         unit.portfolioId,
         unit.propertyId,
+        unit.name,
         data.conditions !== undefined ? (data.conditions ?? null) : unit.conditions,
         data.leaseBaseAmount !== undefined ? data.leaseBaseAmount! : unit.leaseBaseAmount,
         data.leaseBaseCurrency !== undefined ? data.leaseBaseCurrency! : unit.leaseBaseCurrency,
@@ -81,6 +84,10 @@ function buildMocks(unit: PortfolioUnitEntity, ownerId: string) {
     createEnrichedUnit: jest.fn(),
     findPropertyTypeByCode: jest.fn(),
     findAllPropertyTypes: jest.fn(),
+    findAllDepartments: jest.fn(),
+    findCitiesByDepartmentCode: jest.fn(),
+    findDepartmentByCode: jest.fn(),
+    findCityByCode: jest.fn(),
   };
 
   const auditLogger = {
@@ -160,6 +167,10 @@ describe('UpdatePortfolioUnitUseCase — Property 13: round-trip update persists
             createEnrichedUnit: jest.fn(),
             findPropertyTypeByCode: jest.fn(),
             findAllPropertyTypes: jest.fn(),
+            findAllDepartments: jest.fn(),
+            findCitiesByDepartmentCode: jest.fn(),
+            findDepartmentByCode: jest.fn(),
+            findCityByCode: jest.fn(),
           };
           const auditLogger = { log: jest.fn() } as unknown as AuditLoggerService;
           const useCase = new UpdatePortfolioUnitUseCase(repo, auditLogger);

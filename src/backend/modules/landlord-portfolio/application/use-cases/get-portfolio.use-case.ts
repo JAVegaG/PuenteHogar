@@ -9,7 +9,7 @@ export class GetPortfolioUseCase {
   constructor(
     @Inject(PORTFOLIO_REPOSITORY)
     private readonly portfolioRepository: IPortfolioRepository,
-  ) {}
+  ) { }
 
   async execute(userId: string): Promise<PortfolioUnitResponseDto[]> {
     const units = await this.portfolioRepository.findUnitsByUserId(userId);
@@ -21,6 +21,7 @@ export class GetPortfolioUseCase {
     dto.id = entity.id;
     dto.portfolioId = entity.portfolioId;
     dto.propertyId = entity.propertyId;
+    dto.name = entity.name;
     dto.conditions = entity.conditions;
     dto.leaseBaseAmount = entity.leaseBaseAmount;
     dto.leaseBaseCurrency = entity.leaseBaseCurrency;

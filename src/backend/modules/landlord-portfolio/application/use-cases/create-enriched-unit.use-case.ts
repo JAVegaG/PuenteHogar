@@ -39,6 +39,22 @@ export class CreateEnrichedUnitUseCase {
       );
     }
 
+    const department = await this.portfolioRepository.findDepartmentByCode(dto.departmentCode);
+    if (!department) {
+      throw new BadRequestException(
+        `Departamento no válido: "${dto.departmentCode}". Consulte GET /portfolio/departments para ver los departamentos disponibles.`,
+      );
+    }
+    const departmentName = department.name;
+
+    const city = await this.portfolioRepository.findCityByCode(dto.cityCode);
+    if (!city || city.departmentCode !== dto.departmentCode) {
+      throw new BadRequestException(
+        `Ciudad no válida: "${dto.cityCode}" para el departamento "${dto.departmentCode}". Consulte GET /portfolio/departments/${dto.departmentCode}/cities para ver las ciudades disponibles.`,
+      );
+    }
+    const cityName = city.name;
+
     const unit = await this.portfolioRepository.createEnrichedUnit({
       portfolioId,
       name: dto.name,
@@ -51,6 +67,10 @@ export class CreateEnrichedUnitUseCase {
       description: dto.description,
       leaseBaseAmount: dto.leaseBaseAmount,
       leaseBaseCurrency: dto.leaseBaseCurrency ?? 'COP',
+      departmentName,
+      cityName,
+      departmentCode: dto.departmentCode,
+      cityCode: dto.cityCode,
     });
 
     return this.toResponseDto(unit);
@@ -69,6 +89,8 @@ export class CreateEnrichedUnitUseCase {
     dto.description = entity.description;
     dto.leaseBaseAmount = entity.leaseBaseAmount;
     dto.leaseBaseCurrency = entity.leaseBaseCurrency;
+    dto.departmentCode = entity.departmentCode;
+    dto.cityCode = entity.cityCode;
     dto.createdAt = entity.createdAt;
     dto.updatedAt = entity.updatedAt;
     return dto;

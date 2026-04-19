@@ -34,6 +34,12 @@ export class EnrichedUnitResponseDto {
   @ApiProperty({ description: 'Moneda del canon (ISO 4217)' })
   leaseBaseCurrency!: string;
 
+  @ApiProperty({ description: 'Código DANE del departamento' })
+  departmentCode!: string;
+
+  @ApiProperty({ description: 'Código DANE de la ciudad' })
+  cityCode!: string;
+
   @ApiProperty({ description: 'Fecha de creación' })
   createdAt!: Date;
 

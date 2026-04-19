@@ -62,6 +62,10 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             createEnrichedUnit: jest.fn(),
             findPropertyTypeByCode: jest.fn(),
             findAllPropertyTypes: jest.fn(),
+            findAllDepartments: jest.fn(),
+            findCitiesByDepartmentCode: jest.fn(),
+            findDepartmentByCode: jest.fn(),
+            findCityByCode: jest.fn(),
           };
 
           const useCase = new GetPortfolioUseCase(mockRepo);
@@ -99,6 +103,10 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             createEnrichedUnit: jest.fn(),
             findPropertyTypeByCode: jest.fn(),
             findAllPropertyTypes: jest.fn(),
+            findAllDepartments: jest.fn(),
+            findCitiesByDepartmentCode: jest.fn(),
+            findDepartmentByCode: jest.fn(),
+            findCityByCode: jest.fn(),
           };
           const auditLogger = makeAuditLogger();
 
@@ -139,6 +147,10 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             createEnrichedUnit: jest.fn(),
             findPropertyTypeByCode: jest.fn(),
             findAllPropertyTypes: jest.fn(),
+            findAllDepartments: jest.fn(),
+            findCitiesByDepartmentCode: jest.fn(),
+            findDepartmentByCode: jest.fn(),
+            findCityByCode: jest.fn(),
           };
           const auditLogger = makeAuditLogger();
 
@@ -617,6 +629,10 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
               createEnrichedUnit: jest.fn(),
               findPropertyTypeByCode: jest.fn(),
               findAllPropertyTypes: jest.fn(),
+              findAllDepartments: jest.fn(),
+              findCitiesByDepartmentCode: jest.fn(),
+              findDepartmentByCode: jest.fn(),
+              findCityByCode: jest.fn(),
             };
             const auditLogger = makeAuditLogger();
             const portfolioUseCase = new UpdatePortfolioUnitUseCase(portfolioRepo, auditLogger);

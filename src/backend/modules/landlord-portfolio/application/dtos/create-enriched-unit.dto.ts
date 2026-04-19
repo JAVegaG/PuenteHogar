@@ -67,4 +67,14 @@ export class CreateEnrichedUnitDto {
   @IsString()
   @Length(3, 3)
   leaseBaseCurrency?: string = 'COP';
+
+  @ApiProperty({ example: '05', description: 'Código DANE del departamento (2 dígitos). Consulte GET /portfolio/departments' })
+  @IsString()
+  @IsNotEmpty()
+  departmentCode!: string;
+
+  @ApiProperty({ example: '05001', description: 'Código DANE del municipio (5 dígitos). Consulte GET /portfolio/departments/:departmentCode/cities' })
+  @IsString()
+  @IsNotEmpty()
+  cityCode!: string;
 }

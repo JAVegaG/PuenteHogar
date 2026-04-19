@@ -10,6 +10,9 @@ export class PortfolioUnitResponseDto {
   @ApiProperty()
   propertyId!: string;
 
+  @ApiProperty({ description: 'Nombre o identificación de la unidad' })
+  name!: string;
+
   @ApiPropertyOptional({ nullable: true })
   conditions!: string | null;
 
