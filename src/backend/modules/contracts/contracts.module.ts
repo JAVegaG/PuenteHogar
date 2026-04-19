@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
 import { CircuitBreakerFactory } from '@src/shared/circuit-breaker/circuit-breaker.factory';
 import { PrismaService } from '@src/shared/prisma/prisma.service';
+import { S3ClientFactory } from '@src/shared/s3';
 import { GetContractSummaryUseCase } from './application/use-cases/get-contract-summary.use-case';
 import { HandleSigningWebhookUseCase } from './application/use-cases/handle-signing-webhook.use-case';
 import { InitiateSigningUseCase } from './application/use-cases/initiate-signing.use-case';
@@ -26,6 +27,7 @@ import { PrismaContractRepository } from './infrastructure/repositories/prisma-c
     PrismaService,
     AuditLoggerService,
     CircuitBreakerFactory,
+    S3ClientFactory,
     ContractsEtlService,
     UploadContractUseCase,
     GetContractSummaryUseCase,
@@ -62,4 +64,4 @@ import { PrismaContractRepository } from './infrastructure/repositories/prisma-c
     HandleSigningWebhookUseCase,
   ],
 })
-export class ContractsModule {}
+export class ContractsModule { }
