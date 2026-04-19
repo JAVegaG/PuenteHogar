@@ -162,22 +162,10 @@ export class PrismaPortfolioRepository implements IPortfolioRepository {
         const occupancyPercentage =
           totalUnits === 0 ? 0 : Math.round((unitsWithActiveLease / totalUnits) * 100);
 
-        // Resolve propertyType from the first unit's Property (cross-schema lookup)
-        let propertyType: string | null = null;
-        if (portfolio.units.length > 0) {
-          const firstUnit = portfolio.units[0];
-          const property = await this.prisma.property.findUnique({
-            where: { id: firstUnit.property_id },
-            select: { property_type: true },
-          });
-          propertyType = property?.property_type ?? null;
-        }
-
         return {
           id: portfolio.id,
           name: portfolio.name,
           description: portfolio.description,
-          propertyType,
           creationDate: portfolio.creation_date,
           totalUnits,
           activeLeases,

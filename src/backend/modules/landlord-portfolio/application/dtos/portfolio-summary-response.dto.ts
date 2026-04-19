@@ -10,9 +10,6 @@ export class PortfolioSummaryResponseDto {
   @ApiPropertyOptional({ description: 'Descripción del portafolio', nullable: true })
   description!: string | null;
 
-  @ApiPropertyOptional({ description: 'Tipo de propiedad predominante', nullable: true })
-  propertyType!: string | null;
-
   @ApiProperty({ description: 'Fecha de creación del portafolio' })
   creationDate!: Date;
 

@@ -6,7 +6,6 @@ export interface PortfolioWithStats {
   id: string;
   name: string;
   description: string | null;
-  propertyType: string | null;
   creationDate: Date;
   totalUnits: number;
   activeLeases: number;

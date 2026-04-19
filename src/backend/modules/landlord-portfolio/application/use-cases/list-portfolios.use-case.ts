@@ -10,7 +10,7 @@ export class ListPortfoliosUseCase {
   constructor(
     @Inject(PORTFOLIO_REPOSITORY)
     private readonly portfolioRepository: IPortfolioRepository,
-  ) {}
+  ) { }
 
   async execute(
     userId: string,
@@ -30,7 +30,6 @@ export class ListPortfoliosUseCase {
       dto.id = p.id;
       dto.name = p.name;
       dto.description = p.description;
-      dto.propertyType = p.propertyType;
       dto.creationDate = p.creationDate;
       dto.totalUnits = p.totalUnits;
       dto.activeLeases = p.activeLeases;

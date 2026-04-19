@@ -9,7 +9,7 @@ export class CreatePortfolioUseCase {
   constructor(
     @Inject(PORTFOLIO_REPOSITORY)
     private readonly portfolioRepository: IPortfolioRepository,
-  ) {}
+  ) { }
 
   async execute(
     dto: CreatePortfolioDto,
@@ -30,7 +30,6 @@ export class CreatePortfolioUseCase {
     response.id = portfolio.id;
     response.name = portfolio.name;
     response.description = portfolio.description;
-    response.propertyType = null;
     response.creationDate = portfolio.creationDate;
     response.totalUnits = 0;
     response.activeLeases = 0;
