@@ -24,7 +24,8 @@ src/backend/
 │   │   ├── schema.prisma    # Schema Prisma completo (8 esquemas PostgreSQL)
 │   │   └── migrations/      # Migraciones generadas por Prisma
 │   └── seeds/
-│       └── seed.ts          # Seed de catálogos (roles, tipos de documento, tipos de propiedad, estados)
+│       ├── seed.ts                          # Seed de catálogos (roles, tipos de documento, tipos de propiedad, departamentos, ciudades, estados)
+│       └── states_citys_colombia.seed.csv   # Datos DANE: 33 departamentos, 1,122 municipios (delimitado por ;)
 ├── src/
 │   ├── app.module.ts           # Módulo raíz
 │   ├── main.ts                 # Bootstrap: NestExpressApplication, Helmet, trust proxy, ValidationPipe, Swagger, CORS, Morgan HTTP logging (format: 'dev' | 'combined' según NODE_ENV)
@@ -44,7 +45,7 @@ src/backend/
 └── modules/
     ├── users/                  # Registro, login, RBAC
     ├── property-listings/      # Publicaciones, búsqueda, fotos
-    ├── landlord-portfolio/     # Portafolios (CRUD, paginación, estadísticas agregadas), unidades enriquecidas (cross-schema Property+Address+PortfolioUnit), leases
+    ├── landlord-portfolio/     # Portafolios (CRUD, paginación, estadísticas agregadas), unidades enriquecidas (cross-schema Property+Address+PortfolioUnit), leases, catálogo geográfico (departamentos/ciudades DANE)
     ├── contracts/              # Contratos, firma electrónica, almacenamiento de documentos
     ├── payments/               # Pagos, pasarela, idempotencia (dominio, aplicación, infraestructura, controlador)
     ├── accounting/             # Reportes financieros (dominio, aplicación, infraestructura: PrismaAccountingRepository + RedisReportCache)
@@ -145,7 +146,7 @@ npm run lint               # ESLint
 npm run migration:run      # Aplica migraciones Prisma (desde src/backend/)
 npm run migration:generate # Genera nueva migración (desde src/backend/)
 npm run db:studio          # Prisma Studio
-npm run db:seed            # Seed de catálogos (roles, tipos de documento, tipos de propiedad, estados)
+npm run db:seed            # Seed de catálogos (roles, tipos de documento, tipos de propiedad, departamentos/ciudades DANE, estados)
 ```
 
 ## Variables de entorno

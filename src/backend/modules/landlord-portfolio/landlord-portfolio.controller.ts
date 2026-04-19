@@ -10,11 +10,11 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiOkResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiOkResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiParam } from '@nestjs/swagger';
 import { Public } from '@src/shared/decorators';
 import type { IPortfolioRepository } from './domain/ports/portfolio-repository.port';
 import { PORTFOLIO_REPOSITORY } from './application/use-cases/create-portfolio-unit.use-case';
-import { PropertyTypeResponseDto } from './application/dtos';
+import { PropertyTypeResponseDto, DepartmentResponseDto, CityResponseDto } from './application/dtos';
 import { Request } from 'express';
 import { JwtAuthGuard } from '@src/shared/guards/jwt-auth.guard';
 import { UpdatePortfolioUnitDto } from './application/dtos/update-portfolio-unit.dto';
@@ -58,6 +58,29 @@ export class LandlordPortfolioController {
   @ApiOkResponse({ description: 'Lista de tipos de propiedad activos', type: [PropertyTypeResponseDto] })
   getPropertyTypes() {
     return this.portfolioRepository.findAllPropertyTypes();
+  }
+
+  @Public()
+  @Get('departments')
+  @ApiOperation({
+    summary: 'Listar departamentos activos',
+    description: 'Retorna el catálogo de departamentos colombianos activos, ordenados por nombre.',
+  })
+  @ApiOkResponse({ description: 'Lista de departamentos activos', type: [DepartmentResponseDto] })
+  getDepartments() {
+    return this.portfolioRepository.findAllDepartments();
+  }
+
+  @Public()
+  @Get('departments/:departmentCode/cities')
+  @ApiOperation({
+    summary: 'Listar ciudades de un departamento',
+    description: 'Retorna las ciudades/municipios activos del departamento especificado, ordenados por nombre.',
+  })
+  @ApiParam({ name: 'departmentCode', description: 'Código DANE del departamento (2 dígitos)', example: '05' })
+  @ApiOkResponse({ description: 'Lista de ciudades activas del departamento', type: [CityResponseDto] })
+  getCitiesByDepartment(@Param('departmentCode') departmentCode: string) {
+    return this.portfolioRepository.findCitiesByDepartmentCode(departmentCode);
   }
 
   @Get('')
