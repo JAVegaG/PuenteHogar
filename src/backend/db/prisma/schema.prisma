@@ -220,6 +220,29 @@ model PropertyType {
   @@schema("property_listings")
 }
 
+model Department {
+  id        String  @id @default(uuid())
+  code      String  @unique   // 2-digit DANE code, e.g. "05"
+  name      String            // e.g. "ANTIOQUIA"
+  is_active Boolean @default(true)
+
+  cities City[]
+
+  @@schema("property_listings")
+}
+
+model City {
+  id              String  @id @default(uuid())
+  code            String  @unique   // 5-digit DANE code, e.g. "05001"
+  department_code String            // references Department.code
+  name            String            // e.g. "MEDELLÍN"
+  is_active       Boolean @default(true)
+
+  department Department @relation(fields: [department_code], references: [code])
+
+  @@schema("property_listings")
+}
+
 model PropertyListingsRaw {
   id         String   @id @default(uuid())
   payload    Json

@@ -400,6 +400,8 @@ export const ModelName = {
   AdditionalFeature: 'AdditionalFeature',
   PropertyAdditionalFeature: 'PropertyAdditionalFeature',
   PropertyType: 'PropertyType',
+  Department: 'Department',
+  City: 'City',
   PropertyListingsRaw: 'PropertyListingsRaw',
   LandlordPortfolio: 'LandlordPortfolio',
   PortfolioUnit: 'PortfolioUnit',
@@ -448,7 +450,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "documentType" | "naturalPersonDetail" | "legalPersonDetail" | "role" | "permission" | "userRole" | "rolePermission" | "usersRaw" | "property" | "address" | "listing" | "photo" | "additionalFeature" | "propertyAdditionalFeature" | "propertyType" | "propertyListingsRaw" | "landlordPortfolio" | "portfolioUnit" | "lease" | "portfolioRaw" | "leaseStatus" | "leaseStatusHistory" | "leaseCurrentStatus" | "listingStatus" | "listingStatusHistory" | "listingCurrentStatus" | "trackingRaw" | "scheduledPayment" | "payment" | "paymentStatus" | "paymentLog" | "paymentsRaw" | "aggregatedPaymentReport" | "individualPaymentReport" | "accountingRaw" | "notificationType" | "notificationPreference" | "notificationsRaw" | "contractStatus" | "contract" | "contractParty" | "fileType" | "fileStatus" | "file" | "signingStatus" | "signing" | "signingLog" | "contractsRaw"
+    modelProps: "user" | "documentType" | "naturalPersonDetail" | "legalPersonDetail" | "role" | "permission" | "userRole" | "rolePermission" | "usersRaw" | "property" | "address" | "listing" | "photo" | "additionalFeature" | "propertyAdditionalFeature" | "propertyType" | "department" | "city" | "propertyListingsRaw" | "landlordPortfolio" | "portfolioUnit" | "lease" | "portfolioRaw" | "leaseStatus" | "leaseStatusHistory" | "leaseCurrentStatus" | "listingStatus" | "listingStatusHistory" | "listingCurrentStatus" | "trackingRaw" | "scheduledPayment" | "payment" | "paymentStatus" | "paymentLog" | "paymentsRaw" | "aggregatedPaymentReport" | "individualPaymentReport" | "accountingRaw" | "notificationType" | "notificationPreference" | "notificationsRaw" | "contractStatus" | "contract" | "contractParty" | "fileType" | "fileStatus" | "file" | "signingStatus" | "signing" | "signingLog" | "contractsRaw"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1633,6 +1635,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PropertyTypeCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PropertyTypeCountAggregateOutputType> | number
+        }
+      }
+    }
+    Department: {
+      payload: Prisma.$DepartmentPayload<ExtArgs>
+      fields: Prisma.DepartmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DepartmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DepartmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DepartmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DepartmentPayload>
+        }
+        findFirst: {
+          args: Prisma.DepartmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DepartmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DepartmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DepartmentPayload>
+        }
+        findMany: {
+          args: Prisma.DepartmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DepartmentPayload>[]
+        }
+        create: {
+          args: Prisma.DepartmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DepartmentPayload>
+        }
+        createMany: {
+          args: Prisma.DepartmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DepartmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DepartmentPayload>[]
+        }
+        delete: {
+          args: Prisma.DepartmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DepartmentPayload>
+        }
+        update: {
+          args: Prisma.DepartmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DepartmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.DepartmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DepartmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DepartmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DepartmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.DepartmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DepartmentPayload>
+        }
+        aggregate: {
+          args: Prisma.DepartmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDepartment>
+        }
+        groupBy: {
+          args: Prisma.DepartmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DepartmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DepartmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DepartmentCountAggregateOutputType> | number
+        }
+      }
+    }
+    City: {
+      payload: Prisma.$CityPayload<ExtArgs>
+      fields: Prisma.CityFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CityFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CityPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CityFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CityPayload>
+        }
+        findFirst: {
+          args: Prisma.CityFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CityPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CityFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CityPayload>
+        }
+        findMany: {
+          args: Prisma.CityFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CityPayload>[]
+        }
+        create: {
+          args: Prisma.CityCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CityPayload>
+        }
+        createMany: {
+          args: Prisma.CityCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CityCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CityPayload>[]
+        }
+        delete: {
+          args: Prisma.CityDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CityPayload>
+        }
+        update: {
+          args: Prisma.CityUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CityPayload>
+        }
+        deleteMany: {
+          args: Prisma.CityDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CityUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CityUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CityPayload>[]
+        }
+        upsert: {
+          args: Prisma.CityUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CityPayload>
+        }
+        aggregate: {
+          args: Prisma.CityAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCity>
+        }
+        groupBy: {
+          args: Prisma.CityGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CityGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CityCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CityCountAggregateOutputType> | number
         }
       }
     }
@@ -4296,6 +4446,27 @@ export const PropertyTypeScalarFieldEnum = {
 export type PropertyTypeScalarFieldEnum = (typeof PropertyTypeScalarFieldEnum)[keyof typeof PropertyTypeScalarFieldEnum]
 
 
+export const DepartmentScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  name: 'name',
+  is_active: 'is_active'
+} as const
+
+export type DepartmentScalarFieldEnum = (typeof DepartmentScalarFieldEnum)[keyof typeof DepartmentScalarFieldEnum]
+
+
+export const CityScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  department_code: 'department_code',
+  name: 'name',
+  is_active: 'is_active'
+} as const
+
+export type CityScalarFieldEnum = (typeof CityScalarFieldEnum)[keyof typeof CityScalarFieldEnum]
+
+
 export const PropertyListingsRawScalarFieldEnum = {
   id: 'id',
   payload: 'payload',
@@ -4932,6 +5103,8 @@ export type GlobalOmitConfig = {
   additionalFeature?: Prisma.AdditionalFeatureOmit
   propertyAdditionalFeature?: Prisma.PropertyAdditionalFeatureOmit
   propertyType?: Prisma.PropertyTypeOmit
+  department?: Prisma.DepartmentOmit
+  city?: Prisma.CityOmit
   propertyListingsRaw?: Prisma.PropertyListingsRawOmit
   landlordPortfolio?: Prisma.LandlordPortfolioOmit
   portfolioUnit?: Prisma.PortfolioUnitOmit

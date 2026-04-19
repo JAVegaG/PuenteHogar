@@ -98,6 +98,16 @@ export type PropertyAdditionalFeature = Prisma.PropertyAdditionalFeatureModel
  */
 export type PropertyType = Prisma.PropertyTypeModel
 /**
+ * Model Department
+ * 
+ */
+export type Department = Prisma.DepartmentModel
+/**
+ * Model City
+ * 
+ */
+export type City = Prisma.CityModel
+/**
  * Model PropertyListingsRaw
  * 
  */

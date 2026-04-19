@@ -67,6 +67,8 @@ export const ModelName = {
   AdditionalFeature: 'AdditionalFeature',
   PropertyAdditionalFeature: 'PropertyAdditionalFeature',
   PropertyType: 'PropertyType',
+  Department: 'Department',
+  City: 'City',
   PropertyListingsRaw: 'PropertyListingsRaw',
   LandlordPortfolio: 'LandlordPortfolio',
   PortfolioUnit: 'PortfolioUnit',
@@ -295,6 +297,27 @@ export const PropertyTypeScalarFieldEnum = {
 } as const
 
 export type PropertyTypeScalarFieldEnum = (typeof PropertyTypeScalarFieldEnum)[keyof typeof PropertyTypeScalarFieldEnum]
+
+
+export const DepartmentScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  name: 'name',
+  is_active: 'is_active'
+} as const
+
+export type DepartmentScalarFieldEnum = (typeof DepartmentScalarFieldEnum)[keyof typeof DepartmentScalarFieldEnum]
+
+
+export const CityScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  department_code: 'department_code',
+  name: 'name',
+  is_active: 'is_active'
+} as const
+
+export type CityScalarFieldEnum = (typeof CityScalarFieldEnum)[keyof typeof CityScalarFieldEnum]
 
 
 export const PropertyListingsRawScalarFieldEnum = {
