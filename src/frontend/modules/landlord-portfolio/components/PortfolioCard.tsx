@@ -24,12 +24,6 @@ export default function PortfolioCard({ portfolio }: PortfolioCardProps) {
         </p>
       )}
 
-      {portfolio.propertyType !== null && (
-        <span className="inline-block bg-[#f3f4f6] rounded-[4px] px-2 py-0.5 text-[14px] text-[#4b5563] mt-2">
-          {portfolio.propertyType}
-        </span>
-      )}
-
       <div className="flex flex-col gap-1 mt-3 text-[14px] text-[#4b5563]">
         <p>Unidades totales: {portfolio.totalUnits}</p>
         <p>Arriendos activos: {portfolio.activeLeases}</p>

@@ -87,7 +87,7 @@ function LeaseHistoryPlaceholder({
                 {periodText}
             </p>
             <p className="text-body font-semibold mb-[12px]" style={{ color: '#1d4ed8' }}>
-                ${formatPrice(lease.monthlyAmount)}
+                {formatPrice(lease.monthlyAmount)}
             </p>
             <button
                 type="button"

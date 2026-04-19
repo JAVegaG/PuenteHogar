@@ -48,7 +48,7 @@ export function PropertyDetailTable({ units }: PropertyDetailTableProps) {
                                     className="py-[12px] pr-[12px] text-body font-semibold text-right"
                                     style={{ color: '#111827' }}
                                 >
-                                    ${formatPrice(unit.monthlyIncome)}
+                                    {formatPrice(unit.monthlyIncome)}
                                 </td>
                                 <td className="py-[12px]">
                                     <StatusBadge status={unit.paymentStatus} variant="payment" />
@@ -75,7 +75,7 @@ export function PropertyDetailTable({ units }: PropertyDetailTableProps) {
                         </p>
                         <div className="flex items-center justify-between mt-[8px]">
                             <p className="text-body font-semibold" style={{ color: '#111827' }}>
-                                ${formatPrice(unit.monthlyIncome)}
+                                {formatPrice(unit.monthlyIncome)}
                             </p>
                             <StatusBadge status={unit.paymentStatus} variant="payment" />
                         </div>
