@@ -8,6 +8,17 @@ export interface PortfolioUnit {
   leaseBaseCurrency: string;
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
+  // Property details (resolved from Property + Address by backend)
+  propertyType?: string;
+  address?: string;
+  numberOfRooms?: number;
+  numberOfBathrooms?: number;
+  area?: number | null;
+  // Enhanced fields for unit card (optional — populated when available)
+  unitStatus?: 'Ocupado' | 'Disponible' | 'Mantenimiento';
+  hasActiveListing?: boolean;
+  tenantName?: string | null;
+  monthlyRent?: number | null;
 }
 
 export interface CreatePortfolioUnitRequest {
