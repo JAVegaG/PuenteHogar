@@ -1101,3 +1101,75 @@ Este módulo se beneficia de property-based testing para las funciones de valida
 | Crear arriendo — unidad ocupada | Formulario → submit → 409 → mensaje "Esta unidad ya tiene un arriendo activo" |
 | Error 401 en reporte | Carga reporte → 401 → logout automático → redirección a login |
 | Protección de ruta | Usuario TENANT → LandlordRoute → mensaje "sin permisos" |
+
+---
+
+## Addendum: Cambios Post-Implementación
+
+Los siguientes cambios se realizaron durante y después de la implementación, extendiendo o desviándose del diseño original.
+
+### A1. GetPortfolioUseCase — Resolución Cross-Schema de Detalles de Propiedad
+
+El `GetPortfolioUseCase` (`src/backend/modules/landlord-portfolio/application/use-cases/get-portfolio.use-case.ts`) fue mejorado para resolver detalles de propiedad desde las tablas `Property` y `Address` del esquema `landlord_portfolio` via lookup cross-schema. Anteriormente solo retornaba datos básicos de `PortfolioUnit`.
+
+El `PortfolioUnitResponseDto` fue extendido con campos opcionales:
+
+```typescript
+@ApiPropertyOptional({ description: 'Tipo de propiedad (resuelto desde Property)' })
+propertyType?: string;
+
+@ApiPropertyOptional({ description: 'Dirección completa (resuelto desde Address)' })
+address?: string;
+
+@ApiPropertyOptional({ description: 'Número de habitaciones' })
+numberOfRooms?: number;
+
+@ApiPropertyOptional({ description: 'Número de baños' })
+numberOfBathrooms?: number;
+
+@ApiPropertyOptional({ description: 'Área en m² (largo × ancho)', nullable: true })
+area?: number | null;
+```
+
+El use case resuelve estos campos haciendo `prisma.property.findUnique({ where: { id: entity.propertyId }, include: { address: true } })` y calculando `area = length × width` cuando ambos valores están disponibles.
+
+### A2. PortfolioUnit (Frontend) — Tipo Extendido con Detalles de Propiedad
+
+La interfaz `PortfolioUnit` en `src/frontend/modules/landlord-portfolio/types.ts` fue extendida con campos opcionales poblados por el endpoint mejorado del backend:
+
+```typescript
+// Property details (resolved from Property + Address by backend)
+propertyType?: string;
+address?: string;
+numberOfRooms?: number;
+numberOfBathrooms?: number;
+area?: number | null;
+```
+
+### A3. Tarjeta de Unidad Mejorada (Diseño Figma)
+
+Las tarjetas de unidad en la página de lista de unidades del portafolio (`/mi-portafolio/[id]/unidades`) fueron rediseñadas para coincidir con el diseño Figma:
+
+- **Icono de propiedad**: Icono de casa en fondo circular gris (`w-[40px] h-[40px] rounded-full bg-[#f3f4f6]`)
+- **Subtítulo de tipo de propiedad**: Debajo del nombre de la unidad (`text-caption text-[#4b5563]`)
+- **Dirección con icono de ubicación**: Pin de ubicación SVG + texto de dirección
+- **Fila de detalles de propiedad**: Área (m²), habitaciones (hab), baños (baños) separados por puntos (`·`)
+- **Sección de arrendatario**: Para unidades ocupadas, muestra nombre del arrendatario, renta mensual, y flecha chevron de navegación a arriendos
+- **Indicador "Publicada en Explorar"**: Badge/pill con fondo verde (`bg-[#f0fdf4]`, texto `text-[#166534]`)
+- **Link "Ver historial"**: Solo se muestra para unidades no ocupadas (las unidades ocupadas tienen la flecha chevron)
+
+### A4. Patrón Consistente de Botón de Retroceso
+
+Todas las páginas nuevas fueron actualizadas para usar un patrón consistente de botón de retroceso:
+
+- Usa `<Link>` de `next/link` en lugar de `<button>` con `router.push()`
+- Usa clase `rounded-card` en lugar de `rounded-[6px]`
+- Usa el icono SVG de flecha izquierda (`<line x1="19" y1="12" x2="5" y2="12" />` + `<polyline points="12 19 5 12 12 5" />`) en lugar del chevron (`<polyline points="15 18 9 12 15 6" />`)
+
+Este patrón es consistente con las páginas existentes como `mi-portafolio/[id]/page.tsx` y `mi-portafolio/[id]/agregar-unidad/page.tsx`.
+
+Páginas actualizadas: publicar, arriendos, arriendos/crear, arriendos/[leaseId], arriendos/[leaseId]/crear-contrato, mis-ingresos/portafolio/[portfolioId], mis-ingresos/portafolio/[portfolioId]/unidad/[unitId].
+
+### A5. mapPortfolioUnitToUnitInfo — Datos Reales del Backend
+
+La función `mapPortfolioUnitToUnitInfo` en 3 páginas (publicar, arriendos, arriendos/crear) fue actualizada para usar los datos reales de propiedad del response mejorado del backend en lugar de hardcodear ceros para rooms, baths, address, y propertyType.

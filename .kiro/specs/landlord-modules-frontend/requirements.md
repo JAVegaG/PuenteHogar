@@ -369,3 +369,31 @@ The Figma design reference: `https://www.figma.com/design/Yw53CFbVdMWVX7bQ6MFefk
 8. THE Módulo_Arrendador SHALL use ARIA attributes (`aria-live`, `aria-busy`, `role="alert"`, `role="status"`) to communicate dynamic states such as data loading, success messages, and errors to assistive technologies.
 9. THE Módulo_Arrendador SHALL guarantee that the Badge_Estado component communicates the lease status to screen readers via `aria-label` (e.g., `aria-label="Estado: Vigente"`).
 10. THE Módulo_Arrendador SHALL guarantee that the Filtro_Periodo tabs use `role="tablist"` and `role="tab"` with `aria-selected` to communicate the selected period to assistive technologies.
+
+---
+
+### Requirement 16: Enhanced Unit Cards with Property Details (Post-Implementation)
+
+**User Story:** As an authenticated landlord, I want to see property details (type, address, area, rooms, bathrooms) on each unit card in the portfolio units list, so that I can quickly identify and differentiate my properties.
+
+#### Acceptance Criteria
+
+1. THE `GET /portfolio/:portfolioId/units` endpoint SHALL resolve and return property details for each unit: `propertyType` (from `Property.property_type`), `address` (from `Address.address`), `numberOfRooms`, `numberOfBathrooms`, and `area` (computed as `length × width` from `Property`), by performing a cross-schema lookup from `PortfolioUnit.property_id` to the `Property` and `Address` tables.
+2. THE Tarjeta_Unidad_Portafolio SHALL display a property icon (house icon in a circular gray background) to the left of the unit name and status badge.
+3. THE Tarjeta_Unidad_Portafolio SHALL display the property type as a subtitle below the unit name (text-caption color `#4b5563`).
+4. THE Tarjeta_Unidad_Portafolio SHALL display the address with a location pin icon (text-caption color `#4b5563`).
+5. THE Tarjeta_Unidad_Portafolio SHALL display a property details row showing area in m², rooms (hab), and bathrooms (baños) separated by dot separators (text-caption color `#4b5563`).
+6. THE `mapPortfolioUnitToUnitInfo` function used in the publicar, arriendos, and arriendos/crear pages SHALL map the real property data from the backend response (`propertyType`, `address`, `numberOfRooms`, `numberOfBathrooms`, `area`) instead of hardcoding default values.
+
+---
+
+### Requirement 17: Consistent Back Button Navigation Pattern (Post-Implementation)
+
+**User Story:** As a landlord navigating between pages, I want a consistent back button experience across all pages, so that navigation feels predictable and familiar.
+
+#### Acceptance Criteria
+
+1. ALL new landlord module pages SHALL use `<Link>` from `next/link` for the back button instead of `<button>` with `router.push()`, ensuring standard link behavior (right-click, open in new tab, etc.).
+2. ALL back buttons SHALL use the `rounded-card` CSS class for border radius, consistent with the existing design system.
+3. ALL back buttons SHALL use the left-arrow SVG icon consisting of a horizontal line (`<line x1="19" y1="12" x2="5" y2="12" />`) and an arrowhead polyline (`<polyline points="12 19 5 12 12 5" />`), NOT the chevron icon (`<polyline points="15 18 9 12 15 6" />`).
+4. This pattern SHALL be consistent with the back buttons already used in `mi-portafolio/[id]/page.tsx` and `mi-portafolio/[id]/agregar-unidad/page.tsx`.
