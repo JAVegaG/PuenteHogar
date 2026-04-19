@@ -6,6 +6,8 @@
  */
 
 import 'dotenv/config';
+import * as fs from 'fs';
+import * as path from 'path';
 import { PrismaClient } from '@prisma-generated/client';
 import { PrismaPg } from "@prisma/adapter-pg";
 
@@ -56,6 +58,57 @@ async function main() {
     });
   }
   console.log('✅ Property types seeded');
+
+  // ── Departments & Cities (DANE CSV) ────────────────────────────────────────
+  const csvPath = path.join(__dirname, 'states_citys_colombia.seed.csv');
+  const csvContent = fs.readFileSync(csvPath, 'utf-8');
+  const lines = csvContent.split('\n').filter((line) => line.trim().length > 0);
+
+  // Parse header — trim whitespace from each column name
+  const headers = lines[0].split(';').map((h) => h.trim());
+  const codeDeptIdx = headers.indexOf('Código_Departamento');
+  const nameDeptIdx = headers.indexOf('Nombre_Departamento');
+  const codeMunIdx = headers.indexOf('Código_Municipio');
+  const nameMunIdx = headers.indexOf('Nombre_Municipio');
+
+  // Extract unique departments
+  const departmentMap = new Map<string, string>(); // code → name
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(';').map((c) => c.trim());
+    const deptCode = cols[codeDeptIdx];
+    const deptName = cols[nameDeptIdx];
+    if (deptCode && deptName && !departmentMap.has(deptCode)) {
+      departmentMap.set(deptCode, deptName);
+    }
+  }
+
+  // Upsert departments
+  for (const [code, name] of departmentMap) {
+    await prisma.department.upsert({
+      where: { code },
+      update: { name, is_active: true },
+      create: { code, name, is_active: true },
+    });
+  }
+  console.log(`✅ Departments seeded: ${departmentMap.size}`);
+
+  // Upsert cities
+  let cityCount = 0;
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(';').map((c) => c.trim());
+    const cityCode = cols[codeMunIdx];
+    const cityName = cols[nameMunIdx];
+    const deptCode = cols[codeDeptIdx];
+    if (cityCode && cityName && deptCode) {
+      await prisma.city.upsert({
+        where: { code: cityCode },
+        update: { name: cityName, department_code: deptCode, is_active: true },
+        create: { code: cityCode, name: cityName, department_code: deptCode, is_active: true },
+      });
+      cityCount++;
+    }
+  }
+  console.log(`✅ Cities seeded: ${cityCount}`);
 
   // ── Roles ────────────────────────────────────────────────────────────────────
   const roles = [
