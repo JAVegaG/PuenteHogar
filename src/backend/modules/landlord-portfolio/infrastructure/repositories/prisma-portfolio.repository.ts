@@ -267,8 +267,8 @@ export class PrismaPortfolioRepository implements IPortfolioRepository {
         data: {
           property_id: property.id,
           address: data.address,
-          state: '',
-          city: '',
+          state: data.departmentName,
+          city: data.cityName,
           neighborhood: '',
         },
       });
@@ -320,6 +320,8 @@ export class PrismaPortfolioRepository implements IPortfolioRepository {
       unit.conditions,
       leaseAmount,
       unit.lease_base_currency,
+      data.departmentCode,
+      data.cityCode,
       unit.created_at,
       unit.updated_at,
     );
@@ -338,10 +340,39 @@ export class PrismaPortfolioRepository implements IPortfolioRepository {
     return types.map((t) => ({ id: t.id, code: t.code, description: t.description }));
   }
 
+  async findAllDepartments(): Promise<{ id: string; code: string; name: string }[]> {
+    const departments = await this.prisma.department.findMany({
+      where: { is_active: true },
+      orderBy: { name: 'asc' },
+    });
+    return departments.map((d) => ({ id: d.id, code: d.code, name: d.name }));
+  }
+
+  async findCitiesByDepartmentCode(departmentCode: string): Promise<{ id: string; code: string; departmentCode: string; name: string }[]> {
+    const cities = await this.prisma.city.findMany({
+      where: { department_code: departmentCode, is_active: true },
+      orderBy: { name: 'asc' },
+    });
+    return cities.map((c) => ({ id: c.id, code: c.code, departmentCode: c.department_code, name: c.name }));
+  }
+
+  async findDepartmentByCode(code: string): Promise<{ id: string; code: string; name: string } | null> {
+    const dept = await this.prisma.department.findUnique({ where: { code } });
+    if (!dept || !dept.is_active) return null;
+    return { id: dept.id, code: dept.code, name: dept.name };
+  }
+
+  async findCityByCode(code: string): Promise<{ id: string; code: string; departmentCode: string; name: string } | null> {
+    const city = await this.prisma.city.findUnique({ where: { code } });
+    if (!city || !city.is_active) return null;
+    return { id: city.id, code: city.code, departmentCode: city.department_code, name: city.name };
+  }
+
   private toEntity(unit: {
     id: string;
     portfolio_id: string;
     property_id: string;
+    name: string;
     conditions: string | null;
     lease_base_amount: { toNumber(): number } | number;
     lease_base_currency: string;
@@ -357,6 +388,7 @@ export class PrismaPortfolioRepository implements IPortfolioRepository {
       unit.id,
       unit.portfolio_id,
       unit.property_id,
+      unit.name,
       unit.conditions,
       amount,
       unit.lease_base_currency,

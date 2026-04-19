@@ -11,7 +11,9 @@ export class EnrichedPortfolioUnitEntity {
     public readonly description: string | null,
     public readonly leaseBaseAmount: number,
     public readonly leaseBaseCurrency: string,
+    public readonly departmentCode: string,
+    public readonly cityCode: string,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
-  ) {}
+  ) { }
 }

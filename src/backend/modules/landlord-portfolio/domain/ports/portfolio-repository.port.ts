@@ -31,6 +31,10 @@ export interface CreateEnrichedUnitData {
   description?: string;
   leaseBaseAmount: number;
   leaseBaseCurrency: string;
+  departmentName: string;
+  cityName: string;
+  departmentCode: string;
+  cityCode: string;
 }
 
 export interface CreatePortfolioUnitData {
@@ -66,4 +70,10 @@ export interface IPortfolioRepository {
   createEnrichedUnit(data: CreateEnrichedUnitData): Promise<EnrichedPortfolioUnitEntity>;
   findPropertyTypeByCode(code: string): Promise<{ id: string; code: string } | null>;
   findAllPropertyTypes(): Promise<{ id: string; code: string; description: string }[]>;
+
+  // Geographic catalog
+  findAllDepartments(): Promise<{ id: string; code: string; name: string }[]>;
+  findCitiesByDepartmentCode(departmentCode: string): Promise<{ id: string; code: string; departmentCode: string; name: string }[]>;
+  findDepartmentByCode(code: string): Promise<{ id: string; code: string; name: string } | null>;
+  findCityByCode(code: string): Promise<{ id: string; code: string; departmentCode: string; name: string } | null>;
 }
