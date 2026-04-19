@@ -4,6 +4,13 @@
 import * as fc from 'fast-check';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 
+// Mock PrismaService to avoid importing @prisma-generated/client in test environment
+jest.mock('@src/shared/prisma/prisma.service', () => ({
+  PrismaService: jest.fn().mockImplementation(() => ({
+    property: { findUnique: jest.fn().mockResolvedValue(null) },
+  })),
+}));
+
 import { GetPortfolioUseCase } from '@modules/landlord-portfolio/application/use-cases/get-portfolio.use-case';
 import { UpdatePortfolioUnitUseCase } from '@modules/landlord-portfolio/application/use-cases/update-portfolio-unit.use-case';
 import { UnpublishListingUseCase } from '@modules/property-listings/application/use-cases/unpublish-listing.use-case';
