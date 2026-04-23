@@ -6,10 +6,10 @@ import * as crypto from 'crypto';
 import { UnprocessableEntityException } from '@nestjs/common';
 import { UploadContractUseCase } from './upload-contract.use-case';
 import type { IContractRepository, CreateContractData } from '@modules/contracts/domain/ports/contract-repository.port';
+import type { IObjectStorage } from '@modules/contracts/domain/ports/object-storage.port';
 import { ContractEntity, ContractStatus } from '@modules/contracts/domain/entities/contract.entity';
 import type { ContractPartyEntity } from '@modules/contracts/domain/entities/contract-party.entity';
 import { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
-import { Logger } from '@nestjs/common';
 
 function uuidv4(): string {
   return crypto.randomUUID();
@@ -46,6 +46,17 @@ const arbitraryValidFileSize = fc.integer({ min: 1, max: MAX_FILE_SIZE_BYTES });
 
 // ─── Stubs ───────────────────────────────────────────────────────────────────
 
+function makeObjectStorageStub(): IObjectStorage {
+  return {
+    async uploadFile(_buf: Buffer, filename: string): Promise<string> {
+      return `contracts/${uuidv4()}-${filename}`;
+    },
+    async getPresignedUrl(objectKey: string): Promise<string> {
+      return `https://presigned.example.com/${objectKey}`;
+    },
+  };
+}
+
 function makeRepositoryStub(): { stub: IContractRepository; createCallCount: number[] } {
   const createCallCount = [0];
   const fileTypeId = uuidv4();
@@ -71,6 +82,9 @@ function makeRepositoryStub(): { stub: IContractRepository; createCallCount: num
     async findFileTypeByName(): Promise<{ id: string } | null> { return { id: fileTypeId }; },
     async findFileStatusByName(): Promise<{ id: string } | null> { return { id: fileStatusId }; },
     async findContractsByLandlordId(): Promise<any[]> { return []; },
+    async updateFileUrl(): Promise<ContractEntity> { throw new Error('Not expected'); },
+    async deleteContract(): Promise<void> { throw new Error('Not expected'); },
+    async findSigningsByContractId(): Promise<any[]> { return []; },
   };
 
   return { stub, createCallCount };
@@ -83,12 +97,6 @@ function makeAuditLoggerStub(): AuditLoggerService {
 // ─── Tests ───────────────────────────────────────────────────────────────────
 
 describe('UploadContractUseCase — Property 26: Archivo inválido (no PDF o > 10MB) es rechazado con 422', () => {
-  /**
-   * Property 26 — Validates: Requirements 5.2
-   *
-   * For any file with a MIME type other than application/pdf,
-   * the use case must throw UnprocessableEntityException (422).
-   */
   it('Property 26a — non-PDF MIME type is rejected with 422', async () => {
     await fc.assert(
       fc.asyncProperty(
@@ -96,22 +104,22 @@ describe('UploadContractUseCase — Property 26: Archivo inválido (no PDF o > 1
         arbitraryValidFileSize,
         async (mimeType, fileSizeBytes) => {
           const { stub, createCallCount } = makeRepositoryStub();
-          const useCase = new UploadContractUseCase(stub, makeAuditLoggerStub());
+          const objectStorage = makeObjectStorageStub();
+          const useCase = new UploadContractUseCase(stub, objectStorage, makeAuditLoggerStub());
 
-          const dto = {
-            leaseId,
-            startDate: '2025-06-01',
-            fileUrl: 'https://storage.example.com/contracts/test.pdf',
-            mimeType,
-            fileSizeBytes,
+          const file = {
+            buffer: Buffer.from('fake-content'),
+            originalname: 'contrato.pdf',
+            size: fileSizeBytes,
+            mimetype: mimeType,
           };
+          const dto = { leaseId, startDate: '2025-06-01' };
 
           try {
-            await useCase.execute(dto as any, landlordUserId, ['LANDLORD']);
+            await useCase.execute(file, dto as any, landlordUserId, ['LANDLORD']);
             return false; // Should have thrown
           } catch (err) {
             if (!(err instanceof UnprocessableEntityException)) return false;
-            // Repository create must NOT have been called
             if (createCallCount[0] !== 0) return false;
             return true;
           }
@@ -121,28 +129,25 @@ describe('UploadContractUseCase — Property 26: Archivo inválido (no PDF o > 1
     );
   });
 
-  /**
-   * For any file exceeding 10 MB, regardless of MIME type,
-   * the use case must throw UnprocessableEntityException (422).
-   */
   it('Property 26b — file exceeding 10 MB is rejected with 422', async () => {
     await fc.assert(
       fc.asyncProperty(
         arbitraryOversizedFileBytes,
         async (fileSizeBytes) => {
           const { stub, createCallCount } = makeRepositoryStub();
-          const useCase = new UploadContractUseCase(stub, makeAuditLoggerStub());
+          const objectStorage = makeObjectStorageStub();
+          const useCase = new UploadContractUseCase(stub, objectStorage, makeAuditLoggerStub());
 
-          const dto = {
-            leaseId,
-            startDate: '2025-06-01',
-            fileUrl: 'https://storage.example.com/contracts/test.pdf',
-            mimeType: 'application/pdf',
-            fileSizeBytes,
+          const file = {
+            buffer: Buffer.from('fake-content'),
+            originalname: 'contrato.pdf',
+            size: fileSizeBytes,
+            mimetype: 'application/pdf',
           };
+          const dto = { leaseId, startDate: '2025-06-01' };
 
           try {
-            await useCase.execute(dto as any, landlordUserId, ['LANDLORD']);
+            await useCase.execute(file, dto as any, landlordUserId, ['LANDLORD']);
             return false; // Should have thrown
           } catch (err) {
             if (!(err instanceof UnprocessableEntityException)) return false;
@@ -155,10 +160,6 @@ describe('UploadContractUseCase — Property 26: Archivo inválido (no PDF o > 1
     );
   });
 
-  /**
-   * For any file that is both non-PDF AND oversized,
-   * the use case must still reject with 422 (first validation wins).
-   */
   it('Property 26c — non-PDF AND oversized file is rejected with 422', async () => {
     await fc.assert(
       fc.asyncProperty(
@@ -166,18 +167,19 @@ describe('UploadContractUseCase — Property 26: Archivo inválido (no PDF o > 1
         arbitraryOversizedFileBytes,
         async (mimeType, fileSizeBytes) => {
           const { stub, createCallCount } = makeRepositoryStub();
-          const useCase = new UploadContractUseCase(stub, makeAuditLoggerStub());
+          const objectStorage = makeObjectStorageStub();
+          const useCase = new UploadContractUseCase(stub, objectStorage, makeAuditLoggerStub());
 
-          const dto = {
-            leaseId,
-            startDate: '2025-06-01',
-            fileUrl: 'https://storage.example.com/contracts/test.pdf',
-            mimeType,
-            fileSizeBytes,
+          const file = {
+            buffer: Buffer.from('fake-content'),
+            originalname: 'contrato.pdf',
+            size: fileSizeBytes,
+            mimetype: mimeType,
           };
+          const dto = { leaseId, startDate: '2025-06-01' };
 
           try {
-            await useCase.execute(dto as any, landlordUserId, ['LANDLORD']);
+            await useCase.execute(file, dto as any, landlordUserId, ['LANDLORD']);
             return false;
           } catch (err) {
             if (!(err instanceof UnprocessableEntityException)) return false;
@@ -190,23 +192,20 @@ describe('UploadContractUseCase — Property 26: Archivo inválido (no PDF o > 1
     );
   });
 
-  /**
-   * Boundary check: a valid PDF at exactly 10 MB must be accepted (not rejected).
-   * This confirms the boundary is strictly > 10 MB for rejection.
-   */
   it('Property 26d — PDF at exactly 10 MB boundary is accepted', async () => {
     const { stub } = makeRepositoryStub();
-    const useCase = new UploadContractUseCase(stub, makeAuditLoggerStub());
+    const objectStorage = makeObjectStorageStub();
+    const useCase = new UploadContractUseCase(stub, objectStorage, makeAuditLoggerStub());
 
-    const dto = {
-      leaseId,
-      startDate: '2025-06-01',
-      fileUrl: 'https://storage.example.com/contracts/test.pdf',
-      mimeType: 'application/pdf',
-      fileSizeBytes: MAX_FILE_SIZE_BYTES, // exactly 10 MB
+    const file = {
+      buffer: Buffer.from('fake-content'),
+      originalname: 'contrato.pdf',
+      size: MAX_FILE_SIZE_BYTES, // exactly 10 MB
+      mimetype: 'application/pdf',
     };
+    const dto = { leaseId, startDate: '2025-06-01' };
 
-    const result = await useCase.execute(dto as any, landlordUserId, ['LANDLORD']);
+    const result = await useCase.execute(file, dto as any, landlordUserId, ['LANDLORD']);
     expect(result).toBeDefined();
     expect(result.id).toBeDefined();
   });

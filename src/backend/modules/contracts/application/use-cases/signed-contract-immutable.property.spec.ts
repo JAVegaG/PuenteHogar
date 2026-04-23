@@ -15,6 +15,7 @@ import {
   ContractStatus,
 } from '@modules/contracts/domain/entities/contract.entity';
 import { ContractPartyEntity } from '@modules/contracts/domain/entities/contract-party.entity';
+import type { IObjectStorage } from '@modules/contracts/domain/ports/object-storage.port';
 import type { IESignatureProvider } from '@modules/contracts/domain/ports/e-signature-provider.port';
 import { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
 import { CircuitBreakerFactory } from '@src/shared/circuit-breaker/circuit-breaker.factory';
@@ -138,6 +139,15 @@ function makeStubs(input: {
     async findContractsByLandlordId(): Promise<any[]> {
       return [];
     },
+    async updateFileUrl(): Promise<ContractEntity> {
+      throw new Error('Not expected');
+    },
+    async deleteContract(): Promise<void> {
+      throw new Error('Not expected');
+    },
+    async findSigningsByContractId(): Promise<any[]> {
+      return [];
+    },
   };
 
   const eSignatureProvider: IESignatureProvider = {
@@ -220,7 +230,13 @@ describe('Property 31: Contrato SIGNED es inmutable — no permite modificacione
         async (input) => {
           const stubs = makeStubs(input);
 
-          const getUseCase = new GetContractSummaryUseCase(stubs.repository as any);
+          const objectStorage: IObjectStorage = {
+            async uploadFile(): Promise<string> { throw new Error('Not expected'); },
+            async getPresignedUrl(objectKey: string): Promise<string> {
+              return `https://presigned.example.com/${objectKey}`;
+            },
+          };
+          const getUseCase = new GetContractSummaryUseCase(stubs.repository as any, objectStorage);
 
           // Landlord can query
           const summaryLandlord = await getUseCase.execute(
@@ -229,7 +245,7 @@ describe('Property 31: Contrato SIGNED es inmutable — no permite modificacione
           );
 
           if (summaryLandlord.status !== 'SIGNED') return false;
-          if (summaryLandlord.fileUrl !== input.fileUrl) return false;
+          if (!summaryLandlord.fileUrl?.includes(input.fileUrl)) return false;
           if (summaryLandlord.leaseId !== input.leaseId) return false;
 
           // Tenant can also query

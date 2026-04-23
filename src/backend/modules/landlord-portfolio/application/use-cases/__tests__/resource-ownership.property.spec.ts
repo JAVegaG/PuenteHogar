@@ -16,6 +16,7 @@ import { UpdatePortfolioUnitUseCase } from '@modules/landlord-portfolio/applicat
 import { UnpublishListingUseCase } from '@modules/property-listings/application/use-cases/unpublish-listing.use-case';
 import { GetContractSummaryUseCase } from '@modules/contracts/application/use-cases/get-contract-summary.use-case';
 import { UploadContractUseCase } from '@modules/contracts/application/use-cases/upload-contract.use-case';
+import { CreateContractDto } from '@modules/contracts/application/dtos/create-contract.dto';
 import { GetPaymentHistoryUseCase } from '@modules/payments/application/use-cases/get-payment-history.use-case';
 import { GetLeaseStatusUseCase } from '@modules/rental-tracking/application/use-cases/get-lease-status.use-case';
 
@@ -23,6 +24,7 @@ import type { IPortfolioRepository } from '@modules/landlord-portfolio/domain/po
 import type { IListingRepository } from '@modules/property-listings/domain/ports/listing-repository.port';
 import type { IListingCache } from '@modules/property-listings/domain/ports/listing-cache.port';
 import type { IContractRepository } from '@modules/contracts/domain/ports/contract-repository.port';
+import type { IObjectStorage } from '@modules/contracts/domain/ports/object-storage.port';
 import type { IPaymentRepository } from '@modules/payments/domain/ports/payment-repository.port';
 import type { ITrackingRepository } from '@modules/rental-tracking/domain/ports/tracking-repository.port';
 import { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
@@ -261,15 +263,23 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             findFileTypeByName: jest.fn(),
             findFileStatusByName: jest.fn(),
             findContractsByLandlordId: jest.fn(),
+            updateFileUrl: jest.fn(),
+            deleteContract: jest.fn(),
+            findSigningsByContractId: jest.fn(),
+          };
+          const mockObjectStorage: IObjectStorage = {
+            uploadFile: jest.fn(),
+            getPresignedUrl: jest.fn(),
           };
           const auditLogger = makeAuditLogger();
 
-          const useCase = new UploadContractUseCase(mockRepo, auditLogger);
+          const useCase = new UploadContractUseCase(mockRepo, mockObjectStorage, auditLogger);
 
           let threw = false;
           try {
             await useCase.execute(
-              { leaseId, startDate: '2024-01-01', fileUrl: 'https://example.com/contract.pdf' },
+              { buffer: Buffer.from('fake-pdf'), originalname: 'contract.pdf', size: 1024, mimetype: 'application/pdf' },
+              { leaseId, startDate: '2024-01-01' } as CreateContractDto,
               requestingUserId,
               ['LANDLORD'],
             );
@@ -326,9 +336,17 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
               findFileTypeByName: jest.fn(),
               findFileStatusByName: jest.fn(),
               findContractsByLandlordId: jest.fn(),
+              updateFileUrl: jest.fn(),
+              deleteContract: jest.fn(),
+              findSigningsByContractId: jest.fn().mockResolvedValue([]),
             };
 
-            const useCase = new GetContractSummaryUseCase(mockRepo);
+            const mockObjectStorage: IObjectStorage = {
+              uploadFile: jest.fn(),
+              getPresignedUrl: jest.fn().mockResolvedValue('https://presigned.example.com/test'),
+            };
+
+            const useCase = new GetContractSummaryUseCase(mockRepo, mockObjectStorage);
 
             let threw = false;
             try {
@@ -381,9 +399,17 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
               findFileTypeByName: jest.fn(),
               findFileStatusByName: jest.fn(),
               findContractsByLandlordId: jest.fn(),
+              updateFileUrl: jest.fn(),
+              deleteContract: jest.fn(),
+              findSigningsByContractId: jest.fn().mockResolvedValue([]),
             };
 
-            const useCase = new GetContractSummaryUseCase(mockRepo);
+            const mockObjectStorage2: IObjectStorage = {
+              uploadFile: jest.fn(),
+              getPresignedUrl: jest.fn().mockResolvedValue('https://presigned.example.com/test'),
+            };
+
+            const useCase = new GetContractSummaryUseCase(mockRepo, mockObjectStorage2);
 
             let succeeded = false;
             try {

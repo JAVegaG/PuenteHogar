@@ -5,7 +5,8 @@ import * as fc from 'fast-check';
 import * as crypto from 'crypto';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { GetContractSummaryUseCase } from './get-contract-summary.use-case';
-import type { IContractRepository, CreateContractData } from '@modules/contracts/domain/ports/contract-repository.port';
+import type { IContractRepository, CreateContractData, SigningInfo } from '@modules/contracts/domain/ports/contract-repository.port';
+import type { IObjectStorage } from '@modules/contracts/domain/ports/object-storage.port';
 import { ContractEntity, ContractStatus } from '@modules/contracts/domain/entities/contract.entity';
 import { ContractPartyEntity } from '@modules/contracts/domain/entities/contract-party.entity';
 
@@ -46,6 +47,17 @@ const arbitraryContractInput = fc.record({
 
 // ─── Stubs ───────────────────────────────────────────────────────────────────
 
+const PRESIGNED_URL_PREFIX = 'https://presigned.example.com/';
+
+function makeObjectStorageStub(): IObjectStorage {
+  return {
+    async uploadFile(): Promise<string> { throw new Error('Not expected'); },
+    async getPresignedUrl(objectKey: string): Promise<string> {
+      return `${PRESIGNED_URL_PREFIX}${objectKey}?token=abc`;
+    },
+  };
+}
+
 function makeRepositoryStub(input: {
   contractId: string;
   leaseId: string;
@@ -81,6 +93,14 @@ function makeRepositoryStub(input: {
     async findContractParties(contractId: string): Promise<ContractPartyEntity[]> {
       return contractId === input.contractId ? parties : [];
     },
+    async findSigningsByContractId(contractId: string): Promise<SigningInfo[]> {
+      if (contractId !== input.contractId) return [];
+      return parties.map((p) => ({
+        contractPartyId: p.id,
+        role: p.roleInContract,
+        signingStatusName: 'PENDING',
+      }));
+    },
     // Unused methods for this test
     async create(): Promise<ContractEntity> { throw new Error('Not expected'); },
     async findByLeaseId(): Promise<ContractEntity | null> { return null; },
@@ -91,6 +111,8 @@ function makeRepositoryStub(input: {
     async findFileTypeByName(): Promise<{ id: string } | null> { return null; },
     async findFileStatusByName(): Promise<{ id: string } | null> { return null; },
     async findContractsByLandlordId(): Promise<any[]> { return []; },
+    async updateFileUrl(): Promise<ContractEntity> { throw new Error('Not expected'); },
+    async deleteContract(): Promise<void> { throw new Error('Not expected'); },
   };
 }
 
@@ -128,7 +150,8 @@ describe('GetContractSummaryUseCase — Property 27: Resumen de contrato contien
           };
 
           const repo = makeRepositoryStub(input);
-          const useCase = new GetContractSummaryUseCase(repo);
+          const objectStorage = makeObjectStorageStub();
+          const useCase = new GetContractSummaryUseCase(repo, objectStorage);
 
           // Execute as the landlord (a valid party)
           const summary = await useCase.execute(input.contractId, input.landlordUserId);
@@ -147,8 +170,8 @@ describe('GetContractSummaryUseCase — Property 27: Resumen de contrato contien
             if (summary.endDate.getTime() !== input.endDate.getTime()) return false;
           }
 
-          // fileUrl — must be present and match (the document URL)
-          if (summary.fileUrl !== input.fileUrl) return false;
+          // fileUrl — must be a presigned URL (not the raw object key)
+          if (!summary.fileUrl?.startsWith(PRESIGNED_URL_PREFIX)) return false;
 
           // Signing metadata
           if (input.signedAt === null) {
@@ -197,18 +220,15 @@ describe('GetContractSummaryUseCase — Property 27: Resumen de contrato contien
           };
 
           const repo = makeRepositoryStub(input);
-          const useCase = new GetContractSummaryUseCase(repo);
+          const objectStorage = makeObjectStorageStub();
+          const useCase = new GetContractSummaryUseCase(repo, objectStorage);
 
           const summary = await useCase.execute(input.contractId, input.landlordUserId);
 
           // fileUrl must be a string
           if (typeof summary.fileUrl !== 'string') return false;
-          // Must be a valid URL
-          if (!summary.fileUrl.startsWith('https://')) return false;
-          // Must not be binary/base64
-          if (/^[A-Za-z0-9+/]{50,}={0,2}$/.test(summary.fileUrl)) return false;
-          // eslint-disable-next-line no-control-regex
-          if (/[\x00-\x08\x0e-\x1f\x7f]/.test(summary.fileUrl)) return false;
+          // Must be a presigned URL (starts with the presigned prefix)
+          if (!summary.fileUrl.startsWith(PRESIGNED_URL_PREFIX)) return false;
 
           return true;
         },
@@ -240,7 +260,8 @@ describe('GetContractSummaryUseCase — Property 27: Resumen de contrato contien
           };
 
           const repo = makeRepositoryStub(input);
-          const useCase = new GetContractSummaryUseCase(repo);
+          const objectStorage = makeObjectStorageStub();
+          const useCase = new GetContractSummaryUseCase(repo, objectStorage);
 
           const landlordView = await useCase.execute(input.contractId, input.landlordUserId);
           const tenantView = await useCase.execute(input.contractId, input.tenantUserId);
@@ -282,7 +303,8 @@ describe('GetContractSummaryUseCase — Property 27: Resumen de contrato contien
           };
 
           const repo = makeRepositoryStub(input);
-          const useCase = new GetContractSummaryUseCase(repo);
+          const objectStorage = makeObjectStorageStub();
+          const useCase = new GetContractSummaryUseCase(repo, objectStorage);
 
           const outsiderUserId = uuidv4();
 
