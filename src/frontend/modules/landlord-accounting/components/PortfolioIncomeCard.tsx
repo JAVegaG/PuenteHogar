@@ -35,7 +35,7 @@ export function PortfolioIncomeCard({ portfolio }: PortfolioIncomeCardProps) {
                     Ver reporte
                 </Link>
                 <Link
-                    href={`/mi-portafolio/${portfolio.id}`}
+                    href={`/mi-portafolio/${portfolio.id}/unidades`}
                     className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] px-[16px] py-[8px] text-caption font-medium rounded-[6px] transition-colors"
                     style={{
                         color: '#1d4ed8',

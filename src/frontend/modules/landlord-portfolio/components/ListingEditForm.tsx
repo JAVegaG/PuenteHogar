@@ -352,6 +352,7 @@ export default function ListingEditForm({ portfolioId, unitId }: ListingEditForm
                                             const isMarkedForRemoval = removePhotoIds.includes(photo.id);
                                             return (
                                                 <div key={photo.id} className="relative aspect-square rounded-[8px] overflow-hidden">
+                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
                                                     <img
                                                         src={photo.fileUrl}
                                                         alt="Foto existente"
@@ -392,6 +393,7 @@ export default function ListingEditForm({ portfolioId, unitId }: ListingEditForm
                                     <div className="grid grid-cols-3 gap-2 mb-3">
                                         {newPhotos.map((photo, index) => (
                                             <div key={photo.previewUrl} className="relative aspect-square rounded-[8px] overflow-hidden border-2 border-dashed border-primary/40">
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                                 <img
                                                     src={photo.previewUrl}
                                                     alt={`Nueva foto ${index + 1}`}

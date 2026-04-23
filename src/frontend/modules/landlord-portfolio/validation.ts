@@ -68,7 +68,7 @@ export function validatePropertyType(value: string): string | null {
   return null;
 }
 
-export function validatePositiveDecimal(value: string, _fieldLabel: string): string | null {
+export function validatePositiveDecimal(value: string): string | null {
   if (value.trim() === '') {
     return null;
   }
@@ -79,7 +79,7 @@ export function validatePositiveDecimal(value: string, _fieldLabel: string): str
   return null;
 }
 
-export function validateNonNegativeInteger(value: string, _fieldLabel: string): string | null {
+export function validateNonNegativeInteger(value: string): string | null {
   if (value.trim() === '') {
     return null;
   }
@@ -108,22 +108,22 @@ export function validateEnrichedUnitForm(data: EnrichedUnitFormData): Record<str
     errors.propertyType = propertyTypeError;
   }
 
-  const lengthError = validatePositiveDecimal(data.length, 'Largo');
+  const lengthError = validatePositiveDecimal(data.length);
   if (lengthError) {
     errors.length = lengthError;
   }
 
-  const widthError = validatePositiveDecimal(data.width, 'Ancho');
+  const widthError = validatePositiveDecimal(data.width);
   if (widthError) {
     errors.width = widthError;
   }
 
-  const roomsError = validateNonNegativeInteger(data.numberOfRooms, 'Habitaciones');
+  const roomsError = validateNonNegativeInteger(data.numberOfRooms);
   if (roomsError) {
     errors.numberOfRooms = roomsError;
   }
 
-  const bathroomsError = validateNonNegativeInteger(data.numberOfBathrooms, 'Baños');
+  const bathroomsError = validateNonNegativeInteger(data.numberOfBathrooms);
   if (bathroomsError) {
     errors.numberOfBathrooms = bathroomsError;
   }

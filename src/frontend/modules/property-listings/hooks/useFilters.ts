@@ -24,9 +24,9 @@ export function useFilters() {
     const f: ListingFilters = {};
     searchParams.forEach((value, key) => {
       if (NUMERIC_KEYS.includes(key as keyof ListingFilters)) {
-        (f as any)[key] = Number(value);
+        (f as Record<string, string | number>)[key] = Number(value);
       } else {
-        (f as any)[key] = value;
+        (f as Record<string, string | number>)[key] = value;
       }
     });
     return f;
@@ -48,7 +48,7 @@ export function useFilters() {
   const setFilter = useCallback(
     (key: keyof ListingFilters, value: string | number | undefined) => {
       const newFilters = { ...filters, [key]: value, page: 1 };
-      if (value === undefined || value === '') delete (newFilters as any)[key];
+      if (value === undefined || value === '') delete (newFilters as Record<string, string | number | undefined>)[key];
       updateURL(newFilters);
     },
     [filters, updateURL],
@@ -60,7 +60,7 @@ export function useFilters() {
 
   const setSort = useCallback(
     (sortBy: string, sortOrder: string) => {
-      updateURL({ ...filters, sortBy: sortBy as any, sortOrder: sortOrder as any, page: 1 });
+      updateURL({ ...filters, sortBy: sortBy as ListingFilters['sortBy'], sortOrder: sortOrder as ListingFilters['sortOrder'], page: 1 });
     },
     [filters, updateURL],
   );

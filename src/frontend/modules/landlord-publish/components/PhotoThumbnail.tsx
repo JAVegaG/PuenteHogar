@@ -6,6 +6,7 @@ interface PhotoThumbnailProps {
 export function PhotoThumbnail({ src, onRemove }: PhotoThumbnailProps) {
     return (
         <div className="relative flex-shrink-0 w-[80px] h-[80px]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
                 src={src}
                 alt="Foto de la propiedad"

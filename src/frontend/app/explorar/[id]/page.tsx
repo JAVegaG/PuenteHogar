@@ -47,7 +47,9 @@ export default function ListingDetailPage() {
   }, [id]);
 
   useEffect(() => {
-    return loadDetail();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    const cleanup = loadDetail();
+    return cleanup;
   }, [loadDetail]);
 
   const backButton = (
@@ -77,7 +79,7 @@ export default function ListingDetailPage() {
     <>
       <Header
         title="Detalle del inmueble"
-        onMenuClick={() => {}}
+        onMenuClick={() => { }}
         leftAction={backButton}
       />
 

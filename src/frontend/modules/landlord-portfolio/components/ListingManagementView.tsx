@@ -38,7 +38,7 @@ export default function ListingManagementView({ portfolioId, unitId }: ListingMa
     const [showConfirm, setShowConfirm] = useState(false);
     const [isUnpublishing, setIsUnpublishing] = useState(false);
 
-    const unitPath = `/mi-portafolio/${portfolioId}/unidades/${unitId}`;
+    const portfolioPath = `/mi-portafolio/${portfolioId}/unidades`;
 
     const fetchListing = useCallback(async () => {
         const token = user?.accessToken;
@@ -94,8 +94,8 @@ export default function ListingManagementView({ portfolioId, unitId }: ListingMa
 
     const backButton = (
         <Link
-            href={unitPath}
-            aria-label="Volver a detalle de unidad"
+            href={portfolioPath}
+            aria-label="Volver al portafolio"
             className="flex items-center justify-center w-[44px] h-[44px] rounded-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
             <svg
@@ -174,6 +174,7 @@ export default function ListingManagementView({ portfolioId, unitId }: ListingMa
                                                 key={photo.id}
                                                 className={`relative overflow-hidden rounded-[8px] ${index === 0 ? 'col-span-2 aspect-[16/9]' : 'aspect-square'}`}
                                             >
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                                 <img
                                                     src={photo.fileUrl}
                                                     alt={`Foto ${index + 1} de ${listing.title}`}

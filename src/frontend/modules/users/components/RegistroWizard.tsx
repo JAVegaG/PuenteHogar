@@ -6,7 +6,7 @@ import type { RegistrationFormData, DocumentType, RegisterRequest } from '../typ
 import { validateStep1, validateStep2, validateStep3 } from '../validation';
 import { authService } from '@/shared/services/auth';
 import { Button } from '@/shared/components/Button';
-import StepIndicator from './StepIndicator';
+import { WizardProgress } from '@/shared/components/WizardProgress';
 import Step1UserType from './Step1UserType';
 import Step2PersonalData from './Step2PersonalData';
 import Step3Credentials from './Step3Credentials';
@@ -179,7 +179,7 @@ export default function RegistroWizard() {
 
   return (
     <div className="flex flex-col gap-section-gap">
-      <StepIndicator currentStep={currentStep} totalSteps={3} />
+      <WizardProgress currentStep={currentStep} steps={['Tipo de usuario', 'Datos personales', 'Credenciales']} ariaLabel="Progreso del registro" />
 
       {/* Server error banner */}
       {serverError && (

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import LandlordRoute from '@modules/landlord-portfolio/components/LandlordRoute';
 import { Header } from '@/shared/components/Header';
@@ -113,7 +113,6 @@ function EmptyLeaseHistory() {
 
 function UnitReportContent() {
     const params = useParams();
-    const router = useRouter();
     const portfolioId = params.portfolioId as string;
     const unitId = params.unitId as string;
 

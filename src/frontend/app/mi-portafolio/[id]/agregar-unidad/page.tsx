@@ -41,6 +41,7 @@ function AddUnitContent() {
   }, [id, user?.accessToken, logout]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchPortfolioName();
   }, [fetchPortfolioName]);
 

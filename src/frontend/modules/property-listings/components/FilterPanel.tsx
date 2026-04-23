@@ -144,6 +144,7 @@ export default function FilterPanel({
 
   // Sync local state when currentFilters change externally
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCity(currentFilters.city ?? '');
     setNeighborhood(currentFilters.neighborhood ?? '');
     setPublishedWithin(currentFilters.publishedWithin ?? '');
@@ -163,6 +164,7 @@ export default function FilterPanel({
 
   // Reset neighborhood when city is cleared
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!city) setNeighborhood('');
   }, [city]);
 

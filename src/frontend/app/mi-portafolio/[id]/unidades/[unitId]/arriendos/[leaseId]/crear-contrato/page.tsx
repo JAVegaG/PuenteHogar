@@ -91,8 +91,8 @@ function CreateContractContent() {
 
     const leaseDetailPath = `/mi-portafolio/${portfolioId}/unidades/${unitId}/arriendos/${leaseId}`;
 
-    const handleSuccess = () => {
-        router.push(leaseDetailPath);
+    const handleSuccess = (contractId: string) => {
+        router.push(`/mis-contratos/${contractId}`);
     };
 
     const backButton = (
