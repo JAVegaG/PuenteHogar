@@ -6,7 +6,7 @@ import { contractService } from '@/shared/services/contract';
 import { validateContractStep1, validateContractStep2, validateContractStep3 } from '../validation';
 import type { ContractFormData } from '../types';
 import type { LeaseDetail } from '@modules/landlord-leases/types';
-import { WizardProgress } from './WizardProgress';
+import { WizardProgress } from '@/shared/components/WizardProgress';
 import { StepTenant } from './StepTenant';
 import { StepTerms } from './StepTerms';
 import { StepDocument } from './StepDocument';
@@ -16,7 +16,7 @@ const WIZARD_STEPS = ['Arrendatario', 'Términos', 'Documento'];
 
 interface ContractWizardProps {
     lease: LeaseDetail;
-    onSuccess: () => void;
+    onSuccess: (contractId: string) => void;
 }
 
 function parseFullName(fullName: string): { firstName: string; lastName: string } {
@@ -119,7 +119,7 @@ export function ContractWizard({ lease, onSuccess }: ContractWizardProps) {
             // MVP stub: use a placeholder file URL since ObjectStorageAdapter returns a placeholder
             const fileUrl = `https://storage.placeholder.com/contracts/${Date.now()}.pdf`;
 
-            await contractService.createContract(
+            const created = await contractService.createContract(
                 {
                     leaseId: lease.id,
                     startDate: formData.startDate,
@@ -133,7 +133,7 @@ export function ContractWizard({ lease, onSuccess }: ContractWizardProps) {
 
             setSuccessMessage('¡Contrato creado exitosamente!');
             setTimeout(() => {
-                onSuccess();
+                onSuccess(created.id);
             }, 1500);
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Error inesperado';

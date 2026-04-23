@@ -12,7 +12,6 @@ export function WizardProgress({ currentStep, steps }: WizardProgressProps) {
                 const stepNumber = index + 1;
                 const isCompleted = stepNumber < currentStep;
                 const isCurrent = stepNumber === currentStep;
-                const isPending = stepNumber > currentStep;
 
                 return (
                     <div key={label} className="flex items-center">
@@ -22,10 +21,10 @@ export function WizardProgress({ currentStep, steps }: WizardProgressProps) {
                                 aria-current={isCurrent ? 'step' : undefined}
                                 aria-label={`Paso ${stepNumber} de ${steps.length}: ${label}`}
                                 className={`flex items-center justify-center w-[36px] h-[36px] min-w-[44px] min-h-[44px] rounded-full text-body font-semibold transition-colors ${isCompleted
-                                        ? 'bg-[#16a34a] text-white'
-                                        : isCurrent
-                                            ? 'bg-[#1d4ed8] text-white'
-                                            : 'bg-[#f3f4f6] text-[#4b5563]'
+                                    ? 'bg-[#16a34a] text-white'
+                                    : isCurrent
+                                        ? 'bg-[#1d4ed8] text-white'
+                                        : 'bg-[#f3f4f6] text-[#4b5563]'
                                     }`}
                             >
                                 {isCompleted ? (
