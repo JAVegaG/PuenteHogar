@@ -46,8 +46,8 @@ src/backend/
 └── modules/
     ├── users/                  # Registro, login, RBAC
     ├── property-listings/      # Publicaciones, búsqueda, fotos, gestión de publicaciones (editar, despublicar, consulta por unidad)
-    ├── landlord-portfolio/     # Portafolios (CRUD, paginación, estadísticas agregadas), unidades enriquecidas (cross-schema Property+Address+PortfolioUnit, con unitStatus/hasActiveListing/tenantName/monthlyRent computados), leases, catálogo geográfico (departamentos/ciudades DANE)
-    ├── contracts/              # Contratos, firma electrónica, almacenamiento de documentos
+    ├── landlord-portfolio/     # Portafolios (CRUD completo: crear, listar, actualizar, eliminar), unidades enriquecidas (cross-schema Property+Address+PortfolioUnit, con unitStatus/hasActiveListing/tenantName/monthlyRent computados; crear, actualizar, eliminar con validación de arriendos activos), leases (listado por unidad, detalle con info de arrendatario descifrada via IPIIEncryptor), catálogo geográfico (departamentos/ciudades DANE)
+    ├── contracts/              # Contratos, firma electrónica, almacenamiento de documentos, listado de contratos por arrendador (cross-schema: Contract→Lease→PortfolioUnit→LandlordPortfolio)
     ├── payments/               # Pagos, pasarela, idempotencia (dominio, aplicación, infraestructura, controlador)
     ├── accounting/             # Reportes financieros (dominio, aplicación, infraestructura: PrismaAccountingRepository + RedisReportCache)
     ├── rental-tracking/        # Máquina de estados del arriendo (dominio, aplicación, infraestructura, controlador)
@@ -84,7 +84,7 @@ modules/{nombre}/
 
 ## Dependencias inter-módulo
 
-`UsersModule` exporta `JwtModule` — los módulos que necesiten validar tokens JWT deben importar `UsersModule` o configurar `JwtModule` directamente.
+`UsersModule` exporta `JwtModule` y `PII_ENCRYPTOR` — los módulos que necesiten validar tokens JWT deben importar `UsersModule` o configurar `JwtModule` directamente. Los módulos que necesiten descifrar campos PII (e.g. `document_number`, `phone_number`) inyectan `IPIIEncryptor` via el token `PII_ENCRYPTOR` exportado por `UsersModule`.
 
 ## Seguridad
 
