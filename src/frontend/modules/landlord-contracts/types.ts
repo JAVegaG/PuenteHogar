@@ -40,3 +40,12 @@ export interface ContractSummary {
     externalSigningId: string | null;
     parties: ContractParty[];
 }
+
+export interface LandlordContractListItem {
+    id: string;
+    unitName: string;
+    tenantName: string;
+    status: 'PENDING' | 'SIGNATURE_PENDING' | 'SIGNED';
+    startDate: string;
+    endDate: string | null;
+}

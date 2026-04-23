@@ -1,3 +1,5 @@
+import { LandlordContractListItem } from '@modules/landlord-contracts/types';
+
 export interface UploadContractRequest {
     leaseId: string;
     startDate: string;
@@ -98,6 +100,28 @@ export const contractService = {
             });
         } catch {
             throw new Error('No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo.');
+        }
+
+        if (!res.ok) {
+            handleContractError(res.status);
+        }
+
+        return res.json();
+    },
+
+    async getContractsByLandlord(
+        token: string
+    ): Promise<LandlordContractListItem[]> {
+        let res: Response;
+        try {
+            res = await fetch(`${API_URL}/contracts/landlord`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+        } catch {
+            throw new Error('No se pudo conectar con el servidor.');
         }
 
         if (!res.ok) {

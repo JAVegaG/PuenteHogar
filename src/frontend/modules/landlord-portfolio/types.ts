@@ -133,3 +133,8 @@ export interface EnrichedUnitResponse {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface UpdatePortfolioRequest {
+  name?: string;
+  description?: string;
+}
