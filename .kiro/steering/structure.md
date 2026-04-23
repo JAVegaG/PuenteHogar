@@ -95,6 +95,7 @@ modules/{name}/
 - Modules communicate only through defined API interfaces, never direct DB joins across schemas
 - Cross-schema references are plain `String` fields — no Prisma `@relation` across schemas
 - Cross-schema lookups use multi-step queries (e.g. `Lease → PortfolioUnit → LandlordPortfolio`)
+- Cross-schema PII reads must decrypt via `IPIIEncryptor` — import `PII_ENCRYPTOR` token and `AES256PIIEncryptor` from the `users` module
 - `GetPortfolioUseCase` resolves property details (propertyType, address, rooms, bathrooms, area) cross-schema from `Property` + `Address` tables via `prisma.property.findUnique({ include: { address: true } })`
 - RAW tables store incoming JSON/JSONB; curated tables are read-optimized typed columns
 - ETL cron jobs handle raw → curated transformation
@@ -103,7 +104,7 @@ modules/{name}/
 - Input validation at both UI and API boundary
 - Notification ports are stubbed per-module; real `notifications` module wires them in `AppModule`
 - All notifications are fire-and-forget (no `await`, no throw on failure)
-- Shared UI components (e.g. `StatusBadge`, `Header`, `Skeleton`, `ErrorState`) live in `src/frontend/shared/components/` — page files should import these rather than defining inline duplicates
+- Shared UI components (e.g. `StatusBadge`, `Header`, `Skeleton`, `ErrorState`, `ConfirmationDialog`) live in `src/frontend/shared/components/` — page files should import these rather than defining inline duplicates
 
 ## Frontend Naming Convention
 

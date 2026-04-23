@@ -68,6 +68,14 @@ Application architecture per module: Hexagonal (ports & adapters).
 - References between schemas (e.g. `user_id` in `LandlordPortfolio`, `lease_id` in `Contract`) are plain `String` fields — no Prisma `@relation` across schemas
 - Cross-schema lookups use multi-step queries: e.g. `Lease → PortfolioUnit → LandlordPortfolio` to resolve the landlord user ID
 
+### PII decryption in cross-schema reads
+- PII fields (`document_number`, `phone_number`) are stored encrypted (AES-256-CBC) in the `users` schema
+- Any module that reads PII cross-schema must inject `IPIIEncryptor` via `@Inject(PII_ENCRYPTOR)` and call `piiEncryptor.decrypt()` before returning data to the frontend
+- The `PII_ENCRYPTOR` token and `AES256PIIEncryptor` adapter live in the `users` module — other modules import them as cross-module dependencies
+- Modules that need decryption must register `{ provide: PII_ENCRYPTOR, useClass: AES256PIIEncryptor }` in their own module providers and import `ConfigModule` (for the encryption key)
+- Example: `GetLeaseDetailUseCase` in `landlord-portfolio` decrypts tenant `document_number` and `phone_number` before returning the lease detail DTO
+- Never return encrypted PII ciphertext to the frontend — always decrypt at the use case layer
+
 ### Notification ports
 - Each module that fires notifications uses a local `INotificationPort` stub in its module
 - The real `notifications` module will replace these stubs when wired in `AppModule`
@@ -286,18 +294,38 @@ Use these in imports when referencing across the module/src boundary.
 - Back buttons use `<Link>` from `next/link` (not `<button>` with `router.push()`) for standard link behavior (right-click, open in new tab)
 - Back buttons use the `rounded-card` CSS class for border radius
 - Back buttons use the left-arrow SVG icon: `<line x1="19" y1="12" x2="5" y2="12" />` + `<polyline points="12 19 5 12 12 5" />` — NOT the chevron (`<polyline points="15 18 9 12 15 6" />`)
-- This pattern is established in `mi-portafolio/[id]/page.tsx` and `mi-portafolio/[id]/agregar-unidad/page.tsx`
+- This pattern is established in `mi-portafolio/[id]/unidades/page.tsx` and `mi-portafolio/[id]/agregar-unidad/page.tsx`
 
 ### StatusBadge Component
 - Shared component at `src/frontend/shared/components/StatusBadge.tsx`
-- Accepts `status: string` and `variant: 'lease' | 'unit' | 'payment' | 'listing'`
+- Accepts `status: string` and `variant: 'lease' | 'unit' | 'payment' | 'listing' | 'contract'`
 - Available variants and their color mappings:
   - `lease`: Vigente (green), Acordado (blue), Finalizado (gray)
   - `unit`: Ocupado (amber), Disponible (green), Mantenimiento (red)
   - `payment`: Al día (green), Pendiente (amber)
   - `listing`: Publicada (blue), Sin publicar (gray)
+  - `contract`: PENDING → Pendiente (amber), SIGNATURE_PENDING → Firma pendiente (blue), SIGNED → Firmado (green). Uses a `label` field to translate API status keys to Spanish display text.
 - Unknown statuses fall back to gray (`#F3F4F6` bg, `#4B5563` text)
 - Pages should import the shared `UnitCard` component from `@modules/landlord-portfolio/components/UnitCard.tsx` — do NOT duplicate inline
+
+### ConfirmationDialog Component
+- Shared component at `src/frontend/shared/components/ConfirmationDialog.tsx`
+- Used for confirming destructive actions (delete portfolio, delete unit)
+- Props: `isOpen`, `title`, `message`, `confirmLabel`, `cancelLabel?` (default "Cancelar"), `onConfirm`, `onCancel`, `isLoading?`
+- Uses native `<dialog>` element with `role="alertdialog"`, `aria-labelledby`, `aria-describedby`
+- Focus trap, Escape key closes via `onCancel`, 44px min touch targets, spinner on confirm when loading
+
+### SideMenu Navigation
+- First-level pages (e.g. `/mi-portafolio`, `/mis-contratos`, `/mis-ingresos`) use the `SideMenu` component with a hamburger menu button via `Header`'s `onMenuClick`
+- Sub-level pages (e.g. `/mi-portafolio/[id]/unidades`, `/mis-contratos/[id]`) use a back arrow button via `Header`'s `leftAction`
+- The `SideMenu` is lazy-loaded via `React.lazy` + `Suspense` to avoid loading it on every page render
+- All `<a>` tags inside `SideMenu` use `<Link>` from `next/link` for client-side navigation
+
+### Unit Detail Page Route
+- Unit detail page lives at `/mi-portafolio/[id]/unidades/[unitId]` (NOT `/mi-portafolio/[id]`)
+- The `[id]` param is the portfolio ID, `[unitId]` is the unit ID
+- Back button navigates to `/mi-portafolio/[id]/unidades/`
+- `UnitCard` in the units list includes a "Ver detalle de unidad" link pointing to this route
 
 ## Common Commands
 
