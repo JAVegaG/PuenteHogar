@@ -47,6 +47,46 @@ export class GetPortfolioUseCase {
       dto.area = length !== null && width !== null ? length * width : null;
     }
 
+    // Resolve active lease (same schema — Lease has portfolio_unit_id)
+    const activeLease = await this.prisma.lease.findFirst({
+      where: { portfolio_unit_id: entity.id, end_date: null },
+    });
+
+    if (activeLease) {
+      dto.unitStatus = 'Ocupado';
+      dto.monthlyRent = entity.leaseBaseAmount;
+
+      // Resolve tenant name cross-schema
+      const tenant = await this.prisma.user.findUnique({
+        where: { id: activeLease.user_id },
+        select: { id: true },
+      });
+      if (tenant) {
+        const natural = await this.prisma.naturalPersonDetail.findFirst({
+          where: { user_id: tenant.id },
+        });
+        if (natural) {
+          dto.tenantName = `${natural.first_name} ${natural.last_name}`;
+        } else {
+          const legal = await this.prisma.legalPersonDetail.findFirst({
+            where: { user_id: tenant.id },
+          });
+          dto.tenantName = legal?.business_name ?? null;
+        }
+      }
+    } else {
+      dto.unitStatus = 'Disponible';
+      dto.tenantName = null;
+      dto.monthlyRent = null;
+    }
+
+    // Resolve active listing (cross-schema — Listing.portfolio_unit_id)
+    const activeListing = await this.prisma.listing.findFirst({
+      where: { portfolio_unit_id: entity.id, is_active: true },
+      select: { id: true },
+    });
+    dto.hasActiveListing = !!activeListing;
+
     return dto;
   }
 }

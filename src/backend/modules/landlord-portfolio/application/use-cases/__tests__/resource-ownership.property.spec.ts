@@ -192,10 +192,13 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
         fc.asyncProperty(arbitraryTwoDistinctUuids, fc.uuid(), async ([requestingUserId, ownerUserId], listingId) => {
           const mockRepo: jest.Mocked<IListingRepository> = {
             getOwnerUserId: jest.fn().mockResolvedValue(ownerUserId),
+            getOwnerUserIdByUnit: jest.fn(),
             create: jest.fn(),
             findPublished: jest.fn(),
             findById: jest.fn(),
             findDetailById: jest.fn(),
+            findActiveByPortfolioUnitId: jest.fn(),
+            update: jest.fn(),
             unpublish: jest.fn(),
             registerContactEvent: jest.fn(),
           };
@@ -658,10 +661,13 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             // Listing: UnpublishListingUseCase
             const listingRepo: jest.Mocked<IListingRepository> = {
               getOwnerUserId: jest.fn().mockResolvedValue(ownerUserId),
+              getOwnerUserIdByUnit: jest.fn(),
               create: jest.fn(),
               findPublished: jest.fn(),
               findById: jest.fn(),
               findDetailById: jest.fn(),
+              findActiveByPortfolioUnitId: jest.fn(),
+              update: jest.fn(),
               unpublish: jest.fn(),
               registerContactEvent: jest.fn(),
             };

@@ -42,4 +42,16 @@ export class PortfolioUnitResponseDto {
 
   @ApiPropertyOptional({ description: 'Área en m² (largo × ancho)', nullable: true })
   area?: number | null;
+
+  @ApiPropertyOptional({ description: 'Estado de la unidad: Ocupado, Disponible, Mantenimiento' })
+  unitStatus?: string;
+
+  @ApiPropertyOptional({ description: 'Si la unidad tiene una publicación activa' })
+  hasActiveListing?: boolean;
+
+  @ApiPropertyOptional({ description: 'Nombre del arrendatario actual (si ocupado)', nullable: true })
+  tenantName?: string | null;
+
+  @ApiPropertyOptional({ description: 'Canon mensual del arriendo activo (si ocupado)', nullable: true })
+  monthlyRent?: number | null;
 }
