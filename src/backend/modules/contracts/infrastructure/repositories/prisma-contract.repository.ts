@@ -7,6 +7,7 @@ import {
   CreateContractData,
   IContractRepository,
   LandlordContractListItem,
+  SigningInfo,
 } from '@modules/contracts/domain/ports/contract-repository.port';
 
 @Injectable()
@@ -202,6 +203,90 @@ export class PrismaContractRepository implements IContractRepository {
         endDate: c.end_date,
       };
     });
+  }
+
+  async deleteContract(contractId: string): Promise<void> {
+    await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      // 1. Find all contract parties
+      const parties = await tx.contractParty.findMany({
+        where: { contract_id: contractId },
+        select: { id: true },
+      });
+      const partyIds = parties.map((p) => p.id);
+
+      // 2. Find all signings for those parties
+      const signings = await tx.signing.findMany({
+        where: { contract_party_id: { in: partyIds } },
+        select: { id: true },
+      });
+      const signingIds = signings.map((s) => s.id);
+
+      // 3. Delete SigningLog records
+      if (signingIds.length > 0) {
+        await tx.signingLog.deleteMany({
+          where: { signing_id: { in: signingIds } },
+        });
+      }
+
+      // 4. Delete Signing records
+      if (partyIds.length > 0) {
+        await tx.signing.deleteMany({
+          where: { contract_party_id: { in: partyIds } },
+        });
+      }
+
+      // 5. Delete File records
+      await tx.file.deleteMany({
+        where: { contract_id: contractId },
+      });
+
+      // 6. Delete ContractParty records
+      await tx.contractParty.deleteMany({
+        where: { contract_id: contractId },
+      });
+
+      // 7. Delete the Contract record
+      await tx.contract.delete({
+        where: { id: contractId },
+      });
+    });
+  }
+
+  async findSigningsByContractId(contractId: string): Promise<SigningInfo[]> {
+    const parties = await this.prisma.contractParty.findMany({
+      where: { contract_id: contractId },
+      include: {
+        signings: {
+          include: { signing_status: true },
+        },
+      },
+    });
+
+    return parties.map((party) => ({
+      contractPartyId: party.id,
+      role: party.role_in_contract,
+      signingStatusName: party.signings[0]?.signing_status.name ?? 'PENDING',
+    }));
+  }
+
+  async updateFileUrl(contractId: string, newFileUrl: string): Promise<ContractEntity> {
+    const file = await this.prisma.file.findFirst({
+      where: { contract_id: contractId },
+    });
+    if (!file) throw new Error(`No file found for contract ${contractId}`);
+
+    await this.prisma.file.update({
+      where: { id: file.id },
+      data: { file_url: newFileUrl },
+    });
+
+    const contract = await this.prisma.contract.findUnique({
+      where: { id: contractId },
+      include: { status: true, files: true },
+    });
+    if (!contract) throw new Error(`Contract ${contractId} not found`);
+
+    return this.toEntity(contract);
   }
 
   private toEntity(contract: {

@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { S3ServiceException } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { IObjectStorage } from '../../domain/ports/object-storage.port';
 import {
   S3ClientFactory,
   generateObjectKey,
-  buildObjectUrl,
   validateBuffer,
   validateFilename,
   ObjectStorageException,
@@ -24,6 +24,21 @@ export class ContractObjectStorageAdapter implements IObjectStorage {
     private readonly configService: ConfigService,
   ) { }
 
+  async getPresignedUrl(
+    objectKey: string,
+    expiresInSeconds: number = 900,
+  ): Promise<string> {
+    const client = this.s3ClientFactory.getClient();
+    const bucket = this.configService.get<string>('objectStorage.bucket')!;
+
+    const command = new GetObjectCommand({
+      Bucket: bucket,
+      Key: objectKey,
+    });
+
+    return getSignedUrl(client, command, { expiresIn: expiresInSeconds });
+  }
+
   async uploadFile(
     fileBuffer: Buffer,
     filename: string,
@@ -39,7 +54,6 @@ export class ContractObjectStorageAdapter implements IObjectStorage {
     }
 
     const bucket = this.configService.get<string>('objectStorage.bucket')!;
-    const region = this.configService.get<string>('objectStorage.region')!;
     const key = generateObjectKey('contracts', filename);
 
     try {
@@ -53,7 +67,7 @@ export class ContractObjectStorageAdapter implements IObjectStorage {
         }),
       );
 
-      return buildObjectUrl(bucket, region, key);
+      return key;
     } catch (error) {
       if (error instanceof S3ServiceException) {
         if (error.name === 'AccessDenied' || error.$metadata?.httpStatusCode === 403) {
