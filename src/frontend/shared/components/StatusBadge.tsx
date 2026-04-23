@@ -20,17 +20,23 @@ const paymentColors: Record<string, ColorMapping> = {
     Pendiente: { bg: '#FEF3C7', text: '#92400E' },
 };
 
+const listingColors: Record<string, ColorMapping> = {
+    Publicada: { bg: '#DBEAFE', text: '#1E40AF' },
+    'Sin publicar': { bg: '#F3F4F6', text: '#4B5563' },
+};
+
 const variantMap: Record<string, Record<string, ColorMapping>> = {
     lease: leaseColors,
     unit: unitColors,
     payment: paymentColors,
+    listing: listingColors,
 };
 
 const defaultColor: ColorMapping = { bg: '#F3F4F6', text: '#4B5563' };
 
 interface StatusBadgeProps {
     status: string;
-    variant?: 'lease' | 'unit' | 'payment';
+    variant?: 'lease' | 'unit' | 'payment' | 'listing';
 }
 
 export function StatusBadge({ status, variant = 'lease' }: StatusBadgeProps) {

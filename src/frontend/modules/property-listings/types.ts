@@ -56,3 +56,15 @@ export interface PaginatedListings {
   page: number;
   pageSize: number;
 }
+
+export interface ListingResponse {
+  id: string;
+  portfolioUnitId: string;
+  title: string;
+  description: string | null;
+  listingDate: string;
+  price: number;
+  currency: string;
+  isActive: boolean;
+  photos: { id: string; fileUrl: string; isMain: boolean }[];
+}
