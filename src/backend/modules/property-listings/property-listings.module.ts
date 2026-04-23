@@ -5,10 +5,12 @@ import { RedisService } from '@src/shared/redis/redis.service';
 import { S3ClientFactory } from '@src/shared/s3';
 import { PropertyListingsEtlService } from './infrastructure/etl/property-listings-etl.service';
 import { CreateListingUseCase, LISTING_CACHE, LISTING_REPOSITORY, NOTIFICATION_PORT, OBJECT_STORAGE } from './application/use-cases/create-listing.use-case';
+import { FindListingByUnitUseCase } from './application/use-cases/find-listing-by-unit.use-case';
 import { GetListingDetailUseCase } from './application/use-cases/get-listing-detail.use-case';
 import { RegisterContactEventUseCase } from './application/use-cases/register-contact-event.use-case';
 import { SearchListingsUseCase } from './application/use-cases/search-listings.use-case';
 import { UnpublishListingUseCase } from './application/use-cases/unpublish-listing.use-case';
+import { UpdateListingUseCase } from './application/use-cases/update-listing.use-case';
 import { ObjectStorageAdapter } from './infrastructure/adapters/object-storage.adapter';
 import { RedisListingCacheAdapter } from './infrastructure/adapters/redis-listing-cache.adapter';
 import { PrismaListingRepository } from './infrastructure/repositories/prisma-listing.repository';
@@ -23,9 +25,11 @@ import { PropertyListingsController } from './property-listings.controller';
     S3ClientFactory,
     PropertyListingsEtlService,
     CreateListingUseCase,
+    FindListingByUnitUseCase,
     SearchListingsUseCase,
     GetListingDetailUseCase,
     UnpublishListingUseCase,
+    UpdateListingUseCase,
     RegisterContactEventUseCase,
     {
       provide: LISTING_REPOSITORY,
@@ -50,9 +54,11 @@ import { PropertyListingsController } from './property-listings.controller';
   ],
   exports: [
     CreateListingUseCase,
+    FindListingByUnitUseCase,
     SearchListingsUseCase,
     GetListingDetailUseCase,
     UnpublishListingUseCase,
+    UpdateListingUseCase,
     RegisterContactEventUseCase,
   ],
 })

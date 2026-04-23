@@ -22,10 +22,13 @@ import { ListingResponseDto } from './application/dtos/listing-response.dto';
 import { PaginatedListingsResponseDto } from './application/dtos/paginated-listings-response.dto';
 import { ListingDetailResponseDto } from './application/dtos/listing-detail-response.dto';
 import { CreateListingUseCase, UploadedFile } from './application/use-cases/create-listing.use-case';
+import { FindListingByUnitUseCase } from './application/use-cases/find-listing-by-unit.use-case';
 import { GetListingDetailUseCase } from './application/use-cases/get-listing-detail.use-case';
 import { RegisterContactEventUseCase } from './application/use-cases/register-contact-event.use-case';
 import { SearchListingsUseCase } from './application/use-cases/search-listings.use-case';
 import { UnpublishListingUseCase } from './application/use-cases/unpublish-listing.use-case';
+import { UpdateListingUseCase } from './application/use-cases/update-listing.use-case';
+import { UpdateListingDto } from './application/dtos/update-listing.dto';
 import { Public } from '@src/shared';
 
 interface AuthenticatedRequest extends Request {
@@ -47,7 +50,9 @@ export class PropertyListingsController {
     private readonly getListingDetailUseCase: GetListingDetailUseCase,
     private readonly unpublishListingUseCase: UnpublishListingUseCase,
     private readonly registerContactEventUseCase: RegisterContactEventUseCase,
-  ) {}
+    private readonly findListingByUnitUseCase: FindListingByUnitUseCase,
+    private readonly updateListingUseCase: UpdateListingUseCase,
+  ) { }
 
   @Public()
   @Get()
@@ -55,6 +60,20 @@ export class PropertyListingsController {
   @ApiOkResponse({ description: 'Listado paginado de inmuebles', type: PaginatedListingsResponseDto })
   search(@Query() filters: ListingFiltersDto) {
     return this.searchListingsUseCase.execute(filters);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('by-unit/:portfolioUnitId')
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Obtener publicación activa por unidad de portafolio', description: 'Retorna la publicación activa asociada a una unidad de portafolio del arrendador autenticado.' })
+  @ApiOkResponse({ description: 'Publicación activa encontrada', type: ListingResponseDto })
+  @ApiNotFoundResponse({ description: 'Unidad o publicación no encontrada' })
+  @ApiForbiddenResponse({ description: 'Acceso denegado' })
+  findByUnit(
+    @Param('portfolioUnitId') portfolioUnitId: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.findListingByUnitUseCase.execute(portfolioUnitId, req.user.id);
   }
 
   @Public()
@@ -96,6 +115,29 @@ export class PropertyListingsController {
   @ApiForbiddenResponse({ description: 'No tienes permiso sobre esta publicación' })
   unpublish(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
     return this.unpublishListingUseCase.execute(id, req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id')
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Actualizar publicación', description: 'Actualiza los campos de una publicación existente (título, descripción, precio, fotos).' })
+  @ApiOkResponse({ description: 'Publicación actualizada', type: ListingResponseDto })
+  @ApiForbiddenResponse({ description: 'No tienes permiso sobre esta publicación' })
+  @ApiNotFoundResponse({ description: 'Publicación no encontrada' })
+  @ApiConsumes('multipart/form-data', 'application/json')
+  @UseInterceptors(FilesInterceptor('photos', 10))
+  update(
+    @Param('id') id: string,
+    @Body() dto: UpdateListingDto,
+    @Req() req: AuthenticatedRequest,
+    @UploadedFiles() files?: MulterFile[],
+  ) {
+    const uploadedFiles: UploadedFile[] | undefined = files?.map((f) => ({
+      buffer: f.buffer,
+      originalname: f.originalname,
+      mimetype: f.mimetype,
+    }));
+    return this.updateListingUseCase.execute(id, dto, req.user.id, uploadedFiles);
   }
 
   @UseGuards(JwtAuthGuard)
