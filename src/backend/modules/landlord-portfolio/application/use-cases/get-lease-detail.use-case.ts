@@ -1,10 +1,15 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@src/shared/prisma/prisma.service';
+import type { IPIIEncryptor } from '@modules/users/domain/ports/pii-encryptor.port';
+import { PII_ENCRYPTOR } from '@modules/users/application/use-cases/register-user.use-case';
 import { LeaseDetailDto, LeaseDetailTenantDto, LeaseDetailPropertyDto } from '../dtos/lease-detail.dto';
 
 @Injectable()
 export class GetLeaseDetailUseCase {
-    constructor(private readonly prisma: PrismaService) { }
+    constructor(
+        private readonly prisma: PrismaService,
+        @Inject(PII_ENCRYPTOR) private readonly piiEncryptor: IPIIEncryptor,
+    ) { }
 
     async execute(
         portfolioId: string,
@@ -89,9 +94,9 @@ export class GetLeaseDetailUseCase {
         }
 
         tenant.documentTypeCode = user?.document_type?.code ?? '';
-        tenant.documentNumber = user?.document_number ?? '';
+        tenant.documentNumber = user?.document_number ? this.piiEncryptor.decrypt(user.document_number) : '';
         tenant.email = user?.mail ?? '';
-        tenant.phoneNumber = user?.phone_number ?? '';
+        tenant.phoneNumber = user?.phone_number ? this.piiEncryptor.decrypt(user.phone_number) : '';
 
         return tenant;
     }
