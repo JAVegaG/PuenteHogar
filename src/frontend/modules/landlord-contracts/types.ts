@@ -12,16 +12,6 @@ export interface ContractFormData {
     monthlyRent: string;
     // Step 3 — Document
     file: File | null;
-    fileUrl: string;
-}
-
-export interface UploadContractRequest {
-    leaseId: string;
-    startDate: string;
-    endDate?: string;
-    fileUrl: string;
-    fileSizeBytes?: number;
-    mimeType?: string;
 }
 
 export interface ContractParty {
