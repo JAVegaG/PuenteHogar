@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -36,6 +37,10 @@ import { CreateEnrichedUnitUseCase } from './application/use-cases/create-enrich
 import { GetUnitLeasesUseCase } from './application/use-cases/get-unit-leases.use-case';
 import { GetLeaseDetailUseCase } from './application/use-cases/get-lease-detail.use-case';
 import { CreateLeaseUseCase } from './application/use-cases/create-lease.use-case';
+import { UpdatePortfolioUseCase } from './application/use-cases/update-portfolio.use-case';
+import { DeletePortfolioUseCase } from './application/use-cases/delete-portfolio.use-case';
+import { DeleteUnitUseCase } from './application/use-cases/delete-unit.use-case';
+import { UpdatePortfolioDto } from './application/dtos/update-portfolio.dto';
 
 interface AuthenticatedRequest extends Request {
   user: { id: string; roles: string[] };
@@ -56,6 +61,9 @@ export class LandlordPortfolioController {
     private readonly getUnitLeasesUseCase: GetUnitLeasesUseCase,
     private readonly getLeaseDetailUseCase: GetLeaseDetailUseCase,
     private readonly createLeaseUseCase: CreateLeaseUseCase,
+    private readonly updatePortfolioUseCase: UpdatePortfolioUseCase,
+    private readonly deletePortfolioUseCase: DeletePortfolioUseCase,
+    private readonly deleteUnitUseCase: DeleteUnitUseCase,
   ) { }
 
   @Public()
@@ -185,5 +193,45 @@ export class LandlordPortfolioController {
     @Req() req: AuthenticatedRequest,
   ) {
     return this.createLeaseUseCase.execute(portfolioId, unitId, dto, req.user.id);
+  }
+
+  @Patch(':portfolioId')
+  @ApiOperation({ summary: 'Actualizar portafolio', description: 'Actualiza el nombre y/o descripción de un portafolio. Requiere rol LANDLORD.' })
+  @ApiOkResponse({ description: 'Portafolio actualizado', type: PortfolioSummaryResponseDto })
+  @ApiForbiddenResponse({ description: 'Acceso denegado — requiere rol LANDLORD o no es propietario' })
+  @ApiNotFoundResponse({ description: 'Portafolio no encontrado' })
+  updatePortfolio(
+    @Param('portfolioId') portfolioId: string,
+    @Body() dto: UpdatePortfolioDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.updatePortfolioUseCase.execute(portfolioId, dto, req.user.id, req.user.roles);
+  }
+
+  @Delete(':portfolioId')
+  @ApiOperation({ summary: 'Eliminar portafolio', description: 'Elimina un portafolio sin unidades asociadas. Requiere rol LANDLORD.' })
+  @ApiOkResponse({ description: 'Portafolio eliminado' })
+  @ApiForbiddenResponse({ description: 'Acceso denegado — requiere rol LANDLORD o no es propietario' })
+  @ApiNotFoundResponse({ description: 'Portafolio no encontrado' })
+  @ApiConflictResponse({ description: 'El portafolio tiene unidades asociadas y no puede ser eliminado' })
+  deletePortfolio(
+    @Param('portfolioId') portfolioId: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.deletePortfolioUseCase.execute(portfolioId, req.user.id, req.user.roles);
+  }
+
+  @Delete(':portfolioId/units/:id')
+  @ApiOperation({ summary: 'Eliminar unidad de portafolio', description: 'Elimina una unidad sin arriendos activos.' })
+  @ApiOkResponse({ description: 'Unidad eliminada' })
+  @ApiForbiddenResponse({ description: 'Acceso denegado — no es propietario de la unidad' })
+  @ApiNotFoundResponse({ description: 'Unidad no encontrada' })
+  @ApiConflictResponse({ description: 'La unidad tiene arriendos activos y no puede ser eliminada' })
+  deleteUnit(
+    @Param('portfolioId') portfolioId: string,
+    @Param('id') id: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.deleteUnitUseCase.execute(portfolioId, id, req.user.id);
   }
 }

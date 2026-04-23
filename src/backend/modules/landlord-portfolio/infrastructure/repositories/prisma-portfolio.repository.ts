@@ -9,6 +9,7 @@ import {
   CreatePortfolioUnitData,
   IPortfolioRepository,
   PortfolioWithStats,
+  UpdatePortfolioData,
   UpdatePortfolioUnitData,
 } from '../../domain/ports/portfolio-repository.port';
 
@@ -354,6 +355,55 @@ export class PrismaPortfolioRepository implements IPortfolioRepository {
     const city = await this.prisma.city.findUnique({ where: { code } });
     if (!city || !city.is_active) return null;
     return { id: city.id, code: city.code, departmentCode: city.department_code, name: city.name };
+  }
+
+  async updatePortfolio(portfolioId: string, data: UpdatePortfolioData): Promise<LandlordPortfolioEntity> {
+    const updated = await this.prisma.landlordPortfolio.update({
+      where: { id: portfolioId },
+      data: {
+        ...(data.name !== undefined && { name: data.name }),
+        ...(data.description !== undefined && { description: data.description }),
+      },
+    });
+
+    return new LandlordPortfolioEntity(
+      updated.id,
+      updated.user_id,
+      updated.name,
+      updated.description,
+      updated.creation_date,
+    );
+  }
+
+  async deletePortfolio(portfolioId: string): Promise<void> {
+    await this.prisma.landlordPortfolio.delete({ where: { id: portfolioId } });
+  }
+
+  async deleteUnit(unitId: string): Promise<void> {
+    await this.prisma.portfolioUnit.delete({ where: { id: unitId } });
+  }
+
+  async countUnitsByPortfolioId(portfolioId: string): Promise<number> {
+    return this.prisma.portfolioUnit.count({ where: { portfolio_id: portfolioId } });
+  }
+
+  async hasActiveLeases(unitId: string): Promise<boolean> {
+    // Find leases for this unit, then check if any has an active current status
+    const leases = await this.prisma.lease.findMany({
+      where: { portfolio_unit_id: unitId },
+      select: { id: true },
+    });
+
+    if (leases.length === 0) return false;
+
+    // Check if any lease has a current status entry (meaning it's being tracked/active)
+    const activeStatus = await this.prisma.leaseCurrentStatus.findFirst({
+      where: {
+        lease_id: { in: leases.map((l) => l.id) },
+      },
+    });
+
+    return activeStatus !== null;
   }
 
   private toEntity(unit: {

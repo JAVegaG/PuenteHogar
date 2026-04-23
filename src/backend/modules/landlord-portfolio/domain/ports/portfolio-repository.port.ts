@@ -51,6 +51,11 @@ export interface UpdatePortfolioUnitData {
   rawPayload?: Record<string, unknown>;
 }
 
+export interface UpdatePortfolioData {
+  name?: string;
+  description?: string;
+}
+
 export interface IPortfolioRepository {
   findOrCreatePortfolio(userId: string): Promise<{ id: string }>;
   createUnit(data: CreatePortfolioUnitData): Promise<PortfolioUnitEntity>;
@@ -75,4 +80,11 @@ export interface IPortfolioRepository {
   findCitiesByDepartmentCode(departmentCode: string): Promise<{ id: string; code: string; departmentCode: string; name: string }[]>;
   findDepartmentByCode(code: string): Promise<{ id: string; code: string; name: string } | null>;
   findCityByCode(code: string): Promise<{ id: string; code: string; departmentCode: string; name: string } | null>;
+
+  // Portfolio CRUD
+  updatePortfolio(portfolioId: string, data: UpdatePortfolioData): Promise<LandlordPortfolioEntity>;
+  deletePortfolio(portfolioId: string): Promise<void>;
+  deleteUnit(unitId: string): Promise<void>;
+  countUnitsByPortfolioId(portfolioId: string): Promise<number>;
+  hasActiveLeases(unitId: string): Promise<boolean>;
 }

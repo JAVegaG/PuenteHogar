@@ -73,6 +73,11 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             findCitiesByDepartmentCode: jest.fn(),
             findDepartmentByCode: jest.fn(),
             findCityByCode: jest.fn(),
+            updatePortfolio: jest.fn(),
+            deletePortfolio: jest.fn(),
+            deleteUnit: jest.fn(),
+            countUnitsByPortfolioId: jest.fn(),
+            hasActiveLeases: jest.fn(),
           };
 
           const mockPrisma = {
@@ -118,6 +123,11 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             findCitiesByDepartmentCode: jest.fn(),
             findDepartmentByCode: jest.fn(),
             findCityByCode: jest.fn(),
+            updatePortfolio: jest.fn(),
+            deletePortfolio: jest.fn(),
+            deleteUnit: jest.fn(),
+            countUnitsByPortfolioId: jest.fn(),
+            hasActiveLeases: jest.fn(),
           };
           const auditLogger = makeAuditLogger();
 
@@ -162,6 +172,11 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             findCitiesByDepartmentCode: jest.fn(),
             findDepartmentByCode: jest.fn(),
             findCityByCode: jest.fn(),
+            updatePortfolio: jest.fn(),
+            deletePortfolio: jest.fn(),
+            deleteUnit: jest.fn(),
+            countUnitsByPortfolioId: jest.fn(),
+            hasActiveLeases: jest.fn(),
           };
           const auditLogger = makeAuditLogger();
 
@@ -245,6 +260,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             findContractStatusByName: jest.fn(),
             findFileTypeByName: jest.fn(),
             findFileStatusByName: jest.fn(),
+            findContractsByLandlordId: jest.fn(),
           };
           const auditLogger = makeAuditLogger();
 
@@ -309,6 +325,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
               findContractStatusByName: jest.fn(),
               findFileTypeByName: jest.fn(),
               findFileStatusByName: jest.fn(),
+              findContractsByLandlordId: jest.fn(),
             };
 
             const useCase = new GetContractSummaryUseCase(mockRepo);
@@ -363,6 +380,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
               findContractStatusByName: jest.fn(),
               findFileTypeByName: jest.fn(),
               findFileStatusByName: jest.fn(),
+              findContractsByLandlordId: jest.fn(),
             };
 
             const useCase = new GetContractSummaryUseCase(mockRepo);
@@ -647,6 +665,11 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
               findCitiesByDepartmentCode: jest.fn(),
               findDepartmentByCode: jest.fn(),
               findCityByCode: jest.fn(),
+              updatePortfolio: jest.fn(),
+              deletePortfolio: jest.fn(),
+              deleteUnit: jest.fn(),
+              countUnitsByPortfolioId: jest.fn(),
+              hasActiveLeases: jest.fn(),
             };
             const auditLogger = makeAuditLogger();
             const portfolioUseCase = new UpdatePortfolioUnitUseCase(portfolioRepo, auditLogger);
