@@ -9,167 +9,21 @@ import { portfolioService } from '@/shared/services/portfolio';
 import { Header } from '@/shared/components/Header';
 import { Skeleton } from '@/shared/components/Skeleton';
 import { ErrorState } from '@/shared/components/ErrorState';
-import { StatusBadge } from '@/shared/components/StatusBadge';
+import UnitCard from '@modules/landlord-portfolio/components/UnitCard';
 import type { PortfolioUnit, PortfolioSummary } from '@modules/landlord-portfolio/types';
-
-function formatCurrency(amount: number, currency: string): string {
-  try {
-    return new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  } catch {
-    return `${currency} ${amount.toLocaleString('es-CO')}`;
-  }
-}
-
-function UnitCardSkeleton() {
-  return (
-    <div className="border border-neutral-300 rounded-[6px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] bg-white p-4">
-      <Skeleton className="h-5 w-40 mb-2" />
-      <Skeleton className="h-4 w-32 mb-2" />
-      <Skeleton className="h-4 w-24" />
-    </div>
-  );
-}
 
 function UnitsListingSkeleton() {
   return (
     <div className="flex flex-col gap-4" aria-busy="true" aria-live="polite">
       <span className="sr-only">Cargando unidades...</span>
       {[1, 2, 3].map((i) => (
-        <UnitCardSkeleton key={i} />
+        <div key={i} className="border border-neutral-300 rounded-[6px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] bg-white p-4">
+          <Skeleton className="h-5 w-40 mb-2" />
+          <Skeleton className="h-4 w-32 mb-2" />
+          <Skeleton className="h-4 w-24" />
+        </div>
       ))}
     </div>
-  );
-}
-
-function UnitCard({ unit, portfolioId }: { unit: PortfolioUnit; portfolioId: string }) {
-  const status = unit.unitStatus ?? 'Disponible';
-  const hasActiveListing = unit.hasActiveListing ?? false;
-  const isOccupied = status === 'Ocupado';
-  const isAvailable = status === 'Disponible';
-
-  const propertyType = unit.propertyType ?? '';
-  const address = unit.address ?? '';
-  const rooms = unit.numberOfRooms ?? 0;
-  const baths = unit.numberOfBathrooms ?? 0;
-  const area = unit.area ?? null;
-
-  // Build subtitle: "Apartamento • Piso 3" style
-  const subtitle = propertyType || null;
-
-  return (
-    <article className="border border-[#d1d5db] rounded-[6px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] bg-white p-4">
-      {/* Header row: icon + name/type + status badge */}
-      <div className="flex items-start gap-3">
-        {/* Property icon */}
-        <div className="flex items-center justify-center w-[40px] h-[40px] rounded-full bg-[#f3f4f6] shrink-0 mt-[2px]">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4b5563" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-            <polyline points="9 22 9 12 15 12 15 22" />
-          </svg>
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
-            <h3 className="text-body font-semibold text-[#111827]">
-              {unit.name || 'Unidad sin nombre'}
-            </h3>
-            <StatusBadge status={status} variant="unit" />
-          </div>
-          {subtitle && (
-            <p className="text-caption text-[#4b5563] mt-[2px]">{subtitle}</p>
-          )}
-        </div>
-      </div>
-
-      {/* Address */}
-      {address && (
-        <div className="flex items-center gap-[6px] mt-3">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="shrink-0">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-            <circle cx="12" cy="10" r="3" />
-          </svg>
-          <p className="text-caption text-[#4b5563]">{address}</p>
-        </div>
-      )}
-
-      {/* Property details: area, rooms, baths */}
-      {(area !== null || rooms > 0 || baths > 0) && (
-        <div className="flex items-center gap-[12px] mt-[8px] text-caption text-[#4b5563]">
-          {area !== null && <span>{area} m²</span>}
-          {area !== null && rooms > 0 && <span aria-hidden="true">·</span>}
-          {rooms > 0 && <span>{rooms} hab</span>}
-          {(area !== null || rooms > 0) && baths > 0 && <span aria-hidden="true">·</span>}
-          {baths > 0 && <span>{baths} baños</span>}
-        </div>
-      )}
-
-      {/* Tenant section for occupied units */}
-      {isOccupied && unit.tenantName && (
-        <div className="mt-3 pt-3 border-t border-[#e5e7eb]">
-          <p className="text-small text-[#4b5563]">Arrendatario actual</p>
-          <div className="flex items-center justify-between mt-[4px]">
-            <div>
-              <p className="text-caption font-medium text-[#111827]">{unit.tenantName}</p>
-              {unit.monthlyRent != null && (
-                <p className="text-body font-semibold text-[#111827] mt-[2px]">
-                  {formatCurrency(unit.monthlyRent, 'COP')}/mes
-                </p>
-              )}
-            </div>
-            <Link
-              href={`/mi-portafolio/${portfolioId}/unidades/${unit.id}/arriendos`}
-              aria-label={`Ver arriendos de ${unit.name || 'unidad'}`}
-              className="flex items-center justify-center w-[44px] h-[44px] text-[#9ca3af]"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {/* Publish action for available units */}
-      {isAvailable && !hasActiveListing && (
-        <Link
-          href={`/mi-portafolio/${portfolioId}/unidades/${unit.id}/publicar`}
-          className="flex items-center justify-center gap-2 w-full bg-[#1d4ed8] text-white rounded-[6px] text-body font-medium min-h-[44px] mt-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d4ed8] focus-visible:ring-offset-2"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="17 8 12 3 7 8" />
-            <line x1="12" y1="3" x2="12" y2="15" />
-          </svg>
-          Publicar en arriendo
-        </Link>
-      )}
-
-      {/* Published indicator */}
-      {hasActiveListing && (
-        <div className="mt-3 flex items-center justify-center w-full min-h-[44px] rounded-[6px] bg-[#f0fdf4]">
-          <p className="text-caption font-medium text-[#166534]">
-            ✓ Publicada en Explorar
-          </p>
-        </div>
-      )}
-
-      {/* Lease history link (only for non-occupied units, occupied ones have the chevron) */}
-      {!isOccupied && (
-        <div className="mt-3">
-          <Link
-            href={`/mi-portafolio/${portfolioId}/unidades/${unit.id}/arriendos`}
-            className="text-caption text-[#1d4ed8] hover:underline inline-flex items-center min-h-[44px]"
-          >
-            Ver historial
-          </Link>
-        </div>
-      )}
-    </article>
   );
 }
 
