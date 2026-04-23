@@ -15,6 +15,8 @@ import {
   E_SIGNATURE_PROVIDER,
   UploadContractUseCase,
 } from './application/use-cases/upload-contract.use-case';
+import { ReplaceContractFileUseCase } from './application/use-cases/replace-contract-file.use-case';
+import { DeleteContractUseCase } from './application/use-cases/delete-contract.use-case';
 import { ContractsController } from './contracts.controller';
 import { ESignatureProviderAdapter } from './infrastructure/adapters/e-signature-provider.adapter';
 import { ContractObjectStorageAdapter } from './infrastructure/adapters/object-storage.adapter';
@@ -31,6 +33,8 @@ import { PrismaContractRepository } from './infrastructure/repositories/prisma-c
     S3ClientFactory,
     ContractsEtlService,
     UploadContractUseCase,
+    ReplaceContractFileUseCase,
+    DeleteContractUseCase,
     GetContractSummaryUseCase,
     GetLandlordContractsUseCase,
     InitiateSigningUseCase,
