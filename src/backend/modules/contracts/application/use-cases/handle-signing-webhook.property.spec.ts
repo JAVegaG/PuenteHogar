@@ -131,13 +131,16 @@ function makeStubs(input: {
     async findFileStatusByName(): Promise<{ id: string } | null> {
       return { id: uuidv4() };
     },
+    async findContractsByLandlordId(): Promise<any[]> {
+      return [];
+    },
   };
 
   const notificationPort: INotificationPort = {
     async notifyContractSigned(landlordUserId, tenantUserId, contractId, signedAt) {
       notificationCalls.push({ landlordUserId, tenantUserId, contractId, signedAt });
     },
-    async notifySigningFailed() {},
+    async notifySigningFailed() { },
   };
 
   const auditLogger = new AuditLoggerService();

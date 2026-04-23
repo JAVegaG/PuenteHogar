@@ -70,6 +70,7 @@ function makeRepositoryStub(): { stub: IContractRepository; createCallCount: num
     async findContractStatusByName(): Promise<{ id: string } | null> { return { id: uuidv4() }; },
     async findFileTypeByName(): Promise<{ id: string } | null> { return { id: fileTypeId }; },
     async findFileStatusByName(): Promise<{ id: string } | null> { return { id: fileStatusId }; },
+    async findContractsByLandlordId(): Promise<any[]> { return []; },
   };
 
   return { stub, createCallCount };

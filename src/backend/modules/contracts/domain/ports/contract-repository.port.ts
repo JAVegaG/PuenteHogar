@@ -12,6 +12,15 @@ export interface CreateContractData {
   tenantUserId: string;
 }
 
+export interface LandlordContractListItem {
+  id: string;
+  unitName: string;
+  tenantName: string;
+  status: string;
+  startDate: Date;
+  endDate: Date | null;
+}
+
 export interface IContractRepository {
   create(data: CreateContractData): Promise<ContractEntity>;
   findById(id: string): Promise<ContractEntity | null>;
@@ -27,4 +36,5 @@ export interface IContractRepository {
   findContractStatusByName(name: string): Promise<{ id: string } | null>;
   findFileTypeByName(name: string): Promise<{ id: string } | null>;
   findFileStatusByName(name: string): Promise<{ id: string } | null>;
+  findContractsByLandlordId(landlordUserId: string): Promise<LandlordContractListItem[]>;
 }

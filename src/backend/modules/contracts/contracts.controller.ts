@@ -12,10 +12,12 @@ import { Request } from 'express';
 import { JwtAuthGuard } from '@src/shared/guards/jwt-auth.guard';
 import { Public } from '@src/shared/decorators/public.decorator';
 import { InitiateSigningDto } from './application/dtos/initiate-signing.dto';
+import { LandlordContractListItemDto } from './application/dtos/landlord-contract-list-item.dto';
 import { SigningWebhookDto } from './application/dtos/signing-webhook.dto';
 import { UploadContractDto } from './application/dtos/upload-contract.dto';
 import { ContractSummaryDto } from './application/dtos/contract-summary.dto';
 import { GetContractSummaryUseCase } from './application/use-cases/get-contract-summary.use-case';
+import { GetLandlordContractsUseCase } from './application/use-cases/get-landlord-contracts.use-case';
 import { HandleSigningWebhookUseCase } from './application/use-cases/handle-signing-webhook.use-case';
 import { InitiateSigningUseCase } from './application/use-cases/initiate-signing.use-case';
 import { UploadContractUseCase } from './application/use-cases/upload-contract.use-case';
@@ -32,7 +34,8 @@ export class ContractsController {
     private readonly getContractSummaryUseCase: GetContractSummaryUseCase,
     private readonly initiateSigningUseCase: InitiateSigningUseCase,
     private readonly handleSigningWebhookUseCase: HandleSigningWebhookUseCase,
-  ) {}
+    private readonly getLandlordContractsUseCase: GetLandlordContractsUseCase,
+  ) { }
 
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -43,6 +46,15 @@ export class ContractsController {
   @ApiUnprocessableEntityResponse({ description: 'Solo se permiten archivos PDF o el archivo supera 10 MB' })
   upload(@Body() dto: UploadContractDto, @Req() req: AuthenticatedRequest) {
     return this.uploadContractUseCase.execute(dto, req.user.id, req.user.roles);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('landlord')
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Listar contratos del arrendador' })
+  @ApiOkResponse({ type: [LandlordContractListItemDto] })
+  getLandlordContracts(@Req() req: AuthenticatedRequest) {
+    return this.getLandlordContractsUseCase.execute(req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)

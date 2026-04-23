@@ -135,6 +135,9 @@ function makeStubs(input: {
     async findFileStatusByName(): Promise<{ id: string } | null> {
       return { id: uuidv4() };
     },
+    async findContractsByLandlordId(): Promise<any[]> {
+      return [];
+    },
   };
 
   const eSignatureProvider: IESignatureProvider = {

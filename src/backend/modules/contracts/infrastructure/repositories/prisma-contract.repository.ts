@@ -6,11 +6,12 @@ import { ContractPartyEntity } from '@modules/contracts/domain/entities/contract
 import {
   CreateContractData,
   IContractRepository,
+  LandlordContractListItem,
 } from '@modules/contracts/domain/ports/contract-repository.port';
 
 @Injectable()
 export class PrismaContractRepository implements IContractRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(data: CreateContractData): Promise<ContractEntity> {
     const contract = await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
@@ -130,6 +131,77 @@ export class PrismaContractRepository implements IContractRepository {
 
   async findFileStatusByName(name: string): Promise<{ id: string } | null> {
     return this.prisma.fileStatus.findUnique({ where: { name } });
+  }
+
+  async findContractsByLandlordId(landlordUserId: string): Promise<LandlordContractListItem[]> {
+    // Step 1: Find all portfolios owned by this landlord
+    const portfolios = await this.prisma.landlordPortfolio.findMany({
+      where: { user_id: landlordUserId },
+      select: { id: true },
+    });
+    if (portfolios.length === 0) return [];
+
+    const portfolioIds = portfolios.map((p) => p.id);
+
+    // Step 2: Find all portfolio units in those portfolios
+    const units = await this.prisma.portfolioUnit.findMany({
+      where: { portfolio_id: { in: portfolioIds } },
+      select: { id: true, name: true },
+    });
+    if (units.length === 0) return [];
+
+    const unitIds = units.map((u) => u.id);
+    const unitNameMap = new Map(units.map((u) => [u.id, u.name]));
+
+    // Step 3: Find all leases for those units
+    const leases = await this.prisma.lease.findMany({
+      where: { portfolio_unit_id: { in: unitIds } },
+      select: { id: true, portfolio_unit_id: true, user_id: true },
+    });
+    if (leases.length === 0) return [];
+
+    const leaseIds = leases.map((l) => l.id);
+
+    // Step 4: Find all contracts for those leases (include status)
+    const contracts = await this.prisma.contract.findMany({
+      where: { lease_id: { in: leaseIds } },
+      include: { status: true },
+    });
+    if (contracts.length === 0) return [];
+
+    // Step 5: Resolve tenant names from User → NaturalPersonDetail
+    const tenantUserIds = [...new Set(leases.map((l) => l.user_id))];
+    const naturalPersonDetails = await this.prisma.naturalPersonDetail.findMany({
+      where: { user_id: { in: tenantUserIds } },
+      select: { user_id: true, first_name: true, last_name: true },
+    });
+    const tenantNameMap = new Map(
+      naturalPersonDetails.map((np) => [np.user_id, `${np.first_name} ${np.last_name}`]),
+    );
+
+    // Build lookup: leaseId → { unitName, tenantUserId }
+    const leaseMap = new Map(
+      leases.map((l) => [
+        l.id,
+        {
+          unitName: unitNameMap.get(l.portfolio_unit_id) ?? '',
+          tenantUserId: l.user_id,
+        },
+      ]),
+    );
+
+    // Step 6: Map contracts to LandlordContractListItem
+    return contracts.map((c) => {
+      const leaseInfo = leaseMap.get(c.lease_id);
+      return {
+        id: c.id,
+        unitName: leaseInfo?.unitName ?? '',
+        tenantName: tenantNameMap.get(leaseInfo?.tenantUserId ?? '') ?? '',
+        status: c.status.name,
+        startDate: c.start_date,
+        endDate: c.end_date,
+      };
+    });
   }
 
   private toEntity(contract: {

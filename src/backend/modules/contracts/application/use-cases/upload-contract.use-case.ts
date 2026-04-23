@@ -25,7 +25,7 @@ export class UploadContractUseCase {
     @Inject(CONTRACT_REPOSITORY)
     private readonly repository: IContractRepository,
     private readonly auditLogger: AuditLoggerService,
-  ) {}
+  ) { }
 
   async execute(
     dto: UploadContractDto,
@@ -54,11 +54,17 @@ export class UploadContractUseCase {
 
     const tenantUserId = await this.repository.getLeaseTenantUserId(dto.leaseId);
 
-    const fileType = await this.repository.findFileTypeByName('CONTRACT');
+    const fileType = await this.repository.findFileTypeByName('CONTRACT_PDF');
     const fileStatus = await this.repository.findFileStatusByName('ACTIVE');
 
-    const fileTypeId = fileType?.id ?? '';
-    const fileStatusId = fileStatus?.id ?? '';
+    const fileTypeId = fileType?.id;
+    const fileStatusId = fileStatus?.id;
+
+    if (!fileTypeId || !fileStatusId) {
+      throw new UnprocessableEntityException(
+        'Configuración de archivos incompleta. Contacte al administrador.',
+      );
+    }
 
     const contract = await this.repository.create({
       leaseId: dto.leaseId,

@@ -134,6 +134,9 @@ function makeStubs(input: {
     async findFileStatusByName(): Promise<{ id: string } | null> {
       return { id: uuidv4() };
     },
+    async findContractsByLandlordId(): Promise<any[]> {
+      return [];
+    },
   };
 
   const eSignatureProvider: IESignatureProvider = {
@@ -143,8 +146,8 @@ function makeStubs(input: {
   };
 
   const notificationPort: INotificationPort = {
-    async notifyContractSigned() {},
-    async notifySigningFailed() {},
+    async notifyContractSigned() { },
+    async notifySigningFailed() { },
   };
 
   const auditLogger = new AuditLoggerService();

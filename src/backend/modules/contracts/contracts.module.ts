@@ -5,6 +5,7 @@ import { CircuitBreakerFactory } from '@src/shared/circuit-breaker/circuit-break
 import { PrismaService } from '@src/shared/prisma/prisma.service';
 import { S3ClientFactory } from '@src/shared/s3';
 import { GetContractSummaryUseCase } from './application/use-cases/get-contract-summary.use-case';
+import { GetLandlordContractsUseCase } from './application/use-cases/get-landlord-contracts.use-case';
 import { HandleSigningWebhookUseCase } from './application/use-cases/handle-signing-webhook.use-case';
 import { InitiateSigningUseCase } from './application/use-cases/initiate-signing.use-case';
 import {
@@ -31,6 +32,7 @@ import { PrismaContractRepository } from './infrastructure/repositories/prisma-c
     ContractsEtlService,
     UploadContractUseCase,
     GetContractSummaryUseCase,
+    GetLandlordContractsUseCase,
     InitiateSigningUseCase,
     HandleSigningWebhookUseCase,
     {

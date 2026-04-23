@@ -126,6 +126,9 @@ function makeRepositoryStub(landlordUserId: string, tenantUserId: string): {
     async findFileStatusByName(): Promise<{ id: string } | null> {
       return { id: fileStatusId };
     },
+    async findContractsByLandlordId(): Promise<any[]> {
+      return [];
+    },
   };
 
   return { stub, capturedData, storedContracts, storedParties };

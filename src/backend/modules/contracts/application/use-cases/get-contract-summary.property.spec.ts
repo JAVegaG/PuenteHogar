@@ -90,6 +90,7 @@ function makeRepositoryStub(input: {
     async findContractStatusByName(): Promise<{ id: string } | null> { return null; },
     async findFileTypeByName(): Promise<{ id: string } | null> { return null; },
     async findFileStatusByName(): Promise<{ id: string } | null> { return null; },
+    async findContractsByLandlordId(): Promise<any[]> { return []; },
   };
 }
 
