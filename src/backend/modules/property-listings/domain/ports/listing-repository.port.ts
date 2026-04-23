@@ -46,13 +46,24 @@ export interface PaginatedListings {
   total: number;
 }
 
+export interface UpdateListingData {
+  title?: string;
+  description?: string;
+  price?: number;
+  newPhotoUrls?: string[];
+  removePhotoIds?: string[];
+}
+
 export interface IListingRepository {
   create(data: CreateListingData): Promise<ListingEntity>;
   findPublished(filters: ListingFilters): Promise<PaginatedListings>;
   findById(id: string): Promise<ListingEntity | null>;
   findDetailById(id: string): Promise<ListingDetail | null>;
+  findActiveByPortfolioUnitId(portfolioUnitId: string): Promise<ListingEntity | null>;
+  update(id: string, data: UpdateListingData): Promise<ListingEntity>;
   unpublish(id: string): Promise<void>;
   invalidateAllListingCacheKeys?(): Promise<void>;
   getOwnerUserId(listingId: string): Promise<string | null>;
+  getOwnerUserIdByUnit(portfolioUnitId: string): Promise<string | null>;
   registerContactEvent(listingId: string, tenantUserId: string): Promise<void>;
 }

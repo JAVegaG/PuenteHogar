@@ -8,13 +8,14 @@ import {
   ListingDetail,
   ListingFilters,
   PaginatedListings,
+  UpdateListingData,
 } from '@modules/property-listings/domain/ports/listing-repository.port';
 
 @Injectable()
 export class PrismaListingRepository implements IListingRepository {
   private readonly logger = new Logger(PrismaListingRepository.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(data: CreateListingData): Promise<ListingEntity> {
     const listing = await this.prisma.$transaction(async (tx) => {
@@ -290,6 +291,72 @@ export class PrismaListingRepository implements IListingRepository {
     });
 
     return portfolio?.user_id ?? null;
+  }
+
+  async findActiveByPortfolioUnitId(portfolioUnitId: string): Promise<ListingEntity | null> {
+    const listing = await this.prisma.listing.findFirst({
+      where: { portfolio_unit_id: portfolioUnitId, is_active: true },
+      include: { photos: true },
+    });
+
+    if (!listing) return null;
+    return this.toEntity(listing);
+  }
+
+  async getOwnerUserIdByUnit(portfolioUnitId: string): Promise<string | null> {
+    const unit = await this.prisma.portfolioUnit.findFirst({
+      where: { id: portfolioUnitId },
+      select: { portfolio_id: true },
+    });
+
+    if (!unit) return null;
+
+    const portfolio = await this.prisma.landlordPortfolio.findFirst({
+      where: { id: unit.portfolio_id },
+      select: { user_id: true },
+    });
+
+    return portfolio?.user_id ?? null;
+  }
+
+  async update(id: string, data: UpdateListingData): Promise<ListingEntity> {
+    const listing = await this.prisma.$transaction(async (tx) => {
+      // Update only provided fields
+      const updateData: Record<string, unknown> = {};
+      if (data.title !== undefined) updateData.title = data.title;
+      if (data.description !== undefined) updateData.description = data.description;
+      if (data.price !== undefined) updateData.price = data.price;
+
+      if (Object.keys(updateData).length > 0) {
+        await tx.listing.update({ where: { id }, data: updateData });
+      }
+
+      // Remove specified photos
+      if (data.removePhotoIds && data.removePhotoIds.length > 0) {
+        await tx.photo.deleteMany({
+          where: { id: { in: data.removePhotoIds }, listing_id: id },
+        });
+      }
+
+      // Create new photos
+      if (data.newPhotoUrls && data.newPhotoUrls.length > 0) {
+        await tx.photo.createMany({
+          data: data.newPhotoUrls.map((url) => ({
+            listing_id: id,
+            file_url: url,
+            is_main: false,
+          })),
+        });
+      }
+
+      // Return the updated listing with photos
+      return tx.listing.findUniqueOrThrow({
+        where: { id },
+        include: { photos: true },
+      });
+    });
+
+    return this.toEntity(listing);
   }
 
   async registerContactEvent(listingId: string, tenantUserId: string): Promise<void> {
