@@ -131,14 +131,24 @@ export default function UnitCard({ unit, portfolioId }: UnitCardProps) {
         </Link>
       )}
 
-      {/* Lease history link (non-occupied) */}
-      {!isOccupied && pid && (
-        <div className="mt-3">
+      {/* Bottom links row */}
+      {pid && (
+        <div className="mt-3 flex items-center justify-between">
+          {!isOccupied ? (
+            <Link
+              href={`/mi-portafolio/${pid}/unidades/${unit.id}/arriendos`}
+              className="text-caption text-[#1d4ed8] hover:underline inline-flex items-center min-h-[44px]"
+            >
+              Ver historial de arriendos
+            </Link>
+          ) : (
+            <span />
+          )}
           <Link
-            href={`/mi-portafolio/${pid}/unidades/${unit.id}/arriendos`}
-            className="text-caption text-[#1d4ed8] hover:underline inline-flex items-center min-h-[44px]"
+            href={`/mi-portafolio/${pid}/unidades/${unit.id}`}
+            className="text-caption text-[#4b5563] hover:underline inline-flex items-center min-h-[44px]"
           >
-            Ver historial
+            Ver detalle de unidad
           </Link>
         </div>
       )}

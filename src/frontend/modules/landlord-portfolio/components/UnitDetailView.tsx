@@ -1,9 +1,17 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { formatPrice } from '@/shared/utils/formatPrice';
+import { ConfirmationDialog } from '@/shared/components/ConfirmationDialog';
+import { portfolioService } from '@/shared/services/portfolio';
 import type { PortfolioUnit } from '../types';
 
 interface UnitDetailViewProps {
   unit: PortfolioUnit;
+  token: string;
+  onDelete?: () => void;
 }
 
 function formatSpanishDate(isoDate: string): string {
@@ -14,38 +22,69 @@ function formatSpanishDate(isoDate: string): string {
   });
 }
 
-export default function UnitDetailView({ unit }: UnitDetailViewProps) {
+export default function UnitDetailView({ unit, token, onDelete }: UnitDetailViewProps) {
+  const router = useRouter();
   const hasConditions = unit.conditions !== null && unit.conditions.trim() !== '';
   const formattedPrice = formatPrice(unit.leaseBaseAmount);
   const hasActiveListing = unit.hasActiveListing ?? false;
   const unitStatus = unit.unitStatus ?? 'Disponible';
   const portfolioId = unit.portfolioId;
 
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const handleDeleteClick = () => {
+    setDeleteError(null);
+    setIsDialogOpen(true);
+  };
+
+  const handleCancelDelete = () => {
+    setIsDialogOpen(false);
+  };
+
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true);
+    setDeleteError(null);
+    try {
+      await portfolioService.deleteUnit(portfolioId, unit.id, token);
+      setIsDialogOpen(false);
+      onDelete?.();
+      router.push(`/mi-portafolio/${portfolioId}/unidades`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error desconocido';
+      setIsDialogOpen(false);
+      setDeleteError(message);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div>
       <section aria-label="Canon base de arrendamiento">
         <div className="flex items-baseline gap-2 flex-wrap">
           <h2 className="text-[24px] font-bold text-[#1d4ed8]">
-            ${formattedPrice}/mes
+            {formattedPrice}/mes
           </h2>
-          <span className="bg-[#f3f4f6] rounded-[4px] px-2 py-0.5 text-[14px] text-[#4b5563]">
+          <span className="bg-[#f3f4f6] rounded-[4px] px-2 py-0.5 text-caption text-[#4b5563]">
             {unit.leaseBaseCurrency}
           </span>
         </div>
       </section>
 
       <section aria-label="Condiciones del arrendamiento" className="mt-6">
-        <h3 className="text-[20px] font-semibold">Condiciones</h3>
+        <h3 className="text-h3 font-semibold">Condiciones</h3>
         {hasConditions ? (
-          <p className="text-[16px] text-[#4b5563] mt-2">{unit.conditions}</p>
+          <p className="text-body text-[#4b5563] mt-2">{unit.conditions}</p>
         ) : (
-          <p className="text-[16px] text-[#4b5563] mt-2">Sin condiciones especiales</p>
+          <p className="text-body text-[#4b5563] mt-2">Sin condiciones especiales</p>
         )}
       </section>
 
       <section aria-label="Información de la unidad" className="mt-6">
-        <h3 className="text-[20px] font-semibold">Información</h3>
-        <dl className="mt-2 space-y-1 text-[16px] text-[#4b5563]">
+        <h3 className="text-h3 font-semibold">Información</h3>
+        <dl className="mt-2 space-y-1 text-body text-[#4b5563]">
           <div className="flex gap-1">
             <dt>Fecha de creación:</dt>
             <dd>{formatSpanishDate(unit.createdAt)}</dd>
@@ -82,7 +121,31 @@ export default function UnitDetailView({ unit }: UnitDetailViewProps) {
             Publicar en arriendo
           </Link>
         )}
+
+        <button
+          type="button"
+          onClick={handleDeleteClick}
+          className="flex items-center justify-center w-full min-h-[44px] rounded-[10px] text-body font-medium border border-red-600 text-red-600 hover:bg-red-50 active:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2 transition-colors"
+        >
+          Eliminar unidad
+        </button>
       </div>
+
+      {deleteError && (
+        <p className="mt-3 text-caption text-red-600" role="alert">
+          {deleteError}
+        </p>
+      )}
+
+      <ConfirmationDialog
+        isOpen={isDialogOpen}
+        title="Eliminar unidad"
+        message="¿Estás seguro de que deseas eliminar esta unidad?"
+        confirmLabel="Eliminar"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        isLoading={isDeleting}
+      />
     </div>
   );
 }
