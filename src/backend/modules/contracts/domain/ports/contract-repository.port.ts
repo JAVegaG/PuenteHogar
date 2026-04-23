@@ -1,6 +1,12 @@
 import type { ContractEntity, ContractStatus } from '../entities/contract.entity';
 import type { ContractPartyEntity } from '../entities/contract-party.entity';
 
+export interface SigningInfo {
+  contractPartyId: string;
+  role: string;
+  signingStatusName: string;
+}
+
 export interface CreateContractData {
   leaseId: string;
   startDate: Date;
@@ -37,4 +43,7 @@ export interface IContractRepository {
   findFileTypeByName(name: string): Promise<{ id: string } | null>;
   findFileStatusByName(name: string): Promise<{ id: string } | null>;
   findContractsByLandlordId(landlordUserId: string): Promise<LandlordContractListItem[]>;
+  updateFileUrl(contractId: string, newFileUrl: string): Promise<ContractEntity>;
+  deleteContract(contractId: string): Promise<void>;
+  findSigningsByContractId(contractId: string): Promise<SigningInfo[]>;
 }

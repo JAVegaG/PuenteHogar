@@ -1,5 +1,13 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
+export class SigningDetailDto {
+  @ApiProperty({ description: 'Rol de la parte: LANDLORD | TENANT' })
+  role!: string;
+
+  @ApiProperty({ description: 'Indica si la parte ha firmado el contrato' })
+  hasSigned!: boolean;
+}
+
 export class ContractPartyDto {
   @ApiProperty()
   userId!: string;
@@ -35,4 +43,7 @@ export class ContractSummaryDto {
 
   @ApiProperty({ type: [ContractPartyDto] })
   parties!: ContractPartyDto[];
+
+  @ApiPropertyOptional({ type: [SigningDetailDto], description: 'Detalle de firma por cada parte del contrato' })
+  signingDetails?: SigningDetailDto[];
 }
