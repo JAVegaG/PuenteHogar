@@ -288,6 +288,17 @@ Use these in imports when referencing across the module/src boundary.
 - Back buttons use the left-arrow SVG icon: `<line x1="19" y1="12" x2="5" y2="12" />` + `<polyline points="12 19 5 12 12 5" />` — NOT the chevron (`<polyline points="15 18 9 12 15 6" />`)
 - This pattern is established in `mi-portafolio/[id]/page.tsx` and `mi-portafolio/[id]/agregar-unidad/page.tsx`
 
+### StatusBadge Component
+- Shared component at `src/frontend/shared/components/StatusBadge.tsx`
+- Accepts `status: string` and `variant: 'lease' | 'unit' | 'payment' | 'listing'`
+- Available variants and their color mappings:
+  - `lease`: Vigente (green), Acordado (blue), Finalizado (gray)
+  - `unit`: Ocupado (amber), Disponible (green), Mantenimiento (red)
+  - `payment`: Al día (green), Pendiente (amber)
+  - `listing`: Publicada (blue), Sin publicar (gray)
+- Unknown statuses fall back to gray (`#F3F4F6` bg, `#4B5563` text)
+- Pages should import the shared `UnitCard` component from `@modules/landlord-portfolio/components/UnitCard.tsx` — do NOT duplicate inline
+
 ## Common Commands
 
 ```bash

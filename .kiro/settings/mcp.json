@@ -22,7 +22,14 @@
         "clickup_get_chat_message_replies"
       ],
       "autoApprove": [
-        "clickup_get_task"
+        "clickup_get_task",
+        "clickup_search",
+        "clickup_create_task_comment",
+        "clickup_create_task_comment",
+        "clickup_create_task_comment",
+        "clickup_update_task",
+        "clickup_update_task",
+        "clickup_update_task"
       ]
     }
   }

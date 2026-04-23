@@ -103,6 +103,7 @@ modules/{name}/
 - Input validation at both UI and API boundary
 - Notification ports are stubbed per-module; real `notifications` module wires them in `AppModule`
 - All notifications are fire-and-forget (no `await`, no throw on failure)
+- Shared UI components (e.g. `StatusBadge`, `Header`, `Skeleton`, `ErrorState`) live in `src/frontend/shared/components/` — page files should import these rather than defining inline duplicates
 
 ## Frontend Naming Convention
 
