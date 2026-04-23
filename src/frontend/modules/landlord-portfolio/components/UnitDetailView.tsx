@@ -17,6 +17,9 @@ function formatSpanishDate(isoDate: string): string {
 export default function UnitDetailView({ unit }: UnitDetailViewProps) {
   const hasConditions = unit.conditions !== null && unit.conditions.trim() !== '';
   const formattedPrice = formatPrice(unit.leaseBaseAmount);
+  const hasActiveListing = unit.hasActiveListing ?? false;
+  const unitStatus = unit.unitStatus ?? 'Disponible';
+  const portfolioId = unit.portfolioId;
 
   return (
     <div>
@@ -54,13 +57,31 @@ export default function UnitDetailView({ unit }: UnitDetailViewProps) {
         </dl>
       </section>
 
-      <div className="mt-6">
+      <div className="mt-6 flex flex-col gap-3">
         <Link
           href={`/mi-portafolio/${unit.id}/editar`}
           className="block w-full h-[48px] rounded-[10px] min-w-[44px] min-h-[44px] text-body bg-primary text-white text-center leading-[48px] shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)] hover:bg-primary-600 active:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors"
         >
           Editar unidad
         </Link>
+
+        {hasActiveListing && (
+          <Link
+            href={`/mi-portafolio/${portfolioId}/unidades/${unit.id}/publicacion`}
+            className="flex items-center justify-center w-full min-h-[44px] rounded-[10px] text-body font-medium border border-[#1d4ed8] text-[#1d4ed8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d4ed8] focus-visible:ring-offset-2 transition-colors"
+          >
+            Gestionar publicación
+          </Link>
+        )}
+
+        {unitStatus === 'Disponible' && !hasActiveListing && (
+          <Link
+            href={`/mi-portafolio/${portfolioId}/unidades/${unit.id}/publicar`}
+            className="flex items-center justify-center w-full min-h-[44px] rounded-[10px] text-body font-medium border border-[#1d4ed8] text-[#1d4ed8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d4ed8] focus-visible:ring-offset-2 transition-colors"
+          >
+            Publicar en arriendo
+          </Link>
+        )}
       </div>
     </div>
   );

@@ -45,14 +45,19 @@ export default function UnitCard({ unit, portfolioId }: UnitCardProps) {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="text-body font-semibold text-[#111827]">
-              {unit.name || 'Unidad sin nombre'}
-            </h3>
-            <StatusBadge status={status} variant="unit" />
+            <div className="flex flex-col items-start gap-1 shrink-0">
+              <h3 className="text-body font-semibold text-[#111827]">
+                {unit.name || 'Unidad sin nombre'}
+              </h3>
+              {propertyType && (
+                <p className="text-caption text-[#4b5563] mt-[2px]">{propertyType}</p>
+              )}
+            </div>
+            <div className="flex flex-col items-end gap-1 shrink-0">
+              <StatusBadge status={status} variant="unit" />
+              <StatusBadge status={hasActiveListing ? 'Publicada' : 'Sin publicar'} variant="listing" />
+            </div>
           </div>
-          {propertyType && (
-            <p className="text-caption text-[#4b5563] mt-[2px]">{propertyType}</p>
-          )}
         </div>
       </div>
 
@@ -116,11 +121,14 @@ export default function UnitCard({ unit, portfolioId }: UnitCardProps) {
         </Link>
       )}
 
-      {/* Published indicator */}
-      {hasActiveListing && (
-        <div className="mt-3 flex items-center justify-center w-full min-h-[44px] rounded-[6px] bg-[#f0fdf4]">
-          <p className="text-caption font-medium text-[#166534]">✓ Publicada en Explorar</p>
-        </div>
+      {/* Manage listing action */}
+      {hasActiveListing && pid && (
+        <Link
+          href={`/mi-portafolio/${pid}/unidades/${unit.id}/publicacion`}
+          className="flex items-center justify-center gap-2 w-full border border-[#1d4ed8] text-[#1d4ed8] rounded-[6px] text-body font-medium min-h-[44px] mt-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d4ed8] focus-visible:ring-offset-2"
+        >
+          Gestionar publicación
+        </Link>
       )}
 
       {/* Lease history link (non-occupied) */}
