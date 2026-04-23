@@ -81,8 +81,11 @@ function makeRepositoryStub(listings: ListingEntity[]): IListingRepository {
     async create() { throw new Error('not implemented'); },
     async findById() { return null; },
     async findDetailById() { return null; },
+    async findActiveByPortfolioUnitId() { return null; },
+    async update() { return null as unknown as ListingEntity; },
     async unpublish() { return; },
     async getOwnerUserId() { return null; },
+    async getOwnerUserIdByUnit() { return null; },
     async registerContactEvent() { return; },
   };
 }

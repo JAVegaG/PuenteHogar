@@ -131,8 +131,11 @@ function makeRepositoryStub(): {
     async findPublished() { return { data: [], total: 0 }; },
     async findById() { return null; },
     async findDetailById() { return null; },
+    async findActiveByPortfolioUnitId() { return null; },
+    async update() { return null as unknown as ListingEntity; },
     async unpublish() { return; },
     async getOwnerUserId() { return null; },
+    async getOwnerUserIdByUnit() { return null; },
     async registerContactEvent() { return; },
   };
 

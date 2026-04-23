@@ -53,8 +53,11 @@ function makeRepositoryStub(detail: ListingDetail | null): IListingRepository {
     async findPublished() { return { data: [], total: 0 }; },
     async findById() { return null; },
     async findDetailById(): Promise<ListingDetail | null> { return detail; },
+    async findActiveByPortfolioUnitId() { return null; },
+    async update() { return null as unknown as ListingEntity; },
     async unpublish() { return; },
     async getOwnerUserId() { return null; },
+    async getOwnerUserIdByUnit() { return null; },
     async registerContactEvent() { return; },
   };
 }
@@ -135,7 +138,13 @@ describe('GetListingDetailUseCase — Property 20: Detalle de inmueble contiene 
 
         // Req 3.7: listingDate (publication date) must be present
         if (!(result.listingDate instanceof Date)) return false;
-        if (result.listingDate.getTime() !== data.listingDate.getTime()) return false;
+        const expectedTime = data.listingDate.getTime();
+        const actualTime = result.listingDate.getTime();
+        if (Number.isNaN(expectedTime) && Number.isNaN(actualTime)) {
+          // Both NaN — considered equal
+        } else if (actualTime !== expectedTime) {
+          return false;
+        }
 
         // Req 3.6: price (canon) must match
         if (result.price !== data.price) return false;

@@ -39,14 +39,17 @@ function makeRepositoryStub(ownerUserId: string | null): IListingRepository {
         [],
       );
     },
-    async registerContactEvent(): Promise<void> {},
+    async registerContactEvent(): Promise<void> { },
     async getOwnerUserId(): Promise<string | null> {
       return ownerUserId;
     },
     async create() { throw new Error('not implemented'); },
     async findPublished() { return { data: [], total: 0 }; },
     async findDetailById() { return null; },
+    async findActiveByPortfolioUnitId() { return null; },
+    async update() { return null as unknown as ListingEntity; },
     async unpublish() { return; },
+    async getOwnerUserIdByUnit() { return null; },
   };
 }
 

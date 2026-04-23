@@ -107,6 +107,15 @@ function makeMutableRepositoryStub(
     async findDetailById() {
       return null;
     },
+    async findActiveByPortfolioUnitId() {
+      return null;
+    },
+    async update() {
+      return null as unknown as ListingEntity;
+    },
+    async getOwnerUserIdByUnit() {
+      return null;
+    },
     async registerContactEvent() {
       return;
     },

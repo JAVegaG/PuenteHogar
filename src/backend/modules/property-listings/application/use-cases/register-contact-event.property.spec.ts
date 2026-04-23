@@ -57,7 +57,10 @@ function makeRepositoryStub(ownerUserId: string): {
     async create() { throw new Error('not implemented'); },
     async findPublished() { return { data: [], total: 0 }; },
     async findDetailById() { return null; },
+    async findActiveByPortfolioUnitId() { return null; },
+    async update() { return null as unknown as ListingEntity; },
     async unpublish() { return; },
+    async getOwnerUserIdByUnit() { return null; },
   };
 
   return { stub, contactRecords };
