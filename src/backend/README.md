@@ -45,8 +45,8 @@ src/backend/
 │       └── s3/                 # S3ClientFactory, object-key utils, custom exceptions (ObjectStorage*)
 └── modules/
     ├── users/                  # Registro, login, RBAC
-    ├── property-listings/      # Publicaciones, búsqueda, fotos
-    ├── landlord-portfolio/     # Portafolios (CRUD, paginación, estadísticas agregadas), unidades enriquecidas (cross-schema Property+Address+PortfolioUnit), leases, catálogo geográfico (departamentos/ciudades DANE)
+    ├── property-listings/      # Publicaciones, búsqueda, fotos, gestión de publicaciones (editar, despublicar, consulta por unidad)
+    ├── landlord-portfolio/     # Portafolios (CRUD, paginación, estadísticas agregadas), unidades enriquecidas (cross-schema Property+Address+PortfolioUnit, con unitStatus/hasActiveListing/tenantName/monthlyRent computados), leases, catálogo geográfico (departamentos/ciudades DANE)
     ├── contracts/              # Contratos, firma electrónica, almacenamiento de documentos
     ├── payments/               # Pagos, pasarela, idempotencia (dominio, aplicación, infraestructura, controlador)
     ├── accounting/             # Reportes financieros (dominio, aplicación, infraestructura: PrismaAccountingRepository + RedisReportCache)
