@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 
 interface SideMenuProps {
@@ -97,14 +98,14 @@ export function SideMenu({ isOpen, onClose, user, onLogout }: SideMenuProps) {
               {/* Navigation links */}
               <div className="flex-1 py-element-gap">
                 {NAV_LINKS.map((link) => (
-                  <a
+                  <Link
                     key={link.href}
                     href={link.href}
                     className="flex items-center gap-element-gap px-mobile-margin py-3 text-body text-neutral-900 hover:bg-neutral-50 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
                   >
                     <link.icon />
                     <span>{link.label}</span>
-                  </a>
+                  </Link>
                 ))}
               </div>
 
@@ -137,30 +138,30 @@ export function SideMenu({ isOpen, onClose, user, onLogout }: SideMenuProps) {
             <>
               {/* Anonymous user */}
               <div className="flex-1 py-element-gap">
-                <a
+                <Link
                   href="/explorar"
                   className="flex items-center gap-element-gap px-mobile-margin py-3 text-body text-neutral-900 hover:bg-neutral-50 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
                 >
                   <SearchIcon />
                   <span>Explorar inmuebles</span>
-                </a>
+                </Link>
               </div>
 
               <div className="border-t border-neutral-300 py-element-gap">
-                <a
+                <Link
                   href="/auth/login"
                   className="flex items-center gap-element-gap px-mobile-margin py-3 text-body text-neutral-900 hover:bg-neutral-50 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
                 >
                   <LoginIcon />
                   <span>Iniciar sesión</span>
-                </a>
-                <a
+                </Link>
+                <Link
                   href="/auth/registro"
                   className="flex items-center gap-element-gap px-mobile-margin py-3 text-body text-neutral-900 hover:bg-neutral-50 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
                 >
                   <RegisterIcon />
                   <span>Registrarse</span>
-                </a>
+                </Link>
               </div>
             </>
           )}
