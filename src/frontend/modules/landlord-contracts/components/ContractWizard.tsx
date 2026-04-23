@@ -43,7 +43,6 @@ export function ContractWizard({ lease, onSuccess }: ContractWizardProps) {
         endDate: '',
         monthlyRent: String(lease.monthlyAmount || ''),
         file: null,
-        fileUrl: '',
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [serverError, setServerError] = useState<string | null>(null);
@@ -61,7 +60,7 @@ export function ContractWizard({ lease, onSuccess }: ContractWizardProps) {
     };
 
     const handleFileSelect = (file: File) => {
-        setFormData((prev) => ({ ...prev, file, fileUrl: '' }));
+        setFormData((prev) => ({ ...prev, file }));
         setErrors((prev) => {
             if (!prev.file) return prev;
             const next = { ...prev };
@@ -116,17 +115,18 @@ export function ContractWizard({ lease, onSuccess }: ContractWizardProps) {
         }
 
         try {
-            // MVP stub: use a placeholder file URL since ObjectStorageAdapter returns a placeholder
-            const fileUrl = `https://storage.placeholder.com/contracts/${Date.now()}.pdf`;
+            if (!formData.file) {
+                setErrors({ file: 'Debes seleccionar un archivo PDF' });
+                setIsSubmitting(false);
+                return;
+            }
 
             const created = await contractService.createContract(
                 {
+                    file: formData.file,
                     leaseId: lease.id,
                     startDate: formData.startDate,
                     endDate: formData.endDate || undefined,
-                    fileUrl,
-                    fileSizeBytes: formData.file?.size,
-                    mimeType: 'application/pdf',
                 },
                 token
             );
@@ -141,7 +141,11 @@ export function ContractWizard({ lease, onSuccess }: ContractWizardProps) {
                 logout();
                 return;
             }
-            setServerError(message);
+            if (message.includes('almacenamiento') || message.includes('Error del servidor')) {
+                setServerError('Problema temporal de almacenamiento. Intenta de nuevo más tarde.');
+            } else {
+                setServerError(message);
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -226,7 +230,7 @@ export function ContractWizard({ lease, onSuccess }: ContractWizardProps) {
                                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                                     />
                                 </svg>
-                                Creando contrato...
+                                Subiendo contrato...
                             </span>
                         ) : (
                             'Crear contrato'
