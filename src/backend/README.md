@@ -47,7 +47,7 @@ src/backend/
     ├── users/                  # Registro, login, RBAC
     ├── property-listings/      # Publicaciones, búsqueda, fotos, gestión de publicaciones (editar, despublicar, consulta por unidad)
     ├── landlord-portfolio/     # Portafolios (CRUD completo: crear, listar, actualizar, eliminar), unidades enriquecidas (cross-schema Property+Address+PortfolioUnit, con unitStatus/hasActiveListing/tenantName/monthlyRent computados; crear, actualizar, eliminar con validación de arriendos activos), leases (listado por unidad, detalle con info de arrendatario descifrada via IPIIEncryptor), catálogo geográfico (departamentos/ciudades DANE)
-    ├── contracts/              # Contratos, firma electrónica, almacenamiento de documentos, listado de contratos por arrendador (cross-schema: Contract→Lease→PortfolioUnit→LandlordPortfolio)
+    ├── contracts/              # Contratos (CRUD: crear con upload S3 real, consultar con presigned URL, reemplazar PDF en PENDING, eliminar con guardas de estado), firma electrónica, almacenamiento de documentos en S3 (presigned URLs, 15 min TTL), listado de contratos por arrendador (cross-schema: Contract→Lease→PortfolioUnit→LandlordPortfolio), signing details por parte
     ├── payments/               # Pagos, pasarela, idempotencia (dominio, aplicación, infraestructura, controlador)
     ├── accounting/             # Reportes financieros (dominio, aplicación, infraestructura: PrismaAccountingRepository + RedisReportCache)
     ├── rental-tracking/        # Máquina de estados del arriendo (dominio, aplicación, infraestructura, controlador)
@@ -79,6 +79,7 @@ modules/{nombre}/
 | `RedisService` | Cache-aside con fallback transparente a PostgreSQL |
 | `PrismaService` | Cliente Prisma singleton compartido entre módulos (`@src/shared/prisma/`) |
 | `S3ClientFactory` | Crea y cachea una instancia de `S3Client` (AWS SDK v3); soporta endpoint personalizado para LocalStack/MinIO |
+| `@aws-sdk/s3-request-presigner` | Genera presigned URLs para descarga segura de archivos privados en S3 (usado por `ContractObjectStorageAdapter.getPresignedUrl()`) |
 
 > Los módulos acceden a `shared/` mediante el alias `@src/shared/` (resuelto por `tsconfig.paths` como `@src/*` → `./src/*`).
 
@@ -166,3 +167,5 @@ npm run db:seed            # Seed de catálogos (roles, tipos de documento, tipo
 | `PORT` | Puerto del servidor (default: `3000`) |
 | `NODE_ENV` | Entorno de ejecución (`development`, `production`) |
 | `CORS_ORIGINS` | Orígenes permitidos (separados por coma). Si no se define, acepta cualquier origen en desarrollo |
+| `AWS_ACCESS_KEY_ID` | Clave de acceso AWS (opcional; el SDK la resuelve automáticamente en entornos AWS. Definir explícitamente para desarrollo local con LocalStack/MinIO) |
+| `AWS_SECRET_ACCESS_KEY` | Secreto de acceso AWS (misma nota que `AWS_ACCESS_KEY_ID`) |
