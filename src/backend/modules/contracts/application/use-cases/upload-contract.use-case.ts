@@ -1,4 +1,5 @@
 import {
+  BadGatewayException,
   ForbiddenException,
   Inject,
   Injectable,
@@ -6,11 +7,18 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
+import {
+  ObjectStorageException,
+  ObjectStorageCredentialsException,
+  ObjectStorageBucketNotFoundException,
+  ObjectStorageValidationException,
+} from '@src/shared/s3';
 import { ContractEntity } from '@modules/contracts/domain/entities/contract.entity';
 import { ContractPartyEntity } from '@modules/contracts/domain/entities/contract-party.entity';
 import type { IContractRepository } from '@modules/contracts/domain/ports/contract-repository.port';
+import type { IObjectStorage } from '@modules/contracts/domain/ports/object-storage.port';
 import { ContractSummaryDto } from '@modules/contracts/application/dtos/contract-summary.dto';
-import { UploadContractDto } from '@modules/contracts/application/dtos/upload-contract.dto';
+import { CreateContractDto } from '@modules/contracts/application/dtos/create-contract.dto';
 
 export const CONTRACT_REPOSITORY = 'CONTRACT_REPOSITORY';
 export const E_SIGNATURE_PROVIDER = 'E_SIGNATURE_PROVIDER';
@@ -24,11 +32,14 @@ export class UploadContractUseCase {
   constructor(
     @Inject(CONTRACT_REPOSITORY)
     private readonly repository: IContractRepository,
+    @Inject(CONTRACT_OBJECT_STORAGE)
+    private readonly objectStorage: IObjectStorage,
     private readonly auditLogger: AuditLoggerService,
   ) { }
 
   async execute(
-    dto: UploadContractDto,
+    file: { buffer: Buffer; originalname: string; size: number; mimetype: string },
+    dto: CreateContractDto,
     userId: string,
     userRoles: string[],
   ): Promise<ContractSummaryDto> {
@@ -36,11 +47,11 @@ export class UploadContractUseCase {
       throw new ForbiddenException('Acceso denegado');
     }
 
-    if (dto.mimeType && dto.mimeType !== 'application/pdf') {
+    if (file.mimetype !== 'application/pdf') {
       throw new UnprocessableEntityException('Solo se permiten archivos PDF');
     }
 
-    if (dto.fileSizeBytes !== undefined && dto.fileSizeBytes > MAX_FILE_SIZE_BYTES) {
+    if (file.size > MAX_FILE_SIZE_BYTES) {
       throw new UnprocessableEntityException('El archivo no puede superar 10 MB');
     }
 
@@ -50,6 +61,22 @@ export class UploadContractUseCase {
     }
     if (leaseOwnerUserId !== userId) {
       throw new ForbiddenException('No tienes permiso sobre este lease');
+    }
+
+    let objectKey: string;
+    try {
+      objectKey = await this.objectStorage.uploadFile(file.buffer, file.originalname, file.mimetype);
+    } catch (error) {
+      if (error instanceof ObjectStorageValidationException) {
+        throw new UnprocessableEntityException(error.message);
+      }
+      if (error instanceof ObjectStorageCredentialsException || error instanceof ObjectStorageBucketNotFoundException) {
+        throw new BadGatewayException('Error de configuración de almacenamiento');
+      }
+      if (error instanceof ObjectStorageException) {
+        throw new BadGatewayException('Error temporal de almacenamiento. Intenta de nuevo.');
+      }
+      throw error;
     }
 
     const tenantUserId = await this.repository.getLeaseTenantUserId(dto.leaseId);
@@ -70,7 +97,7 @@ export class UploadContractUseCase {
       leaseId: dto.leaseId,
       startDate: new Date(dto.startDate),
       endDate: dto.endDate ? new Date(dto.endDate) : undefined,
-      fileUrl: dto.fileUrl,
+      fileUrl: objectKey,
       fileTypeId,
       fileStatusId,
       landlordUserId: userId,
