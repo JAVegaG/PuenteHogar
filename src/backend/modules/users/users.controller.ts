@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
   Req,
   UseGuards,
@@ -15,9 +17,15 @@ import { LoginDto } from './application/dtos/login.dto';
 import { RegisterUserDto } from './application/dtos/register-user.dto';
 import { AuthTokenDto } from './application/dtos/auth-token.dto';
 import { UserProfileDto } from './application/dtos/user-profile.dto';
+import { AddRoleDto } from './application/dtos/add-role.dto';
+import { RoleChangeResponseDto } from './application/dtos/role-change-response.dto';
+import { RemovableRoleDto } from './application/dtos/removable-role.dto';
 import { GetUserProfileUseCase } from './application/use-cases/get-user-profile.use-case';
 import { LoginUseCase } from './application/use-cases/login.use-case';
 import { RegisterUserUseCase, USER_REPOSITORY } from './application/use-cases/register-user.use-case';
+import { AddRoleUseCase } from './application/use-cases/add-role.use-case';
+import { RemoveRoleUseCase } from './application/use-cases/remove-role.use-case';
+import { GetRemovableRolesUseCase } from './application/use-cases/get-removable-roles.use-case';
 import type { IUserRepository } from './domain/ports/user-repository.port';
 
 interface AuthenticatedRequest extends Request {
@@ -31,8 +39,11 @@ export class UsersController {
     private readonly registerUserUseCase: RegisterUserUseCase,
     private readonly loginUseCase: LoginUseCase,
     private readonly getUserProfileUseCase: GetUserProfileUseCase,
+    private readonly addRoleUseCase: AddRoleUseCase,
+    private readonly removeRoleUseCase: RemoveRoleUseCase,
+    private readonly getRemovableRolesUseCase: GetRemovableRolesUseCase,
     @Inject(USER_REPOSITORY) private readonly userRepository: IUserRepository,
-  ) {}
+  ) { }
 
   @Public()
   @Get('document-types')
@@ -70,6 +81,37 @@ export class UsersController {
   @ApiUnauthorizedResponse({ description: 'Token inválido o expirado' })
   profile(@Req() req: AuthenticatedRequest) {
     return this.getUserProfileUseCase.execute(req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('roles/add')
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Agregar un rol al usuario autenticado' })
+  @ApiOkResponse({ description: 'Rol agregado exitosamente', type: RoleChangeResponseDto })
+  @ApiConflictResponse({ description: 'El usuario ya tiene el rol' })
+  @ApiBadRequestResponse({ description: 'Rol no válido' })
+  addRole(@Body() dto: AddRoleDto, @Req() req: AuthenticatedRequest) {
+    return this.addRoleUseCase.execute(req.user.id, dto.roleName);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('roles/:roleName')
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Eliminar un rol del usuario autenticado' })
+  @ApiOkResponse({ description: 'Rol eliminado exitosamente', type: RoleChangeResponseDto })
+  @ApiConflictResponse({ description: 'No se puede eliminar el rol por recursos activos' })
+  @ApiBadRequestResponse({ description: 'Rol no válido o es el único rol del usuario' })
+  removeRole(@Param('roleName') roleName: string, @Req() req: AuthenticatedRequest) {
+    return this.removeRoleUseCase.execute(req.user.id, roleName);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('roles/removable')
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Consultar eliminabilidad de roles del usuario autenticado' })
+  @ApiOkResponse({ description: 'Lista de roles con su eliminabilidad', type: [RemovableRoleDto] })
+  getRemovableRoles(@Req() req: AuthenticatedRequest) {
+    return this.getRemovableRolesUseCase.execute(req.user.id);
   }
 }
 

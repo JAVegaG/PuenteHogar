@@ -87,10 +87,21 @@ function buildMocksForScenario(
       findRoleByName: async (name: string) => ({ id: 'role-id', name }),
       findDocumentTypeByCode: async (code: string) => ({ id: 'doc-id', code }),
       findAllDocumentTypes: async () => [],
-    findDisplayName: async () => null,
+      findDisplayName: async () => null,
       create: async () => {
         throw new Error('should not be called');
       },
+      addRoleToUser: async () => { },
+      removeRoleFromUser: async () => { },
+      updateUserType: async () => { },
+      findUserRoles: async () => [],
+      findUserRoleRecord: async () => null,
+      hasActiveLeases: async () => false,
+      hasActiveContractsAsRole: async () => false,
+      hasPendingPayments: async () => false,
+      hasPortfoliosWithUnits: async () => false,
+      hasActiveLeasesInPortfolios: async () => false,
+      countUserRoles: async () => 1,
     };
 
     const passwordHasher: IPasswordHasher = {
@@ -124,6 +135,17 @@ function buildMocksForScenario(
     create: async () => {
       throw new Error('should not be called');
     },
+    addRoleToUser: async () => { },
+    removeRoleFromUser: async () => { },
+    updateUserType: async () => { },
+    findUserRoles: async () => [],
+    findUserRoleRecord: async () => null,
+    hasActiveLeases: async () => false,
+    hasActiveContractsAsRole: async () => false,
+    hasPendingPayments: async () => false,
+    hasPortfoliosWithUnits: async () => false,
+    hasActiveLeasesInPortfolios: async () => false,
+    countUserRoles: async () => 1,
   };
 
   // Password hasher always returns false — wrong password

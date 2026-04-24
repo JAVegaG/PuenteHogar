@@ -148,6 +148,17 @@ describe('RegisterUserUseCase — Property 2: Correo duplicado es rechazado con 
           findAllDocumentTypes: async () => [],
           findDisplayName: async () => null,
           create: async () => existingUser,
+          addRoleToUser: async () => { },
+          removeRoleFromUser: async () => { },
+          updateUserType: async () => { },
+          findUserRoles: async () => [],
+          findUserRoleRecord: async () => null,
+          hasActiveLeases: async () => false,
+          hasActiveContractsAsRole: async () => false,
+          hasPendingPayments: async () => false,
+          hasPortfoliosWithUnits: async () => false,
+          hasActiveLeasesInPortfolios: async () => false,
+          countUserRoles: async () => 1,
         };
 
         const useCase = new RegisterUserUseCase(

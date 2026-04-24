@@ -60,6 +60,17 @@ function buildMocks(mail: string, role: string) {
     findAllDocumentTypes: async () => [],
     findDisplayName: async () => null,
     create: async () => userEntity,
+    addRoleToUser: async () => { },
+    removeRoleFromUser: async () => { },
+    updateUserType: async () => { },
+    findUserRoles: async () => [],
+    findUserRoleRecord: async () => null,
+    hasActiveLeases: async () => false,
+    hasActiveContractsAsRole: async () => false,
+    hasPendingPayments: async () => false,
+    hasPortfoliosWithUnits: async () => false,
+    hasActiveLeasesInPortfolios: async () => false,
+    countUserRoles: async () => 1,
   };
 
   const passwordHasher: IPasswordHasher = {

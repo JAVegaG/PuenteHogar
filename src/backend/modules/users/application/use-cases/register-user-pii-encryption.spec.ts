@@ -69,6 +69,17 @@ function buildRepositoryMock(
         data.phoneNumber,
       );
     },
+    addRoleToUser: async () => { },
+    removeRoleFromUser: async () => { },
+    updateUserType: async () => { },
+    findUserRoles: async () => [],
+    findUserRoleRecord: async () => null,
+    hasActiveLeases: async () => false,
+    hasActiveContractsAsRole: async () => false,
+    hasPendingPayments: async () => false,
+    hasPortfoliosWithUnits: async () => false,
+    hasActiveLeasesInPortfolios: async () => false,
+    countUserRoles: async () => 1,
   };
 }
 

@@ -90,6 +90,17 @@ function buildMocksForFailedLogin(
     create: async () => {
       throw new Error('should not be called');
     },
+    addRoleToUser: async () => { },
+    removeRoleFromUser: async () => { },
+    updateUserType: async () => { },
+    findUserRoles: async () => [],
+    findUserRoleRecord: async () => null,
+    hasActiveLeases: async () => false,
+    hasActiveContractsAsRole: async () => false,
+    hasPendingPayments: async () => false,
+    hasPortfoliosWithUnits: async () => false,
+    hasActiveLeasesInPortfolios: async () => false,
+    countUserRoles: async () => 1,
   };
 
   // Password hasher always returns false — wrong password triggers audit log

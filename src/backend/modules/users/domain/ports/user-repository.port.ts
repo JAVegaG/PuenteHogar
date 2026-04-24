@@ -27,4 +27,17 @@ export interface IUserRepository {
   findRoleByName(name: string): Promise<{ id: string; name: string } | null>;
   findDocumentTypeByCode(code: string): Promise<{ id: string; code: string } | null>;
   findAllDocumentTypes(): Promise<{ id: string; code: string; description: string }[]>;
+
+  // Role management methods
+  addRoleToUser(userId: string, roleId: string, autoAssigned: boolean): Promise<void>;
+  removeRoleFromUser(userId: string, roleId: string): Promise<void>;
+  updateUserType(userId: string, userType: string): Promise<void>;
+  findUserRoles(userId: string): Promise<{ id: string; name: string; autoAssigned: boolean }[]>;
+  findUserRoleRecord(userId: string, roleName: string): Promise<{ id: string; roleId: string; autoAssigned: boolean } | null>;
+  hasActiveLeases(userId: string): Promise<boolean>;
+  hasActiveContractsAsRole(userId: string, role: string): Promise<boolean>;
+  hasPendingPayments(userId: string): Promise<boolean>;
+  hasPortfoliosWithUnits(userId: string): Promise<boolean>;
+  hasActiveLeasesInPortfolios(userId: string): Promise<boolean>;
+  countUserRoles(userId: string): Promise<number>;
 }

@@ -12,6 +12,10 @@ import {
   RegisterUserUseCase,
   USER_REPOSITORY,
 } from './application/use-cases/register-user.use-case';
+import { AddRoleUseCase } from './application/use-cases/add-role.use-case';
+import { RemoveRoleUseCase } from './application/use-cases/remove-role.use-case';
+import { GetRemovableRolesUseCase } from './application/use-cases/get-removable-roles.use-case';
+import { CheckAndRevokeAutoAssignedRoleUseCase } from './application/use-cases/check-and-revoke-auto-assigned-role.use-case';
 import { AES256PIIEncryptor } from './infrastructure/adapters/aes256-pii-encryptor.adapter';
 import { BcryptPasswordHasher } from './infrastructure/adapters/bcrypt-password-hasher.adapter';
 import { JwtStrategy } from './infrastructure/adapters/jwt-strategy';
@@ -38,6 +42,10 @@ import ms from 'ms'
     RegisterUserUseCase,
     LoginUseCase,
     GetUserProfileUseCase,
+    AddRoleUseCase,
+    RemoveRoleUseCase,
+    GetRemovableRolesUseCase,
+    CheckAndRevokeAutoAssignedRoleUseCase,
     AuditLoggerService,
     JwtStrategy,
     UsersEtlService,
@@ -54,6 +62,6 @@ import ms from 'ms'
       useClass: AES256PIIEncryptor,
     },
   ],
-  exports: [JwtModule],
+  exports: [JwtModule, CheckAndRevokeAutoAssignedRoleUseCase],
 })
-export class UsersModule {}
+export class UsersModule { }

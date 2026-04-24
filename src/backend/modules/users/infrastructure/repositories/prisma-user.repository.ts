@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma-generated/client';
 import { PrismaService } from '@src/shared/prisma/prisma.service';
 import { UserEntity } from '@modules/users/domain/entities/user.entity';
 import {
@@ -8,7 +9,7 @@ import {
 
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async findByMail(mail: string): Promise<UserEntity | null> {
     const user = await this.prisma.user.findUnique({
@@ -118,6 +119,133 @@ export class PrismaUserRepository implements IUserRepository {
       orderBy: { code: 'asc' },
     });
     return types.map((t) => ({ id: t.id, code: t.code, description: t.description }));
+  }
+
+  async addRoleToUser(userId: string, roleId: string, autoAssigned: boolean): Promise<void> {
+    await this.prisma.userRole.create({
+      data: {
+        user_id: userId,
+        role_id: roleId,
+        auto_assigned: autoAssigned,
+      },
+    });
+  }
+
+  async removeRoleFromUser(userId: string, roleId: string): Promise<void> {
+    await this.prisma.userRole.deleteMany({
+      where: { user_id: userId, role_id: roleId },
+    });
+  }
+
+  async updateUserType(userId: string, userType: string): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { user_type: userType },
+    });
+  }
+
+  async findUserRoles(userId: string): Promise<{ id: string; name: string; autoAssigned: boolean }[]> {
+    const userRoles = await this.prisma.userRole.findMany({
+      where: { user_id: userId },
+      include: { role: true },
+    });
+    return userRoles.map((ur) => ({
+      id: ur.id,
+      name: ur.role.name,
+      autoAssigned: ur.auto_assigned,
+    }));
+  }
+
+  async findUserRoleRecord(userId: string, roleName: string): Promise<{ id: string; roleId: string; autoAssigned: boolean } | null> {
+    const userRole = await this.prisma.userRole.findFirst({
+      where: {
+        user_id: userId,
+        role: { name: roleName },
+      },
+      include: { role: true },
+    });
+    return userRole
+      ? { id: userRole.id, roleId: userRole.role_id, autoAssigned: userRole.auto_assigned }
+      : null;
+  }
+
+  async hasActiveLeases(userId: string): Promise<boolean> {
+    const result = await this.prisma.$queryRaw<{ count: bigint }[]>(
+      Prisma.sql`
+        SELECT COUNT(*) as count
+        FROM "landlord_portfolio"."Lease" l
+        INNER JOIN "tracking_process"."LeaseCurrentStatus" lcs ON lcs."lease_id" = l."id"
+        INNER JOIN "tracking_process"."LeaseStatus" ls ON ls."id" = lcs."lease_status_id"
+        WHERE l."user_id" = ${userId}
+          AND ls."name" IN ('Vigente', 'Acordado')
+      `,
+    );
+    return Number(result[0].count) > 0;
+  }
+
+  async hasActiveContractsAsRole(userId: string, role: string): Promise<boolean> {
+    const result = await this.prisma.$queryRaw<{ count: bigint }[]>(
+      Prisma.sql`
+        SELECT COUNT(*) as count
+        FROM "contracts"."ContractParty" cp
+        INNER JOIN "contracts"."Contract" c ON c."id" = cp."contract_id"
+        INNER JOIN "contracts"."ContractStatus" cs ON cs."id" = c."contract_status_id"
+        WHERE cp."user_id" = ${userId}
+          AND cp."role_in_contract" = ${role}
+          AND cs."name" != 'SIGNED'
+      `,
+    );
+    return Number(result[0].count) > 0;
+  }
+
+  async hasPendingPayments(userId: string): Promise<boolean> {
+    const result = await this.prisma.$queryRaw<{ count: bigint }[]>(
+      Prisma.sql`
+        SELECT COUNT(*) as count
+        FROM "payments"."ScheduledPayment" sp
+        INNER JOIN "landlord_portfolio"."Lease" l ON l."id" = sp."lease_id"
+        WHERE l."user_id" = ${userId}
+          AND NOT EXISTS (
+            SELECT 1 FROM "payments"."Payment" p
+            WHERE p."scheduled_payment_id" = sp."id"
+          )
+      `,
+    );
+    return Number(result[0].count) > 0;
+  }
+
+  async hasPortfoliosWithUnits(userId: string): Promise<boolean> {
+    const result = await this.prisma.$queryRaw<{ count: bigint }[]>(
+      Prisma.sql`
+        SELECT COUNT(*) as count
+        FROM "landlord_portfolio"."LandlordPortfolio" lp
+        INNER JOIN "landlord_portfolio"."PortfolioUnit" pu ON pu."portfolio_id" = lp."id"
+        WHERE lp."user_id" = ${userId}
+      `,
+    );
+    return Number(result[0].count) > 0;
+  }
+
+  async hasActiveLeasesInPortfolios(userId: string): Promise<boolean> {
+    const result = await this.prisma.$queryRaw<{ count: bigint }[]>(
+      Prisma.sql`
+        SELECT COUNT(*) as count
+        FROM "landlord_portfolio"."LandlordPortfolio" lp
+        INNER JOIN "landlord_portfolio"."PortfolioUnit" pu ON pu."portfolio_id" = lp."id"
+        INNER JOIN "landlord_portfolio"."Lease" l ON l."portfolio_unit_id" = pu."id"
+        INNER JOIN "tracking_process"."LeaseCurrentStatus" lcs ON lcs."lease_id" = l."id"
+        INNER JOIN "tracking_process"."LeaseStatus" ls ON ls."id" = lcs."lease_status_id"
+        WHERE lp."user_id" = ${userId}
+          AND ls."name" IN ('Vigente', 'Acordado')
+      `,
+    );
+    return Number(result[0].count) > 0;
+  }
+
+  async countUserRoles(userId: string): Promise<number> {
+    return this.prisma.userRole.count({
+      where: { user_id: userId },
+    });
   }
 
   private toEntity(user: {
