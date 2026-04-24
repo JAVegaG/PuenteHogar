@@ -1,0 +1,367 @@
+# Implementation Plan: Multirole y Notificaciones (Frontend)
+
+## Overview
+
+This plan implements in-app notifications, multirole experience, and role management across the full stack. Tasks are ordered by dependency: DB migration → backend repository extensions → backend use cases → backend controller endpoints → frontend services → shared components → pages → cross-module modifications → checkpoints.
+
+## Tasks
+
+- [x] 1. Database migration: InAppNotification table and UserRole.auto_assigned column
+  - [x] 1.1 Add `InAppNotification` model to Prisma schema in `notifications` schema
+    - Add model with fields: `id`, `user_id`, `notification_type_id`, `title`, `message`, `read` (default false), `event_source`, `data` (Json default "{}"), `created_at`
+    - Add relation to `NotificationType` via `notification_type_id`
+    - Add composite indexes: `@@index([user_id, read])` and `@@index([user_id, created_at])`
+    - Add `in_app_notifications InAppNotification[]` relation on `NotificationType` model
+    - _Requirements: 2.10_
+  - [x] 1.2 Add `auto_assigned` column to `UserRole` model in Prisma schema
+    - Add `auto_assigned Boolean @default(false)` to the `UserRole` model in `users` schema
+    - _Requirements: 13.1_
+  - [x] 1.3 Generate and apply Prisma migration
+    - Run `npx prisma migrate dev --name add_in_app_notification_and_auto_assigned` from `src/backend/db/prisma`
+    - Regenerate Prisma client
+    - _Requirements: 2.10, 13.1_
+
+- [x] 2. Backend — Extend notification repository and domain
+  - [x] 2.1 Create `InAppNotificationEntity` domain entity
+    - Create `src/backend/modules/notifications/domain/entities/in-app-notification.entity.ts`
+    - Fields: `id`, `userId`, `notificationTypeId`, `title`, `message`, `read`, `eventSource`, `data`, `createdAt`
+    - _Requirements: 2.10_
+  - [x] 2.2 Create `NotificationTypeEntity` domain entity
+    - Create `src/backend/modules/notifications/domain/entities/notification-type.entity.ts`
+    - Fields: `id`, `name`, `description`
+    - _Requirements: 2.6_
+  - [x] 2.3 Extend `INotificationRepository` port with in-app notification methods
+    - Add methods: `createInAppNotification`, `findInAppNotificationsByUserId`, `countUnreadByUserId`, `markAsRead`, `markAllAsRead`, `findAllNotificationTypes`, `findActiveExternalPreferences`
+    - _Requirements: 2.1, 2.2, 2.3, 2.5, 2.6, 2.8, 2.9_
+  - [x] 2.4 Implement new methods in `PrismaNotificationRepository`
+    - Implement all new `INotificationRepository` methods using Prisma client
+    - `findInAppNotificationsByUserId`: query `InAppNotification` WHERE `user_id`, ORDER BY `created_at` DESC
+    - `countUnreadByUserId`: COUNT WHERE `user_id` AND `read = false`
+    - `markAsRead`: UPDATE `read = true` WHERE `id` AND `user_id`, return entity or null
+    - `markAllAsRead`: UPDATE all WHERE `user_id` AND `read = false`, return count
+    - `findAllNotificationTypes`: query all `NotificationType` records
+    - `findActiveExternalPreferences`: query `NotificationPreference` WHERE `user_id`, `notification_type_id`, `is_active = true`
+    - `createInAppNotification`: INSERT into `InAppNotification` with `read: false`
+    - _Requirements: 2.1, 2.2, 2.3, 2.5, 2.6, 2.8, 2.9_
+  - [ ]* 2.5 Write property tests for notification repository methods
+    - **Property 4: In-app notifications ordered by creation date**
+    - **Property 5: Unread count matches actual unread notifications**
+    - **Validates: Requirements 2.1, 2.2**
+
+- [x] 3. Backend — Notification use cases and DTOs
+  - [x] 3.1 Create notification DTOs
+    - Create `InAppNotificationDto` (response) in `src/backend/modules/notifications/application/dtos/`
+    - Create `NotificationCountDto` (response)
+    - Create `PreferencesGroupedDto` and `ChannelPreferenceDto` (response)
+    - All DTOs must have `@ApiProperty()` decorators on every field
+    - _Requirements: 2.1, 2.2, 2.6_
+  - [x] 3.2 Create `GetNotificationsUseCase`
+    - Create `src/backend/modules/notifications/application/use-cases/get-notifications.use-case.ts`
+    - Inject `INotificationRepository`, query by userId, map to `InAppNotificationDto[]`
+    - Include notification type name in response via join or lookup
+    - _Requirements: 2.1_
+  - [x] 3.3 Create `GetNotificationCountUseCase`
+    - Create `src/backend/modules/notifications/application/use-cases/get-notification-count.use-case.ts`
+    - Inject `INotificationRepository`, return `{ unreadCount }` for userId
+    - _Requirements: 2.2_
+  - [x] 3.4 Create `MarkNotificationReadUseCase`
+    - Create `src/backend/modules/notifications/application/use-cases/mark-notification-read.use-case.ts`
+    - Inject `INotificationRepository`, validate ownership (userId match), update `read = true`
+    - Throw `NotFoundException` if not found or not owned by user
+    - _Requirements: 2.3, 2.4_
+  - [x] 3.5 Create `MarkAllNotificationsReadUseCase`
+    - Create `src/backend/modules/notifications/application/use-cases/mark-all-notifications-read.use-case.ts`
+    - Inject `INotificationRepository`, update all unread for userId, return `{ updatedCount }`
+    - _Requirements: 2.5_
+  - [x] 3.6 Create `GetNotificationPreferencesUseCase`
+    - Create `src/backend/modules/notifications/application/use-cases/get-notification-preferences.use-case.ts`
+    - Inject `INotificationRepository`, query all `NotificationType`, cross-join with channels [EMAIL, WHATSAPP]
+    - Fill `isActive` from `NotificationPreference` or default to `false`
+    - Return `PreferencesGroupedDto[]`
+    - _Requirements: 2.6_
+  - [x] 3.7 Modify `SendNotificationUseCase` to always create in-app notification
+    - Before external channel logic, call `repository.createInAppNotification(...)` with `read: false`
+    - Create helper `buildNotificationContent(typeName, data): { title, message }`
+    - After in-app creation, query active external preferences and send only for active channels
+    - Maintain existing retry/backoff logic for external channels
+    - _Requirements: 2.8, 2.9_
+  - [ ]* 3.8 Write property tests for notification use cases
+    - **Property 6: Mark as read updates correctly**
+    - **Property 7: Mark all as read updates all unread**
+    - **Property 8: Preferences grouped with defaults**
+    - **Property 9: SendNotificationUseCase always creates in-app notification**
+    - **Property 10: External channels sent only when active**
+    - **Validates: Requirements 2.3, 2.5, 2.6, 2.8, 2.9**
+
+- [x] 4. Backend — Extend NotificationsController with new endpoints
+  - [x] 4.1 Add `GET /notifications` endpoint
+    - Wire `GetNotificationsUseCase`, extract userId from JWT, return `InAppNotificationDto[]`
+    - Add `@ApiTags`, `@ApiOperation`, `@ApiBearerAuth`, `@ApiOkResponse` decorators
+    - _Requirements: 2.1_
+  - [x] 4.2 Add `GET /notifications/count` endpoint
+    - Wire `GetNotificationCountUseCase`, return `NotificationCountDto`
+    - _Requirements: 2.2_
+  - [x] 4.3 Add `PATCH /notifications/:id/read` endpoint
+    - Wire `MarkNotificationReadUseCase`, extract userId from JWT and id from params
+    - Return updated `InAppNotificationDto` or 404
+    - _Requirements: 2.3, 2.4_
+  - [x] 4.4 Add `PATCH /notifications/read-all` endpoint
+    - Wire `MarkAllNotificationsReadUseCase`, return `{ updatedCount }`
+    - _Requirements: 2.5_
+  - [x] 4.5 Add `GET /notifications/preferences` endpoint
+    - Wire `GetNotificationPreferencesUseCase`, return `PreferencesGroupedDto[]`
+    - _Requirements: 2.6_
+  - [x] 4.6 Wire new use cases in `NotificationsModule`
+    - Register `GetNotificationsUseCase`, `GetNotificationCountUseCase`, `MarkNotificationReadUseCase`, `MarkAllNotificationsReadUseCase`, `GetNotificationPreferencesUseCase` as providers
+    - _Requirements: 2.1, 2.2, 2.3, 2.5, 2.6_
+
+- [x] 5. Checkpoint — Backend notifications module
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 6. Backend — Extend user repository and domain for role management
+  - [x] 6.1 Extend `IUserRepository` port with role management methods
+    - Add methods: `addRoleToUser`, `removeRoleFromUser`, `updateUserType`, `findUserRoles`, `findUserRoleRecord`, `hasActiveLeases`, `hasActiveContractsAsRole`, `hasPendingPayments`, `hasPortfoliosWithUnits`, `hasActiveLeasesInPortfolios`, `countUserRoles`
+    - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 13.6_
+  - [x] 6.2 Implement new methods in `PrismaUserRepository`
+    - `addRoleToUser`: INSERT `UserRole` with `auto_assigned` parameter
+    - `removeRoleFromUser`: DELETE `UserRole` by userId and roleId
+    - `updateUserType`: UPDATE `User.user_type`
+    - `findUserRoles`: query `UserRole` with role join, return `{ id, name, autoAssigned }`
+    - `findUserRoleRecord`: find specific `UserRole` by userId and roleName
+    - `hasActiveLeases`: check cross-schema for active leases (status "Vigente" or "Acordado") where `user_id` matches
+    - `hasActiveContractsAsRole`: check `ContractParty` for active contracts with given role
+    - `hasPendingPayments`: check `ScheduledPayment` without completed payment
+    - `hasPortfoliosWithUnits`: check `LandlordPortfolio` with `PortfolioUnit` for userId
+    - `hasActiveLeasesInPortfolios`: check leases in portfolio units with active status
+    - `countUserRoles`: COUNT `UserRole` for userId
+    - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 13.6_
+
+- [x] 7. Backend — Role management use cases and DTOs
+  - [x] 7.1 Create role management DTOs
+    - Create `AddRoleDto` (request) with `@IsIn(['LANDLORD', 'TENANT'])` validation
+    - Create `RemovableRoleDto` (response) with `roleName`, `removable`, `reasons[]`
+    - Create `RoleChangeResponseDto` (response) with `accessToken`, `roles[]`
+    - All DTOs in `src/backend/modules/users/application/dtos/`
+    - _Requirements: 12.1, 12.2, 12.5_
+  - [x] 7.2 Create `AddRoleUseCase`
+    - Create `src/backend/modules/users/application/use-cases/add-role.use-case.ts`
+    - Validate role exists, user doesn't already have it (throw 409 if duplicate)
+    - Insert `UserRole` with `auto_assigned = false`
+    - Update `user_type` to "BOTH"
+    - Sign new JWT with updated roles, return `RoleChangeResponseDto`
+    - Log audit event `ROLE_ADDED`
+    - _Requirements: 12.1, 13.3_
+  - [x] 7.3 Create `RemoveRoleUseCase`
+    - Create `src/backend/modules/users/application/use-cases/remove-role.use-case.ts`
+    - Validate role exists, user has it, user has >1 role (throw 400 if only role)
+    - Check removability via active resources (throw 409 if not removable with reasons)
+    - Delete `UserRole`, update `user_type` to remaining role
+    - Sign new JWT with updated roles, return `RoleChangeResponseDto`
+    - Log audit event `ROLE_REMOVED`
+    - _Requirements: 12.5, 12.6_
+  - [x] 7.4 Create `GetRemovableRolesUseCase`
+    - Create `src/backend/modules/users/application/use-cases/get-removable-roles.use-case.ts`
+    - For each user role, check active resources using repository methods
+    - TENANT: active leases, active contracts as tenant, pending payments
+    - LANDLORD: portfolios with units, active leases in portfolios, active contracts as landlord
+    - Return `RemovableRoleDto[]` with `removable` flag and `reasons[]` in Spanish
+    - _Requirements: 12.2, 12.3, 12.4_
+  - [x] 7.5 Create `CheckAndRevokeAutoAssignedRoleUseCase`
+    - Create `src/backend/modules/users/application/use-cases/check-and-revoke-auto-assigned-role.use-case.ts`
+    - Execute within a transaction: find UserRole → check auto_assigned → check active leases → check role count → delete if all conditions met
+    - Update `user_type` to remaining role, log `ROLE_AUTO_REVOKED` audit event
+    - Return `{ revoked: boolean }`
+    - _Requirements: 13.4, 13.5, 13.6, 13.7, 13.8, 13.9, 13.10_
+  - [ ]* 7.6 Write property tests for role management use cases
+    - **Property 23: Role removability determined by active resources**
+    - **Property 24: Add role returns new JWT with updated roles**
+    - **Property 25: Remove role returns new JWT with remaining role**
+    - **Property 27: auto_assigned flag reflects assignment source**
+    - **Property 28: Auto-revocation decision correctness**
+    - **Validates: Requirements 12.1, 12.2, 12.3, 12.4, 12.5, 13.2, 13.3, 13.6, 13.7, 13.8, 13.10**
+
+- [x] 8. Backend — Extend UsersController with role endpoints
+  - [x] 8.1 Add `POST /auth/roles/add` endpoint
+    - Wire `AddRoleUseCase`, extract userId from JWT, validate `AddRoleDto` body
+    - Return `RoleChangeResponseDto`
+    - Add Swagger decorators: `@ApiTags('auth')`, `@ApiOperation`, `@ApiBearerAuth`, `@ApiOkResponse`, `@ApiConflictResponse`
+    - _Requirements: 12.1_
+  - [x] 8.2 Add `DELETE /auth/roles/:roleName` endpoint
+    - Wire `RemoveRoleUseCase`, extract userId from JWT and roleName from params
+    - Return `RoleChangeResponseDto`
+    - _Requirements: 12.5, 12.6_
+  - [x] 8.3 Add `GET /auth/roles/removable` endpoint
+    - Wire `GetRemovableRolesUseCase`, extract userId from JWT
+    - Return `RemovableRoleDto[]`
+    - _Requirements: 12.2_
+  - [x] 8.4 Wire new use cases in `UsersModule`
+    - Register `AddRoleUseCase`, `RemoveRoleUseCase`, `GetRemovableRolesUseCase`, `CheckAndRevokeAutoAssignedRoleUseCase` as providers
+    - Export `CheckAndRevokeAutoAssignedRoleUseCase` for cross-module use by `ContractsModule`
+    - _Requirements: 12.1, 12.2, 12.5, 13.4_
+
+- [x] 9. Checkpoint — Backend role management
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 10. Backend — Cross-module modifications
+  - [x] 10.1 Modify `CreateLeaseUseCase` to auto-assign TENANT role
+    - After resolving tenant user, check if tenant has TENANT role
+    - If not: insert `UserRole` with `auto_assigned = true`, update `user_type` to "BOTH"
+    - Execute within the existing transaction
+    - Handle unique constraint violation silently (user already has role)
+    - Log audit event `ROLE_AUTO_ASSIGNED`
+    - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5_
+  - [x] 10.2 Modify `DeleteContractUseCase` to trigger auto-revocation check
+    - After successful contract deletion, if deleted contract had status PENDING:
+      - Resolve `tenantUserId` from the lease associated with the contract
+      - Invoke `CheckAndRevokeAutoAssignedRoleUseCase.execute(tenantUserId, "TENANT")`
+      - Fire-and-forget: log errors but don't revert contract deletion
+    - Import `CheckAndRevokeAutoAssignedRoleUseCase` from `UsersModule`
+    - _Requirements: 13.4_
+  - [ ]* 10.3 Write property tests for cross-module modifications
+    - **Property 21: Auto-assign TENANT role on lease creation**
+    - **Property 22: Idempotent TENANT assignment on lease creation**
+    - **Validates: Requirements 11.1, 11.2, 11.4**
+
+- [x] 11. Checkpoint — Backend cross-module modifications
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 12. Frontend — Notification and role services
+  - [x] 12.1 Create `notificationService` in `src/frontend/shared/services/notification.ts`
+    - Implement methods: `getNotifications`, `getNotificationCount`, `markAsRead`, `markAllAsRead`, `getPreferences`, `updatePreference`
+    - Follow existing service pattern (native `fetch`, `API_URL` from env, error handling by HTTP status)
+    - Error mapping: 401 → "Sesión expirada", 403 → "No tienes permiso...", 500+ → "Error del servidor..."
+    - Define TypeScript interfaces: `InAppNotification`, `NotificationCount`, `NotificationPreferenceGroup`
+    - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 1.10_
+  - [x] 12.2 Create `roleService` in `src/frontend/shared/services/role.ts`
+    - Implement methods: `addRole`, `removeRole`, `getRemovableRoles`
+    - Follow existing service pattern
+    - Define TypeScript interfaces: `RemovableRole`, `RoleChangeResponse`
+    - _Requirements: 12.1, 12.2, 12.5_
+  - [ ]* 12.3 Write property tests for frontend services
+    - **Property 1: Notification service response parsing round-trip**
+    - **Property 2: Notification service request construction**
+    - **Property 3: Service error mapping for server errors**
+    - **Validates: Requirements 1.1, 1.2, 1.3, 1.5, 1.6, 1.9**
+
+- [x] 13. Frontend — Shared component modifications
+  - [x] 13.1 Extend `StatusBadge` with `notification` variant
+    - Add `notificationColors` mapping: SENT → "Enviada" (green), FAILED → "Fallida" (red), PENDING → "Pendiente" (amber)
+    - Add `'notification'` to the `variant` union type and `variantMap`
+    - Maintain all existing variants unchanged
+    - _Requirements: 8.1, 8.2, 8.3_
+  - [x] 13.2 Create `translateNotificationType` helper
+    - Create helper in `src/frontend/modules/notifications/utils/translate-notification-type.ts`
+    - Map: CONTRACT_SIGNED → "Contrato firmado", PAYMENT_RECEIVED → "Pago recibido", CONTACT_INITIATED → "Contacto iniciado", CONTRACT_UPLOADED → "Contrato cargado"
+    - Unknown types return original string as fallback
+    - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_
+  - [x] 13.3 Extend `AuthContext` with `updateAuth` method
+    - Add `updateAuth(accessToken: string, roles: string[])` to `AuthContextValue` interface
+    - Implement: update `localStorage` auth data and `user` state with new token and roles without re-login
+    - _Requirements: 12.11_
+  - [x] 13.4 Modify `LoginForm` for post-login redirect to `/mi-perfil`
+    - Change `router.push('/explorar')` to `router.push('/mi-perfil')`
+    - Add `returnUrl` support: read from `useSearchParams()`, redirect to `returnUrl` if present instead of `/mi-perfil`
+    - _Requirements: 6.1, 6.2, 6.3_
+  - [x] 13.5 Modify `SideMenu` to add "Mis notificaciones" link with unread badge
+    - In `buildNavLinks()`, insert `{ label: 'Mis notificaciones', href: '/mis-notificaciones', icon: BellIcon }` immediately before the "Mi perfil" link for all authenticated role configurations
+    - Create `BellIcon` component following existing icon pattern
+    - Add unread badge: `SideMenu` accepts optional `unreadNotificationCount` prop, renders numeric badge next to bell icon when count > 0
+    - _Requirements: 7.1, 7.2, 7.3_
+  - [ ]* 13.6 Write property tests for shared component modifications
+    - **Property 16: SideMenu notification link positioned before "Mi perfil"**
+    - **Property 17: Unread badge visibility**
+    - **Property 18: QuickNavSection shows correct cards based on roles**
+    - **Property 19: StatusBadge notification variant mapping**
+    - **Property 20: Unknown notification type fallback**
+    - **Validates: Requirements 7.1, 7.2, 5.2, 5.3, 5.4, 8.1, 8.3, 9.5**
+
+- [x] 14. Checkpoint — Frontend services and shared components
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 15. Frontend — Notifications page
+  - [x] 15.1 Create `NotificationsListView` component
+    - Create `src/frontend/modules/notifications/components/NotificationsListView.tsx`
+    - Render list of notification cards with: translated type name, title, message, read/unread indicator (blue left border or bold for unread), relative creation date
+    - Tap on unread card calls `markAsRead` and updates visual state
+    - "Marcar todas como leídas" button calls `markAllAsRead`
+    - Empty state: "No tienes notificaciones aún"
+    - Link to preferences: "Gestionar preferencias" → `/mis-notificaciones/preferencias`
+    - _Requirements: 3.3, 3.4, 3.5, 3.6, 3.8_
+  - [x] 15.2 Create notifications page at `/mis-notificaciones`
+    - Create `src/frontend/app/mis-notificaciones/page.tsx`
+    - `ProtectedRoute` wrapper, `Header` with hamburger + `SideMenu`, title "Mis notificaciones"
+    - Fetch notifications via `notificationService.getNotifications(token)`
+    - Skeleton loading state, error state with retry via `ErrorState`
+    - Render `NotificationsListView` with fetched data
+    - _Requirements: 3.1, 3.2, 3.7, 3.9, 3.10_
+  - [ ]* 15.3 Write property test for notification card rendering
+    - **Property 11: Notification card contains all required fields**
+    - **Validates: Requirements 3.3**
+
+- [x] 16. Frontend — Preferences page
+  - [x] 16.1 Create `PreferencesView` component
+    - Create `src/frontend/modules/notifications/components/PreferencesView.tsx`
+    - Info banner: blue background, "Las notificaciones en la aplicación están siempre activas"
+    - Sections per notification type with translated name
+    - Toggle controls for EMAIL and WHATSAPP per type with `role="switch"` and `aria-checked`
+    - Optimistic UI: toggle immediately, revert on API failure with error message
+    - _Requirements: 4.3, 4.4, 4.5, 4.6, 4.7, 10.4_
+  - [x] 16.2 Create preferences page at `/mis-notificaciones/preferencias`
+    - Create `src/frontend/app/mis-notificaciones/preferencias/page.tsx`
+    - `ProtectedRoute` wrapper, `Header` with back arrow to `/mis-notificaciones`, title "Preferencias de notificación"
+    - Fetch preferences via `notificationService.getPreferences(token)`
+    - Skeleton loading state, error state with retry
+    - Render `PreferencesView` with fetched data
+    - _Requirements: 4.1, 4.2, 4.8, 4.9, 4.10_
+  - [ ]* 16.3 Write property tests for preferences page
+    - **Property 12: Preferences page shows exactly EMAIL and WHATSAPP toggles per type**
+    - **Property 13: Optimistic toggle update with rollback on failure**
+    - **Validates: Requirements 4.4, 4.5, 4.6, 4.7**
+
+- [x] 17. Frontend — Profile page enhancements
+  - [x] 17.1 Create `RoleManagementSection` component
+    - Create `src/frontend/modules/users/components/RoleManagementSection.tsx`
+    - Display current roles as badges
+    - "Agregar rol" button if user has only one role (adds the missing LANDLORD or TENANT)
+    - "Eliminar rol" button per role, disabled with tooltip showing reasons if not removable
+    - `ConfirmationDialog` before role deletion
+    - On role change: call `roleService`, then `updateAuth` on `AuthContext` with new JWT and roles
+    - Fetch removability via `roleService.getRemovableRoles(token)` on mount
+    - _Requirements: 12.7, 12.8, 12.9, 12.10, 12.11_
+  - [x] 17.2 Create `QuickNavSection` component
+    - Create `src/frontend/modules/users/components/QuickNavSection.tsx`
+    - Title "Navegación rápida"
+    - `getQuickNavCards(roles)` function: LANDLORD → "Ir a mi portafolio" card, TENANT → "Ir a mis arriendos" card, both if multirole
+    - Each card: `<Link>` with border, `border-radius: 6px`, min touch target 44px, icon, description, arrow indicator
+    - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
+  - [x] 17.3 Modify profile page to include new sections
+    - Add `RoleManagementSection` below `ProfileCard`
+    - Add `QuickNavSection` below `RoleManagementSection`
+    - Pass `user` data and `updateAuth` from `AuthContext` to `RoleManagementSection`
+    - Fetch unread notification count for `SideMenu` badge
+    - _Requirements: 5.1, 12.7_
+  - [ ]* 17.4 Write property tests for profile page components
+    - **Property 14: Post-login redirect always to /mi-perfil**
+    - **Property 26: AuthProvider updates state with new JWT data**
+    - **Validates: Requirements 6.1, 6.2, 12.11**
+
+- [x] 18. Frontend — Accessibility compliance for all new pages
+  - Verify semantic HTML elements (`nav`, `main`, `section`, `header`, `button`, `a`) in all new pages
+  - Verify all interactive elements have min 44×44px touch targets
+  - Verify keyboard navigation (Tab, Enter, Escape) on all new interactive elements
+  - Verify `role="switch"` and `aria-checked` on preference toggles
+  - Verify contrast ratio ≥ 4.5:1 on all new text elements
+  - Verify all visible text is in Spanish
+  - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6_
+
+- [~] 19. Final checkpoint — Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+## Notes
+
+- Tasks marked with `*` are optional and can be skipped for faster MVP
+- Each task references specific requirements for traceability
+- Checkpoints ensure incremental validation after each major backend/frontend phase
+- Property tests validate universal correctness properties from the design document
+- Unit tests validate specific examples and edge cases
+- The design uses TypeScript throughout — no language selection needed
