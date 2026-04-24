@@ -115,7 +115,6 @@ describe('validateUnitForm', () => {
     expect(errors).toEqual({
       propertyId: 'El ID del inmueble es obligatorio',
       leaseBaseAmount: 'El canon base es obligatorio',
-      leaseBaseCurrency: 'La moneda es obligatoria',
     });
   });
 

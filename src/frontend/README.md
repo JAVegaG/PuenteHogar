@@ -1,6 +1,6 @@
 # Frontend — Plataforma de Arriendo
 
-Aplicación Next.js (App Router) con Tailwind CSS y TypeScript para la plataforma de arriendo de vivienda urbana. Incluye los módulos de exploración de inmuebles, autenticación/perfil de usuarios, portafolio del arrendador, contabilidad, gestión de arriendos, gestión de contratos (listado, detalle, creación y firma) y publicación de unidades.
+Aplicación Next.js (App Router) con Tailwind CSS y TypeScript para la plataforma de arriendo de vivienda urbana. Incluye los módulos de exploración de inmuebles, autenticación/perfil de usuarios, portafolio del arrendador, contabilidad, gestión de arriendos, gestión de contratos (listado, detalle, creación y firma), publicación de unidades, notificaciones in-app con preferencias de canales externos, experiencia multirole con gestión de roles, y flujos del arrendatario (arriendos activos, pagos, contratos).
 
 ## Stack
 
@@ -28,7 +28,15 @@ src/frontend/
 │   │   └── [id]/
 │   │       └── page.tsx      # Página de detalle (Server Component)
 │   ├── mi-perfil/
-│   │   └── page.tsx          # Página de perfil (Client Component, protegida)
+│   │   └── page.tsx          # Página de perfil con gestión de roles y navegación rápida (Client Component, protegida)
+│   ├── mis-notificaciones/
+│   │   ├── page.tsx              # Historial de notificaciones in-app (Client Component, protegida)
+│   │   └── preferencias/
+│   │       └── page.tsx          # Preferencias de canales externos (Client Component, protegida)
+│   ├── mis-arriendos/
+│   │   ├── page.tsx              # Arriendos activos del arrendatario (Client Component, TENANT)
+│   │   └── [id]/
+│   │       └── page.tsx          # Detalle de arriendo del arrendatario (Client Component, TENANT)
 │   ├── mi-portafolio/
 │   │   ├── page.tsx              # Listado de portafolios con estadísticas (Client Component, LANDLORD)
 │   │   ├── nueva-unidad/
@@ -139,13 +147,29 @@ src/frontend/
 │   │   │   ├── useFilters.ts          # Gestión de filtros vía URL query params
 │   │   │   └── useListings.ts         # Fetch con AbortController + loading state
 │   │   └── types.ts                   # Interfaces: Listing, ListingDetail, ListingFilters, etc.
+│   ├── notifications/
+│   │   ├── components/
+│   │   │   ├── NotificationsListView.tsx  # Lista de tarjetas de notificación (leído/no leído, marcar como leída)
+│   │   │   └── PreferencesView.tsx        # Preferencias de canales externos (toggles EMAIL/WHATSAPP)
+│   │   └── utils/
+│   │       └── translate-notification-type.ts  # Mapa de traducciones de tipos de notificación
+│   ├── tenant/
+│   │   └── components/
+│   │       ├── ContactLandlordButton.tsx      # Botón de contacto con arrendador
+│   │       ├── PaymentsView.tsx               # Vista de historial de pagos
+│   │       ├── RentalDetailView.tsx           # Detalle de arriendo del arrendatario
+│   │       ├── RentalsListView.tsx            # Lista de arriendos activos
+│   │       ├── TenantContractDetailView.tsx   # Detalle de contrato del arrendatario
+│   │       └── TenantContractsListView.tsx    # Lista de contratos del arrendatario
 │   └── users/
 │       ├── components/
 │       │   ├── LoginForm.tsx          # Formulario de login con validación client-side
 │       │   ├── ProfileCard.tsx        # Tarjeta de perfil (solo lectura) + logout
 │       │   ├── ProtectedRoute.tsx     # Wrapper de protección de rutas autenticadas
+│       │   ├── QuickNavSection.tsx     # Navegación rápida por rol (tarjetas LANDLORD/TENANT)
 │       │   ├── RegistrationWizard.tsx     # Orquestador del formulario multi-paso (3 pasos)
 │       │   ├── RegistroWizard.tsx         # Wizard de registro alternativo (mismo flujo, naming en español)
+│       │   ├── RoleManagementSection.tsx  # Gestión de roles (agregar/eliminar) en perfil
 │       │   ├── Step1UserType.tsx      # Paso 1: selección de rol y tipo de persona
 │       │   ├── Step2PersonalData.tsx  # Paso 2: datos personales + documento + teléfono
 │       │   ├── Step3Credentials.tsx   # Paso 3: email + contraseña + confirmación
@@ -183,7 +207,10 @@ src/frontend/
 │   │   ├── auth.ts               # Servicio HTTP auth (login, register, getProfile, getDocumentTypes)
 │   │   ├── contract.ts           # ContractService (createContract, getContract, signContract)
 │   │   ├── lease.ts              # LeaseService (getUnitLeases, getLeaseDetail, createLease)
-│   │   └── portfolio.ts          # PortfolioService (getPortfolios, createPortfolio, getUnits, createUnit, createEnrichedUnit, updateUnit, getDepartments, getCitiesByDepartment, getPropertyTypes)
+│   │   ├── notification.ts       # NotificationService (getNotifications, getNotificationCount, markAsRead, markAllAsRead, getPreferences, updatePreference)
+│   │   ├── portfolio.ts          # PortfolioService (getPortfolios, createPortfolio, getUnits, createUnit, createEnrichedUnit, updateUnit, getDepartments, getCitiesByDepartment, getPropertyTypes)
+│   │   ├── role.ts               # RoleService (addRole, removeRole, getRemovableRoles)
+│   │   └── tenant.ts             # TenantService (getActiveLeases, getLeaseStatus, getPaymentHistory, initiatePayment, transitionLeaseState, getTenantContracts)
 │   └── utils/
 │       ├── formatPrice.ts         # Formato COP ($X.XXX.XXX)
 │       └── formatRelativeDate.ts  # Fecha relativa en español
@@ -218,7 +245,11 @@ npm run lint       # Linting
 | `/explorar/[id]` | Server Component | No | Detalle del inmueble con galería de fotos |
 | `/auth/login` | Client Component | No | Inicio de sesión (email + contraseña) |
 | `/auth/registro` | Client Component | No | Registro multi-paso (rol, datos personales, credenciales) |
-| `/mi-perfil` | Client Component | Sí | Perfil del usuario autenticado (solo lectura) |
+| `/mi-perfil` | Client Component | Sí | Perfil del usuario con gestión de roles y navegación rápida por rol |
+| `/mis-notificaciones` | Client Component | Sí | Historial de notificaciones in-app (leído/no leído, marcar como leída) |
+| `/mis-notificaciones/preferencias` | Client Component | Sí | Preferencias de canales externos (EMAIL, WHATSAPP) por tipo de notificación |
+| `/mis-arriendos` | Client Component | TENANT | Arriendos activos del arrendatario con estado y seguimiento |
+| `/mis-arriendos/[id]` | Client Component | TENANT | Detalle de arriendo del arrendatario (estado, contratos, pagos) |
 | `/mi-portafolio` | Client Component | LANDLORD | Listado de portafolios con estadísticas, paginación y creación |
 | `/mi-portafolio/nueva-unidad` | Client Component | LANDLORD | Redirige a `/mi-portafolio` (legacy) |
 | `/mi-portafolio/[id]/editar` | Client Component | LANDLORD | Editar unidad de portafolio existente |
@@ -247,7 +278,15 @@ Exploración pública de inmuebles: listado con filtros avanzados (ciudad, barri
 
 ### users
 
-Autenticación y perfil de usuario: login con email/contraseña, registro multi-paso (3 pasos: tipo de usuario, datos personales, credenciales), perfil de solo lectura, gestión de sesión JWT (AuthProvider), protección de rutas y catálogo de tipos de documento desde el backend.
+Autenticación y perfil de usuario: login con email/contraseña, registro multi-paso (3 pasos: tipo de usuario, datos personales, credenciales), perfil con gestión de roles (agregar/eliminar) y navegación rápida por rol, gestión de sesión JWT (AuthProvider con `updateAuth` para cambios de rol), protección de rutas, catálogo de tipos de documento desde el backend, y redirección post-login a `/mi-perfil` con soporte para `returnUrl`.
+
+### notifications
+
+Notificaciones in-app y preferencias de canales externos: historial de notificaciones con indicador leído/no leído, marcar como leída individual o masiva, enlace a preferencias, página de preferencias con toggles EMAIL/WHATSAPP por tipo de notificación con UI optimista, banner informativo de canal in-app siempre activo, y helper de traducción de tipos de notificación al español. Componentes: NotificationsListView, PreferencesView.
+
+### tenant
+
+Flujos del arrendatario: listado de arriendos activos con estado y seguimiento, detalle de arriendo con historial de estados, historial de pagos con iniciación de pago, listado y detalle de contratos del arrendatario, y botón de contacto con arrendador. Componentes: RentalsListView, RentalDetailView, PaymentsView, TenantContractsListView, TenantContractDetailView, ContactLandlordButton.
 
 ### landlord-portfolio
 
@@ -281,10 +320,10 @@ Publicación de unidades: formulario para publicar una unidad del portafolio com
 | `ListingDetailSkeleton` | Skeleton para detalle de listing |
 | `ListingGridSkeleton` | Skeleton para grilla de listings |
 | `Pagination` | Paginación con selector de items/página |
-| `SideMenu` | Menú lateral (drawer 320px, auth-aware) |
+| `SideMenu` | Menú lateral (drawer 320px, auth-aware, enlace "Mis notificaciones" con badge de no leídas) |
 | `Skeleton` | Skeleton loader genérico |
 | `ConfirmationDialog` | Diálogo modal de confirmación para acciones destructivas (native `<dialog>`, focus trap, Escape to close) |
-| `StatusBadge` | Badge de estado con variantes: lease (Vigente/Acordado/Finalizado), unit (Ocupado/Disponible/Mantenimiento), payment (Al día/Pendiente), listing (Publicada/Sin publicar), contract (Pendiente/Firma pendiente/Firmado) |
+| `StatusBadge` | Badge de estado con variantes: lease (Vigente/Acordado/Finalizado), unit (Ocupado/Disponible/Mantenimiento), payment (Al día/Pendiente), listing (Publicada/Sin publicar), contract (Pendiente/Firma pendiente/Firmado), notification (Enviada/Fallida/Pendiente), tracking, paymentStatus |
 | `Toast` | Notificación temporal auto-hide (`role="status"`, `aria-live="polite"`) |
 | `WizardProgress` | Indicador visual de progreso multi-paso (pasos numerados con check en completados, conector entre pasos, `aria-current="step"`) |
 
@@ -298,6 +337,9 @@ Publicación de unidades: formulario para publicar una unidad del portafolio com
 | Accounting | `accounting.ts` | getAggregatedReport, getIndividualReport |
 | Contract | `contract.ts` | createContract, getContract, signContract, getContractsByLandlord |
 | Lease | `lease.ts` | getUnitLeases, getLeaseDetail, createLease |
+| Notification | `notification.ts` | getNotifications, getNotificationCount, markAsRead, markAllAsRead, getPreferences, updatePreference |
+| Role | `role.ts` | addRole, removeRole, getRemovableRoles |
+| Tenant | `tenant.ts` | getActiveLeases, getLeaseStatus, getPaymentHistory, initiatePayment, transitionLeaseState, getTenantContracts |
 
 Todos los servicios usan `fetch` nativo, `Authorization: Bearer <token>` desde `localStorage`, y manejo de errores tipado con mensajes en español.
 
@@ -334,6 +376,21 @@ El frontend consume los endpoints REST del backend NestJS:
 - `GET /contracts/landlord` — Listado de contratos del arrendador (requiere JWT)
 - `GET /contracts/:id` — Resumen de contrato (requiere JWT, rol LANDLORD)
 - `POST /contracts/:id/sign` — Iniciar firma digital (requiere JWT, rol LANDLORD)
+- `GET /contracts/tenant` — Listado de contratos del arrendatario (requiere JWT, rol TENANT)
+- `GET /notifications` — Listado de notificaciones in-app del usuario (requiere JWT)
+- `GET /notifications/count` — Conteo de notificaciones no leídas (requiere JWT)
+- `PATCH /notifications/:id/read` — Marcar notificación como leída (requiere JWT)
+- `PATCH /notifications/read-all` — Marcar todas como leídas (requiere JWT)
+- `GET /notifications/preferences` — Preferencias de canales externos agrupadas por tipo (requiere JWT)
+- `PUT /notifications/preferences` — Actualizar preferencia de canal externo (requiere JWT)
+- `POST /auth/roles/add` — Agregar rol al usuario (requiere JWT)
+- `DELETE /auth/roles/:roleName` — Eliminar rol del usuario (requiere JWT)
+- `GET /auth/roles/removable` — Consultar eliminabilidad de roles (requiere JWT)
+- `GET /tracking/leases/active` — Arriendos activos del arrendatario (requiere JWT, rol TENANT)
+- `GET /tracking/leases/:leaseId/status` — Estado e historial de un arriendo (requiere JWT, rol TENANT)
+- `POST /tracking/leases/transition` — Transicionar estado de arriendo (requiere JWT)
+- `GET /payments/history` — Historial de pagos del arrendatario (requiere JWT, rol TENANT)
+- `POST /payments/initiate` — Iniciar pago (requiere JWT, rol TENANT)
 
 ## Diseño
 
