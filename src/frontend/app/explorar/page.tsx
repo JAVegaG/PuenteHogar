@@ -31,7 +31,7 @@ function ExploreContent() {
   const { user, logout } = useAuth();
 
   const sideMenuUser = user
-    ? { name: user.displayName, role: translateRole(user.roles[0]) }
+    ? { name: user.displayName, role: translateRole(user.roles[0]), roles: user.roles }
     : null;
 
   const currentSort = {
@@ -96,7 +96,7 @@ export default function ExplorePage() {
   return (
     <Suspense fallback={
       <>
-        <Header title="Explorar inmuebles" onMenuClick={() => {}} />
+        <Header title="Explorar inmuebles" onMenuClick={() => { }} />
         <div className="px-mobile-margin md:px-desktop-margin py-section-gap">
           <ListingGridSkeleton />
         </div>

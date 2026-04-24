@@ -53,7 +53,7 @@ function ProfilePageContent() {
   }, [fetchProfile, profile]);
 
   const sideMenuUser = user
-    ? { name: profile?.displayName ?? user.displayName, role: translateRole(user.roles[0]) }
+    ? { name: profile?.displayName ?? user.displayName, role: translateRole(user.roles[0]), roles: user.roles }
     : null;
 
   return (

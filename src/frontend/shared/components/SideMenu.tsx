@@ -7,11 +7,29 @@ import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 interface SideMenuProps {
   isOpen: boolean;
   onClose: () => void;
-  user?: { name: string; role: string } | null;
+  user?: { name: string; role: string; roles?: string[] } | null;
   onLogout?: () => void;
 }
 
-const NAV_LINKS = [
+type NavLink = { label: string; href: string; icon: () => React.JSX.Element };
+
+const TENANT_LINKS: NavLink[] = [
+  { label: 'Explorar inmuebles', href: '/explorar', icon: SearchIcon },
+  { label: 'Mis arriendos', href: '/mis-arriendos', icon: HomeIcon },
+  { label: 'Mis contratos', href: '/mis-contratos-arrendatario', icon: FileIcon },
+  { label: 'Mis pagos', href: '/mis-pagos', icon: WalletIcon },
+  { label: 'Mi perfil', href: '/mi-perfil', icon: UserIcon },
+];
+
+const LANDLORD_LINKS: NavLink[] = [
+  { label: 'Explorar inmuebles', href: '/explorar', icon: SearchIcon },
+  { label: 'Mi portafolio', href: '/mi-portafolio', icon: HomeIcon },
+  { label: 'Mis ingresos', href: '/mis-ingresos', icon: WalletIcon },
+  { label: 'Mis contratos', href: '/mis-contratos', icon: FileIcon },
+  { label: 'Mi perfil', href: '/mi-perfil', icon: UserIcon },
+];
+
+const DEFAULT_NAV_LINKS: NavLink[] = [
   { label: 'Explorar inmuebles', href: '/explorar', icon: SearchIcon },
   { label: 'Mis arriendos', href: '/mi-portafolio', icon: HomeIcon },
   { label: 'Mis ingresos', href: '/mis-ingresos', icon: WalletIcon },
@@ -19,9 +37,38 @@ const NAV_LINKS = [
   { label: 'Mi perfil', href: '/mi-perfil', icon: UserIcon },
 ];
 
+export function buildNavLinks(roles: string[]): NavLink[] {
+  const hasTenant = roles.includes('TENANT');
+  const hasLandlord = roles.includes('LANDLORD');
+
+  if (hasTenant && hasLandlord) {
+    return [
+      { label: 'Explorar inmuebles', href: '/explorar', icon: SearchIcon },
+      { label: 'Mi portafolio', href: '/mi-portafolio', icon: HomeIcon },
+      { label: 'Mis arriendos', href: '/mis-arriendos', icon: HomeIcon },
+      { label: 'Mis ingresos', href: '/mis-ingresos', icon: WalletIcon },
+      { label: 'Mis contratos (arrendador)', href: '/mis-contratos', icon: FileIcon },
+      { label: 'Mis contratos (arrendatario)', href: '/mis-contratos-arrendatario', icon: FileIcon },
+      { label: 'Mis pagos', href: '/mis-pagos', icon: WalletIcon },
+      { label: 'Mi perfil', href: '/mi-perfil', icon: UserIcon },
+    ];
+  }
+
+  if (hasTenant) {
+    return TENANT_LINKS;
+  }
+
+  if (hasLandlord) {
+    return LANDLORD_LINKS;
+  }
+
+  return DEFAULT_NAV_LINKS;
+}
+
 export function SideMenu({ isOpen, onClose, user, onLogout }: SideMenuProps) {
   useBodyScrollLock(isOpen);
   const drawerRef = useRef<HTMLDivElement>(null);
+  const navLinks = user?.roles ? buildNavLinks(user.roles) : DEFAULT_NAV_LINKS;
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -97,7 +144,7 @@ export function SideMenu({ isOpen, onClose, user, onLogout }: SideMenuProps) {
 
               {/* Navigation links */}
               <div className="flex-1 py-element-gap">
-                {NAV_LINKS.map((link) => (
+                {navLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}

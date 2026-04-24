@@ -63,7 +63,7 @@ function PortfolioContent() {
   const { user, logout } = useAuth();
 
   const sideMenuUser = user
-    ? { name: user.displayName, role: translateRole(user.roles[0]) }
+    ? { name: user.displayName, role: translateRole(user.roles[0]), roles: user.roles }
     : null;
 
   const fetchPortfolios = useCallback(async () => {

@@ -54,7 +54,7 @@ export default function ContractsListView() {
     const [error, setError] = useState<string | null>(null);
 
     const sideMenuUser = user
-        ? { name: user.displayName, role: translateRole(user.roles[0]) }
+        ? { name: user.displayName, role: translateRole(user.roles[0]), roles: user.roles }
         : null;
 
     const fetchContracts = useCallback(async () => {
