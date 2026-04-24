@@ -81,4 +81,5 @@ export interface AuthContextValue {
   isLoading: boolean;
   login: (accessToken: string, userId: string, displayName: string, roles: string[]) => void;
   logout: () => void;
+  updateAuth: (accessToken: string, roles: string[]) => void;
 }

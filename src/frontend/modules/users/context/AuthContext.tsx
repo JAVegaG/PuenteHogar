@@ -43,10 +43,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push('/auth/login');
   }, [router]);
 
+  const updateAuth = useCallback((accessToken: string, roles: string[]) => {
+    const storedData = localStorage.getItem('auth_user');
+    if (!storedData) return;
+
+    try {
+      const current = JSON.parse(storedData) as AuthUser;
+      const updated: AuthUser = { ...current, accessToken, roles };
+      localStorage.setItem('auth_token', accessToken);
+      localStorage.setItem('auth_user', JSON.stringify(updated));
+      setUser(updated);
+    } catch {
+      // If stored data is corrupted, do nothing
+    }
+  }, []);
+
   const isAuthenticated = user !== null;
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout, updateAuth }}>
       {children}
     </AuthContext.Provider>
   );

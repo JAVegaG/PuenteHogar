@@ -9,6 +9,7 @@ interface SideMenuProps {
   onClose: () => void;
   user?: { name: string; role: string; roles?: string[] } | null;
   onLogout?: () => void;
+  unreadNotificationCount?: number;
 }
 
 type NavLink = { label: string; href: string; icon: () => React.JSX.Element };
@@ -18,6 +19,7 @@ const TENANT_LINKS: NavLink[] = [
   { label: 'Mis arriendos', href: '/mis-arriendos', icon: HomeIcon },
   { label: 'Mis contratos', href: '/mis-contratos-arrendatario', icon: FileIcon },
   { label: 'Mis pagos', href: '/mis-pagos', icon: WalletIcon },
+  { label: 'Mis notificaciones', href: '/mis-notificaciones', icon: BellIcon },
   { label: 'Mi perfil', href: '/mi-perfil', icon: UserIcon },
 ];
 
@@ -26,6 +28,7 @@ const LANDLORD_LINKS: NavLink[] = [
   { label: 'Mi portafolio', href: '/mi-portafolio', icon: HomeIcon },
   { label: 'Mis ingresos', href: '/mis-ingresos', icon: WalletIcon },
   { label: 'Mis contratos', href: '/mis-contratos', icon: FileIcon },
+  { label: 'Mis notificaciones', href: '/mis-notificaciones', icon: BellIcon },
   { label: 'Mi perfil', href: '/mi-perfil', icon: UserIcon },
 ];
 
@@ -34,6 +37,7 @@ const DEFAULT_NAV_LINKS: NavLink[] = [
   { label: 'Mis arriendos', href: '/mi-portafolio', icon: HomeIcon },
   { label: 'Mis ingresos', href: '/mis-ingresos', icon: WalletIcon },
   { label: 'Mis contratos', href: '/mis-contratos', icon: FileIcon },
+  { label: 'Mis notificaciones', href: '/mis-notificaciones', icon: BellIcon },
   { label: 'Mi perfil', href: '/mi-perfil', icon: UserIcon },
 ];
 
@@ -50,6 +54,7 @@ export function buildNavLinks(roles: string[]): NavLink[] {
       { label: 'Mis contratos (arrendador)', href: '/mis-contratos', icon: FileIcon },
       { label: 'Mis contratos (arrendatario)', href: '/mis-contratos-arrendatario', icon: FileIcon },
       { label: 'Mis pagos', href: '/mis-pagos', icon: WalletIcon },
+      { label: 'Mis notificaciones', href: '/mis-notificaciones', icon: BellIcon },
       { label: 'Mi perfil', href: '/mi-perfil', icon: UserIcon },
     ];
   }
@@ -65,7 +70,7 @@ export function buildNavLinks(roles: string[]): NavLink[] {
   return DEFAULT_NAV_LINKS;
 }
 
-export function SideMenu({ isOpen, onClose, user, onLogout }: SideMenuProps) {
+export function SideMenu({ isOpen, onClose, user, onLogout, unreadNotificationCount }: SideMenuProps) {
   useBodyScrollLock(isOpen);
   const drawerRef = useRef<HTMLDivElement>(null);
   const navLinks = user?.roles ? buildNavLinks(user.roles) : DEFAULT_NAV_LINKS;
@@ -152,6 +157,14 @@ export function SideMenu({ isOpen, onClose, user, onLogout }: SideMenuProps) {
                   >
                     <link.icon />
                     <span>{link.label}</span>
+                    {link.href === '/mis-notificaciones' && unreadNotificationCount != null && unreadNotificationCount > 0 && (
+                      <span
+                        aria-label={`${unreadNotificationCount} notificaciones no leídas`}
+                        className="ml-auto flex items-center justify-center min-w-[20px] h-[20px] px-1 rounded-full bg-red-600 text-white text-small font-semibold leading-none"
+                      >
+                        {unreadNotificationCount}
+                      </span>
+                    )}
                   </Link>
                 ))}
               </div>
@@ -219,6 +232,15 @@ export function SideMenu({ isOpen, onClose, user, onLogout }: SideMenuProps) {
 }
 
 /* ── Icon Components ── */
+
+function BellIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+    </svg>
+  );
+}
 
 function SearchIcon() {
   return (

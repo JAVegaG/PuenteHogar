@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/shared/components/Header';
 import { useAuth } from '@modules/users/context/AuthContext';
@@ -12,7 +12,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.push('/explorar');
+      router.push('/mi-perfil');
     }
   }, [isAuthenticated, isLoading, router]);
 
@@ -33,7 +33,7 @@ export default function LoginPage() {
   if (isLoading) {
     return (
       <>
-        <Header title="Iniciar sesión" onMenuClick={() => {}} leftAction={backButton} />
+        <Header title="Iniciar sesión" onMenuClick={() => { }} leftAction={backButton} />
         <div className="flex items-center justify-center min-h-[60vh]" role="status" aria-busy="true" aria-label="Verificando autenticación">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
         </div>
@@ -47,10 +47,12 @@ export default function LoginPage() {
 
   return (
     <>
-      <Header title="Iniciar sesión" onMenuClick={() => {}} leftAction={backButton} />
+      <Header title="Iniciar sesión" onMenuClick={() => { }} leftAction={backButton} />
       <main className="flex justify-center px-4 pt-[73px]">
         <div className="w-full max-w-[448px] px-4 py-6">
-          <LoginForm />
+          <Suspense fallback={null}>
+            <LoginForm />
+          </Suspense>
         </div>
       </main>
     </>

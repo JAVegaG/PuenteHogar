@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { validateLoginForm } from '../validation';
 import { authService } from '@/shared/services/auth';
@@ -16,6 +16,8 @@ export default function LoginForm() {
 
   const { login } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnUrl = searchParams.get('returnUrl');
 
   function handleMailChange(value: string) {
     setMail(value);
@@ -54,7 +56,7 @@ export default function LoginForm() {
     try {
       const response = await authService.login({ mail, password });
       login(response.accessToken, response.userId, response.displayName, response.roles);
-      router.push('/explorar');
+      router.push(returnUrl || '/mi-perfil');
     } catch (err) {
       const message = err instanceof Error ? err.message : '';
       if (message === 'Credenciales inválidas') {

@@ -50,6 +50,12 @@ const paymentStatusColors: Record<string, ContractColorMapping> = {
     REJECTED: { bg: '#FEE2E2', text: '#991B1B', label: 'Rechazado' },
 };
 
+const notificationColors: Record<string, ContractColorMapping> = {
+    SENT: { bg: '#DCFCE7', text: '#166534', label: 'Enviada' },
+    FAILED: { bg: '#FEE2E2', text: '#991B1B', label: 'Fallida' },
+    PENDING: { bg: '#FEF3C7', text: '#92400E', label: 'Pendiente' },
+};
+
 const variantMap: Record<string, Record<string, ColorMapping | ContractColorMapping>> = {
     lease: leaseColors,
     unit: unitColors,
@@ -58,13 +64,14 @@ const variantMap: Record<string, Record<string, ColorMapping | ContractColorMapp
     contract: contractColors,
     tracking: trackingColors,
     paymentStatus: paymentStatusColors,
+    notification: notificationColors,
 };
 
 const defaultColor: ColorMapping = { bg: '#F3F4F6', text: '#4B5563' };
 
 interface StatusBadgeProps {
     status: string;
-    variant?: 'lease' | 'unit' | 'payment' | 'listing' | 'contract' | 'tracking' | 'paymentStatus';
+    variant?: 'lease' | 'unit' | 'payment' | 'listing' | 'contract' | 'tracking' | 'paymentStatus' | 'notification';
 }
 
 export function StatusBadge({ status, variant = 'lease' }: StatusBadgeProps) {
