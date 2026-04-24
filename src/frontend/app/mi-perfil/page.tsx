@@ -4,11 +4,14 @@ import { useState, useEffect, useCallback } from 'react';
 import ProtectedRoute from '@modules/users/components/ProtectedRoute';
 import { useAuth } from '@modules/users/context/AuthContext';
 import { authService } from '@shared/services/auth';
+import { notificationService } from '@shared/services/notification';
 import { Header } from '@shared/components/Header';
 import { SideMenu } from '@shared/components/SideMenu';
 import { Skeleton } from '@shared/components/Skeleton';
 import { ErrorState } from '@shared/components/ErrorState';
 import ProfileCard from '@modules/users/components/ProfileCard';
+import RoleManagementSection from '@modules/users/components/RoleManagementSection';
+import QuickNavSection from '@modules/users/components/QuickNavSection';
 import type { UserProfile } from '@modules/users/types';
 
 function translateRole(role: string): string {
@@ -20,11 +23,12 @@ function translateRole(role: string): string {
 }
 
 function ProfilePageContent() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateAuth } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [profileError, setProfileError] = useState(false);
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
 
   const fetchProfile = useCallback(async () => {
     const token = user?.accessToken;
@@ -52,6 +56,14 @@ function ProfilePageContent() {
     }
   }, [fetchProfile, profile]);
 
+  useEffect(() => {
+    const token = user?.accessToken;
+    if (!token) return;
+    notificationService.getNotificationCount(token)
+      .then((data) => setUnreadCount(data.unreadCount))
+      .catch(() => { /* silently ignore — badge just won't show */ });
+  }, [user?.accessToken]);
+
   const sideMenuUser = user
     ? { name: profile?.displayName ?? user.displayName, role: translateRole(user.roles[0]), roles: user.roles }
     : null;
@@ -68,6 +80,7 @@ function ProfilePageContent() {
           onClose={() => setIsSideMenuOpen(false)}
           user={sideMenuUser}
           onLogout={logout}
+          unreadNotificationCount={unreadCount}
         />
       )}
 
@@ -92,7 +105,19 @@ function ProfilePageContent() {
         )}
 
         {!isLoadingProfile && !profileError && profile && (
-          <ProfileCard profile={profile} onLogout={logout} />
+          <>
+            <ProfileCard profile={profile} onLogout={logout} />
+            {user && (
+              <>
+                <RoleManagementSection
+                  roles={user.roles}
+                  accessToken={user.accessToken}
+                  updateAuth={updateAuth}
+                />
+                <QuickNavSection roles={user.roles} />
+              </>
+            )}
+          </>
         )}
       </main>
     </>
