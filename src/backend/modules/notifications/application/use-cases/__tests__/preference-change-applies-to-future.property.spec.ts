@@ -106,6 +106,20 @@ function makeMutableRepo(initialChannel: NotificationChannel): {
       persisted.push(record);
       return Promise.resolve();
     }),
+    createInAppNotification: jest.fn().mockResolvedValue(null),
+    findInAppNotificationsByUserId: jest.fn().mockResolvedValue([]),
+    countUnreadByUserId: jest.fn().mockResolvedValue(0),
+    markAsRead: jest.fn().mockResolvedValue(null),
+    markAllAsRead: jest.fn().mockResolvedValue(0),
+    findAllNotificationTypes: jest.fn().mockResolvedValue([]),
+    findActiveExternalPreferences: jest.fn().mockImplementation(
+      (userId: string, typeId: string) => {
+        const activePrefs = Array.from(preferences.values()).filter(
+          (p) => p.userId === userId && p.notificationTypeId === typeId && p.isActive,
+        );
+        return Promise.resolve(activePrefs);
+      },
+    ),
   };
 
   return { repo, persisted, getPreferences: () => preferences };
@@ -187,15 +201,19 @@ describe('Property 47: Cambio de preferencias aplica a notificaciones futuras', 
             });
 
             // The second notification must NOT use the now-disabled channel
-            expect(persisted).toHaveLength(2);
-            const secondNotification = persisted[1];
-            // Either it was sent via a fallback channel or it was FAILED (no active channel)
-            if (secondNotification.status === 'SENT') {
-              expect(secondNotification.channel).not.toBe(originalChannel);
+            // With the new flow, no external send happens when channel is disabled
+            if (persisted.length === 2) {
+              // If another channel was active, it was sent via that channel
+              const secondNotification = persisted[1];
+              if (secondNotification.status === 'SENT') {
+                expect(secondNotification.channel).not.toBe(originalChannel);
+              }
             } else {
-              // If no fallback channel is active, it should be FAILED
-              expect(secondNotification.status).toBe('FAILED');
+              // No external notification persisted — only in-app was created
+              expect(persisted).toHaveLength(1);
             }
+            // In-app notification should always be created (twice total)
+            expect(repo.createInAppNotification).toHaveBeenCalledTimes(2);
 
             return true;
           },
@@ -226,7 +244,7 @@ describe('Property 47: Cambio de preferencias aplica a notificaciones futuras', 
             await repo.upsertPreference(userId, NOTIFICATION_TYPE_ID, 'EMAIL', false);
             await repo.upsertPreference(userId, NOTIFICATION_TYPE_ID, 'WHATSAPP', false);
 
-            // ── Step 1: Send notification — should FAIL (all channels disabled) ──
+            // ── Step 1: Send notification — should not send externally (all channels disabled) ──
             await sendUseCase.execute({
               userId,
               notificationTypeName: NOTIFICATION_TYPE_NAME,
@@ -234,9 +252,11 @@ describe('Property 47: Cambio de preferencias aplica a notificaciones futuras', 
               data: dataBefore,
             });
 
-            expect(persisted).toHaveLength(1);
-            expect(persisted[0].status).toBe('FAILED');
+            // No external notification persisted
+            expect(persisted).toHaveLength(0);
             expect(sentPayloads).toHaveLength(0);
+            // But in-app notification should be created
+            expect(repo.createInAppNotification).toHaveBeenCalledTimes(1);
 
             // ── Step 2: Re-enable the target channel ──
             await updateUseCase.execute(userId, {
@@ -253,10 +273,10 @@ describe('Property 47: Cambio de preferencias aplica a notificaciones futuras', 
               data: dataAfter,
             });
 
-            expect(persisted).toHaveLength(2);
-            const secondNotification = persisted[1];
-            expect(secondNotification.status).toBe('SENT');
-            expect(secondNotification.channel).toBe(targetChannel);
+            expect(persisted).toHaveLength(1);
+            const externalNotification = persisted[0];
+            expect(externalNotification.status).toBe('SENT');
+            expect(externalNotification.channel).toBe(targetChannel);
             expect(sentPayloads).toHaveLength(1);
             expect(sentPayloads[0].channel).toBe(targetChannel);
 
@@ -325,6 +345,8 @@ describe('Property 47: Cambio de preferencias aplica a notificaciones futuras', 
             expect(persisted[1].status).toBe('SENT');
             expect(sentPayloads).toHaveLength(2);
             expect(sentPayloads[1].channel).toBe('EMAIL');
+            // In-app notifications should always be created
+            expect(repo.createInAppNotification).toHaveBeenCalledTimes(2);
 
             return true;
           },

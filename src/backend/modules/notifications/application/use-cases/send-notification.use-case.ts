@@ -12,14 +12,59 @@ const MAX_RETRIES = 2;
 const BASE_BACKOFF_MS = 500;
 
 /**
+ * Builds Spanish notification content (title + message) from the notification type name and event data.
+ */
+export function buildNotificationContent(
+  typeName: string,
+  data: Record<string, unknown>,
+): { title: string; message: string } {
+  switch (typeName) {
+    case 'CONTRACT_SIGNED':
+      return {
+        title: 'Contrato firmado',
+        message: data.contractId
+          ? `El contrato ${String(data.contractId)} ha sido firmado exitosamente.`
+          : 'Un contrato ha sido firmado exitosamente.',
+      };
+    case 'PAYMENT_RECEIVED':
+      return {
+        title: 'Pago recibido',
+        message: data.amount
+          ? `Se ha recibido un pago por $${String(data.amount)}.`
+          : 'Se ha recibido un pago.',
+      };
+    case 'CONTACT_INITIATED':
+      return {
+        title: 'Contacto iniciado',
+        message: data.listingId
+          ? `Se ha iniciado un contacto para el inmueble ${String(data.listingId)}.`
+          : 'Se ha iniciado un nuevo contacto.',
+      };
+    case 'CONTRACT_UPLOADED':
+      return {
+        title: 'Contrato cargado',
+        message: data.contractId
+          ? `El contrato ${String(data.contractId)} ha sido cargado.`
+          : 'Un contrato ha sido cargado.',
+      };
+    default:
+      return {
+        title: typeName,
+        message: `Notificación: ${typeName}`,
+      };
+  }
+}
+
+/**
  * SendNotificationUseCase
  *
- * Determines the user's preferred channel, sends the notification via that channel,
- * retries up to 2 times with exponential backoff on failure, persists the notification
- * with its final status, and logs definitive failures to the audit log without
- * interrupting the calling flow (fire-and-forget).
+ * 1. Resolves the notification type by name
+ * 2. Builds notification content using buildNotificationContent helper
+ * 3. Always creates an in-app notification (read: false)
+ * 4. Queries active external preferences and sends only for active channels
+ * 5. Maintains retry/backoff logic for external channels
  *
- * Requirements: 9.2, 9.3, 9.4, 9.5, 9.6
+ * Requirements: 2.8, 2.9, 9.2, 9.3, 9.4, 9.5, 9.6
  */
 @Injectable()
 export class SendNotificationUseCase {
@@ -31,9 +76,10 @@ export class SendNotificationUseCase {
     @Inject(MESSAGING_CHANNEL)
     private readonly messagingChannel: IMessagingChannel,
     private readonly auditLogger: AuditLoggerService,
-  ) {}
+  ) { }
 
   async execute(dto: SendNotificationDto): Promise<void> {
+    // 1. Resolve notification type by name
     const notificationType = await this.repository.findNotificationTypeByName(
       dto.notificationTypeName,
     );
@@ -43,43 +89,44 @@ export class SendNotificationUseCase {
       return;
     }
 
-    // Determine preferred channel (Req 9.2)
-    const preference = await this.repository.findPreferenceByUserAndType(
+    const eventData = dto.data ?? {};
+
+    // 2. Build notification content
+    const { title, message } = buildNotificationContent(dto.notificationTypeName, eventData);
+
+    // 3. Always create in-app notification (Req 2.8)
+    await this.repository.createInAppNotification({
+      userId: dto.userId,
+      notificationTypeId: notificationType.id,
+      title,
+      message,
+      eventSource: dto.eventSource,
+      data: eventData,
+    });
+
+    // 4. Query active external preferences (Req 2.9)
+    const activePreferences = await this.repository.findActiveExternalPreferences(
       dto.userId,
       notificationType.id,
     );
 
-    // Default to WHATSAPP if no preference set
-    const channel: NotificationChannel =
-      preference?.isActive === false
-        ? 'EMAIL' // fallback if preferred channel is disabled
-        : (preference?.channel ?? 'WHATSAPP');
-
-    // Check if the resolved channel is also disabled (Req 9.6)
-    const allPreferences = await this.repository.findPreferencesByUserId(dto.userId);
-    const channelPref = allPreferences.find(
-      (p) => p.notificationTypeId === notificationType.id && p.channel === channel,
-    );
-    if (channelPref && !channelPref.isActive) {
-      this.logger.log(
-        `Notification suppressed for user ${dto.userId} — channel ${channel} is disabled`,
-      );
-      await this.repository.persistNotification({
-        userId: dto.userId,
-        notificationTypeId: notificationType.id,
-        channel,
-        status: 'FAILED',
-        eventSource: dto.eventSource,
-        payload: dto.data ?? {},
-      });
-      return;
+    // 5. For each active preference, send via external channel with retry/backoff
+    for (const pref of activePreferences) {
+      await this.sendViaExternalChannel(dto, notificationType, pref.channel, eventData);
     }
+  }
 
+  private async sendViaExternalChannel(
+    dto: SendNotificationDto,
+    notificationType: { id: string; name: string },
+    channel: NotificationChannel,
+    eventData: Record<string, unknown>,
+  ): Promise<void> {
     const payload = {
       userId: dto.userId,
       channel,
       eventSource: dto.eventSource,
-      data: dto.data ?? {},
+      data: eventData,
     };
 
     let sent = false;
@@ -90,7 +137,7 @@ export class SendNotificationUseCase {
       if (attempt > 0) {
         const delay = BASE_BACKOFF_MS * Math.pow(2, attempt - 1);
         this.logger.warn(
-          `Notification retry ${attempt}/${MAX_RETRIES} for user ${dto.userId} — waiting ${delay}ms`,
+          `Notification retry ${attempt}/${MAX_RETRIES} for user ${dto.userId} channel ${channel} — waiting ${delay}ms`,
         );
         await this.sleep(delay);
       }
@@ -102,7 +149,7 @@ export class SendNotificationUseCase {
       } catch (err) {
         lastError = err;
         this.logger.error(
-          `Notification attempt ${attempt + 1} failed for user ${dto.userId}: ${err instanceof Error ? err.message : String(err)}`,
+          `Notification attempt ${attempt + 1} failed for user ${dto.userId} channel ${channel}: ${err instanceof Error ? err.message : String(err)}`,
         );
       }
     }
@@ -114,7 +161,7 @@ export class SendNotificationUseCase {
       channel,
       status: sent ? 'SENT' : 'FAILED',
       eventSource: dto.eventSource,
-      payload: dto.data ?? {},
+      payload: eventData,
       sentAt: sent ? new Date() : undefined,
     });
 

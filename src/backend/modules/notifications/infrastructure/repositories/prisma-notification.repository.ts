@@ -1,15 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@src/shared/prisma/prisma.service';
+import { InAppNotificationEntity } from '../../domain/entities/in-app-notification.entity';
 import { NotificationPreferenceEntity } from '../../domain/entities/notification-preference.entity';
+import { NotificationTypeEntity } from '../../domain/entities/notification-type.entity';
 import type { NotificationChannel } from '../../domain/entities/notification-preference.entity';
 import type {
+  CreateInAppNotificationData,
   INotificationRepository,
   NotificationRecord,
 } from '../../domain/ports/notification-repository.port';
 
 @Injectable()
 export class PrismaNotificationRepository implements INotificationRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async findPreferencesByUserId(userId: string): Promise<NotificationPreferenceEntity[]> {
     const records = await this.prisma.notificationPreference.findMany({
@@ -99,5 +102,128 @@ export class PrismaNotificationRepository implements INotificationRepository {
         ),
       },
     });
+  }
+
+  async createInAppNotification(data: CreateInAppNotificationData): Promise<InAppNotificationEntity> {
+    const record = await this.prisma.inAppNotification.create({
+      data: {
+        user_id: data.userId,
+        notification_type_id: data.notificationTypeId,
+        title: data.title,
+        message: data.message,
+        read: false,
+        event_source: data.eventSource,
+        data: data.data as object,
+      },
+    });
+
+    return new InAppNotificationEntity(
+      record.id,
+      record.user_id,
+      record.notification_type_id,
+      record.title,
+      record.message,
+      record.read,
+      record.event_source,
+      record.data as Record<string, unknown>,
+      record.created_at,
+    );
+  }
+
+  async findInAppNotificationsByUserId(userId: string): Promise<InAppNotificationEntity[]> {
+    const records = await this.prisma.inAppNotification.findMany({
+      where: { user_id: userId },
+      orderBy: { created_at: 'desc' },
+    });
+
+    return records.map(
+      (r: typeof records[number]) =>
+        new InAppNotificationEntity(
+          r.id,
+          r.user_id,
+          r.notification_type_id,
+          r.title,
+          r.message,
+          r.read,
+          r.event_source,
+          r.data as Record<string, unknown>,
+          r.created_at,
+        ),
+    );
+  }
+
+  async countUnreadByUserId(userId: string): Promise<number> {
+    return this.prisma.inAppNotification.count({
+      where: { user_id: userId, read: false },
+    });
+  }
+
+  async markAsRead(id: string, userId: string): Promise<InAppNotificationEntity | null> {
+    const existing = await this.prisma.inAppNotification.findFirst({
+      where: { id, user_id: userId },
+    });
+
+    if (!existing) return null;
+
+    const record = await this.prisma.inAppNotification.update({
+      where: { id },
+      data: { read: true },
+    });
+
+    return new InAppNotificationEntity(
+      record.id,
+      record.user_id,
+      record.notification_type_id,
+      record.title,
+      record.message,
+      record.read,
+      record.event_source,
+      record.data as Record<string, unknown>,
+      record.created_at,
+    );
+  }
+
+  async markAllAsRead(userId: string): Promise<number> {
+    const result = await this.prisma.inAppNotification.updateMany({
+      where: { user_id: userId, read: false },
+      data: { read: true },
+    });
+
+    return result.count;
+  }
+
+  async findAllNotificationTypes(): Promise<NotificationTypeEntity[]> {
+    const records = await this.prisma.notificationType.findMany();
+
+    return records.map(
+      (r: typeof records[number]) =>
+        new NotificationTypeEntity(r.id, r.name, r.description),
+    );
+  }
+
+  async findActiveExternalPreferences(
+    userId: string,
+    notificationTypeId: string,
+  ): Promise<NotificationPreferenceEntity[]> {
+    const records = await this.prisma.notificationPreference.findMany({
+      where: {
+        user_id: userId,
+        notification_type_id: notificationTypeId,
+        is_active: true,
+      },
+    });
+
+    return records.map(
+      (r: typeof records[number]) =>
+        new NotificationPreferenceEntity(
+          r.id,
+          r.user_id,
+          r.notification_type_id,
+          r.channel as NotificationChannel,
+          r.is_active,
+          r.created_at,
+          r.updated_at,
+        ),
+    );
   }
 }

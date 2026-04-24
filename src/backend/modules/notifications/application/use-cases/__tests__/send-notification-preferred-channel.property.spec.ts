@@ -39,17 +39,20 @@ function makeMockRepo(
 
   const preferences: NotificationPreferenceEntity[] = preferredChannel
     ? [
-        new NotificationPreferenceEntity(
-          'pref-1',
-          'any-user',
-          NOTIFICATION_TYPE_ID,
-          preferredChannel,
-          isActive,
-          new Date(),
-          new Date(),
-        ),
-      ]
+      new NotificationPreferenceEntity(
+        'pref-1',
+        'any-user',
+        NOTIFICATION_TYPE_ID,
+        preferredChannel,
+        isActive,
+        new Date(),
+        new Date(),
+      ),
+    ]
     : [];
+
+  // Active external preferences: only include if isActive is true
+  const activeExternalPrefs = preferences.filter((p) => p.isActive);
 
   const repo: jest.Mocked<INotificationRepository> = {
     findNotificationTypeByName: jest.fn().mockResolvedValue({
@@ -66,6 +69,13 @@ function makeMockRepo(
       persisted.push(record);
       return Promise.resolve();
     }),
+    createInAppNotification: jest.fn().mockResolvedValue(null),
+    findInAppNotificationsByUserId: jest.fn().mockResolvedValue([]),
+    countUnreadByUserId: jest.fn().mockResolvedValue(0),
+    markAsRead: jest.fn().mockResolvedValue(null),
+    markAllAsRead: jest.fn().mockResolvedValue(0),
+    findAllNotificationTypes: jest.fn().mockResolvedValue([]),
+    findActiveExternalPreferences: jest.fn().mockResolvedValue(activeExternalPrefs),
   };
 
   return { repo, persisted };
@@ -106,19 +116,12 @@ describe('Property 44: Notificación enviada por el canal preferido del usuario'
           arbitraryNotificationData(),
           async (userId, preferredChannel, eventSource, data) => {
             const { repo } = makeMockRepo(preferredChannel, true);
-            // Override findPreferenceByUserAndType to use the generated userId
-            repo.findPreferenceByUserAndType.mockResolvedValue(
-              new NotificationPreferenceEntity(
-                'pref-1', userId, NOTIFICATION_TYPE_ID,
-                preferredChannel, true, new Date(), new Date(),
-              ),
+            // Override findActiveExternalPreferences to return the active preference
+            const activePref = new NotificationPreferenceEntity(
+              'pref-1', userId, NOTIFICATION_TYPE_ID,
+              preferredChannel, true, new Date(), new Date(),
             );
-            repo.findPreferencesByUserId.mockResolvedValue([
-              new NotificationPreferenceEntity(
-                'pref-1', userId, NOTIFICATION_TYPE_ID,
-                preferredChannel, true, new Date(), new Date(),
-              ),
-            ]);
+            repo.findActiveExternalPreferences.mockResolvedValue([activePref]);
 
             const { channel, sentPayloads } = makeMockMessagingChannel();
             const auditLogger = makeMockAuditLogger();
@@ -146,8 +149,8 @@ describe('Property 44: Notificación enviada por el canal preferido del usuario'
     });
   });
 
-  describe('defaults to WHATSAPP when no preference is configured', () => {
-    it('sends via WHATSAPP if user has no preference set', async () => {
+  describe('no external sends when no preference is configured', () => {
+    it('does not send via any external channel if user has no active preferences', async () => {
       await fc.assert(
         fc.asyncProperty(
           fc.uuid(),
@@ -155,7 +158,7 @@ describe('Property 44: Notificación enviada por el canal preferido del usuario'
           arbitraryNotificationData(),
           async (userId, eventSource, data) => {
             const { repo } = makeMockRepo(null);
-            repo.findPreferencesByUserId.mockResolvedValue([]);
+            repo.findActiveExternalPreferences.mockResolvedValue([]);
 
             const { channel, sentPayloads } = makeMockMessagingChannel();
             const auditLogger = makeMockAuditLogger();
@@ -169,8 +172,10 @@ describe('Property 44: Notificación enviada por el canal preferido del usuario'
               data,
             });
 
-            expect(sentPayloads).toHaveLength(1);
-            expect(sentPayloads[0].channel).toBe('WHATSAPP');
+            // No external sends when no active preferences
+            expect(sentPayloads).toHaveLength(0);
+            // But in-app notification should still be created
+            expect(repo.createInAppNotification).toHaveBeenCalledTimes(1);
 
             return true;
           },
@@ -190,18 +195,12 @@ describe('Property 44: Notificación enviada por el canal preferido del usuario'
           arbitraryNotificationData(),
           async (userId, preferredChannel, eventSource, data) => {
             const { repo, persisted } = makeMockRepo(preferredChannel, true);
-            repo.findPreferenceByUserAndType.mockResolvedValue(
-              new NotificationPreferenceEntity(
-                'pref-1', userId, NOTIFICATION_TYPE_ID,
-                preferredChannel, true, new Date(), new Date(),
-              ),
+            // Override findActiveExternalPreferences to return the active preference
+            const activePref = new NotificationPreferenceEntity(
+              'pref-1', userId, NOTIFICATION_TYPE_ID,
+              preferredChannel, true, new Date(), new Date(),
             );
-            repo.findPreferencesByUserId.mockResolvedValue([
-              new NotificationPreferenceEntity(
-                'pref-1', userId, NOTIFICATION_TYPE_ID,
-                preferredChannel, true, new Date(), new Date(),
-              ),
-            ]);
+            repo.findActiveExternalPreferences.mockResolvedValue([activePref]);
 
             const { channel } = makeMockMessagingChannel();
             const auditLogger = makeMockAuditLogger();
@@ -234,18 +233,12 @@ describe('Property 44: Notificación enviada por el canal preferido del usuario'
       const userId = 'user-fixed-id';
 
       const { repo } = makeMockRepo(preferredChannel, true);
-      repo.findPreferenceByUserAndType.mockResolvedValue(
-        new NotificationPreferenceEntity(
-          'pref-1', userId, NOTIFICATION_TYPE_ID,
-          preferredChannel, true, new Date(), new Date(),
-        ),
+      // Override findActiveExternalPreferences to return the active preference
+      const activePref = new NotificationPreferenceEntity(
+        'pref-1', userId, NOTIFICATION_TYPE_ID,
+        preferredChannel, true, new Date(), new Date(),
       );
-      repo.findPreferencesByUserId.mockResolvedValue([
-        new NotificationPreferenceEntity(
-          'pref-1', userId, NOTIFICATION_TYPE_ID,
-          preferredChannel, true, new Date(), new Date(),
-        ),
-      ]);
+      repo.findActiveExternalPreferences.mockResolvedValue([activePref]);
 
       const { channel, sentPayloads } = makeMockMessagingChannel();
       const auditLogger = makeMockAuditLogger();

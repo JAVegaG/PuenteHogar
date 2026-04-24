@@ -8,6 +8,11 @@ import {
   SendNotificationUseCase,
 } from './application/use-cases/send-notification.use-case';
 import { UpdateNotificationPreferencesUseCase } from './application/use-cases/update-notification-preferences.use-case';
+import { GetNotificationsUseCase } from './application/use-cases/get-notifications.use-case';
+import { GetNotificationCountUseCase } from './application/use-cases/get-notification-count.use-case';
+import { MarkNotificationReadUseCase } from './application/use-cases/mark-notification-read.use-case';
+import { MarkAllNotificationsReadUseCase } from './application/use-cases/mark-all-notifications-read.use-case';
+import { GetNotificationPreferencesUseCase } from './application/use-cases/get-notification-preferences.use-case';
 import { MessagingChannelAdapter } from './infrastructure/adapters/messaging-channel.adapter';
 import { NotificationsEtlService } from './infrastructure/etl/notifications-etl.service';
 import { PrismaNotificationRepository } from './infrastructure/repositories/prisma-notification.repository';
@@ -22,6 +27,11 @@ import { NotificationsController } from './notifications.controller';
     NotificationsEtlService,
     SendNotificationUseCase,
     UpdateNotificationPreferencesUseCase,
+    GetNotificationsUseCase,
+    GetNotificationCountUseCase,
+    MarkNotificationReadUseCase,
+    MarkAllNotificationsReadUseCase,
+    GetNotificationPreferencesUseCase,
     {
       provide: NOTIFICATION_REPOSITORY,
       useClass: PrismaNotificationRepository,
@@ -33,4 +43,4 @@ import { NotificationsController } from './notifications.controller';
   ],
   exports: [SendNotificationUseCase, UpdateNotificationPreferencesUseCase],
 })
-export class NotificationsModule {}
+export class NotificationsModule { }

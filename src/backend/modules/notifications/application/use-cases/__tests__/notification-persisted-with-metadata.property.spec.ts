@@ -60,6 +60,13 @@ function makeMockRepo(
       persisted.push(record);
       return Promise.resolve();
     }),
+    createInAppNotification: jest.fn().mockResolvedValue(null),
+    findInAppNotificationsByUserId: jest.fn().mockResolvedValue([]),
+    countUnreadByUserId: jest.fn().mockResolvedValue(0),
+    markAsRead: jest.fn().mockResolvedValue(null),
+    markAllAsRead: jest.fn().mockResolvedValue(0),
+    findAllNotificationTypes: jest.fn().mockResolvedValue([]),
+    findActiveExternalPreferences: jest.fn().mockResolvedValue([pref]),
   };
 
   return { repo, persisted };

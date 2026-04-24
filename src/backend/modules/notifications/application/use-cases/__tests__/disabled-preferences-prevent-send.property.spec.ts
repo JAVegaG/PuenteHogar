@@ -57,6 +57,13 @@ function makeMockRepo(
       persisted.push(record);
       return Promise.resolve();
     }),
+    createInAppNotification: jest.fn().mockResolvedValue(null),
+    findInAppNotificationsByUserId: jest.fn().mockResolvedValue([]),
+    countUnreadByUserId: jest.fn().mockResolvedValue(0),
+    markAsRead: jest.fn().mockResolvedValue(null),
+    markAllAsRead: jest.fn().mockResolvedValue(0),
+    findAllNotificationTypes: jest.fn().mockResolvedValue([]),
+    findActiveExternalPreferences: jest.fn().mockResolvedValue([]),
   };
 
   return { repo, persisted };
@@ -104,7 +111,7 @@ function makePreference(
 describe('Property 46: Preferencias de notificaci√≥n desactivadas previenen env√≠o por ese canal', () => {
 
   describe('when the preferred channel is disabled and fallback channel is also disabled', () => {
-    it('does NOT send via any channel and persists notification as FAILED', async () => {
+    it('does NOT send via any channel and does not persist external notification', async () => {
       await fc.assert(
         fc.asyncProperty(
           fc.uuid(),
@@ -118,6 +125,8 @@ describe('Property 46: Preferencias de notificaci√≥n desactivadas previenen env√
             ];
 
             const { repo, persisted } = makeMockRepo(preferences);
+            // No active external preferences
+            repo.findActiveExternalPreferences.mockResolvedValue([]);
             const { channel, sentPayloads } = makeMockMessagingChannel();
             const auditLogger = makeMockAuditLogger();
 
@@ -134,10 +143,10 @@ describe('Property 46: Preferencias de notificaci√≥n desactivadas previenen env√
             expect(sentPayloads).toHaveLength(0);
             expect(channel.send).not.toHaveBeenCalled();
 
-            // Notification should be persisted as FAILED
-            expect(persisted).toHaveLength(1);
-            expect(persisted[0].status).toBe('FAILED');
-            expect(persisted[0].userId).toBe(userId);
+            // No external notification persisted (only in-app was created)
+            expect(persisted).toHaveLength(0);
+            // But in-app notification should still be created
+            expect(repo.createInAppNotification).toHaveBeenCalledTimes(1);
 
             return true;
           },
@@ -147,8 +156,8 @@ describe('Property 46: Preferencias de notificaci√≥n desactivadas previenen env√
     });
   });
 
-  describe('when a specific channel is disabled, notification is not sent via that channel', () => {
-    it('falls back to EMAIL when WHATSAPP preference is disabled', async () => {
+  describe('when a specific channel is disabled, only active channels are sent', () => {
+    it('sends via EMAIL when WHATSAPP preference is disabled but EMAIL is active', async () => {
       await fc.assert(
         fc.asyncProperty(
           fc.uuid(),
@@ -162,10 +171,10 @@ describe('Property 46: Preferencias de notificaci√≥n desactivadas previenen env√
             ];
 
             const { repo, persisted } = makeMockRepo(preferences);
-            // Override to return the WHATSAPP (disabled) preference as the primary one
-            repo.findPreferenceByUserAndType.mockResolvedValue(
-              makePreference(userId, 'WHATSAPP', false),
-            );
+            // Only EMAIL is active
+            repo.findActiveExternalPreferences.mockResolvedValue([
+              makePreference(userId, 'EMAIL', true),
+            ]);
 
             const { channel, sentPayloads } = makeMockMessagingChannel();
             const auditLogger = makeMockAuditLogger();
@@ -179,7 +188,7 @@ describe('Property 46: Preferencias de notificaci√≥n desactivadas previenen env√
               data,
             });
 
-            // Should have sent via EMAIL (fallback), not WHATSAPP
+            // Should have sent via EMAIL only
             expect(sentPayloads).toHaveLength(1);
             expect(sentPayloads[0].channel).toBe('EMAIL');
             expect(sentPayloads[0].channel).not.toBe('WHATSAPP');
@@ -197,8 +206,8 @@ describe('Property 46: Preferencias de notificaci√≥n desactivadas previenen env√
     });
   });
 
-  describe('disabled preference suppresses notification and persists record', () => {
-    it('for any channel, disabling it prevents sending and records FAILED status', async () => {
+  describe('disabled preference suppresses notification and no external record persisted', () => {
+    it('for any channel, disabling all channels prevents sending and no external record is persisted', async () => {
       await fc.assert(
         fc.asyncProperty(
           fc.uuid(),
@@ -206,18 +215,14 @@ describe('Property 46: Preferencias de notificaci√≥n desactivadas previenen env√
           arbitraryEventSource(),
           arbitraryNotificationData(),
           async (userId, disabledChannel, eventSource, data) => {
-            // Only one preference exists and it is disabled; no fallback available
-            // When the primary channel is disabled, use case falls back to EMAIL.
-            // If EMAIL is the disabled channel, the fallback check catches it.
-            // If WHATSAPP is disabled, fallback is EMAIL ‚Äî we need EMAIL also disabled to suppress.
+            // All channels disabled
             const preferences = CHANNELS.map((ch) =>
               makePreference(userId, ch, false),
             );
 
             const { repo, persisted } = makeMockRepo(preferences);
-            repo.findPreferenceByUserAndType.mockResolvedValue(
-              makePreference(userId, disabledChannel, false),
-            );
+            // No active external preferences
+            repo.findActiveExternalPreferences.mockResolvedValue([]);
 
             const { channel, sentPayloads } = makeMockMessagingChannel();
             const auditLogger = makeMockAuditLogger();
@@ -235,9 +240,10 @@ describe('Property 46: Preferencias de notificaci√≥n desactivadas previenen env√
             expect(sentPayloads).toHaveLength(0);
             expect(channel.send).not.toHaveBeenCalled();
 
-            // Notification persisted as FAILED
-            expect(persisted).toHaveLength(1);
-            expect(persisted[0].status).toBe('FAILED');
+            // No external notification persisted
+            expect(persisted).toHaveLength(0);
+            // But in-app notification should still be created
+            expect(repo.createInAppNotification).toHaveBeenCalledTimes(1);
 
             return true;
           },
@@ -259,9 +265,10 @@ describe('Property 46: Preferencias de notificaci√≥n desactivadas previenen env√
             const preferences = [makePreference(userId, activeChannel, true)];
 
             const { repo, persisted } = makeMockRepo(preferences);
-            repo.findPreferenceByUserAndType.mockResolvedValue(
+            // Return the active preference from findActiveExternalPreferences
+            repo.findActiveExternalPreferences.mockResolvedValue([
               makePreference(userId, activeChannel, true),
-            );
+            ]);
 
             const { channel, sentPayloads } = makeMockMessagingChannel();
             const auditLogger = makeMockAuditLogger();
