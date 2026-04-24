@@ -423,6 +423,7 @@ export const ModelName = {
   IndividualPaymentReport: 'IndividualPaymentReport',
   AccountingRaw: 'AccountingRaw',
   NotificationType: 'NotificationType',
+  InAppNotification: 'InAppNotification',
   NotificationPreference: 'NotificationPreference',
   NotificationsRaw: 'NotificationsRaw',
   ContractStatus: 'ContractStatus',
@@ -450,7 +451,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "documentType" | "naturalPersonDetail" | "legalPersonDetail" | "role" | "permission" | "userRole" | "rolePermission" | "usersRaw" | "property" | "address" | "listing" | "photo" | "additionalFeature" | "propertyAdditionalFeature" | "propertyType" | "department" | "city" | "propertyListingsRaw" | "landlordPortfolio" | "portfolioUnit" | "lease" | "portfolioRaw" | "leaseStatus" | "leaseStatusHistory" | "leaseCurrentStatus" | "listingStatus" | "listingStatusHistory" | "listingCurrentStatus" | "trackingRaw" | "scheduledPayment" | "payment" | "paymentStatus" | "paymentLog" | "paymentsRaw" | "aggregatedPaymentReport" | "individualPaymentReport" | "accountingRaw" | "notificationType" | "notificationPreference" | "notificationsRaw" | "contractStatus" | "contract" | "contractParty" | "fileType" | "fileStatus" | "file" | "signingStatus" | "signing" | "signingLog" | "contractsRaw"
+    modelProps: "user" | "documentType" | "naturalPersonDetail" | "legalPersonDetail" | "role" | "permission" | "userRole" | "rolePermission" | "usersRaw" | "property" | "address" | "listing" | "photo" | "additionalFeature" | "propertyAdditionalFeature" | "propertyType" | "department" | "city" | "propertyListingsRaw" | "landlordPortfolio" | "portfolioUnit" | "lease" | "portfolioRaw" | "leaseStatus" | "leaseStatusHistory" | "leaseCurrentStatus" | "listingStatus" | "listingStatusHistory" | "listingCurrentStatus" | "trackingRaw" | "scheduledPayment" | "payment" | "paymentStatus" | "paymentLog" | "paymentsRaw" | "aggregatedPaymentReport" | "individualPaymentReport" | "accountingRaw" | "notificationType" | "inAppNotification" | "notificationPreference" | "notificationsRaw" | "contractStatus" | "contract" | "contractParty" | "fileType" | "fileStatus" | "file" | "signingStatus" | "signing" | "signingLog" | "contractsRaw"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3340,6 +3341,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    InAppNotification: {
+      payload: Prisma.$InAppNotificationPayload<ExtArgs>
+      fields: Prisma.InAppNotificationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.InAppNotificationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InAppNotificationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.InAppNotificationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InAppNotificationPayload>
+        }
+        findFirst: {
+          args: Prisma.InAppNotificationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InAppNotificationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.InAppNotificationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InAppNotificationPayload>
+        }
+        findMany: {
+          args: Prisma.InAppNotificationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InAppNotificationPayload>[]
+        }
+        create: {
+          args: Prisma.InAppNotificationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InAppNotificationPayload>
+        }
+        createMany: {
+          args: Prisma.InAppNotificationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.InAppNotificationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InAppNotificationPayload>[]
+        }
+        delete: {
+          args: Prisma.InAppNotificationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InAppNotificationPayload>
+        }
+        update: {
+          args: Prisma.InAppNotificationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InAppNotificationPayload>
+        }
+        deleteMany: {
+          args: Prisma.InAppNotificationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.InAppNotificationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.InAppNotificationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InAppNotificationPayload>[]
+        }
+        upsert: {
+          args: Prisma.InAppNotificationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InAppNotificationPayload>
+        }
+        aggregate: {
+          args: Prisma.InAppNotificationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateInAppNotification>
+        }
+        groupBy: {
+          args: Prisma.InAppNotificationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InAppNotificationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.InAppNotificationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InAppNotificationCountAggregateOutputType> | number
+        }
+      }
+    }
     NotificationPreference: {
       payload: Prisma.$NotificationPreferencePayload<ExtArgs>
       fields: Prisma.NotificationPreferenceFieldRefs
@@ -4336,7 +4411,8 @@ export type PermissionScalarFieldEnum = (typeof PermissionScalarFieldEnum)[keyof
 export const UserRoleScalarFieldEnum = {
   id: 'id',
   user_id: 'user_id',
-  role_id: 'role_id'
+  role_id: 'role_id',
+  auto_assigned: 'auto_assigned'
 } as const
 
 export type UserRoleScalarFieldEnum = (typeof UserRoleScalarFieldEnum)[keyof typeof UserRoleScalarFieldEnum]
@@ -4718,6 +4794,21 @@ export const NotificationTypeScalarFieldEnum = {
 } as const
 
 export type NotificationTypeScalarFieldEnum = (typeof NotificationTypeScalarFieldEnum)[keyof typeof NotificationTypeScalarFieldEnum]
+
+
+export const InAppNotificationScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  notification_type_id: 'notification_type_id',
+  title: 'title',
+  message: 'message',
+  read: 'read',
+  event_source: 'event_source',
+  data: 'data',
+  created_at: 'created_at'
+} as const
+
+export type InAppNotificationScalarFieldEnum = (typeof InAppNotificationScalarFieldEnum)[keyof typeof InAppNotificationScalarFieldEnum]
 
 
 export const NotificationPreferenceScalarFieldEnum = {
@@ -5126,6 +5217,7 @@ export type GlobalOmitConfig = {
   individualPaymentReport?: Prisma.IndividualPaymentReportOmit
   accountingRaw?: Prisma.AccountingRawOmit
   notificationType?: Prisma.NotificationTypeOmit
+  inAppNotification?: Prisma.InAppNotificationOmit
   notificationPreference?: Prisma.NotificationPreferenceOmit
   notificationsRaw?: Prisma.NotificationsRawOmit
   contractStatus?: Prisma.ContractStatusOmit

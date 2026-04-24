@@ -90,6 +90,7 @@ export const ModelName = {
   IndividualPaymentReport: 'IndividualPaymentReport',
   AccountingRaw: 'AccountingRaw',
   NotificationType: 'NotificationType',
+  InAppNotification: 'InAppNotification',
   NotificationPreference: 'NotificationPreference',
   NotificationsRaw: 'NotificationsRaw',
   ContractStatus: 'ContractStatus',
@@ -189,7 +190,8 @@ export type PermissionScalarFieldEnum = (typeof PermissionScalarFieldEnum)[keyof
 export const UserRoleScalarFieldEnum = {
   id: 'id',
   user_id: 'user_id',
-  role_id: 'role_id'
+  role_id: 'role_id',
+  auto_assigned: 'auto_assigned'
 } as const
 
 export type UserRoleScalarFieldEnum = (typeof UserRoleScalarFieldEnum)[keyof typeof UserRoleScalarFieldEnum]
@@ -571,6 +573,21 @@ export const NotificationTypeScalarFieldEnum = {
 } as const
 
 export type NotificationTypeScalarFieldEnum = (typeof NotificationTypeScalarFieldEnum)[keyof typeof NotificationTypeScalarFieldEnum]
+
+
+export const InAppNotificationScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  notification_type_id: 'notification_type_id',
+  title: 'title',
+  message: 'message',
+  read: 'read',
+  event_source: 'event_source',
+  data: 'data',
+  created_at: 'created_at'
+} as const
+
+export type InAppNotificationScalarFieldEnum = (typeof InAppNotificationScalarFieldEnum)[keyof typeof InAppNotificationScalarFieldEnum]
 
 
 export const NotificationPreferenceScalarFieldEnum = {

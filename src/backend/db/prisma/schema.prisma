@@ -90,9 +90,10 @@ model Permission {
 }
 
 model UserRole {
-  id      String @id @default(uuid())
-  user_id String
-  role_id String
+  id            String  @id @default(uuid())
+  user_id       String
+  role_id       String
+  auto_assigned Boolean @default(false)
 
   user User @relation(fields: [user_id], references: [id])
   role Role @relation(fields: [role_id], references: [id])
@@ -528,8 +529,27 @@ model NotificationType {
   name        String  @unique
   description String?
 
-  preferences NotificationPreference[]
+  preferences          NotificationPreference[]
+  in_app_notifications InAppNotification[]
 
+  @@schema("notifications")
+}
+
+model InAppNotification {
+  id                   String   @id @default(uuid())
+  user_id              String
+  notification_type_id String
+  title                String
+  message              String
+  read                 Boolean  @default(false)
+  event_source         String
+  data                 Json     @default("{}")
+  created_at           DateTime @default(now())
+
+  notification_type NotificationType @relation(fields: [notification_type_id], references: [id])
+
+  @@index([user_id, read])
+  @@index([user_id, created_at])
   @@schema("notifications")
 }
 

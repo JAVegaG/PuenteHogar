@@ -235,6 +235,11 @@ export type AccountingRaw = Prisma.AccountingRawModel
  */
 export type NotificationType = Prisma.NotificationTypeModel
 /**
+ * Model InAppNotification
+ * 
+ */
+export type InAppNotification = Prisma.InAppNotificationModel
+/**
  * Model NotificationPreference
  * 
  */
