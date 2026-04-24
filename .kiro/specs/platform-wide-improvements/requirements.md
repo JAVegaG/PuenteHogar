@@ -25,7 +25,8 @@ This document specifies the requirements for a set of cross-cutting improvements
 - **Centered_Container**: The `max-w-[560px]` centered layout wrapper used on form and visual pages to prevent content from stretching full-width on desktop viewports, following the pattern: `<main className="flex justify-center ..."><div className="w-full max-w-[560px]">...</div></main>`.
 - **RAW_Table**: A per-module PostgreSQL table (e.g., `UsersRaw`, `PortfolioRaw`, `ContractsRaw`) that stores incoming data as JSON/JSONB for later ETL processing into curated typed tables.
 - **ETL_Cron**: A scheduled job that transforms data from RAW_Tables into curated typed tables with validated, typed columns.
-- **Hybrid_Persistence_Pattern**: The architectural pattern where each module persists incoming data first to a RAW_Table (JSON/JSONB) and then transforms it via ETL_Cron into curated typed tables for reads.
+- **Hybrid_Persistence_Pattern**: The architectural pattern where each module persists the complete incoming payload to a single RAW_Table (JSON/JSONB) and then the ETL_Cron decomposes (materializes) that payload into the module's individual curated typed tables for reads. One RAW record may produce rows in multiple curated tables.
+- **Materialization**: The ETL process of decomposing a single RAW_Table JSON payload into multiple curated typed table rows (e.g., a single `UsersRaw` record is materialized into `User`, `UserRole`, and `NaturalPersonDetail`/`LegalPersonDetail` rows).
 - **Soft_Delete**: A data deletion strategy where records are marked as deleted (via a `deleted_at` timestamp column) rather than physically removed from the database, preserving data for audits and recovery.
 - **Cross_Schema_Query**: A database query that directly accesses tables belonging to another module's PostgreSQL schema, bypassing the module's public API boundary.
 - **Internal_API**: A controller endpoint or service method exposed by a module that other modules call to access that module's data, respecting the modular monolith boundary.
@@ -111,12 +112,13 @@ This document specifies the requirements for a set of cross-cutting improvements
 #### Acceptance Criteria
 
 1. THE Backend_Module for each domain (users, property-listings, landlord-portfolio, contracts, payments, accounting, notifications) SHALL persist incoming write data to its respective RAW_Table before or alongside writing to curated typed tables.
-2. WHEN a Backend_Module persists data to a RAW_Table, THE Backend_Module SHALL store the `payload` field as a proper JSON/JSONB object (using Prisma's `Json` type), not as a stringified JSON string.
-3. THE `users` module SHALL update its `UsersRaw` persistence to pass the payload as a JSON object instead of calling `JSON.stringify(data)` on the payload value.
-4. THE `landlord-portfolio` module SHALL update its `PortfolioRaw` persistence to pass the payload as a JSON object instead of calling `JSON.stringify(data)` on the payload value.
-5. THE `contracts` module, `payments` module, and `notifications` module SHALL maintain their current correct pattern of storing proper JSON objects in their respective RAW_Tables.
-6. WHEN an ETL_Cron processes records from a RAW_Table, THE ETL_Cron SHALL be able to read the `payload` field directly as a JSON object without needing to parse a stringified JSON string.
-7. IF a RAW_Table contains legacy records with stringified JSON payloads, THEN THE ETL_Cron SHALL handle both formats (stringified string and proper JSON object) gracefully during a transition period.
+2. WHEN a Backend_Module persists data to a RAW_Table, THE Backend_Module SHALL store the complete incoming JSON payload as a proper JSON/JSONB object (using Prisma's `Json` type), not as a stringified JSON string. Each module has a single RAW_Table that receives the full payload.
+3. THE ETL_Cron for each module SHALL be responsible for reading the complete JSON payload from the single RAW_Table and materializing (splitting/transforming) it into the individual curated typed tables that the module owns. For example, a single `UsersRaw` record containing user, role, and person detail data SHALL be decomposed by the ETL into the `User`, `UserRole`, `NaturalPersonDetail`/`LegalPersonDetail` curated tables.
+4. THE `users` module SHALL update its `UsersRaw` persistence to pass the payload as a JSON object instead of calling `JSON.stringify(data)` on the payload value.
+5. THE `landlord-portfolio` module SHALL update its `PortfolioRaw` persistence to pass the payload as a JSON object instead of calling `JSON.stringify(data)` on the payload value.
+6. THE `contracts` module, `payments` module, and `notifications` module SHALL maintain their current correct pattern of storing proper JSON objects in their respective RAW_Tables.
+7. WHEN an ETL_Cron processes records from a RAW_Table, THE ETL_Cron SHALL be able to read the `payload` field directly as a JSON object without needing to parse a stringified JSON string.
+8. IF a RAW_Table contains legacy records with stringified JSON payloads, THEN THE ETL_Cron SHALL handle both formats (stringified string and proper JSON object) gracefully during a transition period.
 
 ---
 
@@ -150,3 +152,20 @@ This document specifies the requirements for a set of cross-cutting improvements
 6. WHEN the `users` module needs to verify if a user has portfolios with units, THE `users` module SHALL call an Internal_API exposed by the `landlord-portfolio` module instead of executing a raw SQL query against the `landlord_portfolio` tables.
 7. EACH Backend_Module that exposes Internal_APIs for cross-module consumption SHALL define the API contract as a port interface in its `domain/ports/` directory, following the hexagonal architecture pattern.
 8. THE cross-module Internal_API calls SHALL be synchronous service method invocations within the monolith (not HTTP calls), injected via NestJS dependency injection, to maintain performance while preserving module boundaries.
+
+---
+
+### Requirement 9: Documentation and Steering Updates to Reflect New Standards
+
+**User Story:** As a developer onboarding or maintaining the platform, I want all project documentation and steering files to reflect the standardized patterns established by this spec, so that future development follows the same conventions without ambiguity.
+
+#### Acceptance Criteria
+
+1. THE steering files in `.kiro/steering/` (tech.md, structure.md, product.md) SHALL be updated to document the soft delete pattern (`deleted_at` column on all tables), including the distinction between `deleted_at` (record deletion) and `is_active` (catalog item availability).
+2. THE steering files SHALL be updated to explicitly document the RAW/ETL hybrid persistence standard: each module persists the full incoming payload as a proper JSON/JSONB object to a single RAW_Table, and the ETL cron materializes (decomposes) that payload into the module's individual curated typed tables.
+3. THE steering files SHALL be updated to document the internal API pattern for cross-module communication: modules expose port interfaces in `domain/ports/` and other modules consume them via NestJS dependency injection — no direct cross-schema Prisma queries or raw SQL across schema boundaries.
+4. THE steering files SHALL be updated to document the Centered_Container standard (`max-w-[560px]`) for all form and visual pages except `/explorar`.
+5. THE steering files SHALL be updated to document that Auth_Pages (`/auth/login`, `/auth/registro`) are first-level pages that use the hamburger menu (not back button) navigation pattern.
+6. THE steering files SHALL be updated to document the Primary_Button_Style standard for all main CTAs: blue background (`#1d4ed8`), white text, `rounded-[6px]`, minimum touch target `44×44px`.
+7. THE `documentation/` folder (SRS and architectural design documents) SHALL be reviewed and updated where applicable to reflect the soft delete strategy, the RAW/ETL materialization flow, and the internal API cross-module communication pattern.
+8. ALL documentation updates SHALL be consistent with each other and with the implemented code changes from Requirements 1–8.
