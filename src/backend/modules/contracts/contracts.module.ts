@@ -4,8 +4,11 @@ import { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
 import { CircuitBreakerFactory } from '@src/shared/circuit-breaker/circuit-breaker.factory';
 import { PrismaService } from '@src/shared/prisma/prisma.service';
 import { S3ClientFactory } from '@src/shared/s3';
+import { PII_ENCRYPTOR } from '@modules/users/application/use-cases/register-user.use-case';
+import { AES256PIIEncryptor } from '@modules/users/infrastructure/adapters/aes256-pii-encryptor.adapter';
 import { GetContractSummaryUseCase } from './application/use-cases/get-contract-summary.use-case';
 import { GetLandlordContractsUseCase } from './application/use-cases/get-landlord-contracts.use-case';
+import { GetTenantContractsUseCase } from './application/use-cases/get-tenant-contracts.use-case';
 import { HandleSigningWebhookUseCase } from './application/use-cases/handle-signing-webhook.use-case';
 import { InitiateSigningUseCase } from './application/use-cases/initiate-signing.use-case';
 import {
@@ -37,6 +40,7 @@ import { PrismaContractRepository } from './infrastructure/repositories/prisma-c
     DeleteContractUseCase,
     GetContractSummaryUseCase,
     GetLandlordContractsUseCase,
+    GetTenantContractsUseCase,
     InitiateSigningUseCase,
     HandleSigningWebhookUseCase,
     {
@@ -61,6 +65,10 @@ import { PrismaContractRepository } from './infrastructure/repositories/prisma-c
           // stub — notifications module will handle this
         },
       },
+    },
+    {
+      provide: PII_ENCRYPTOR,
+      useClass: AES256PIIEncryptor,
     },
   ],
   exports: [

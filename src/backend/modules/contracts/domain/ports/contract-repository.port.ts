@@ -27,6 +27,17 @@ export interface LandlordContractListItem {
   endDate: Date | null;
 }
 
+export interface TenantContractRawItem {
+  id: string;
+  leaseId: string;
+  status: string;
+  startDate: Date;
+  endDate: Date | null;
+  portfolioUnitId: string;
+  landlordUserId: string;
+  createdAt: Date;
+}
+
 export interface IContractRepository {
   create(data: CreateContractData): Promise<ContractEntity>;
   findById(id: string): Promise<ContractEntity | null>;
@@ -43,6 +54,7 @@ export interface IContractRepository {
   findFileTypeByName(name: string): Promise<{ id: string } | null>;
   findFileStatusByName(name: string): Promise<{ id: string } | null>;
   findContractsByLandlordId(landlordUserId: string): Promise<LandlordContractListItem[]>;
+  findContractsByTenantId(tenantUserId: string): Promise<TenantContractRawItem[]>;
   updateFileUrl(contractId: string, newFileUrl: string): Promise<ContractEntity>;
   deleteContract(contractId: string): Promise<void>;
   findSigningsByContractId(contractId: string): Promise<SigningInfo[]>;

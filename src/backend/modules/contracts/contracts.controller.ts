@@ -31,11 +31,13 @@ import { JwtAuthGuard } from '@src/shared/guards/jwt-auth.guard';
 import { Public } from '@src/shared/decorators/public.decorator';
 import { InitiateSigningDto } from './application/dtos/initiate-signing.dto';
 import { LandlordContractListItemDto } from './application/dtos/landlord-contract-list-item.dto';
+import { TenantContractListItemDto } from './application/dtos/tenant-contract-list-item.dto';
 import { SigningWebhookDto } from './application/dtos/signing-webhook.dto';
 import { CreateContractDto } from './application/dtos/create-contract.dto';
 import { ContractSummaryDto } from './application/dtos/contract-summary.dto';
 import { GetContractSummaryUseCase } from './application/use-cases/get-contract-summary.use-case';
 import { GetLandlordContractsUseCase } from './application/use-cases/get-landlord-contracts.use-case';
+import { GetTenantContractsUseCase } from './application/use-cases/get-tenant-contracts.use-case';
 import { HandleSigningWebhookUseCase } from './application/use-cases/handle-signing-webhook.use-case';
 import { InitiateSigningUseCase } from './application/use-cases/initiate-signing.use-case';
 import { UploadContractUseCase } from './application/use-cases/upload-contract.use-case';
@@ -55,6 +57,7 @@ export class ContractsController {
     private readonly initiateSigningUseCase: InitiateSigningUseCase,
     private readonly handleSigningWebhookUseCase: HandleSigningWebhookUseCase,
     private readonly getLandlordContractsUseCase: GetLandlordContractsUseCase,
+    private readonly getTenantContractsUseCase: GetTenantContractsUseCase,
     private readonly replaceContractFileUseCase: ReplaceContractFileUseCase,
     private readonly deleteContractUseCase: DeleteContractUseCase,
   ) { }
@@ -86,6 +89,15 @@ export class ContractsController {
   @ApiOkResponse({ type: [LandlordContractListItemDto] })
   getLandlordContracts(@Req() req: AuthenticatedRequest) {
     return this.getLandlordContractsUseCase.execute(req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('tenant')
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Listar contratos del arrendatario' })
+  @ApiOkResponse({ type: [TenantContractListItemDto] })
+  getTenantContracts(@Req() req: AuthenticatedRequest) {
+    return this.getTenantContractsUseCase.execute(req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)

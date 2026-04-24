@@ -8,6 +8,7 @@ import {
   IContractRepository,
   LandlordContractListItem,
   SigningInfo,
+  TenantContractRawItem,
 } from '@modules/contracts/domain/ports/contract-repository.port';
 
 @Injectable()
@@ -203,6 +204,51 @@ export class PrismaContractRepository implements IContractRepository {
         endDate: c.end_date,
       };
     });
+  }
+
+  async findContractsByTenantId(tenantUserId: string): Promise<TenantContractRawItem[]> {
+    // Step 1: Find all ContractParty where user_id = tenantUserId and role_in_contract = 'TENANT'
+    const tenantParties = await this.prisma.contractParty.findMany({
+      where: { user_id: tenantUserId, role_in_contract: 'TENANT' },
+      select: { contract_id: true },
+    });
+    if (tenantParties.length === 0) return [];
+
+    const contractIds = tenantParties.map((p) => p.contract_id);
+
+    // Step 2: Find all Contracts by those IDs, include status, order by created_at DESC
+    const contracts = await this.prisma.contract.findMany({
+      where: { id: { in: contractIds } },
+      include: { status: true },
+      orderBy: { created_at: 'desc' },
+    });
+    if (contracts.length === 0) return [];
+
+    // Step 3: For each contract, resolve Lease to get portfolio_unit_id and find the LANDLORD party
+    const leaseIds = [...new Set(contracts.map((c) => c.lease_id))];
+    const leases = await this.prisma.lease.findMany({
+      where: { id: { in: leaseIds } },
+      select: { id: true, portfolio_unit_id: true },
+    });
+    const leaseMap = new Map(leases.map((l) => [l.id, l.portfolio_unit_id]));
+
+    // Find landlord parties for these contracts
+    const landlordParties = await this.prisma.contractParty.findMany({
+      where: { contract_id: { in: contractIds }, role_in_contract: 'LANDLORD' },
+      select: { contract_id: true, user_id: true },
+    });
+    const landlordMap = new Map(landlordParties.map((p) => [p.contract_id, p.user_id]));
+
+    return contracts.map((c) => ({
+      id: c.id,
+      leaseId: c.lease_id,
+      status: c.status.name,
+      startDate: c.start_date,
+      endDate: c.end_date,
+      portfolioUnitId: leaseMap.get(c.lease_id) ?? '',
+      landlordUserId: landlordMap.get(c.id) ?? '',
+      createdAt: c.created_at,
+    }));
   }
 
   async deleteContract(contractId: string): Promise<void> {
