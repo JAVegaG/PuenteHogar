@@ -85,7 +85,7 @@ function UnitDetailContent() {
     <>
       <Header
         title="Detalle de unidad"
-        onMenuClick={() => {}}
+        onMenuClick={() => { }}
         leftAction={backArrow}
       />
 
@@ -133,7 +133,7 @@ function UnitDetailContent() {
         )}
 
         {!isLoading && !error && !notFound && unit && (
-          <UnitDetailView unit={unit} />
+          <UnitDetailView unit={unit} token={user?.accessToken ?? ''} />
         )}
       </main>
     </>

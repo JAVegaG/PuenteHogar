@@ -1,5 +1,3 @@
-import Link from 'next/link';
-
 import { formatPrice } from '@/shared/utils/formatPrice';
 
 import type { ListingDetail } from '../types';
@@ -93,15 +91,7 @@ export default function ListingDetailView({ listing }: ListingDetailViewProps) {
         </section>
       )}
 
-      {/* Contactar arrendador */}
-      <section>
-        <Link
-          href="/auth/login"
-          className="flex items-center justify-center w-full bg-primary text-white rounded-card h-[56px] min-w-[44px] min-h-[44px] text-body font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-        >
-          Contactar arrendador
-        </Link>
-      </section>
+
     </div>
   );
 }

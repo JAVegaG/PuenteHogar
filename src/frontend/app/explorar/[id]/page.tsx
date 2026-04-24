@@ -10,6 +10,7 @@ import { ListingDetailSkeleton } from '@/shared/components/ListingDetailSkeleton
 import { fetchListingDetail } from '@/shared/services/api';
 import PhotoGallery from '@modules/property-listings/components/PhotoGallery';
 import ListingDetailView from '@modules/property-listings/components/ListingDetailView';
+import { ContactLandlordButton } from '@/modules/tenant/components/ContactLandlordButton';
 import type { ListingDetail } from '@modules/property-listings/types';
 
 type PageState =
@@ -117,6 +118,9 @@ export default function ListingDetailPage() {
             <PhotoGallery photos={state.data.photos} />
             <div className="mt-section-gap">
               <ListingDetailView listing={state.data} />
+            </div>
+            <div className="mt-section-gap pb-section-gap">
+              <ContactLandlordButton listingId={state.data.id} />
             </div>
           </>
         )}
