@@ -7,15 +7,21 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
+import { PrismaService } from '@src/shared/prisma/prisma.service';
 import type { IContractRepository } from '@modules/contracts/domain/ports/contract-repository.port';
+import { CheckAndRevokeAutoAssignedRoleUseCase } from '@modules/users/application/use-cases/check-and-revoke-auto-assigned-role.use-case';
 import { CONTRACT_REPOSITORY } from './upload-contract.use-case';
 
 @Injectable()
 export class DeleteContractUseCase {
+    private readonly logger = new Logger(DeleteContractUseCase.name);
+
     constructor(
         @Inject(CONTRACT_REPOSITORY)
         private readonly repository: IContractRepository,
         private readonly auditLogger: AuditLoggerService,
+        private readonly prisma: PrismaService,
+        private readonly checkAndRevokeAutoAssignedRole: CheckAndRevokeAutoAssignedRoleUseCase,
     ) { }
 
     async execute(
@@ -55,6 +61,9 @@ export class DeleteContractUseCase {
             }
         }
 
+        const wasPending = contract.status === 'PENDING';
+        const leaseId = contract.leaseId;
+
         await this.repository.deleteContract(contractId);
 
         this.auditLogger.log({
@@ -64,6 +73,23 @@ export class DeleteContractUseCase {
             resourceId: contractId,
             timestamp: new Date(),
         });
+
+        // Fire-and-forget: check if TENANT role should be auto-revoked
+        if (wasPending) {
+            try {
+                const lease = await this.prisma.lease.findUnique({
+                    where: { id: leaseId },
+                    select: { user_id: true },
+                });
+                if (lease) {
+                    await this.checkAndRevokeAutoAssignedRole.execute(lease.user_id, 'TENANT');
+                }
+            } catch (error) {
+                this.logger.error(
+                    `Failed to check auto-revocation for lease ${leaseId}: ${error instanceof Error ? error.message : error}`,
+                );
+            }
+        }
 
         return { message: 'Contrato eliminado exitosamente' };
     }

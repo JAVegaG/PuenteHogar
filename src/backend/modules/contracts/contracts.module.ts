@@ -6,6 +6,7 @@ import { PrismaService } from '@src/shared/prisma/prisma.service';
 import { S3ClientFactory } from '@src/shared/s3';
 import { PII_ENCRYPTOR } from '@modules/users/application/use-cases/register-user.use-case';
 import { AES256PIIEncryptor } from '@modules/users/infrastructure/adapters/aes256-pii-encryptor.adapter';
+import { UsersModule } from '@modules/users/users.module';
 import { GetContractSummaryUseCase } from './application/use-cases/get-contract-summary.use-case';
 import { GetLandlordContractsUseCase } from './application/use-cases/get-landlord-contracts.use-case';
 import { GetTenantContractsUseCase } from './application/use-cases/get-tenant-contracts.use-case';
@@ -27,7 +28,7 @@ import { ContractsEtlService } from './infrastructure/etl/contracts-etl.service'
 import { PrismaContractRepository } from './infrastructure/repositories/prisma-contract.repository';
 
 @Module({
-  imports: [ConfigModule],
+  imports: [ConfigModule, UsersModule],
   controllers: [ContractsController],
   providers: [
     PrismaService,

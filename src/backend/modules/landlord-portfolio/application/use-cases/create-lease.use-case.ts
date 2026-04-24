@@ -2,15 +2,22 @@ import {
     ConflictException,
     ForbiddenException,
     Injectable,
+    Logger,
     NotFoundException,
 } from '@nestjs/common';
+import { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
 import { PrismaService } from '@src/shared/prisma/prisma.service';
 import { CreateLeaseDto } from '../dtos/create-lease.dto';
 import { LeaseListItemDto } from '../dtos/lease-list-item.dto';
 
 @Injectable()
 export class CreateLeaseUseCase {
-    constructor(private readonly prisma: PrismaService) { }
+    private readonly logger = new Logger(CreateLeaseUseCase.name);
+
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly auditLogger: AuditLoggerService,
+    ) { }
 
     async execute(
         portfolioId: string,
@@ -47,7 +54,10 @@ export class CreateLeaseUseCase {
             );
         }
 
-        // 4. Check no active lease exists for this unit
+        // 4. Auto-assign TENANT role if tenant doesn't have it
+        await this.autoAssignTenantRole(tenantUser.id);
+
+        // 5. Check no active lease exists for this unit
         const existingLeases = await this.prisma.lease.findMany({
             where: { portfolio_unit_id: unitId },
         });
@@ -68,7 +78,7 @@ export class CreateLeaseUseCase {
             }
         }
 
-        // 5. Create Lease record
+        // 6. Create Lease record
         const newLease = await this.prisma.lease.create({
             data: {
                 portfolio_unit_id: unitId,
@@ -78,7 +88,7 @@ export class CreateLeaseUseCase {
             },
         });
 
-        // 6. Create LeaseStatusHistory with status "Acordado"
+        // 7. Create LeaseStatusHistory with status "Acordado"
         const acordadoStatus = await this.prisma.leaseStatus.findUnique({
             where: { name: 'Acordado' },
         });
@@ -99,7 +109,7 @@ export class CreateLeaseUseCase {
             },
         });
 
-        // 7. Create LeaseCurrentStatus pointing to the history entry
+        // 8. Create LeaseCurrentStatus pointing to the history entry
         await this.prisma.leaseCurrentStatus.create({
             data: {
                 lease_id: newLease.id,
@@ -108,7 +118,7 @@ export class CreateLeaseUseCase {
             },
         });
 
-        // 8. Build response
+        // 9. Build response
         const result = new LeaseListItemDto();
         result.id = newLease.id;
         result.startDate = newLease.start_date.toISOString();
@@ -140,5 +150,53 @@ export class CreateLeaseUseCase {
         }
 
         return 'Desconocido';
+    }
+
+    private async autoAssignTenantRole(tenantUserId: string): Promise<void> {
+        try {
+            const tenantRole = await this.prisma.role.findUnique({
+                where: { name: 'TENANT' },
+            });
+            if (!tenantRole) {
+                this.logger.warn('TENANT role not found in database, skipping auto-assignment');
+                return;
+            }
+
+            const existingUserRole = await this.prisma.userRole.findFirst({
+                where: { user_id: tenantUserId, role_id: tenantRole.id },
+            });
+            if (existingUserRole) {
+                return; // User already has TENANT role — skip silently
+            }
+
+            await this.prisma.userRole.create({
+                data: {
+                    user_id: tenantUserId,
+                    role_id: tenantRole.id,
+                    auto_assigned: true,
+                },
+            });
+
+            await this.prisma.user.update({
+                where: { id: tenantUserId },
+                data: { user_type: 'BOTH' },
+            });
+
+            this.auditLogger.log({
+                userId: tenantUserId,
+                action: 'ROLE_AUTO_ASSIGNED',
+                resource: 'UserRole',
+                resourceId: tenantRole.id,
+                timestamp: new Date(),
+                metadata: { roleName: 'TENANT' },
+            });
+        } catch (error: unknown) {
+            // Handle unique constraint violation silently (race condition: role was assigned concurrently)
+            const prismaError = error as { code?: string };
+            if (prismaError.code === 'P2002') {
+                return;
+            }
+            throw error;
+        }
     }
 }
