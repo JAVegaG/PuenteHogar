@@ -35,19 +35,36 @@ const contractColors: Record<string, ContractColorMapping> = {
     SIGNED: { bg: '#D1FAE5', text: '#065F46', label: 'Firmado' },
 };
 
+const trackingColors: Record<string, ContractColorMapping> = {
+    PUBLISHED: { bg: '#F3F4F6', text: '#4B5563', label: 'Publicado' },
+    CONTACT_INITIATED: { bg: '#DBEAFE', text: '#1E40AF', label: 'Contacto iniciado' },
+    CONTRACT_UPLOADED: { bg: '#FEF3C7', text: '#92400E', label: 'Contrato cargado' },
+    CONTRACT_SIGNED: { bg: '#DCFCE7', text: '#166534', label: 'Contrato firmado' },
+    PAYMENT_RECEIVED: { bg: '#D1FAE5', text: '#065F46', label: 'Pago recibido' },
+};
+
+const paymentStatusColors: Record<string, ContractColorMapping> = {
+    PENDING: { bg: '#FEF3C7', text: '#92400E', label: 'Pendiente' },
+    PROCESSING: { bg: '#DBEAFE', text: '#1E40AF', label: 'Procesando' },
+    PAID: { bg: '#DCFCE7', text: '#065F46', label: 'Pagado' },
+    REJECTED: { bg: '#FEE2E2', text: '#991B1B', label: 'Rechazado' },
+};
+
 const variantMap: Record<string, Record<string, ColorMapping | ContractColorMapping>> = {
     lease: leaseColors,
     unit: unitColors,
     payment: paymentColors,
     listing: listingColors,
     contract: contractColors,
+    tracking: trackingColors,
+    paymentStatus: paymentStatusColors,
 };
 
 const defaultColor: ColorMapping = { bg: '#F3F4F6', text: '#4B5563' };
 
 interface StatusBadgeProps {
     status: string;
-    variant?: 'lease' | 'unit' | 'payment' | 'listing' | 'contract';
+    variant?: 'lease' | 'unit' | 'payment' | 'listing' | 'contract' | 'tracking' | 'paymentStatus';
 }
 
 export function StatusBadge({ status, variant = 'lease' }: StatusBadgeProps) {
