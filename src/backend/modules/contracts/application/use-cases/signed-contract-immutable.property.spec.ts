@@ -139,6 +139,9 @@ function makeStubs(input: {
     async findContractsByLandlordId(): Promise<any[]> {
       return [];
     },
+    async findContractsByTenantId(): Promise<any[]> {
+      return [];
+    },
     async updateFileUrl(): Promise<ContractEntity> {
       throw new Error('Not expected');
     },

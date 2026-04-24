@@ -111,6 +111,7 @@ function makeRepositoryStub(input: {
     async findFileTypeByName(): Promise<{ id: string } | null> { return null; },
     async findFileStatusByName(): Promise<{ id: string } | null> { return null; },
     async findContractsByLandlordId(): Promise<any[]> { return []; },
+    async findContractsByTenantId(): Promise<any[]> { return []; },
     async updateFileUrl(): Promise<ContractEntity> { throw new Error('Not expected'); },
     async deleteContract(): Promise<void> { throw new Error('Not expected'); },
   };
