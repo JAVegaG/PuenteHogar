@@ -202,10 +202,16 @@ model Photo {
 }
 
 model AdditionalFeature {
-  id          String    @id @default(uuid())
-  name        String
-  description String?
-  deleted_at  DateTime?
+  id            String    @id @default(uuid())
+  name          String
+  description   String?
+  type          String    @default("text")
+  element       String    @default("text_field")
+  active        Boolean   @default(true)
+  main          Boolean   @default(false)
+  required      Boolean   @default(false)
+  error_message String?
+  deleted_at    DateTime?
 
   properties PropertyAdditionalFeature[]
 
