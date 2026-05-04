@@ -96,10 +96,10 @@ export default function NotificationsListView({
 
     return (
         <div className="flex flex-col gap-6">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center flex-wrap gap-2">
                 <Link
                     href="/mis-notificaciones/preferencias"
-                    className="bg-[#1d4ed8] text-white rounded-[6px] min-h-[44px] min-w-[44px] px-4 inline-flex items-center justify-center font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    className="min-h-[44px] min-w-[44px] px-2 text-body font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-[6px] inline-flex items-center"
                 >
                     Gestionar preferencias
                 </Link>
@@ -107,7 +107,7 @@ export default function NotificationsListView({
                     <button
                         type="button"
                         onClick={handleMarkAllAsRead}
-                        className="min-h-[44px] min-w-[44px] px-4 text-body font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-[6px]"
+                        className="min-h-[44px] min-w-[44px] px-2 text-body font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-[6px]"
                     >
                         Marcar todas como leídas
                     </button>
