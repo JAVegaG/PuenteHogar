@@ -50,7 +50,7 @@ Replace empty notification port stubs in four backend modules (contracts, paymen
     - Replace `{ provide: CONTRACT_NOTIFICATION_PORT, useValue: { ... } }` with `{ provide: CONTRACT_NOTIFICATION_PORT, useClass: ContractNotificationAdapter }`
     - _Requirements: 1.4, 1.5, 9.2, 9.6_
 
-  - [~] 3.4 Create `PaymentNotificationAdapter`
+  - [x] 3.4 Create `PaymentNotificationAdapter`
     - Create file `src/backend/modules/payments/infrastructure/adapters/payment-notification.adapter.ts`
     - Implement `IPaymentNotificationPort` with `@Injectable()` decorator
     - Inject `SendNotificationUseCase` via constructor
