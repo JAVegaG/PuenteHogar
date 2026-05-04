@@ -13,6 +13,7 @@ import { CreateEnrichedUnitUseCase } from './application/use-cases/create-enrich
 import { GetUnitLeasesUseCase } from './application/use-cases/get-unit-leases.use-case';
 import { GetLeaseDetailUseCase } from './application/use-cases/get-lease-detail.use-case';
 import { CreateLeaseUseCase } from './application/use-cases/create-lease.use-case';
+import { CancelLeaseUseCase } from './application/use-cases/cancel-lease.use-case';
 import { DeletePortfolioUseCase } from './application/use-cases/delete-portfolio.use-case';
 import { DeleteUnitUseCase } from './application/use-cases/delete-unit.use-case';
 import { UpdatePortfolioUseCase } from './application/use-cases/update-portfolio.use-case';
@@ -38,6 +39,7 @@ import { LandlordPortfolioController } from './landlord-portfolio.controller';
     GetUnitLeasesUseCase,
     GetLeaseDetailUseCase,
     CreateLeaseUseCase,
+    CancelLeaseUseCase,
     UpdatePortfolioUseCase,
     DeletePortfolioUseCase,
     DeleteUnitUseCase,
@@ -55,6 +57,6 @@ import { LandlordPortfolioController } from './landlord-portfolio.controller';
       useClass: AES256PIIEncryptor,
     },
   ],
-  exports: [CreatePortfolioUnitUseCase, GetPortfolioUseCase, UpdatePortfolioUnitUseCase, ListPortfoliosUseCase, CreatePortfolioUseCase, CreateEnrichedUnitUseCase, GetUnitLeasesUseCase, GetLeaseDetailUseCase, CreateLeaseUseCase, UpdatePortfolioUseCase, DeletePortfolioUseCase, DeleteUnitUseCase, PortfolioCrossModuleQueryService, PORTFOLIO_CROSS_MODULE_QUERY],
+  exports: [CreatePortfolioUnitUseCase, GetPortfolioUseCase, UpdatePortfolioUnitUseCase, ListPortfoliosUseCase, CreatePortfolioUseCase, CreateEnrichedUnitUseCase, GetUnitLeasesUseCase, GetLeaseDetailUseCase, CreateLeaseUseCase, CancelLeaseUseCase, UpdatePortfolioUseCase, DeletePortfolioUseCase, DeleteUnitUseCase, PortfolioCrossModuleQueryService, PORTFOLIO_CROSS_MODULE_QUERY],
 })
 export class LandlordPortfolioModule { }
