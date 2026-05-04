@@ -13,7 +13,7 @@ Replace empty notification port stubs in four backend modules (contracts, paymen
     - Use `upsert` to avoid duplicates, matching the existing seed pattern
     - _Requirements: 8.1, 8.2_
 
-  - [~] 1.2 Add new cases to `buildNotificationContent` in `SendNotificationUseCase`
+  - [-] 1.2 Add new cases to `buildNotificationContent` in `SendNotificationUseCase`
     - Open `src/backend/modules/notifications/application/use-cases/send-notification.use-case.ts`
     - Add `case 'NEW_INTEREST'` with title `'Nuevo interesado'` and message referencing `data.listingId`
     - Add `case 'LEASE_CREATED'` with title `'Arriendo creado'` and message referencing `data.leaseId`
