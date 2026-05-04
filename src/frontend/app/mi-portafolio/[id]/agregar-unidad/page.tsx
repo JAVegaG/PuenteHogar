@@ -87,17 +87,19 @@ function AddUnitContent() {
           onMenuClick={() => { }}
           leftAction={backArrow}
         />
-        <main className="px-mobile-margin md:px-desktop-margin py-section-gap">
-          <div className="text-center py-section-gap" aria-live="polite">
-            <p className="text-[18px] font-medium text-neutral-900">
-              Portafolio no encontrado
-            </p>
-            <Link
-              href="/mi-portafolio"
-              className="mt-4 inline-flex items-center text-primary underline hover:text-primary/80 min-h-[44px] min-w-[44px]"
-            >
-              Volver a mis portafolios
-            </Link>
+        <main className="flex justify-center px-mobile-margin md:px-desktop-margin py-section-gap">
+          <div className="w-full max-w-[560px]">
+            <div className="text-center py-section-gap" aria-live="polite">
+              <p className="text-[18px] font-medium text-neutral-900">
+                Portafolio no encontrado
+              </p>
+              <Link
+                href="/mi-portafolio"
+                className="mt-4 inline-flex items-center text-primary underline hover:text-primary/80 min-h-[44px] min-w-[44px]"
+              >
+                Volver a mis portafolios
+              </Link>
+            </div>
           </div>
         </main>
       </>
@@ -112,17 +114,19 @@ function AddUnitContent() {
           onMenuClick={() => { }}
           leftAction={backArrow}
         />
-        <main className="px-mobile-margin md:px-desktop-margin py-section-gap">
-          <div
-            role="alert"
-            className="rounded-md bg-green-50 border border-green-200 p-4 text-center"
-          >
-            <p className="text-green-800 font-medium">
-              ¡Unidad agregada exitosamente!
-            </p>
-            <p className="text-green-700 text-caption mt-1">
-              Redirigiendo al portafolio...
-            </p>
+        <main className="flex justify-center px-mobile-margin md:px-desktop-margin py-section-gap">
+          <div className="w-full max-w-[560px]">
+            <div
+              role="alert"
+              className="rounded-md bg-green-50 border border-green-200 p-4 text-center"
+            >
+              <p className="text-green-800 font-medium">
+                ¡Unidad agregada exitosamente!
+              </p>
+              <p className="text-green-700 text-caption mt-1">
+                Redirigiendo al portafolio...
+              </p>
+            </div>
           </div>
         </main>
       </>

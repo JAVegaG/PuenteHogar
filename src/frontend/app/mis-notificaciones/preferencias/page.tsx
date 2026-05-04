@@ -104,17 +104,19 @@ function PreferencesPageContent() {
                 leftAction={backArrow}
             />
 
-            <main className="px-mobile-margin md:px-desktop-margin py-section-gap">
-                {isLoading && <PreferencesSkeleton />}
+            <main className="flex justify-center px-mobile-margin md:px-desktop-margin py-section-gap">
+                <div className="w-full max-w-[560px]">
+                    {isLoading && <PreferencesSkeleton />}
 
-                {!isLoading && error && <ErrorState onRetry={fetchPreferences} />}
+                    {!isLoading && error && <ErrorState onRetry={fetchPreferences} />}
 
-                {!isLoading && !error && (
-                    <PreferencesView
-                        preferences={preferences}
-                        onToggle={handleToggle}
-                    />
-                )}
+                    {!isLoading && !error && (
+                        <PreferencesView
+                            preferences={preferences}
+                            onToggle={handleToggle}
+                        />
+                    )}
+                </div>
             </main>
         </>
     );

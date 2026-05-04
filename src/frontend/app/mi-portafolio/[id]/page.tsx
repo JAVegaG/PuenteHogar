@@ -89,52 +89,54 @@ function UnitDetailContent() {
         leftAction={backArrow}
       />
 
-      <main className="px-mobile-margin md:px-desktop-margin py-section-gap">
-        {isLoading && (
-          <div aria-busy="true" aria-live="polite">
-            <section aria-label="Cargando detalle de unidad">
-              <div className="flex items-baseline gap-2">
-                <Skeleton className="h-8 w-48" />
-                <Skeleton className="h-6 w-12" />
-              </div>
+      <main className="flex justify-center px-mobile-margin md:px-desktop-margin py-section-gap">
+        <div className="w-full max-w-[560px]">
+          {isLoading && (
+            <div aria-busy="true" aria-live="polite">
+              <section aria-label="Cargando detalle de unidad">
+                <div className="flex items-baseline gap-2">
+                  <Skeleton className="h-8 w-48" />
+                  <Skeleton className="h-6 w-12" />
+                </div>
 
-              <div className="mt-6">
-                <Skeleton className="h-6 w-32" />
-                <Skeleton className="h-5 w-full mt-2" />
-              </div>
+                <div className="mt-6">
+                  <Skeleton className="h-6 w-32" />
+                  <Skeleton className="h-5 w-full mt-2" />
+                </div>
 
-              <div className="mt-6">
-                <Skeleton className="h-6 w-32" />
-                <Skeleton className="h-5 w-56 mt-2" />
-                <Skeleton className="h-5 w-56 mt-1" />
-              </div>
+                <div className="mt-6">
+                  <Skeleton className="h-6 w-32" />
+                  <Skeleton className="h-5 w-56 mt-2" />
+                  <Skeleton className="h-5 w-56 mt-1" />
+                </div>
 
-              <Skeleton className="h-[48px] w-full mt-6 rounded-[10px]" />
-            </section>
-          </div>
-        )}
+                <Skeleton className="h-[48px] w-full mt-6 rounded-[10px]" />
+              </section>
+            </div>
+          )}
 
-        {!isLoading && notFound && (
-          <div className="text-center py-section-gap" aria-live="polite">
-            <p className="text-[18px] font-medium text-neutral-900">
-              Unidad de portafolio no encontrada
-            </p>
-            <Link
-              href="/mi-portafolio"
-              className="mt-4 inline-flex items-center text-primary underline hover:text-primary/80 min-h-[44px] min-w-[44px]"
-            >
-              Volver a mi portafolio
-            </Link>
-          </div>
-        )}
+          {!isLoading && notFound && (
+            <div className="text-center py-section-gap" aria-live="polite">
+              <p className="text-[18px] font-medium text-neutral-900">
+                Unidad de portafolio no encontrada
+              </p>
+              <Link
+                href="/mi-portafolio"
+                className="mt-4 inline-flex items-center text-primary underline hover:text-primary/80 min-h-[44px] min-w-[44px]"
+              >
+                Volver a mi portafolio
+              </Link>
+            </div>
+          )}
 
-        {!isLoading && error && !notFound && (
-          <ErrorState onRetry={fetchUnit} />
-        )}
+          {!isLoading && error && !notFound && (
+            <ErrorState onRetry={fetchUnit} />
+          )}
 
-        {!isLoading && !error && !notFound && unit && (
-          <UnitDetailView unit={unit} token={user?.accessToken ?? ''} />
-        )}
+          {!isLoading && !error && !notFound && unit && (
+            <UnitDetailView unit={unit} token={user?.accessToken ?? ''} />
+          )}
+        </div>
       </main>
     </>
   );

@@ -84,41 +84,43 @@ function ProfilePageContent() {
         />
       )}
 
-      <main className="px-mobile-margin md:px-desktop-margin py-section-gap">
-        {isLoadingProfile && (
-          <div
-            className="bg-white border border-[#d1d5db] rounded-[6px] p-6 flex flex-col items-center gap-4"
-            role="status"
-            aria-busy="true"
-            aria-label="Cargando perfil"
-          >
-            <Skeleton className="w-[64px] h-[64px] rounded-full" />
-            <Skeleton className="h-4 w-48" />
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-20" />
-            <Skeleton className="h-[44px] w-36 mt-2" />
-          </div>
-        )}
+      <main className="flex justify-center px-mobile-margin md:px-desktop-margin py-section-gap">
+        <div className="w-full max-w-[560px]">
+          {isLoadingProfile && (
+            <div
+              className="bg-white border border-[#d1d5db] rounded-[6px] p-6 flex flex-col items-center gap-4"
+              role="status"
+              aria-busy="true"
+              aria-label="Cargando perfil"
+            >
+              <Skeleton className="w-[64px] h-[64px] rounded-full" />
+              <Skeleton className="h-4 w-48" />
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-[44px] w-36 mt-2" />
+            </div>
+          )}
 
-        {!isLoadingProfile && profileError && (
-          <ErrorState onRetry={fetchProfile} />
-        )}
+          {!isLoadingProfile && profileError && (
+            <ErrorState onRetry={fetchProfile} />
+          )}
 
-        {!isLoadingProfile && !profileError && profile && (
-          <>
-            <ProfileCard profile={profile} onLogout={logout} />
-            {user && (
-              <>
-                <RoleManagementSection
-                  roles={user.roles}
-                  accessToken={user.accessToken}
-                  updateAuth={updateAuth}
-                />
-                <QuickNavSection roles={user.roles} />
-              </>
-            )}
-          </>
-        )}
+          {!isLoadingProfile && !profileError && profile && (
+            <>
+              <ProfileCard profile={profile} onLogout={logout} />
+              {user && (
+                <>
+                  <RoleManagementSection
+                    roles={user.roles}
+                    accessToken={user.accessToken}
+                    updateAuth={updateAuth}
+                  />
+                  <QuickNavSection roles={user.roles} />
+                </>
+              )}
+            </>
+          )}
+        </div>
       </main>
     </>
   );

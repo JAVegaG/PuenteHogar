@@ -110,17 +110,19 @@ function PortfolioUnitsContent() {
           onMenuClick={() => { }}
           leftAction={backArrow}
         />
-        <main className="px-mobile-margin md:px-desktop-margin py-section-gap">
-          <div className="text-center py-section-gap" aria-live="polite">
-            <p className="text-[18px] font-medium text-neutral-900">
-              Portafolio no encontrado
-            </p>
-            <Link
-              href="/mi-portafolio"
-              className="mt-4 inline-flex items-center text-primary underline hover:text-primary/80 min-h-[44px] min-w-[44px]"
-            >
-              Volver a mis portafolios
-            </Link>
+        <main className="flex justify-center px-mobile-margin md:px-desktop-margin py-section-gap">
+          <div className="w-full max-w-[560px]">
+            <div className="text-center py-section-gap" aria-live="polite">
+              <p className="text-[18px] font-medium text-neutral-900">
+                Portafolio no encontrado
+              </p>
+              <Link
+                href="/mi-portafolio"
+                className="mt-4 inline-flex items-center text-primary underline hover:text-primary/80 min-h-[44px] min-w-[44px]"
+              >
+                Volver a mis portafolios
+              </Link>
+            </div>
           </div>
         </main>
       </>

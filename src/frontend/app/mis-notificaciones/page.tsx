@@ -118,18 +118,20 @@ function NotificationsPageContent() {
                 )}
             </Suspense>
 
-            <main className="px-mobile-margin md:px-desktop-margin py-section-gap">
-                {isLoading && <NotificationsListSkeleton />}
+            <main className="flex justify-center px-mobile-margin md:px-desktop-margin py-section-gap">
+                <div className="w-full max-w-[560px]">
+                    {isLoading && <NotificationsListSkeleton />}
 
-                {!isLoading && error && <ErrorState onRetry={fetchNotifications} />}
+                    {!isLoading && error && <ErrorState onRetry={fetchNotifications} />}
 
-                {!isLoading && !error && (
-                    <NotificationsListView
-                        notifications={notifications}
-                        onMarkAsRead={handleMarkAsRead}
-                        onMarkAllAsRead={handleMarkAllAsRead}
-                    />
-                )}
+                    {!isLoading && !error && (
+                        <NotificationsListView
+                            notifications={notifications}
+                            onMarkAsRead={handleMarkAsRead}
+                            onMarkAllAsRead={handleMarkAllAsRead}
+                        />
+                    )}
+                </div>
             </main>
         </>
     );

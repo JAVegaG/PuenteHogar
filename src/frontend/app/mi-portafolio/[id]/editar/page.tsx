@@ -83,53 +83,55 @@ function EditUnitContent() {
     <>
       <Header
         title="Editar unidad"
-        onMenuClick={() => {}}
+        onMenuClick={() => { }}
         leftAction={backArrow}
       />
 
-      <main className="px-mobile-margin md:px-desktop-margin py-section-gap">
-        {isLoading && (
-          <div aria-busy="true" aria-live="polite">
-            <section aria-label="Cargando formulario de edición">
-              <Skeleton className="h-5 w-24 mb-1" />
-              <Skeleton className="h-[48px] w-full rounded-[10px]" />
+      <main className="flex justify-center px-mobile-margin md:px-desktop-margin py-section-gap">
+        <div className="w-full max-w-[560px]">
+          {isLoading && (
+            <div aria-busy="true" aria-live="polite">
+              <section aria-label="Cargando formulario de edición">
+                <Skeleton className="h-5 w-24 mb-1" />
+                <Skeleton className="h-[48px] w-full rounded-[10px]" />
 
-              <Skeleton className="h-5 w-48 mt-4 mb-1" />
-              <Skeleton className="h-[48px] w-full rounded-[10px]" />
+                <Skeleton className="h-5 w-48 mt-4 mb-1" />
+                <Skeleton className="h-[48px] w-full rounded-[10px]" />
 
-              <Skeleton className="h-5 w-20 mt-4 mb-1" />
-              <Skeleton className="h-[48px] w-full rounded-[10px]" />
+                <Skeleton className="h-5 w-20 mt-4 mb-1" />
+                <Skeleton className="h-[48px] w-full rounded-[10px]" />
 
-              <Skeleton className="h-5 w-52 mt-4 mb-1" />
-              <Skeleton className="h-[72px] w-full rounded-[10px]" />
+                <Skeleton className="h-5 w-52 mt-4 mb-1" />
+                <Skeleton className="h-[72px] w-full rounded-[10px]" />
 
-              <Skeleton className="h-[48px] w-full mt-4 rounded-[10px]" />
-            </section>
-          </div>
-        )}
+                <Skeleton className="h-[48px] w-full mt-4 rounded-[10px]" />
+              </section>
+            </div>
+          )}
 
-        {!isLoading && notFound && (
-          <div className="text-center py-section-gap" aria-live="polite">
-            <p className="text-[18px] font-medium text-neutral-900">
-              Unidad de portafolio no encontrada
-            </p>
-            <Link
-              href="/mi-portafolio"
-              className="mt-4 inline-flex items-center text-primary underline hover:text-primary/80 min-h-[44px] min-w-[44px]"
-            >
-              Volver a mi portafolio
-            </Link>
-          </div>
-        )}
+          {!isLoading && notFound && (
+            <div className="text-center py-section-gap" aria-live="polite">
+              <p className="text-[18px] font-medium text-neutral-900">
+                Unidad de portafolio no encontrada
+              </p>
+              <Link
+                href="/mi-portafolio"
+                className="mt-4 inline-flex items-center text-primary underline hover:text-primary/80 min-h-[44px] min-w-[44px]"
+              >
+                Volver a mi portafolio
+              </Link>
+            </div>
+          )}
 
-        {!isLoading && !notFound && unit && (
-          <UnitForm
-            mode="edit"
-            portfolioId={unit.portfolioId}
-            initialData={unit}
-            onSuccess={() => router.push(`/mi-portafolio/${id}`)}
-          />
-        )}
+          {!isLoading && !notFound && unit && (
+            <UnitForm
+              mode="edit"
+              portfolioId={unit.portfolioId}
+              initialData={unit}
+              onSuccess={() => router.push(`/mi-portafolio/${id}`)}
+            />
+          )}
+        </div>
       </main>
     </>
   );
