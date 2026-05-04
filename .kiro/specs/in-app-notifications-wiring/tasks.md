@@ -43,7 +43,7 @@ Replace empty notification port stubs in four backend modules (contracts, paymen
     - `notifyContractUploaded`: guard `if (!tenantUserId) return;`, then call once with `notificationTypeName: 'CONTRACT_UPLOADED'`, `eventSource: 'contract.uploaded'`, `data: { contractId, leaseId }`
     - _Requirements: 1.1, 1.2, 1.3, 2.1, 2.2, 2.4_
 
-  - [~] 3.3 Wire `ContractNotificationAdapter` in `ContractsModule`
+  - [x] 3.3 Wire `ContractNotificationAdapter` in `ContractsModule`
     - Open `src/backend/modules/contracts/contracts.module.ts`
     - Add `NotificationsModule` to `imports` array
     - Import `ContractNotificationAdapter`
