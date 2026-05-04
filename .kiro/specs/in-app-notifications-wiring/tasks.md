@@ -290,6 +290,23 @@ _These tasks address UX issues discovered during manual testing after the initia
     - Wire `deleteReadNotifications` service method in the notifications page
     - _Requirements: 18.3, 18.4, 18.5, 18.6_
 
+- [x] 16. Hide portfolio names from tenant-facing notifications
+  - [x] 16.1 Update `buildNotificationContent` to use `unitName` for tenant-facing types
+    - `LEASE_CREATED`, `LEASE_CANCELLED`, `CONTRACT_UPLOADED`: use `data.unitName` instead of `data.propertyName`
+    - `CONTRACT_SIGNED`: check `data.propertyName` first (landlord), then `data.unitName` (tenant), then generic fallback
+    - _Requirements: 19.1, 19.4, 19.5_
+
+  - [x] 16.2 Update `ContractNotificationAdapter` to pass role-aware data
+    - `notifyContractSigned`: pass `{ propertyName }` to landlord and `{ unitName }` to tenant in separate calls
+    - `notifyContractUploaded`: pass `{ unitName }` only (tenant-facing)
+    - `notifySigningFailed`: pass `{ propertyName }` (landlord-facing)
+    - _Requirements: 19.2, 19.3_
+
+  - [x] 16.3 Update `PortfolioNotificationAdapter` to pass `unitName` only
+    - `notifyLeaseCancelled`: resolve unit name from lease, pass as `unitName` (not `propertyName`)
+    - `notifyLeaseCreated`: already passes `unitName` — no change needed
+    - _Requirements: 19.1_
+
 ## Notes
 
 - Tasks marked with `*` are optional and can be skipped for faster MVP

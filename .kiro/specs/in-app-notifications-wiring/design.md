@@ -626,3 +626,17 @@ LEASE_CANCELLED: 'Arriendo cancelado',
 4. **Frontend service**: `deleteReadNotifications(token)` calls `DELETE /notifications/read`.
 
 5. **Frontend UI**: "Eliminar leídas" button in the action bar, styled in red text (`text-red-600`) to signal destructive action. Appears only when there are read notifications. Uses optimistic removal with rollback on failure.
+
+### Tenant Privacy: Hide Portfolio Names from Tenant Notifications (Req 19)
+
+**Problem**: Tenant-facing notifications exposed the landlord's portfolio name (e.g., "Mi primer portafolio"), which is an internal organizational concept. Tenants should only see the unit name they're renting.
+
+**Approach — role-aware data payloads**:
+
+The adapters now pass different data fields depending on the recipient:
+- **Landlord-facing** (`propertyName`): Portfolio name — used in `CONTRACT_SIGNED` (to landlord), `PAYMENT_RECEIVED`, `NEW_INTEREST`, signing failed
+- **Tenant-facing** (`unitName`): Unit name only — used in `LEASE_CREATED`, `LEASE_CANCELLED`, `CONTRACT_UPLOADED`, `CONTRACT_SIGNED` (to tenant)
+
+For `CONTRACT_SIGNED` (sent to both), the adapter makes two separate `execute` calls with different data payloads: `{ propertyName }` for the landlord and `{ unitName }` for the tenant.
+
+`buildNotificationContent` uses `unitName` for tenant-facing types and `propertyName` for landlord-facing types, with generic fallbacks when neither is available.

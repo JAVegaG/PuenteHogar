@@ -234,3 +234,17 @@ The following requirements were identified during manual testing after the initi
 4. THE "Eliminar leídas" button SHALL optimistically remove read notifications from the list and restore them if the API call fails
 5. THE "Eliminar leídas" button SHALL be styled in red text to indicate a destructive action
 6. THE button SHALL only appear when there are notifications with read status (either originally read or marked as read during the session)
+
+### Requirement 19: Tenant-Facing Notifications Must Not Expose Portfolio Names
+
+**User Story:** As a tenant, I want notification messages to show only the unit name (e.g., "Mi primer apartamento"), not the landlord's internal portfolio name, so that I only see information relevant to me.
+
+**Context:** During testing, tenant-facing notifications like "Arriendo creado" displayed "Se ha creado un nuevo arriendo en **Mi primer portafolio** (**Mi primer apartamento**) para ti." — exposing the landlord's portfolio name, which is an internal organizational concept that tenants should not see.
+
+#### Acceptance Criteria
+
+1. TENANT-FACING notification types (`LEASE_CREATED`, `LEASE_CANCELLED`, `CONTRACT_UPLOADED`) SHALL use `unitName` (the portfolio unit name) in messages, NOT `propertyName` (the portfolio name)
+2. LANDLORD-FACING notification types (`CONTRACT_SIGNED` to landlord, `PAYMENT_RECEIVED`, `NEW_INTEREST`, `CONTRACT_SIGNED` signing failed) SHALL continue using `propertyName` (the portfolio name)
+3. WHEN `CONTRACT_SIGNED` is sent to both landlord and tenant, THE adapter SHALL pass `propertyName` in the landlord's data payload and `unitName` in the tenant's data payload
+4. THE `buildNotificationContent` function SHALL prefer `unitName` for tenant-facing types and `propertyName` for landlord-facing types
+5. WHEN neither name is available, THE message SHALL use a generic description without any name
