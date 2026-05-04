@@ -25,51 +25,51 @@ export function buildNotificationContent(
       return {
         title: 'Contrato firmado',
         message: data.propertyName
-          ? `Un contrato ha sido firmado exitosamente para tu inmueble ${String(data.propertyName)}.`
+          ? `Un contrato ha sido firmado exitosamente para tu inmueble **${String(data.propertyName)}**.`
           : 'Un contrato ha sido firmado exitosamente.',
       };
     case 'PAYMENT_RECEIVED':
       return {
         title: 'Pago recibido',
         message: data.propertyName
-          ? `Se ha recibido un pago${data.amount ? ` por ${String(data.amount)}` : ''} en ${String(data.propertyName)}.`
+          ? `Se ha recibido un pago${data.amount ? ` por **${String(data.amount)}**` : ''} en **${String(data.propertyName)}**.`
           : data.amount
-            ? `Se ha recibido un pago por ${String(data.amount)}.`
+            ? `Se ha recibido un pago por **${String(data.amount)}**.`
             : 'Se ha recibido un pago.',
       };
     case 'CONTACT_INITIATED':
       return {
         title: 'Contacto iniciado',
         message: data.propertyTitle
-          ? `Se ha iniciado un contacto para tu inmueble ${String(data.propertyTitle)}.`
+          ? `Se ha iniciado un contacto para tu inmueble **${String(data.propertyTitle)}**.`
           : 'Se ha iniciado un nuevo contacto.',
       };
     case 'CONTRACT_UPLOADED':
       return {
         title: 'Contrato cargado',
         message: data.propertyName
-          ? `Se ha cargado un contrato para tu arriendo en ${String(data.propertyName)}.`
+          ? `Se ha cargado un contrato para tu arriendo en **${String(data.propertyName)}**.`
           : 'Se ha cargado un contrato para tu arriendo.',
       };
     case 'NEW_INTEREST':
       return {
         title: 'Nuevo interesado',
         message: data.propertyTitle
-          ? `Un arrendatario ha mostrado interés en tu inmueble ${String(data.propertyTitle)}.`
+          ? `Un arrendatario ha mostrado interés en tu inmueble **${String(data.propertyTitle)}**.`
           : 'Un arrendatario ha mostrado interés en uno de tus inmuebles.',
       };
     case 'LEASE_CREATED':
       return {
         title: 'Arriendo creado',
         message: data.propertyName
-          ? `Se ha creado un nuevo arriendo en ${String(data.propertyName)}${data.unitName ? ` (${String(data.unitName)})` : ''} para ti.`
+          ? `Se ha creado un nuevo arriendo en **${String(data.propertyName)}**${data.unitName ? ` (**${String(data.unitName)}**)` : ''} para ti.`
           : 'Se ha creado un nuevo arriendo para ti.',
       };
     case 'LEASE_CANCELLED':
       return {
         title: 'Arriendo cancelado',
         message: data.propertyName
-          ? `El arriendo en ${String(data.propertyName)} ha sido cancelado.`
+          ? `El arriendo en **${String(data.propertyName)}** ha sido cancelado.`
           : 'Un arriendo ha sido cancelado.',
       };
     default:

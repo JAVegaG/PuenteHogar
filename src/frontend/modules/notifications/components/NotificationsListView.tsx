@@ -42,6 +42,24 @@ function TrashIcon() {
     );
 }
 
+/**
+ * Parses **bold** markers in notification messages and renders them as
+ * <strong> elements with a distinct color so dynamic names (property, unit)
+ * stand out visually from the surrounding text.
+ */
+function renderMessageWithBold(message: string): React.ReactNode {
+    const parts = message.split(/\*\*(.+?)\*\*/g);
+    if (parts.length === 1) return message;
+
+    return parts.map((part, i) =>
+        i % 2 === 1 ? (
+            <strong key={i} className="font-semibold text-neutral-900">{part}</strong>
+        ) : (
+            <span key={i}>{part}</span>
+        )
+    );
+}
+
 export default function NotificationsListView({
     notifications,
     onMarkAsRead,
@@ -173,7 +191,7 @@ export default function NotificationsListView({
                                         {notification.title}
                                     </p>
                                     <p className="text-caption text-neutral-600 mt-1">
-                                        {notification.message}
+                                        {renderMessageWithBold(notification.message)}
                                     </p>
                                     <p className="text-small text-neutral-600 mt-2">
                                         {formatRelativeDate(notification.createdAt)}
