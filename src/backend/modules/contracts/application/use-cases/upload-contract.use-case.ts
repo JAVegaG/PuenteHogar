@@ -17,6 +17,7 @@ import { ContractEntity } from '@modules/contracts/domain/entities/contract.enti
 import { ContractPartyEntity } from '@modules/contracts/domain/entities/contract-party.entity';
 import type { IContractRepository } from '@modules/contracts/domain/ports/contract-repository.port';
 import type { IObjectStorage } from '@modules/contracts/domain/ports/object-storage.port';
+import type { INotificationPort } from '@modules/contracts/domain/ports/notification.port';
 import { ContractSummaryDto } from '@modules/contracts/application/dtos/contract-summary.dto';
 import { CreateContractDto } from '@modules/contracts/application/dtos/create-contract.dto';
 
@@ -34,6 +35,8 @@ export class UploadContractUseCase {
     private readonly repository: IContractRepository,
     @Inject(CONTRACT_OBJECT_STORAGE)
     private readonly objectStorage: IObjectStorage,
+    @Inject(CONTRACT_NOTIFICATION_PORT)
+    private readonly notificationPort: INotificationPort,
     private readonly auditLogger: AuditLoggerService,
   ) { }
 
@@ -128,6 +131,10 @@ export class UploadContractUseCase {
       resourceId: contract.id,
       timestamp: new Date(),
     });
+
+    if (tenantUserId) {
+      this.notificationPort.notifyContractUploaded(tenantUserId, contract.id, dto.leaseId).catch(() => undefined);
+    }
 
     return this.toSummaryDto(contract, [
       { userId, role: 'LANDLORD' },
