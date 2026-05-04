@@ -48,7 +48,7 @@ This plan implements ten interconnected improvements across backend schema, API 
 - [x] 3. Checkpoint — Ensure backend schema and endpoints compile
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 4. Backend: CancelLeaseUseCase
+- [x] 4. Backend: CancelLeaseUseCase
   - [x] 4.1 Create CancelLeaseUseCase
     - Create `src/backend/modules/landlord-portfolio/application/use-cases/cancel-lease.use-case.ts`
     - Implement transactional logic: verify portfolio ownership (403 if not owner), verify unit belongs to portfolio, find lease and verify it belongs to unit, check lease status is "Acordado" (409 otherwise), check associated contract status — SIGNED → 409 conflict, PENDING/SIGNATURE_PENDING → soft-delete contract, none → proceed
@@ -57,7 +57,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - Follow the same ownership verification pattern as `CreateLeaseUseCase` and `GetLeaseDetailUseCase`
     - _Requirements: 8.3, 8.4, 8.5, 8.7_
 
-  - [ ] 4.2 Add DELETE route to LandlordPortfolioController
+  - [x] 4.2 Add DELETE route to LandlordPortfolioController
     - Add `@Delete(':portfolioId/units/:unitId/leases/:leaseId')` route in `src/backend/modules/landlord-portfolio/landlord-portfolio.controller.ts`
     - Inject `CancelLeaseUseCase` in the controller constructor
     - Register the use case in `landlord-portfolio.module.ts` providers
