@@ -1357,3 +1357,65 @@ La siguiente sección propone criterios de aceptación en formato Gherkin para l
 **Cuando** el servicio externo no está disponible
 **Entonces** la plataforma informa al arrendador que la evaluación avanzada no pudo completarse
 **Y** sigue permitiendo ver los datos básicos del postulante para una decisión manual
+
+# Decisiones de gestión de datos y persistencia
+
+Esta sección documenta las decisiones técnicas adoptadas para la gestión del ciclo de vida de los datos, la persistencia de información y la comunicación entre módulos del sistema. Estas decisiones son transversales a todos los dominios funcionales y complementan los requerimientos funcionales y no funcionales previamente descritos.
+
+## Eliminación lógica (Soft Delete)
+
+El sistema implementa una estrategia de **eliminación lógica** para todas las tablas del modelo de datos (excepto las tablas de ingestión RAW). Los registros nunca se eliminan físicamente de la base de datos; en su lugar, se marcan como eliminados mediante una columna `deleted_at` de tipo `DateTime?` (nullable).
+
+### Justificación
+
+- **Auditoría y trazabilidad:** permite reconstruir el historial completo de datos del sistema sin pérdida de información.
+- **Recuperación:** facilita la restauración de registros eliminados por error.
+- **Integridad referencial:** evita problemas de cascada al eliminar registros que son referenciados por otras entidades.
+- **Cumplimiento normativo:** alineado con los requisitos de protección de datos y trazabilidad documental del sistema (Ley 1581 de 2012).
+
+### Comportamiento
+
+| Operación | Comportamiento |
+| --- | --- |
+| Eliminación de un registro | Se establece `deleted_at = timestamp_UTC_actual` en lugar de eliminar la fila |
+| Consulta de registros (por defecto) | Solo retorna registros donde `deleted_at IS NULL` |
+| Consulta con bypass (auditoría) | Retorna todos los registros independientemente del valor de `deleted_at` |
+
+### Distinción con `is_active` en tablas de catálogo
+
+Las tablas de catálogo (`DocumentType`, `PropertyType`, `Role`, `Permission`, `ContractStatus`, `PaymentStatus`, `LeaseStatus`, `ListingStatus`, `NotificationType`, entre otras) conservan su campo `is_active` existente. Ambos campos coexisten con propósitos distintos:
+
+- `is_active`: controla la **disponibilidad de negocio** del ítem (por ejemplo, un tipo de documento que ya no se acepta pero cuyos registros históricos deben mantenerse).
+- `deleted_at`: controla el **ciclo de vida del registro** en el sistema (eliminación lógica completa).
+
+## Persistencia híbrida RAW/ETL
+
+El sistema adopta un patrón de **persistencia híbrida** donde cada módulo de dominio almacena el payload completo de cada operación de escritura en una tabla RAW (JSON/JSONB) y posteriormente un proceso ETL programado (cron) descompone ese payload en las tablas curadas tipadas del módulo.
+
+### Flujo de materialización
+
+1. **Ingesta:** el módulo recibe una petición de escritura y persiste el payload completo como un objeto JSON/JSONB en su tabla RAW correspondiente (por ejemplo, `UsersRaw`, `PortfolioRaw`, `ContractsRaw`).
+2. **ETL (Materialización):** un cron job lee los registros no procesados de la tabla RAW y los descompone en filas de las tablas curadas con columnas tipadas.
+3. **Marcado:** el registro RAW se marca como procesado (`processed: true`) una vez materializado exitosamente.
+
+### Reglas de implementación
+
+- **Nunca se utiliza `JSON.stringify()`** al escribir en tablas RAW. El objeto se pasa directamente al campo de tipo JSON de Prisma.
+- Un solo registro RAW puede generar múltiples filas en distintas tablas curadas (por ejemplo, un `UsersRaw` se materializa en `User`, `UserRole` y `NaturalPersonDetail`).
+- Los servicios ETL utilizan un helper `parsePayload<T>()` para manejar tanto payloads JSON nativos como payloads legacy almacenados como cadenas de texto.
+
+## Comunicación interna entre módulos
+
+El sistema sigue una arquitectura de monolito modular donde cada módulo opera dentro de su propio esquema PostgreSQL. La comunicación entre módulos se realiza exclusivamente a través de **interfaces de puerto** (port interfaces) definidas en la capa de dominio de cada módulo e inyectadas mediante el sistema de dependencias de NestJS.
+
+### Principios
+
+- **No se permiten consultas SQL directas** que crucen los límites de esquema de otro módulo.
+- Cada módulo que expone datos para consumo externo define una **interfaz de puerto** en `domain/ports/`.
+- La implementación concreta reside en la capa de infraestructura del módulo proveedor, utilizando consultas exclusivamente contra su propio esquema.
+- Los módulos consumidores acceden a los datos inyectando el token de la interfaz correspondiente.
+- Las llamadas son **invocaciones síncronas de métodos de servicio** dentro del monolito (no llamadas HTTP), preservando el rendimiento mientras se mantienen los límites de módulo.
+
+### Ejemplo
+
+El módulo de usuarios necesita verificar si un usuario tiene arriendos activos. En lugar de ejecutar una consulta SQL contra el esquema `landlord_portfolio`, el módulo de usuarios inyecta la interfaz `IPortfolioCrossModuleQuery` expuesta por el módulo `landlord-portfolio`, que internamente ejecuta la consulta contra su propio esquema y retorna el resultado.

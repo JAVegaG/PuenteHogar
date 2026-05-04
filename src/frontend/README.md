@@ -70,6 +70,12 @@ src/frontend/
 │   │   │   └── page.tsx          # Creación de contrato via wizard (Client Component, LANDLORD)
 │   │   └── [id]/
 │   │       └── page.tsx          # Detalle de contrato (Client Component, LANDLORD)
+│   ├── mis-contratos-arrendatario/
+│   │   ├── page.tsx              # Listado de contratos del arrendatario (Client Component, TENANT)
+│   │   └── [id]/
+│   │       └── page.tsx          # Detalle de contrato del arrendatario (Client Component, TENANT)
+│   ├── mis-pagos/
+│   │   └── page.tsx              # Historial de pagos del arrendatario (Client Component, TENANT)
 │   └── mis-ingresos/
 │       ├── page.tsx              # Dashboard de ingresos del arrendador (Client Component, LANDLORD)
 │       └── portafolio/
@@ -152,7 +158,8 @@ src/frontend/
 │   │   │   ├── NotificationsListView.tsx  # Lista de tarjetas de notificación (leído/no leído, marcar como leída)
 │   │   │   └── PreferencesView.tsx        # Preferencias de canales externos (toggles EMAIL/WHATSAPP)
 │   │   └── utils/
-│   │       └── translate-notification-type.ts  # Mapa de traducciones de tipos de notificación
+│   │       ├── translate-notification-type.test.ts  # Tests de traducción de tipos de notificación
+│   │       └── translate-notification-type.ts       # Mapa de traducciones de tipos de notificación
 │   ├── tenant/
 │   │   └── components/
 │   │       ├── ContactLandlordButton.tsx      # Botón de contacto con arrendador
@@ -266,6 +273,9 @@ npm run lint       # Linting
 | `/mis-contratos` | Client Component | LANDLORD | Listado de contratos del arrendador con badges de estado (SideMenu, no back arrow — first-level page) |
 | `/mis-contratos/[id]` | Client Component | LANDLORD | Detalle de contrato (estado, partes, firma, PDF) |
 | `/mis-contratos/crear` | Client Component | LANDLORD | Creación de contrato via wizard (3 pasos) |
+| `/mis-contratos-arrendatario` | Client Component | TENANT | Listado de contratos del arrendatario |
+| `/mis-contratos-arrendatario/[id]` | Client Component | TENANT | Detalle de contrato del arrendatario |
+| `/mis-pagos` | Client Component | TENANT | Historial de pagos del arrendatario |
 | `/mis-ingresos` | Client Component | LANDLORD | Dashboard de ingresos del arrendador |
 | `/mis-ingresos/portafolio/[portfolioId]` | Client Component | LANDLORD | Reporte agregado de ingresos por portafolio |
 | `/mis-ingresos/portafolio/[portfolioId]/unidad/[unitId]` | Client Component | LANDLORD | Reporte individual de ingresos por unidad |
@@ -282,7 +292,7 @@ Autenticación y perfil de usuario: login con email/contraseña, registro multi-
 
 ### notifications
 
-Notificaciones in-app y preferencias de canales externos: historial de notificaciones con indicador leído/no leído, marcar como leída individual o masiva, enlace a preferencias, página de preferencias con toggles EMAIL/WHATSAPP por tipo de notificación con UI optimista, banner informativo de canal in-app siempre activo, y helper de traducción de tipos de notificación al español. Componentes: NotificationsListView, PreferencesView.
+Notificaciones in-app y preferencias de canales externos: historial de notificaciones con indicador leído/no leído, marcar como leída individual o masiva, enlace a preferencias, página de preferencias con toggles EMAIL/WHATSAPP por tipo de notificación con UI optimista, banner informativo de canal in-app siempre activo, y helper de traducción de tipos de notificación al español (CONTRACT_SIGNED, PAYMENT_RECEIVED, CONTACT_INITIATED, CONTRACT_UPLOADED, PAYMENT_DUE, NEW_INTEREST) con fallback automático para tipos desconocidos. Componentes: NotificationsListView, PreferencesView.
 
 ### tenant
 

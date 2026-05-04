@@ -35,12 +35,15 @@ src/backend/
 │       ├── audit/              # AuditLoggerService (sin PII en logs)
 │       ├── circuit-breaker/    # CircuitBreaker + CircuitBreakerFactory
 │       ├── decorators/         # @Roles(), @Public()
+│       ├── etl/                # parsePayload<T>() helper para lectura backward-compatible de tablas RAW
 │       ├── guards/             # JwtAuthGuard, RBACGuard
 │       ├── interceptors/       # ValidationInterceptor (XSS/SQL sanitization)
 │       │   └── validation-malicious-payload.spec.ts  # PBT Property 9: payloads maliciosos sanitizados
-│       ├── prisma/             # PrismaModule + PrismaService (singleton compartido)
-│       │   ├── prisma-migrations.spec.ts  # PBT Property 51: idempotencia de migraciones
-│       │   └── prisma-uniqueness.spec.ts  # PBT Property 50: restricciones de unicidad
+│       ├── prisma/             # PrismaModule + PrismaService + soft-delete utilities
+│       │   ├── soft-delete.utils.ts          # Utilidades de soft delete: softDeleteFilter, softDeleteData(), withSoftDeleteFilter()
+│       │   ├── soft-delete.utils.spec.ts     # Tests unitarios de soft-delete utilities
+│       │   ├── prisma-migrations.spec.ts   # PBT Property 51: idempotencia de migraciones
+│       │   └── prisma-uniqueness.spec.ts   # PBT Property 50: restricciones de unicidad
 │       ├── redis/              # RedisService (cache-aside con fallback)
 │       └── s3/                 # S3ClientFactory, object-key utils, custom exceptions (ObjectStorage*)
 └── modules/
@@ -78,6 +81,8 @@ modules/{nombre}/
 | `CircuitBreakerFactory` | Instancia circuit breakers por tipo de integración externa |
 | `RedisService` | Cache-aside con fallback transparente a PostgreSQL |
 | `PrismaService` | Cliente Prisma singleton compartido entre módulos (`@src/shared/prisma/`) |
+| `softDeleteFilter` / `softDeleteData()` / `withSoftDeleteFilter()` | Utilidades de soft delete para queries Prisma. Prisma 6+ no soporta la API `$use` middleware, así que el soft delete se implementa como helpers que los repositorios usan al construir sus queries. `softDeleteFilter` filtra registros eliminados en lecturas, `softDeleteData()` genera el payload para marcar como eliminado, `withSoftDeleteFilter()` inyecta el filtro condicionalmente. No aplica a tablas RAW. (`@src/shared/prisma/soft-delete.utils.ts`) |
+| `parsePayload<T>()` | Helper ETL para leer payloads de tablas RAW con compatibilidad hacia atrás (maneja tanto JSON propio como strings legacy). (`@src/shared/etl/parse-payload.ts`) |
 | `S3ClientFactory` | Crea y cachea una instancia de `S3Client` (AWS SDK v3); soporta endpoint personalizado para LocalStack/MinIO |
 | `@aws-sdk/s3-request-presigner` | Genera presigned URLs para descarga segura de archivos privados en S3 (usado por `ContractObjectStorageAdapter.getPresignedUrl()`) |
 
@@ -86,6 +91,41 @@ modules/{nombre}/
 ## Dependencias inter-módulo
 
 `UsersModule` exporta `JwtModule` y `PII_ENCRYPTOR` — los módulos que necesiten validar tokens JWT deben importar `UsersModule` o configurar `JwtModule` directamente. Los módulos que necesiten descifrar campos PII (e.g. `document_number`, `phone_number`) inyectan `IPIIEncryptor` via el token `PII_ENCRYPTOR` exportado por `UsersModule`.
+
+### Cross-Module Query Ports
+
+Los módulos exponen interfaces de consulta cross-module para evitar queries SQL directos entre esquemas:
+
+| Token | Módulo fuente | Métodos |
+|-------|---------------|---------|
+| `PORTFOLIO_CROSS_MODULE_QUERY` | `landlord-portfolio` | `hasActiveLeases(userId)`, `hasPortfoliosWithUnits(userId)`, `hasActiveLeasesInPortfolios(userId)` |
+| `CONTRACTS_CROSS_MODULE_QUERY` | `contracts` | `hasActiveContractsAsRole(userId, role)` |
+| `PAYMENTS_CROSS_MODULE_QUERY` | `payments` | `hasPendingPayments(userId)` |
+
+Estos ports se inyectan en módulos consumidores (e.g. `UsersModule`) via NestJS DI. Cada implementación consulta únicamente su propio esquema PostgreSQL.
+
+## Soft Delete
+
+Todas las tablas (excepto RAW) tienen una columna `deleted_at DateTime?`. Dado que Prisma 6+ no soporta la API `$use` middleware, el soft delete se implementa como **utilidades de query** que los repositorios y servicios usan explícitamente:
+
+- **`softDeleteFilter`**: constante `{ deleted_at: null }` — spread en el `where` de lecturas para excluir registros eliminados
+- **`softDeleteData()`**: retorna `{ deleted_at: new Date() }` — usar como `data` en `update`/`updateMany` en lugar de `delete`/`deleteMany`
+- **`withSoftDeleteFilter(where?)`**: inyecta `deleted_at: null` en un objeto `where` si `deleted_at` no está ya presente (bypass automático)
+- **Bypass**: no incluir `softDeleteFilter` en el `where`, o pasar `deleted_at: { not: null }` explícitamente
+- **Excluidas**: tablas RAW (`UsersRaw`, `PortfolioRaw`, etc.) — usan flag `processed` en su lugar
+
+```typescript
+import { softDeleteFilter, softDeleteData, withSoftDeleteFilter } from '@src/shared/prisma/soft-delete.utils.js';
+
+// Lectura (excluir eliminados):
+const users = await prisma.user.findMany({ where: { ...softDeleteFilter, is_active: true } });
+
+// Eliminación suave:
+await prisma.user.update({ where: { id }, data: softDeleteData() });
+
+// Inyección condicional:
+const where = withSoftDeleteFilter({ is_active: true }); // => { is_active: true, deleted_at: null }
+```
 
 ## Seguridad
 

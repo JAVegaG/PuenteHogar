@@ -87,6 +87,55 @@ Application architecture per module: Hexagonal (ports & adapters).
 - `messaging`: failureThreshold=3, timeout=15s
 - Instances cached by name in `CircuitBreakerFactory`
 
+### Soft Delete Pattern
+- All tables (except RAW tables) have a `deleted_at DateTime?` column
+- Active records: `deleted_at = null`
+- Soft-deleted records: `deleted_at` contains a UTC timestamp of when the record was deleted
+- Soft delete utilities (`src/backend/src/shared/prisma/soft-delete.utils.ts`) provide helpers for repositories:
+  - `softDeleteFilter`: constant `{ deleted_at: null }` — spread into `where` clauses on read operations to exclude soft-deleted records
+  - `softDeleteData()`: returns `{ deleted_at: new Date() }` — use as `data` payload when converting a delete to an update
+  - `withSoftDeleteFilter(where)`: conditionally injects `deleted_at: null` into a where clause if not already present (supports bypass)
+- Prisma 6+ does not support the `$use` middleware API, so soft delete is implemented as explicit query helpers rather than transparent middleware
+- Bypass: explicitly pass `deleted_at` in the `where` clause (e.g., `where: { deleted_at: { not: null } }`) to include or target soft-deleted records
+- RAW tables (`UsersRaw`, `PortfolioRaw`, etc.) do not have `deleted_at` — they use the `processed` flag instead
+- **Distinction between `deleted_at` and `is_active`:**
+  - `deleted_at` = record deletion lifecycle (the record has been logically removed from the system)
+  - `is_active` = catalog item business availability (e.g., a `PropertyType` can be deactivated without being deleted)
+  - Catalog tables retain both fields — they serve different purposes
+
+### RAW/ETL Hybrid Persistence Standard
+- Each module persists the full incoming payload as a **proper JSON/JSONB object** to its RAW table (e.g., `UsersRaw`, `PortfolioRaw`, `ContractsRaw`)
+- **Never use `JSON.stringify(data)`** when writing to RAW tables — pass the object directly to Prisma's `Json` type field
+- Each module has a single RAW table that receives the complete payload; the ETL cron materializes (decomposes) that payload into the module's individual curated typed tables
+- Example: a single `UsersRaw` record containing user, role, and person detail data is decomposed by the ETL into `User`, `UserRole`, and `NaturalPersonDetail`/`LegalPersonDetail` curated tables
+- When reading RAW records, use the `parsePayload<T>()` helper from `@src/shared/etl/parse-payload.ts` for backward compatibility with legacy stringified payloads:
+  ```typescript
+  function parsePayload<T>(raw: unknown): T {
+    if (typeof raw === 'string') {
+      return JSON.parse(raw) as T;
+    }
+    return raw as T;
+  }
+  ```
+- All ETL cron services must use `parsePayload` to handle both formats (proper JSON and legacy stringified JSON) during the transition period
+
+### Cross-Module Communication (Internal API)
+- Modules communicate exclusively through **port interfaces** — no direct cross-schema Prisma queries or raw SQL across schema boundaries
+- Pattern:
+  1. **Define interface + DI token** in the source module's `domain/ports/` directory (e.g., `landlord-portfolio/domain/ports/cross-module-query.port.ts`)
+  2. **Implement as a service** in the source module's `infrastructure/` layer using Prisma queries against its own schema only
+  3. **Export** the service and DI token from the source module (e.g., `landlord-portfolio.module.ts`)
+  4. **Inject** in the consuming module via NestJS DI using the token (e.g., `@Inject(PORTFOLIO_CROSS_MODULE_QUERY)`)
+- Cross-module calls are synchronous service method invocations within the monolith (not HTTP calls) — injected via NestJS dependency injection for performance while preserving module boundaries
+- Example ports:
+  - `IPortfolioCrossModuleQuery` — `hasActiveLeases(userId)`, `hasPortfoliosWithUnits(userId)`, `hasActiveLeasesInPortfolios(userId)`
+  - `IContractsCrossModuleQuery` — `hasActiveContractsAsRole(userId, role)`
+  - `IPaymentsCrossModuleQuery` — `hasPendingPayments(userId)`
+- **Forbidden patterns:**
+  - Raw SQL queries that join tables across different PostgreSQL schemas
+  - Direct Prisma queries against another module's schema tables
+  - Importing another module's repository directly
+
 ### MVP stubs
 - `ObjectStorageAdapter` returns a placeholder S3 URL — real S3 SDK integration is post-MVP
 - `ESignatureProviderAdapter` returns a mock signing ID — real provider integration is post-MVP
@@ -280,9 +329,16 @@ Use these in imports when referencing across the module/src boundary.
 - Section headings in forms: `text-h3 font-semibold`
 - Body text: `text-body`
 
-### Desktop Layout for Form Pages
-- Form pages and listing pages wrap their `<main>` content in a centered container: `<main className="flex justify-center ..."><div className="w-full max-w-[560px]">...</div></main>`
-- This follows the auth pages pattern (`max-w-[448px]`) to prevent forms from stretching across the full viewport on desktop
+### Desktop Layout for Form Pages (Centered Container Standard)
+- All form and visual pages (except `/explorar`) wrap their `<main>` content in a centered container with `max-w-[560px]`:
+  ```html
+  <main className="flex justify-center px-mobile-margin md:px-desktop-margin ...">
+    <div className="w-full max-w-[560px]">...</div>
+  </main>
+  ```
+- This applies to: auth pages (`/auth/login`, `/auth/registro`), `/mi-perfil`, `/mi-portafolio` and sub-pages, `/mis-contratos` and sub-pages, `/mis-contratos-arrendatario` and sub-pages, `/mis-arriendos` and sub-pages, `/mis-ingresos` and sub-pages, `/mis-notificaciones` and sub-pages, `/mis-pagos` and sub-pages
+- The `/explorar` page is **exempt** — it uses a full-width grid layout
+- All pages use `max-w-[560px]` consistently (not `max-w-[448px]`)
 
 ### Currency (MVP)
 - All currency is "COP" (Colombian Peso) for the MVP
@@ -316,10 +372,24 @@ Use these in imports when referencing across the module/src boundary.
 - Focus trap, Escape key closes via `onCancel`, 44px min touch targets, spinner on confirm when loading
 
 ### SideMenu Navigation
-- First-level pages (e.g. `/mi-portafolio`, `/mis-contratos`, `/mis-ingresos`) use the `SideMenu` component with a hamburger menu button via `Header`'s `onMenuClick`
+- First-level pages (e.g. `/mi-portafolio`, `/mis-contratos`, `/mis-ingresos`, `/auth/login`, `/auth/registro`) use the `SideMenu` component with a hamburger menu button via `Header`'s `onMenuClick`
+- **Auth pages (`/auth/login`, `/auth/registro`) are first-level pages** — they use the hamburger menu navigation pattern (NOT a back button). They follow the same `SideMenu` lazy-loading pattern as other first-level pages.
 - Sub-level pages (e.g. `/mi-portafolio/[id]/unidades`, `/mis-contratos/[id]`) use a back arrow button via `Header`'s `leftAction`
 - The `SideMenu` is lazy-loaded via `React.lazy` + `Suspense` to avoid loading it on every page render
 - All `<a>` tags inside `SideMenu` use `<Link>` from `next/link` for client-side navigation
+
+### Primary Button Style (Primary_Button_Style)
+- All main CTAs (call-to-action buttons) across the platform use the Primary_Button_Style:
+  ```
+  bg-[#1d4ed8] text-white rounded-[6px] min-h-[44px] min-w-[44px] px-4 inline-flex items-center justify-center font-semibold
+  ```
+- Blue background (`#1d4ed8`), white text, `rounded-[6px]` border radius
+- Minimum touch target: `44×44px` (`min-h-[44px] min-w-[44px]`) for WCAG 2.1 AA compliance
+- Horizontal padding: `px-4`
+- Layout: `inline-flex items-center justify-center` for proper content alignment
+- Font weight: `font-semibold`
+- This applies to primary action buttons (e.g., "Gestionar preferencias", form submit buttons, main navigation CTAs)
+- When using `<Link>` from `next/link` as a CTA, apply the same classes to style it as a primary button
 
 ### Unit Detail Page Route
 - Unit detail page lives at `/mi-portafolio/[id]/unidades/[unitId]` (NOT `/mi-portafolio/[id]`)

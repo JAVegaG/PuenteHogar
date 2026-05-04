@@ -662,6 +662,119 @@ El modelo asume que el estado actual debe ser coherente con el último evento re
 *   procesos de sincronización que actualicen el snapshot cada vez que se registra un cambio histórico
 El objetivo es evitar divergencias entre la representación histórica y la condición operativa vigente.
 
+## Estrategias de gestión de datos y comunicación entre módulos
+
+Esta sección documenta las estrategias transversales adoptadas para la gestión del ciclo de vida de los datos, la persistencia de información entrante y la comunicación entre módulos del sistema. Estas decisiones complementan el modelo lógico y físico previamente descrito, estableciendo patrones operativos que garantizan consistencia, trazabilidad y mantenibilidad a lo largo de la evolución del sistema.
+
+### Estrategia de eliminación lógica (Soft Delete)
+
+El sistema adopta una estrategia de **eliminación lógica** (soft delete) para todas las tablas curadas del modelo de datos. Bajo esta estrategia, los registros nunca se eliminan físicamente de la base de datos; en su lugar, se marcan como eliminados mediante una columna `deleted_at` de tipo `DateTime?` (nullable).
+
+#### Reglas de operación
+
+- **Registros activos:** aquellos cuyo campo `deleted_at` es `null`.
+- **Registros eliminados lógicamente:** aquellos cuyo campo `deleted_at` contiene una marca temporal UTC indicando el momento de la eliminación.
+- **Operaciones de eliminación:** toda operación de borrado se convierte internamente en una actualización que establece `deleted_at = fecha_actual_UTC`.
+- **Operaciones de lectura:** por defecto, todas las consultas de lectura (listados, búsquedas, conteos) filtran automáticamente los registros donde `deleted_at` no es nulo, retornando únicamente registros activos.
+- **Mecanismo de bypass:** cuando se requiere acceder a registros eliminados (por ejemplo, para auditoría o recuperación), se proporciona una opción explícita para omitir el filtro de eliminación lógica.
+
+#### Implementación mediante utilidades de query
+
+Dado que Prisma 6+ no soporta la API `$use` middleware, la estrategia se implementa mediante **utilidades de query** explícitas (`src/backend/src/shared/prisma/soft-delete.utils.ts`) que los repositorios y servicios utilizan al construir sus consultas:
+
+- **`softDeleteFilter`**: constante `{ deleted_at: null }` que se incluye en las cláusulas `where` de las operaciones de lectura para excluir registros eliminados.
+- **`softDeleteData()`**: retorna `{ deleted_at: new Date() }` para usar como payload de datos al convertir una eliminación en una actualización.
+- **`withSoftDeleteFilter(where)`**: inyecta condicionalmente `deleted_at: null` en una cláusula `where` si no está ya presente, permitiendo el bypass cuando se pasa `deleted_at` explícitamente.
+
+Este enfoque requiere que cada repositorio utilice las utilidades de forma explícita, lo cual es impuesto por convención y verificado en revisiones de código.
+
+#### Exclusiones
+
+Las tablas de tipo RAW (ingestión de datos crudos) quedan excluidas de esta estrategia, dado que utilizan un mecanismo propio basado en el campo `processed` para controlar su ciclo de vida.
+
+#### Distinción entre `deleted_at` e `is_active`
+
+Las tablas de catálogo (por ejemplo, `DocumentType`, `PropertyType`, `Role`, `Permission`, `ContractStatus`, `PaymentStatus`, entre otras) conservan su campo `is_active` existente además de la nueva columna `deleted_at`. Ambos campos cumplen propósitos distintos:
+
+| Campo | Propósito | Ejemplo |
+| --- | --- | --- |
+| `is_active` | Disponibilidad de negocio del ítem de catálogo (puede desactivarse sin eliminarse) | Un tipo de propiedad que ya no se ofrece pero cuyos registros históricos deben mantenerse |
+| `deleted_at` | Ciclo de vida del registro (eliminación lógica del sistema) | Un registro que fue eliminado por un administrador y no debe aparecer en ninguna consulta estándar |
+
+### Flujo de persistencia RAW/ETL (Materialización)
+
+El sistema implementa un patrón de **persistencia híbrida** donde cada módulo de dominio mantiene una tabla RAW que almacena el payload completo de cada operación de escritura como un objeto JSON/JSONB, y un conjunto de tablas curadas con columnas tipadas que se alimentan mediante procesos ETL programados.
+
+#### Flujo de datos
+
+```
+Petición entrante → Módulo de dominio → Tabla RAW (JSON/JSONB completo)
+                                                    ↓
+                                            ETL Cron Job
+                                                    ↓
+                                    Tablas curadas tipadas (lectura optimizada)
+```
+
+#### Reglas de persistencia RAW
+
+1. **Cada módulo persiste el payload completo** como un objeto JSON/JSONB propio en su tabla RAW correspondiente (por ejemplo, `UsersRaw`, `PortfolioRaw`, `ContractsRaw`).
+2. **Nunca se utiliza `JSON.stringify()`** al escribir en tablas RAW. El objeto se pasa directamente al campo de tipo `Json` de Prisma, que maneja la serialización internamente.
+3. **Un solo registro RAW puede materializar múltiples filas** en distintas tablas curadas. Por ejemplo, un registro en `UsersRaw` se descompone en filas de `User`, `UserRole` y `NaturalPersonDetail`/`LegalPersonDetail`.
+
+#### Proceso ETL (Materialización)
+
+Los cron jobs ETL de cada módulo son responsables de:
+
+1. Leer registros no procesados de la tabla RAW (`processed: false`).
+2. Descomponer el payload JSON en las filas correspondientes de las tablas curadas.
+3. Marcar el registro RAW como procesado (`processed: true`).
+
+#### Compatibilidad con formatos legacy
+
+Para garantizar compatibilidad durante el período de transición con registros legacy que pudieran contener payloads almacenados como cadenas JSON (resultado de un `JSON.stringify` previo), todos los servicios ETL utilizan un helper `parsePayload<T>()` que detecta si el valor es una cadena de texto y, en ese caso, lo parsea antes de procesarlo:
+
+```typescript
+function parsePayload<T>(raw: unknown): T {
+  if (typeof raw === 'string') {
+    return JSON.parse(raw) as T;
+  }
+  return raw as T;
+}
+```
+
+### Comunicación interna entre módulos (Internal API)
+
+El sistema sigue una arquitectura de **monolito modular** donde cada módulo de dominio opera dentro de su propio esquema de base de datos. La comunicación entre módulos se realiza exclusivamente a través de **interfaces de puerto** (port interfaces) inyectadas mediante el sistema de inyección de dependencias de NestJS.
+
+#### Principios de comunicación inter-módulo
+
+1. **Prohibición de consultas directas cross-schema:** ningún módulo puede ejecutar consultas SQL o Prisma directamente contra tablas de otro esquema.
+2. **Interfaces de puerto como contrato:** cada módulo que expone datos para consumo externo define una interfaz en su capa de dominio (`domain/ports/`) que especifica los métodos disponibles.
+3. **Implementación en infraestructura:** la implementación concreta de cada interfaz reside en la capa de infraestructura del módulo proveedor, utilizando consultas Prisma exclusivamente contra su propio esquema.
+4. **Inyección vía DI:** los módulos consumidores acceden a los datos de otros módulos inyectando el token de la interfaz correspondiente a través del sistema de dependencias de NestJS.
+5. **Invocaciones síncronas:** las llamadas entre módulos son invocaciones directas de métodos de servicio dentro del monolito (no llamadas HTTP), lo que preserva el rendimiento mientras mantiene los límites de módulo.
+
+#### Patrón de implementación
+
+```
+Módulo proveedor:
+  domain/ports/cross-module-query.port.ts  → Define la interfaz + token DI
+  infrastructure/repositories/             → Implementa la interfaz con Prisma (solo su esquema)
+  module.ts                                → Exporta el servicio y token
+
+Módulo consumidor:
+  module.ts                                → Importa el módulo proveedor
+  infrastructure/repositories/             → Inyecta el token y delega las consultas
+```
+
+#### Ejemplo de interfaces expuestas
+
+- **Módulo landlord-portfolio:** `hasActiveLeases(userId)`, `hasPortfoliosWithUnits(userId)`, `hasActiveLeasesInPortfolios(userId)`
+- **Módulo contracts:** `hasActiveContractsAsRole(userId, role)`
+- **Módulo payments:** `hasPendingPayments(userId)`
+
+Estas interfaces permiten que el módulo de usuarios verifique el estado de recursos de un usuario en otros dominios sin necesidad de ejecutar consultas SQL que crucen los límites de esquema.
+
 # Diseño de interfaz y experiencia de usuario
 
 # Introducción
