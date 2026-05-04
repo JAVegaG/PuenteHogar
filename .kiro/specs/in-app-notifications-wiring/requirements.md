@@ -128,3 +128,70 @@ This feature wires real in-app notification implementations across the contracts
 2. THE frontend `InAppNotification` interface SHALL match the backend DTO field names exactly (already the case)
 3. WHEN a new notification is created, THE notification title and message SHALL be in Spanish and describe the event clearly (e.g., "Contrato firmado", "Pago recibido", "Arriendo creado")
 4. THE `buildNotificationContent` function SHALL use contextual data (contract ID, amount, lease ID) to produce informative messages when available
+
+---
+
+## Post-Implementation Findings
+
+The following requirements were identified during manual testing after the initial implementation was deployed. They address UX gaps discovered when real notifications were observed in the frontend.
+
+### Requirement 11: Human-Readable Notification Messages (replaces raw UUIDs)
+
+**User Story:** As a user, I want notification messages to show meaningful names (e.g., property name, tenant name) instead of raw UUIDs, so that I can understand the notification without looking up IDs.
+
+**Context:** During testing, notification messages displayed raw UUIDs like "El contrato 28c794b0-ce76-4a80-..." and "arriendo f5ed74c2-6af8-...". These are not useful to end users.
+
+#### Acceptance Criteria
+
+1. THE `buildNotificationContent` function SHALL display human-readable descriptions instead of raw UUIDs in notification messages
+2. THE notification adapters SHALL resolve human-readable context (e.g., property/unit name, tenant name) before passing data to `SendNotificationUseCase`, OR the `SendNotificationUseCase` SHALL accept pre-resolved display names in the data payload
+3. WHEN a resource name cannot be resolved, THE message SHALL use a generic description (e.g., "un contrato", "un arriendo") instead of a raw UUID
+4. THE notification messages SHALL never expose raw UUIDs to end users
+
+### Requirement 12: Notification Type Labels in Spanish (frontend)
+
+**User Story:** As a user, I want all notification type labels displayed in Spanish, so that the interface is consistent with the rest of the platform.
+
+**Context:** During testing, `LEASE_CREATED` and `LEASE_CANCELLED` notification types were displayed as "Lease created" and "Lease cancelled" (English fallback) because the frontend translation map was missing these entries.
+
+#### Acceptance Criteria
+
+1. THE frontend `translateNotificationType` function SHALL include Spanish translations for `LEASE_CREATED` ("Arriendo creado") and `LEASE_CANCELLED` ("Arriendo cancelado")
+2. ALL notification type names defined in the backend seed SHALL have corresponding Spanish translations in the frontend
+
+### Requirement 13: Delete Notification
+
+**User Story:** As a user, I want to delete individual notifications, so that I can keep my notification list clean and relevant.
+
+#### Acceptance Criteria
+
+1. THE backend SHALL expose a `DELETE /notifications/:id` endpoint that soft-deletes a notification belonging to the authenticated user
+2. IF the notification does not belong to the authenticated user, THE endpoint SHALL return 403 Forbidden
+3. IF the notification does not exist, THE endpoint SHALL return 404 Not Found
+4. THE frontend notification card SHALL include a delete action (e.g., a trash icon or swipe-to-delete)
+5. THE frontend SHALL remove the notification from the list immediately after successful deletion (optimistic UI)
+
+### Requirement 14: Notification Badge on Hamburger Menu Icon
+
+**User Story:** As a user, I want to see a notification badge on the hamburger menu icon (not just inside the side menu), so that I'm aware of unread notifications without opening the menu.
+
+**Context:** During testing, the unread notification count badge was only visible inside the side menu next to "Mis notificaciones". Users on other pages had no visual indicator of pending notifications unless they opened the menu. The badge should also appear on the hamburger icon itself.
+
+#### Acceptance Criteria
+
+1. THE `Header` component's hamburger menu button SHALL display a small red dot or count badge when there are unread notifications
+2. THE badge SHALL be visible on all authenticated pages that use the hamburger menu navigation pattern
+3. THE badge SHALL disappear when all notifications are read
+4. ALL pages that render `SideMenu` SHALL pass the `unreadNotificationCount` prop (currently only `mi-perfil` and `mis-notificaciones` do; all other pages omit it)
+
+### Requirement 15: Move "Gestionar preferencias" to Top of Notifications Page
+
+**User Story:** As a user, I want the preferences link to be easily accessible at the top of the notifications page, so that I can manage my notification settings without scrolling past all my notifications.
+
+**Context:** During testing, the "Gestionar preferencias" button was placed at the bottom of the notification list. As notifications accumulate, this button gets pushed further down and becomes hard to find. It should be positioned at the top of the page alongside the "Marcar todas como leídas" action.
+
+#### Acceptance Criteria
+
+1. THE "Gestionar preferencias" link SHALL be positioned at the top of the notifications page, in the action bar area alongside "Marcar todas como leídas"
+2. THE "Gestionar preferencias" link SHALL NOT appear at the bottom of the notification list
+3. THE "Gestionar preferencias" link SHALL remain visible when the notification list is empty

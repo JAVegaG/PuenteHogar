@@ -519,3 +519,70 @@ Each property test mocks `SendNotificationUseCase.execute` and generates random 
 | PropertyListingsModule resolves `NOTIFICATION_PORT` | Provider is `ListingNotificationAdapter`, not the stub |
 | NotificationsModule exports `SendNotificationUseCase` | Available for injection by consuming modules |
 | Seed includes all 7 notification types | `CONTRACT_SIGNED`, `PAYMENT_RECEIVED`, `NEW_INTEREST`, `CONTRACT_UPLOADED`, `PAYMENT_DUE`, `LEASE_CREATED`, `LEASE_CANCELLED` |
+
+---
+
+## Post-Implementation Design Additions
+
+The following design additions address UX gaps found during manual testing (Requirements 11–14).
+
+### Human-Readable Notification Messages (Req 11)
+
+**Problem**: `buildNotificationContent` interpolates raw UUIDs into messages (e.g., "El contrato 28c794b0-ce76-..."). Users cannot interpret these.
+
+**Approach**: Each notification adapter resolves human-readable context *before* calling `SendNotificationUseCase`. The resolved names are passed in the `data` payload alongside the IDs. `buildNotificationContent` uses the display names when available, falling back to generic descriptions.
+
+**Data payload changes**:
+
+| Event | Additional data fields |
+|-------|----------------------|
+| Contract uploaded | `propertyName?: string` (resolved from lease → unit → portfolio) |
+| Lease created | `propertyName?: string`, `unitName?: string` |
+| Lease cancelled | `propertyName?: string` |
+| Contract signed | `propertyName?: string` |
+| Payment received | (amount already human-readable) |
+| New interest | `propertyTitle?: string` (from listing) |
+
+**Message examples** (after fix):
+- "Se ha cargado un contrato para tu arriendo en Apartamento Centro." (instead of UUID)
+- "Se ha creado un nuevo arriendo en Casa Norte para ti." (instead of UUID)
+- "Un arriendo ha sido cancelado." (generic fallback when name unavailable)
+
+### Frontend Notification Type Translations (Req 12)
+
+**File**: `src/frontend/modules/notifications/utils/translate-notification-type.ts`
+
+Add missing entries:
+```typescript
+LEASE_CREATED: 'Arriendo creado',
+LEASE_CANCELLED: 'Arriendo cancelado',
+```
+
+### Delete Notification Endpoint (Req 13)
+
+**Backend**:
+- Add `DELETE /notifications/:id` to `NotificationsController`
+- Create `DeleteNotificationUseCase` that soft-deletes the `InAppNotification` record (sets `deleted_at`)
+- Add `softDeleteNotification(id, userId)` to `INotificationRepository` and `PrismaNotificationRepository`
+- Verify ownership: notification's `user_id` must match the authenticated user
+
+**Frontend**:
+- Add a delete button (trash icon) to each notification card in `NotificationsListView`
+- Call `DELETE /notifications/:id` on click
+- Remove the card from the list optimistically
+
+### Notification Badge on Hamburger Icon (Req 14)
+
+**Problem**: The `SideMenu` already shows a badge next to "Mis notificaciones", but most pages don't pass `unreadNotificationCount` to it. More importantly, the hamburger icon itself has no indicator — users must open the menu to discover unread notifications.
+
+**Approach**:
+1. Add an optional `unreadNotificationCount` prop to the `Header` component
+2. When > 0, render a small red dot on the hamburger menu button (top-right corner)
+3. All authenticated pages that use `SideMenu` must fetch the unread count and pass it to both `Header` and `SideMenu`
+4. Consider extracting the notification count fetch into a shared hook (`useUnreadNotificationCount`) to avoid duplicating the fetch logic across every page
+
+### Move "Gestionar preferencias" to Top of Page (Req 15)
+
+**Problem**: The "Gestionar preferencias" button is at the bottom of the notification list in `NotificationsListView`. As notifications accumulate, it gets buried and users may never find it.
+
+**Approach**: Move the preferences link to the top action bar, next to "Marcar todas como leídas". Both actions become a top toolbar row. When the list is empty, the preferences link still appears at the top (not centered in the empty state).

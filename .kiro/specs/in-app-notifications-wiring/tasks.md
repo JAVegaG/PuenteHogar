@@ -170,6 +170,81 @@ Replace empty notification port stubs in four backend modules (contracts, paymen
 - [x] 7. Final checkpoint — Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
+---
+
+## Post-Implementation UX Fixes (Requirements 11–14)
+
+_These tasks address UX issues discovered during manual testing after the initial implementation._
+
+- [x] 8. Fix notification type translations in frontend
+  - [x] 8.1 Add missing Spanish translations for `LEASE_CREATED` and `LEASE_CANCELLED`
+    - Open `src/frontend/modules/notifications/utils/translate-notification-type.ts`
+    - Add `LEASE_CREATED: 'Arriendo creado'` and `LEASE_CANCELLED: 'Arriendo cancelado'` to the translations map
+    - _Requirements: 12.1, 12.2_
+
+- [ ] 9. Replace raw UUIDs with human-readable names in notification messages
+  - [~] 9.1 Update notification adapters to resolve display names before sending
+    - In each adapter, resolve human-readable context (property name, unit name) from the database before calling `SendNotificationUseCase`
+    - Pass resolved names in the `data` payload (e.g., `propertyName`, `unitName`)
+    - _Requirements: 11.1, 11.2_
+
+  - [~] 9.2 Update `buildNotificationContent` to use display names
+    - Open `src/backend/modules/notifications/application/use-cases/send-notification.use-case.ts`
+    - Update each case to prefer `data.propertyName` / `data.unitName` over raw IDs
+    - Fall back to generic descriptions (e.g., "un contrato", "un arriendo") when names are unavailable
+    - _Requirements: 11.1, 11.3, 11.4_
+
+- [ ] 10. Add delete notification endpoint and frontend action
+  - [~] 10.1 Add `softDeleteNotification` to notification repository
+    - Add method to `INotificationRepository` and `PrismaNotificationRepository`
+    - Soft-delete by setting `deleted_at` on the `InAppNotification` record
+    - Verify ownership: notification's `user_id` must match the requesting user
+    - _Requirements: 13.1, 13.2, 13.3_
+
+  - [~] 10.2 Create `DeleteNotificationUseCase`
+    - Create use case that validates ownership and calls repository soft-delete
+    - _Requirements: 13.1, 13.2, 13.3_
+
+  - [~] 10.3 Add `DELETE /notifications/:id` endpoint to controller
+    - Add route to `NotificationsController` with JWT guard
+    - Add Swagger decorators
+    - _Requirements: 13.1, 13.2, 13.3_
+
+  - [~] 10.4 Add delete button to frontend notification cards
+    - Add a trash icon button to each notification card in `NotificationsListView`
+    - Call `DELETE /notifications/:id` on click
+    - Remove the card from the list optimistically
+    - _Requirements: 13.4, 13.5_
+
+- [ ] 11. Add notification badge to hamburger menu icon
+  - [~] 11.1 Create shared `useUnreadNotificationCount` hook
+    - Create a reusable hook that fetches `GET /notifications/count` and returns the unread count
+    - Avoid duplicating the fetch logic across every page
+    - _Requirements: 14.2, 14.4_
+
+  - [~] 11.2 Add `unreadNotificationCount` prop to `Header` component
+    - Add optional prop to `Header`
+    - When > 0, render a small red dot indicator on the hamburger menu button
+    - _Requirements: 14.1, 14.3_
+
+  - [~] 11.3 Wire unread count into all authenticated pages
+    - Update all pages that render `SideMenu` to use the shared hook and pass the count to both `Header` and `SideMenu`
+    - Pages to update: `mi-portafolio`, `mis-contratos`, `mis-contratos-arrendatario`, `mis-arriendos`, `mis-pagos`, `mis-ingresos`, `explorar` (when authenticated)
+    - _Requirements: 14.2, 14.4_
+
+- [ ] 12. Post-fix checkpoint — build and verify
+  - Ensure `npm run build` passes for both frontend and backend
+  - Ensure `npm run test` passes for backend
+  - Verify notifications display human-readable messages, Spanish labels, delete works, and badge appears on hamburger icon
+
+- [ ] 13. Move "Gestionar preferencias" to top of notifications page
+  - [~] 13.1 Relocate preferences link in `NotificationsListView`
+    - Open `src/frontend/modules/notifications/components/NotificationsListView.tsx`
+    - Move the "Gestionar preferencias" link from the bottom of the list to the top action bar, alongside "Marcar todas como leídas"
+    - Remove the bottom "Gestionar preferencias" link
+    - Ensure the link is visible in the empty state as well
+    - _Requirements: 15.1, 15.2, 15.3_
+
 ## Notes
 
 - Tasks marked with `*` are optional and can be skipped for faster MVP
