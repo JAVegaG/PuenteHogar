@@ -199,7 +199,7 @@ export default function ContractDetailView({ contractId }: ContractDetailViewPro
                             <ErrorState onRetry={fetchContract} />
                         ) : contract ? (
                             <div className="flex flex-col gap-6">
-                                {/* Status */}
+                                {/* Page heading with status */}
                                 <div className="flex items-center justify-between">
                                     <h2 className="text-h2 font-semibold text-neutral-900">
                                         Contrato
@@ -207,141 +207,55 @@ export default function ContractDetailView({ contractId }: ContractDetailViewPro
                                     <StatusBadge status={contract.status} variant="contract" />
                                 </div>
 
-                                {/* Dates */}
-                                <div className="flex flex-col gap-2">
-                                    <p className="text-body text-neutral-700">
-                                        <span className="font-medium">Fecha de inicio:</span>{' '}
-                                        {formatDate(contract.startDate)}
-                                    </p>
-                                    {contract.endDate && (
+                                {/* Card: Términos */}
+                                <div className="border border-neutral-200 rounded-card bg-white p-4">
+                                    <h3 className="text-h3 font-semibold text-neutral-900 mb-3">
+                                        Términos
+                                    </h3>
+                                    <div className="flex flex-col gap-2">
                                         <p className="text-body text-neutral-700">
-                                            <span className="font-medium">Fecha de fin:</span>{' '}
-                                            {formatDate(contract.endDate)}
+                                            <span className="font-medium">Fecha de inicio:</span>{' '}
+                                            {formatDate(contract.startDate)}
                                         </p>
+                                        {contract.endDate && (
+                                            <p className="text-body text-neutral-700">
+                                                <span className="font-medium">Fecha de fin:</span>{' '}
+                                                {formatDate(contract.endDate)}
+                                            </p>
+                                        )}
+                                        <p className="text-body text-neutral-700">
+                                            <span className="font-medium">Estado:</span>{' '}
+                                            <StatusBadge status={contract.status} variant="contract" />
+                                        </p>
+                                    </div>
+
+                                    {/* Conditional status messages */}
+                                    {contract.status === 'SIGNATURE_PENDING' && (
+                                        <div className="border border-blue-200 bg-blue-50 rounded-[6px] p-4 mt-3">
+                                            <p className="text-body text-blue-800">
+                                                Esperando firmas de las partes
+                                            </p>
+                                        </div>
                                     )}
-                                </div>
 
-                                {/* PDF Download */}
-                                <div>
-                                    <a
-                                        href={contract.fileUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-2 text-body text-primary font-medium underline min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                                    >
-                                        <svg
-                                            width="20"
-                                            height="20"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            aria-hidden="true"
-                                        >
-                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                            <polyline points="7 10 12 15 17 10" />
-                                            <line x1="12" y1="15" x2="12" y2="3" />
-                                        </svg>
-                                        Descargar contrato PDF
-                                    </a>
-                                </div>
-
-                                {/* File Actions */}
-                                <div className="flex flex-col gap-3">
-                                    <input
-                                        ref={fileInputRef}
-                                        type="file"
-                                        accept=".pdf,application/pdf"
-                                        className="hidden"
-                                        onChange={handleReplaceFile}
-                                    />
-
-                                    {canReplace && (
-                                        <button
-                                            type="button"
-                                            onClick={() => fileInputRef.current?.click()}
-                                            disabled={isReplacing}
-                                            className="inline-flex items-center justify-center gap-2 border border-neutral-300 bg-white text-body text-neutral-900 font-medium rounded-card min-h-[44px] min-w-[44px] px-6 hover:bg-neutral-50 active:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                        >
-                                            {isReplacing ? (
-                                                <>
-                                                    <svg
-                                                        className="animate-spin h-[18px] w-[18px]"
-                                                        viewBox="0 0 24 24"
-                                                        fill="none"
-                                                        aria-hidden="true"
-                                                    >
-                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                                    </svg>
-                                                    Reemplazando...
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <svg
-                                                        width="20"
-                                                        height="20"
-                                                        viewBox="0 0 24 24"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        strokeWidth="2"
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        aria-hidden="true"
-                                                    >
-                                                        <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
-                                                    </svg>
-                                                    Reemplazar documento
-                                                </>
+                                    {contract.status === 'SIGNED' && (
+                                        <div className="border border-green-200 bg-green-50 rounded-[6px] p-4 mt-3 flex flex-col gap-1">
+                                            <p className="text-body font-medium text-green-800">
+                                                Contrato firmado
+                                            </p>
+                                            {contract.signedAt && (
+                                                <p className="text-caption text-green-700">
+                                                    Firmado el {formatDate(contract.signedAt)}
+                                                </p>
                                             )}
-                                        </button>
-                                    )}
-
-                                    {replaceError && (
-                                        <p role="alert" className="text-caption text-red-600">
-                                            {replaceError}
-                                        </p>
-                                    )}
-
-                                    {canDelete && (
-                                        <button
-                                            type="button"
-                                            onClick={() => setIsDeleteDialogOpen(true)}
-                                            className="inline-flex items-center justify-center gap-2 border border-red-300 bg-white text-body text-red-600 font-medium rounded-card min-h-[44px] min-w-[44px] px-6 hover:bg-red-50 active:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2 transition-colors"
-                                        >
-                                            <svg
-                                                width="20"
-                                                height="20"
-                                                viewBox="0 0 24 24"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                strokeWidth="2"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                aria-hidden="true"
-                                            >
-                                                <polyline points="3 6 5 6 21 6" />
-                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                                                <line x1="10" y1="11" x2="10" y2="17" />
-                                                <line x1="14" y1="11" x2="14" y2="17" />
-                                            </svg>
-                                            Eliminar contrato
-                                        </button>
-                                    )}
-
-                                    {deleteError && (
-                                        <p role="alert" className="text-caption text-red-600">
-                                            {deleteError}
-                                        </p>
+                                        </div>
                                     )}
                                 </div>
 
-                                {/* Parties */}
-                                <div className="flex flex-col gap-2">
-                                    <h3 className="text-h3 font-semibold text-neutral-900">
-                                        Partes del contrato
+                                {/* Card: Partes */}
+                                <div className="border border-neutral-200 rounded-card bg-white p-4">
+                                    <h3 className="text-h3 font-semibold text-neutral-900 mb-3">
+                                        Partes
                                     </h3>
                                     {(contract.parties?.length ?? 0) > 0 ? (
                                         <ul className="flex flex-col gap-2">
@@ -366,42 +280,141 @@ export default function ContractDetailView({ contractId }: ContractDetailViewPro
                                     )}
                                 </div>
 
-                                {/* Conditional actions based on status */}
-                                <div className="flex flex-col gap-3">
+                                {/* Card: Documento */}
+                                <div className="border border-neutral-200 rounded-card bg-white p-4">
+                                    <h3 className="text-h3 font-semibold text-neutral-900 mb-3">
+                                        Documento
+                                    </h3>
+
+                                    {/* PDF Download */}
+                                    <a
+                                        href={contract.fileUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-2 text-body text-primary font-medium underline min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                                    >
+                                        <svg
+                                            width="20"
+                                            height="20"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            aria-hidden="true"
+                                        >
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                            <polyline points="7 10 12 15 17 10" />
+                                            <line x1="12" y1="15" x2="12" y2="3" />
+                                        </svg>
+                                        Descargar contrato PDF
+                                    </a>
+
+                                    {/* File Actions */}
+                                    <div className="flex flex-col gap-3 mt-3">
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept=".pdf,application/pdf"
+                                            className="hidden"
+                                            onChange={handleReplaceFile}
+                                        />
+
+                                        {canReplace && (
+                                            <button
+                                                type="button"
+                                                onClick={() => fileInputRef.current?.click()}
+                                                disabled={isReplacing}
+                                                className="inline-flex items-center justify-center gap-2 border border-neutral-300 bg-white text-body text-neutral-900 font-medium rounded-card min-h-[44px] min-w-[44px] px-6 hover:bg-neutral-50 active:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                            >
+                                                {isReplacing ? (
+                                                    <>
+                                                        <svg
+                                                            className="animate-spin h-[18px] w-[18px]"
+                                                            viewBox="0 0 24 24"
+                                                            fill="none"
+                                                            aria-hidden="true"
+                                                        >
+                                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                                        </svg>
+                                                        Reemplazando...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <svg
+                                                            width="20"
+                                                            height="20"
+                                                            viewBox="0 0 24 24"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            strokeWidth="2"
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            aria-hidden="true"
+                                                        >
+                                                            <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
+                                                        </svg>
+                                                        Reemplazar documento
+                                                    </>
+                                                )}
+                                            </button>
+                                        )}
+
+                                        {replaceError && (
+                                            <p role="alert" className="text-caption text-red-600">
+                                                {replaceError}
+                                            </p>
+                                        )}
+
+                                        {canDelete && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsDeleteDialogOpen(true)}
+                                                className="inline-flex items-center justify-center gap-2 border border-red-300 bg-white text-body text-red-600 font-medium rounded-card min-h-[44px] min-w-[44px] px-6 hover:bg-red-50 active:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2 transition-colors"
+                                            >
+                                                <svg
+                                                    width="20"
+                                                    height="20"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth="2"
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    aria-hidden="true"
+                                                >
+                                                    <polyline points="3 6 5 6 21 6" />
+                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                                    <line x1="10" y1="11" x2="10" y2="17" />
+                                                    <line x1="14" y1="11" x2="14" y2="17" />
+                                                </svg>
+                                                Eliminar contrato
+                                            </button>
+                                        )}
+
+                                        {deleteError && (
+                                            <p role="alert" className="text-caption text-red-600">
+                                                {deleteError}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    {/* Sign action */}
                                     {contract.status === 'PENDING' && (
-                                        <>
+                                        <div className="flex flex-col gap-3 mt-3">
                                             <button
                                                 type="button"
                                                 onClick={handleSign}
                                                 disabled={isSigning}
-                                                className="bg-primary text-white rounded-card h-[56px] px-6 min-w-[44px] min-h-[44px] text-body font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
+                                                className="bg-[#1d4ed8] text-white rounded-[6px] min-h-[44px] min-w-[44px] px-4 inline-flex items-center justify-center font-semibold text-body focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
                                             >
                                                 {isSigning ? 'Iniciando firma...' : 'Iniciar firma'}
                                             </button>
                                             {signError && (
                                                 <p role="alert" className="text-caption text-red-600">
                                                     {signError}
-                                                </p>
-                                            )}
-                                        </>
-                                    )}
-
-                                    {contract.status === 'SIGNATURE_PENDING' && (
-                                        <div className="border border-blue-200 bg-blue-50 rounded-[6px] p-4">
-                                            <p className="text-body text-blue-800">
-                                                Esperando firmas de las partes
-                                            </p>
-                                        </div>
-                                    )}
-
-                                    {contract.status === 'SIGNED' && (
-                                        <div className="border border-green-200 bg-green-50 rounded-[6px] p-4 flex flex-col gap-1">
-                                            <p className="text-body font-medium text-green-800">
-                                                Contrato firmado
-                                            </p>
-                                            {contract.signedAt && (
-                                                <p className="text-caption text-green-700">
-                                                    Firmado el {formatDate(contract.signedAt)}
                                                 </p>
                                             )}
                                         </div>
