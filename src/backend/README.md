@@ -151,7 +151,7 @@ const where = withSoftDeleteFilter({ is_active: true }); // => { is_active: true
 |-------|-------------|
 | `@src/*` | `./src/*` |
 | `@modules/*` | `./modules/*` |
-| `@prisma-generated/*` | `./prisma/generated/*` |
+| `@prisma-generated/*` | `./db/prisma/src/*` |
 
 > **NodeNext import convention**: `"module": "NodeNext"` is set in `tsconfig.json` and the package has `"type": "module"`, so it runs as ESM. Relative imports **must** use `.js` extensions (e.g. `import './foo.js'`). Path-alias imports (`@src/...`, `@modules/...`) are resolved via `tsconfig.paths` as usual.
 
@@ -173,9 +173,11 @@ Disponible en `http://localhost:{PORT}/api/docs` cuando el servidor está corrie
 
 Jest is configured in `jest.config.ts` with:
 - Roots: `src/` and `modules/`
-- Path aliases: `@src/*` → `./src/*`, `@modules/*` → `./modules/*` (mirrors `tsconfig.json`)
+- Path aliases: `@src/*` → `./src/*`, `@modules/*` → `./modules/*`
 - Transform: `ts-jest`
 - Test pattern: `*.spec.ts`
+
+> **Note**: The `@prisma-generated/*` alias is **not** mapped in Jest's `moduleNameMapper`. Tests that depend on Prisma types must mock `@prisma-generated/client` (e.g. via `jest.mock()`) rather than resolving it directly. This avoids pulling the full Prisma client into the test environment.
 
 Property-based tests use `fast-check` with `numRuns: 100` and traceability comments linking to spec requirements.
 
