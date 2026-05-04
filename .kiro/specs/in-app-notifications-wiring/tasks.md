@@ -28,7 +28,7 @@ Replace empty notification port stubs in four backend modules (contracts, paymen
     - Ensure the module can be imported by contracts, payments, landlord-portfolio, and property-listings modules
     - _Requirements: 9.1_
 
-- [ ] 3. Create adapter classes and wire them in each module
+- [x] 3. Create adapter classes and wire them in each module
   - [x] 3.1 Extend contracts `INotificationPort` with `notifyContractUploaded`
     - Open `src/backend/modules/contracts/domain/ports/notification.port.ts`
     - Add `notifyContractUploaded(tenantUserId: string, contractId: string, leaseId: string): Promise<void>` to the interface
@@ -92,7 +92,7 @@ Replace empty notification port stubs in four backend modules (contracts, paymen
     - `notifyLandlordOfInterest`: call once with `notificationTypeName: 'NEW_INTEREST'`, `eventSource: 'listing.contact_initiated'`, `data: { listingId, tenantUserId }`
     - _Requirements: 6.1, 6.2_
 
-  - [~] 3.10 Wire `ListingNotificationAdapter` in `PropertyListingsModule`
+  - [x] 3.10 Wire `ListingNotificationAdapter` in `PropertyListingsModule`
     - Open `src/backend/modules/property-listings/property-listings.module.ts`
     - Add `NotificationsModule` to `imports` array
     - Import `ListingNotificationAdapter`
