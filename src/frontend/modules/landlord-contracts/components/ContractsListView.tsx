@@ -3,6 +3,7 @@
 import { lazy, Suspense, useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@modules/users/context/AuthContext';
+import { useUnreadNotificationCount } from '@shared/hooks/useUnreadNotificationCount';
 import { contractService } from '@/shared/services/contract';
 import { Header } from '@/shared/components/Header';
 import { Skeleton } from '@/shared/components/Skeleton';
@@ -48,6 +49,7 @@ function formatDate(dateStr: string): string {
 
 export default function ContractsListView() {
     const { user, logout } = useAuth();
+    const { unreadCount } = useUnreadNotificationCount();
     const [menuOpen, setMenuOpen] = useState(false);
     const [contracts, setContracts] = useState<LandlordContractListItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -85,7 +87,7 @@ export default function ContractsListView() {
 
     return (
         <>
-            <Header title="Mis contratos" onMenuClick={() => setMenuOpen(true)} />
+            <Header title="Mis contratos" onMenuClick={() => setMenuOpen(true)} unreadNotificationCount={unreadCount} />
 
             <Suspense fallback={null}>
                 {menuOpen && (
@@ -94,6 +96,7 @@ export default function ContractsListView() {
                         onClose={() => setMenuOpen(false)}
                         user={sideMenuUser}
                         onLogout={user ? logout : undefined}
+                        unreadNotificationCount={unreadCount}
                     />
                 )}
             </Suspense>

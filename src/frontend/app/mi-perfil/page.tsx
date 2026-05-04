@@ -73,6 +73,7 @@ function ProfilePageContent() {
       <Header
         title="Mi perfil"
         onMenuClick={() => setIsSideMenuOpen(true)}
+        unreadNotificationCount={unreadCount}
       />
       {isSideMenuOpen && (
         <SideMenu

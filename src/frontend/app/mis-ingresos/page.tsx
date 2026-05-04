@@ -6,6 +6,7 @@ import { Header } from '@/shared/components/Header';
 import { Skeleton } from '@/shared/components/Skeleton';
 import { ErrorState } from '@/shared/components/ErrorState';
 import { useAuth } from '@modules/users/context/AuthContext';
+import { useUnreadNotificationCount } from '@shared/hooks/useUnreadNotificationCount';
 import { portfolioService } from '@/shared/services/portfolio';
 import { formatPrice } from '@/shared/utils/formatPrice';
 import { SummaryCard } from '@modules/landlord-accounting/components/SummaryCard';
@@ -76,6 +77,7 @@ function IncomeOverviewContent() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { user, logout } = useAuth();
+    const { unreadCount } = useUnreadNotificationCount();
 
     const sideMenuUser = user
         ? { name: user.displayName, role: translateRole(user.roles[0]), roles: user.roles }
@@ -123,7 +125,7 @@ function IncomeOverviewContent() {
 
     return (
         <>
-            <Header title="Mis ingresos" onMenuClick={() => setMenuOpen(true)} />
+            <Header title="Mis ingresos" onMenuClick={() => setMenuOpen(true)} unreadNotificationCount={unreadCount} />
 
             <Suspense fallback={null}>
                 {menuOpen && (
@@ -132,6 +134,7 @@ function IncomeOverviewContent() {
                         onClose={() => setMenuOpen(false)}
                         user={sideMenuUser}
                         onLogout={user ? logout : undefined}
+                        unreadNotificationCount={unreadCount}
                     />
                 )}
             </Suspense>

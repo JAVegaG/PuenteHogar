@@ -3,6 +3,7 @@
 import { lazy, Suspense, useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@modules/users/context/AuthContext';
+import { useUnreadNotificationCount } from '@shared/hooks/useUnreadNotificationCount';
 import { tenantService } from '@/shared/services/tenant';
 import type { TenantContractListItem } from '@/shared/services/tenant';
 import { Header } from '@/shared/components/Header';
@@ -48,6 +49,7 @@ function TenantContractsListSkeleton() {
 
 export default function TenantContractsListView() {
     const { user, logout } = useAuth();
+    const { unreadCount } = useUnreadNotificationCount();
     const [menuOpen, setMenuOpen] = useState(false);
     const [contracts, setContracts] = useState<TenantContractListItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -92,7 +94,7 @@ export default function TenantContractsListView() {
 
     return (
         <>
-            <Header title="Mis contratos" onMenuClick={() => setMenuOpen(true)} />
+            <Header title="Mis contratos" onMenuClick={() => setMenuOpen(true)} unreadNotificationCount={unreadCount} />
 
             <Suspense fallback={null}>
                 {menuOpen && (
@@ -101,6 +103,7 @@ export default function TenantContractsListView() {
                         onClose={() => setMenuOpen(false)}
                         user={sideMenuUser}
                         onLogout={user ? logout : undefined}
+                        unreadNotificationCount={unreadCount}
                     />
                 )}
             </Suspense>

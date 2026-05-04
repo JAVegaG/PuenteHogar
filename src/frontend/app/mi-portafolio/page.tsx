@@ -9,6 +9,7 @@ import { ErrorState } from '@/shared/components/ErrorState';
 import { Pagination } from '@/shared/components/Pagination';
 import { Button } from '@/shared/components/Button';
 import { useAuth } from '@modules/users/context/AuthContext';
+import { useUnreadNotificationCount } from '@shared/hooks/useUnreadNotificationCount';
 import { portfolioService } from '@/shared/services/portfolio';
 import type { PaginatedPortfolios, PortfolioSummary } from '@modules/landlord-portfolio/types';
 
@@ -61,6 +62,7 @@ function PortfolioContent() {
   const [createError, setCreateError] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const { user, logout } = useAuth();
+  const { unreadCount } = useUnreadNotificationCount();
 
   const sideMenuUser = user
     ? { name: user.displayName, role: translateRole(user.roles[0]), roles: user.roles }
@@ -143,7 +145,7 @@ function PortfolioContent() {
 
   return (
     <>
-      <Header title="Mis arriendos" onMenuClick={() => setMenuOpen(true)} />
+      <Header title="Mis arriendos" onMenuClick={() => setMenuOpen(true)} unreadNotificationCount={unreadCount} />
 
       <Suspense fallback={null}>
         {menuOpen && (
@@ -152,6 +154,7 @@ function PortfolioContent() {
             onClose={() => setMenuOpen(false)}
             user={sideMenuUser}
             onLogout={user ? logout : undefined}
+            unreadNotificationCount={unreadCount}
           />
         )}
       </Suspense>
