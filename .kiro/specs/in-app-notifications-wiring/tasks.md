@@ -267,6 +267,29 @@ _These tasks address UX issues discovered during manual testing after the initia
     - Messages without markers render as plain text (backward-compatible)
     - _Requirements: 17.2, 17.4_
 
+- [x] 15. Add bulk delete read notifications
+  - [x] 15.1 Add `softDeleteAllReadByUserId` to notification repository
+    - Add method to `INotificationRepository` and `PrismaNotificationRepository`
+    - Uses `updateMany` with `where: { user_id, read: true, ...softDeleteFilter }` and `data: softDeleteData()`
+    - Returns count of deleted notifications
+    - _Requirements: 18.1, 18.2_
+
+  - [x] 15.2 Create `DeleteReadNotificationsUseCase`
+    - Create use case that calls `repository.softDeleteAllReadByUserId(userId)` and returns `{ deletedCount }`
+    - _Requirements: 18.1, 18.2_
+
+  - [x] 15.3 Add `DELETE /notifications/read` endpoint to controller
+    - Add route BEFORE `DELETE /notifications/:id` to avoid param collision
+    - Add Swagger decorators
+    - _Requirements: 18.1, 18.2_
+
+  - [x] 15.4 Add "Eliminar leídas" button to frontend notification action bar
+    - Add `onDeleteRead` optional prop to `NotificationsListView`
+    - Show "Eliminar leídas" button (red text) when there are read notifications
+    - Optimistic removal with rollback on failure
+    - Wire `deleteReadNotifications` service method in the notifications page
+    - _Requirements: 18.3, 18.4, 18.5, 18.6_
+
 ## Notes
 
 - Tasks marked with `*` are optional and can be skipped for faster MVP

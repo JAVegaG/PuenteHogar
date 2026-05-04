@@ -610,3 +610,19 @@ LEASE_CANCELLED: 'Arriendo cancelado',
 - "El arriendo en **Mi primer apartamento** ha sido cancelado." → "Mi primer apartamento" appears bold and darker
 - "Se ha recibido un pago por **150000** en **Casa Norte**." → amount and property name both highlighted
 - "Un arriendo ha sido cancelado." → no bold markers, renders as plain text
+
+### Bulk Delete Read Notifications (Req 18)
+
+**Problem**: Users accumulate read notifications over time and have no way to clean them up in bulk — only one-by-one via the trash icon.
+
+**Approach — full stack**:
+
+1. **Repository**: `softDeleteAllReadByUserId(userId)` uses `updateMany` with `where: { user_id, read: true, ...softDeleteFilter }` and `data: softDeleteData()`. Returns the count of affected rows.
+
+2. **Use case**: `DeleteReadNotificationsUseCase` — thin delegation layer that calls the repository and returns `{ deletedCount }`.
+
+3. **Controller**: `DELETE /notifications/read` endpoint (placed before `DELETE /notifications/:id` to avoid route param collision). Returns `{ deletedCount }`.
+
+4. **Frontend service**: `deleteReadNotifications(token)` calls `DELETE /notifications/read`.
+
+5. **Frontend UI**: "Eliminar leídas" button in the action bar, styled in red text (`text-red-600`) to signal destructive action. Appears only when there are read notifications. Uses optimistic removal with rollback on failure.

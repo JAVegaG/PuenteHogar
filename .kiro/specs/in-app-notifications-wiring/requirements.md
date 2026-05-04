@@ -221,3 +221,16 @@ The following requirements were identified during manual testing after the initi
 2. THE frontend notification card message renderer SHALL parse `**bold**` markers and render them as `<strong>` elements with `font-semibold text-neutral-900` styling
 3. WHEN no dynamic name is available (generic fallback message), THE message SHALL NOT contain any bold markers
 4. THE bold rendering SHALL be backward-compatible — messages without `**` markers SHALL render as plain text
+
+### Requirement 18: Bulk Delete Read Notifications
+
+**User Story:** As a user, I want to delete all my read notifications at once, so that I can quickly clean up my notification list without deleting them one by one.
+
+#### Acceptance Criteria
+
+1. THE backend SHALL expose a `DELETE /notifications/read` endpoint that soft-deletes all read notifications belonging to the authenticated user
+2. THE endpoint SHALL return the count of deleted notifications in the response body (`{ deletedCount: number }`)
+3. THE frontend notification action bar SHALL include an "Eliminar leídas" button that appears when there are read notifications
+4. THE "Eliminar leídas" button SHALL optimistically remove read notifications from the list and restore them if the API call fails
+5. THE "Eliminar leídas" button SHALL be styled in red text to indicate a destructive action
+6. THE button SHALL only appear when there are notifications with read status (either originally read or marked as read during the session)
