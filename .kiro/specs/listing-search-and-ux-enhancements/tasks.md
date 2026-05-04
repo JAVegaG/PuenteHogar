@@ -49,7 +49,7 @@ This plan implements ten interconnected improvements across backend schema, API 
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 4. Backend: CancelLeaseUseCase
-  - [ ] 4.1 Create CancelLeaseUseCase
+  - [x] 4.1 Create CancelLeaseUseCase
     - Create `src/backend/modules/landlord-portfolio/application/use-cases/cancel-lease.use-case.ts`
     - Implement transactional logic: verify portfolio ownership (403 if not owner), verify unit belongs to portfolio, find lease and verify it belongs to unit, check lease status is "Acordado" (409 otherwise), check associated contract status — SIGNED → 409 conflict, PENDING/SIGNATURE_PENDING → soft-delete contract, none → proceed
     - Soft-delete lease (set `deleted_at`), create `LeaseStatusHistory` entry with "Finalizado" status, update `LeaseCurrentStatus` to "Finalizado"
