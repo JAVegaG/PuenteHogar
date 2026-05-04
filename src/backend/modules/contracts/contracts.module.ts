@@ -7,6 +7,8 @@ import { S3ClientFactory } from '@src/shared/s3';
 import { PII_ENCRYPTOR } from '@modules/users/application/use-cases/register-user.use-case';
 import { AES256PIIEncryptor } from '@modules/users/infrastructure/adapters/aes256-pii-encryptor.adapter';
 import { UsersModule } from '@modules/users/users.module';
+import { NotificationsModule } from '@modules/notifications';
+import { ContractNotificationAdapter } from './infrastructure/adapters/contract-notification.adapter';
 import { GetContractSummaryUseCase } from './application/use-cases/get-contract-summary.use-case';
 import { GetLandlordContractsUseCase } from './application/use-cases/get-landlord-contracts.use-case';
 import { GetTenantContractsUseCase } from './application/use-cases/get-tenant-contracts.use-case';
@@ -30,7 +32,7 @@ import { ContractsCrossModuleQueryService } from './infrastructure/repositories/
 import { CONTRACTS_CROSS_MODULE_QUERY } from './domain/ports/cross-module-query.port';
 
 @Module({
-  imports: [ConfigModule, forwardRef(() => UsersModule)],
+  imports: [ConfigModule, forwardRef(() => UsersModule), NotificationsModule],
   controllers: [ContractsController],
   providers: [
     PrismaService,
@@ -61,17 +63,7 @@ import { CONTRACTS_CROSS_MODULE_QUERY } from './domain/ports/cross-module-query.
     },
     {
       provide: CONTRACT_NOTIFICATION_PORT,
-      useValue: {
-        notifyContractSigned: async () => {
-          // stub — notifications module will handle this
-        },
-        notifySigningFailed: async () => {
-          // stub — notifications module will handle this
-        },
-        notifyContractUploaded: async () => {
-          // stub — notifications module will handle this
-        },
-      },
+      useClass: ContractNotificationAdapter,
     },
     {
       provide: PII_ENCRYPTOR,
