@@ -154,6 +154,7 @@ function makeStubs(input: {
   const notificationPort: INotificationPort = {
     async notifyContractSigned() { },
     async notifySigningFailed() { },
+    async notifyContractUploaded() { },
   };
 
   const auditLogger = new AuditLoggerService();

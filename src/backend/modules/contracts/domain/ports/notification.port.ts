@@ -6,4 +6,9 @@ export interface INotificationPort {
     signedAt: Date,
   ): Promise<void>;
   notifySigningFailed(userId: string, contractId: string): Promise<void>;
+  notifyContractUploaded(
+    tenantUserId: string,
+    contractId: string,
+    leaseId: string,
+  ): Promise<void>;
 }

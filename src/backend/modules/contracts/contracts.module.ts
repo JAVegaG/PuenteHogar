@@ -68,6 +68,9 @@ import { CONTRACTS_CROSS_MODULE_QUERY } from './domain/ports/cross-module-query.
         notifySigningFailed: async () => {
           // stub — notifications module will handle this
         },
+        notifyContractUploaded: async () => {
+          // stub — notifications module will handle this
+        },
       },
     },
     {

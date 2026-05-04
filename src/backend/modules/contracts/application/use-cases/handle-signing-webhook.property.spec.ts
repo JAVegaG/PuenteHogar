@@ -147,6 +147,7 @@ function makeStubs(input: {
       notificationCalls.push({ landlordUserId, tenantUserId, contractId, signedAt });
     },
     async notifySigningFailed() { },
+    async notifyContractUploaded() { },
   };
 
   const auditLogger = new AuditLoggerService();
