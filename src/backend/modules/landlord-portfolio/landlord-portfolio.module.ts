@@ -4,6 +4,7 @@ import { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
 import { PrismaService } from '@src/shared/prisma/prisma.service';
 import { PII_ENCRYPTOR } from '@modules/users/application/use-cases/register-user.use-case';
 import { AES256PIIEncryptor } from '@modules/users/infrastructure/adapters/aes256-pii-encryptor.adapter';
+import { NotificationsModule } from '@modules/notifications';
 import { CreatePortfolioUnitUseCase, PORTFOLIO_REPOSITORY } from './application/use-cases/create-portfolio-unit.use-case';
 import { GetPortfolioUseCase } from './application/use-cases/get-portfolio.use-case';
 import { UpdatePortfolioUnitUseCase } from './application/use-cases/update-portfolio-unit.use-case';
@@ -21,10 +22,12 @@ import { LandlordPortfolioEtlService } from './infrastructure/etl/landlord-portf
 import { PrismaPortfolioRepository } from './infrastructure/repositories/prisma-portfolio.repository';
 import { PortfolioCrossModuleQueryService } from './infrastructure/repositories/portfolio-cross-module-query.service';
 import { PORTFOLIO_CROSS_MODULE_QUERY } from './domain/ports/cross-module-query.port';
+import { PORTFOLIO_NOTIFICATION_PORT } from './domain/ports/notification.port';
+import { PortfolioNotificationAdapter } from './infrastructure/adapters/portfolio-notification.adapter';
 import { LandlordPortfolioController } from './landlord-portfolio.controller';
 
 @Module({
-  imports: [ConfigModule],
+  imports: [ConfigModule, NotificationsModule],
   controllers: [LandlordPortfolioController],
   providers: [
     PrismaService,
@@ -55,6 +58,10 @@ import { LandlordPortfolioController } from './landlord-portfolio.controller';
     {
       provide: PII_ENCRYPTOR,
       useClass: AES256PIIEncryptor,
+    },
+    {
+      provide: PORTFOLIO_NOTIFICATION_PORT,
+      useClass: PortfolioNotificationAdapter,
     },
   ],
   exports: [CreatePortfolioUnitUseCase, GetPortfolioUseCase, UpdatePortfolioUnitUseCase, ListPortfoliosUseCase, CreatePortfolioUseCase, CreateEnrichedUnitUseCase, GetUnitLeasesUseCase, GetLeaseDetailUseCase, CreateLeaseUseCase, CancelLeaseUseCase, UpdatePortfolioUseCase, DeletePortfolioUseCase, DeleteUnitUseCase, PortfolioCrossModuleQueryService, PORTFOLIO_CROSS_MODULE_QUERY],
