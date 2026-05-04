@@ -93,10 +93,27 @@ export class UploadContractUseCase {
       );
     }
 
+    const parsedStartDate = new Date(dto.startDate);
+    if (isNaN(parsedStartDate.getTime())) {
+      throw new UnprocessableEntityException(
+        'La fecha de inicio no es válida. Use formato ISO 8601 (ej: 2025-01-15)',
+      );
+    }
+
+    let parsedEndDate: Date | undefined;
+    if (dto.endDate) {
+      parsedEndDate = new Date(dto.endDate);
+      if (isNaN(parsedEndDate.getTime())) {
+        throw new UnprocessableEntityException(
+          'La fecha de fin no es válida. Use formato ISO 8601 (ej: 2025-01-15)',
+        );
+      }
+    }
+
     const contract = await this.repository.create({
       leaseId: dto.leaseId,
-      startDate: new Date(dto.startDate),
-      endDate: dto.endDate ? new Date(dto.endDate) : undefined,
+      startDate: parsedStartDate,
+      endDate: parsedEndDate,
       fileUrl: objectKey,
       fileTypeId,
       fileStatusId,
