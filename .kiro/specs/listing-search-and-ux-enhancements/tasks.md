@@ -154,7 +154,7 @@ This plan implements ten interconnected improvements across backend schema, API 
 - [x] 11. Checkpoint — Ensure frontend builds and all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 12. Frontend: Lease detail page redesign with cards
+- [x] 12. Frontend: Lease detail page redesign with cards
   - [x] 12.1 Redesign LeaseDetailPage with card-based layout
     - Update the lease detail page component to organize information into three card sections: "Inmueble" (property type, rooms, bathrooms, area, address), "Arrendatario" (full name, document, email, phone), and "Acuerdo" (monthly amount, start date, end date, contract link, contract status)
     - Each card section uses visible border/background consistent with platform card styling (`border border-neutral-200 rounded-card bg-white p-4`)
@@ -164,7 +164,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - Follow mobile-first responsive design and WCAG 2.1 AA
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
 
-  - [ ] 12.2 Add "Cancelar arriendo" button and cancellation flow
+  - [x] 12.2 Add "Cancelar arriendo" button and cancellation flow
     - Show "Cancelar arriendo" button only when lease status is "Acordado"
     - On click, display `ConfirmationDialog` explaining consequences of cancellation
     - On confirm, call `DELETE /portfolio/:pid/units/:uid/leases/:lid` with auth token
