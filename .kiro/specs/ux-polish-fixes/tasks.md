@@ -45,7 +45,7 @@
 
 - [ ] 3. Fix Bug #1 — Red confirm button → variant-aware ConfirmationDialog
 
-  - [~] 3.1 Add `variant` prop to ConfirmationDialog
+  - [x] 3.1 Add `variant` prop to ConfirmationDialog
     - Add `variant?: 'destructive' | 'primary'` to `ConfirmationDialogProps`, defaulting to `'destructive'`
     - Replace hardcoded `bg-red-600` confirm button classes with conditional expression:
       - `variant === 'primary'`: `bg-[#1d4ed8] hover:bg-blue-800 active:bg-blue-900 focus-visible:ring-[#1d4ed8]`
@@ -56,14 +56,14 @@
     - _Preservation: default (no variant or variant='destructive') continues to use bg-red-600_
     - _Requirements: 2.1, 3.1, 3.6_
 
-  - [~] 3.2 Pass `variant="primary"` in ContactLandlordButton
+  - [x] 3.2 Pass `variant="primary"` in ContactLandlordButton
     - Add `variant="primary"` prop to the `<ConfirmationDialog>` usage in ContactLandlordButton
     - File: `src/frontend/modules/tenant/components/ContactLandlordButton.tsx`
     - _Requirements: 2.1_
 
 - [ ] 4. Fix Bug #2 — Buried error message → error above button
 
-  - [~] 4.1 Move error message above button in ContactLandlordButton
+  - [x] 4.1 Move error message above button in ContactLandlordButton
     - Reorder JSX so the `message` alert `div` renders BEFORE the `<button>` element
     - Enhance error styling: use `rounded-md border border-red-200 bg-red-50 p-3 text-body text-red-700` for error state
     - Keep success message styling as-is (green variant)
@@ -75,7 +75,7 @@
 
 - [ ] 5. Fix Bug #3 — startDate not pre-filled in ContractWizard
 
-  - [~] 5.1 Pre-fill startDate from lease data
+  - [x] 5.1 Pre-fill startDate from lease data
     - Change `startDate: ''` to `startDate: lease.startDate || ''` in the `useState` initializer for `formData`
     - Follow the same pattern as `monthlyRent: String(lease.monthlyAmount || '')`
     - File: `src/frontend/modules/landlord-contracts/components/ContractWizard.tsx`
@@ -86,24 +86,24 @@
 
 - [ ] 6. Fix Bug #4 — Duplicated `$` symbols in currency formatting
 
-  - [~] 6.1 Update `formatPrice` to prepend `$`
+  - [x] 6.1 Update `formatPrice` to prepend `$`
     - Change return statement to `return \`$${formatted}\`` so the shared utility includes the `$` symbol
     - File: `src/frontend/shared/utils/formatPrice.ts`
     - _Requirements: 2.4_
 
-  - [~] 6.2 Remove manual `$` prefix from callers of formatPrice
+  - [x] 6.2 Remove manual `$` prefix from callers of formatPrice
     - Update `PortfolioIncomeCard.tsx`: remove manual `$` prefix where `formatPrice` is called
     - Update `mis-ingresos/page.tsx`: remove `` `$${formatPrice(...)}` `` → use `formatPrice(...)` directly
     - Update `mis-ingresos/portafolio/[portfolioId]/page.tsx`: remove manual `$` prefix
     - _Requirements: 2.4_
 
-  - [~] 6.3 Fix local `formatCOP` in ListingManagementView
+  - [x] 6.3 Fix local `formatCOP` in ListingManagementView
     - Ensure the local `formatCOP(amount: number)` returns `$` + formatted digits with no possibility of double `$`
     - Current code: `` return `${formatted}` `` — change to `` return `$${formatted}` `` (it currently omits the `$`)
     - File: `src/frontend/modules/landlord-portfolio/components/ListingManagementView.tsx`
     - _Requirements: 2.4_
 
-  - [~] 6.4 Verify local `formatCOP` in StepTerms and FilterPanel
+  - [x] 6.4 Verify local `formatCOP` in StepTerms and FilterPanel
     - Verify `StepTerms.tsx` local `formatCOP(raw: string)` strips non-digits via `raw.replace(/\D/g, '')` and prepends exactly one `$`
     - Verify `FilterPanel.tsx` local `formatCOP(raw: string)` follows the same pattern
     - Fix if needed — the string-based variants already strip `$` since it's a non-digit character
