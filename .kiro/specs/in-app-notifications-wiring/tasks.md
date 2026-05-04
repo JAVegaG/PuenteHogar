@@ -195,7 +195,7 @@ _These tasks address UX issues discovered during manual testing after the initia
     - _Requirements: 11.1, 11.3, 11.4_
 
 - [ ] 10. Add delete notification endpoint and frontend action
-  - [~] 10.1 Add `softDeleteNotification` to notification repository
+  - [x] 10.1 Add `softDeleteNotification` to notification repository
     - Add method to `INotificationRepository` and `PrismaNotificationRepository`
     - Soft-delete by setting `deleted_at` on the `InAppNotification` record
     - Verify ownership: notification's `user_id` must match the requesting user
