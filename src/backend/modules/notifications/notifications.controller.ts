@@ -1,10 +1,12 @@
-import { Controller, Get, Patch, Put, Body, Param, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Put, Delete, Body, Param, Req, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiBearerAuth,
   ApiOkResponse,
+  ApiNoContentResponse,
   ApiNotFoundResponse,
+  ApiForbiddenResponse,
 } from '@nestjs/swagger';
 import { Request } from 'express';
 import { JwtAuthGuard } from '@src/shared/guards/jwt-auth.guard';
@@ -18,6 +20,7 @@ import { MarkNotificationReadUseCase } from './application/use-cases/mark-notifi
 import { MarkAllNotificationsReadUseCase } from './application/use-cases/mark-all-notifications-read.use-case';
 import { GetNotificationPreferencesUseCase } from './application/use-cases/get-notification-preferences.use-case';
 import { UpdateNotificationPreferencesUseCase } from './application/use-cases/update-notification-preferences.use-case';
+import { DeleteNotificationUseCase } from './application/use-cases/delete-notification.use-case';
 
 interface AuthenticatedRequest extends Request {
   user: { id: string; roles: string[] };
@@ -33,6 +36,7 @@ export class NotificationsController {
     private readonly markAllNotificationsReadUseCase: MarkAllNotificationsReadUseCase,
     private readonly getNotificationPreferencesUseCase: GetNotificationPreferencesUseCase,
     private readonly updatePreferencesUseCase: UpdateNotificationPreferencesUseCase,
+    private readonly deleteNotificationUseCase: DeleteNotificationUseCase,
   ) { }
 
   @UseGuards(JwtAuthGuard)
@@ -92,5 +96,17 @@ export class NotificationsController {
     @Req() req: AuthenticatedRequest,
   ) {
     return this.updatePreferencesUseCase.execute(req.user.id, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Delete a notification' })
+  @ApiNoContentResponse({ description: 'Notification deleted successfully' })
+  @ApiNotFoundResponse({ description: 'Notification not found' })
+  @ApiForbiddenResponse({ description: 'Notification does not belong to the user' })
+  deleteNotification(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
+    return this.deleteNotificationUseCase.execute(id, req.user.id);
   }
 }
