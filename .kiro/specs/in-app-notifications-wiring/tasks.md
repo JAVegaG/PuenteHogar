@@ -222,7 +222,7 @@ _These tasks address UX issues discovered during manual testing after the initia
     - Avoid duplicating the fetch logic across every page
     - _Requirements: 14.2, 14.4_
 
-  - [~] 11.2 Add `unreadNotificationCount` prop to `Header` component
+  - [x] 11.2 Add `unreadNotificationCount` prop to `Header` component
     - Add optional prop to `Header`
     - When > 0, render a small red dot indicator on the hamburger menu button
     - _Requirements: 14.1, 14.3_
