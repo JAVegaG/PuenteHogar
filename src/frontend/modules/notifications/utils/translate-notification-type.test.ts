@@ -18,11 +18,23 @@ describe('translateNotificationType', () => {
         expect(translateNotificationType('CONTRACT_UPLOADED')).toBe('Contrato cargado');
     });
 
-    it('returns the original string for unknown types', () => {
-        expect(translateNotificationType('UNKNOWN_TYPE')).toBe('UNKNOWN_TYPE');
+    it('translates PAYMENT_DUE to "Pago pendiente"', () => {
+        expect(translateNotificationType('PAYMENT_DUE')).toBe('Pago pendiente');
     });
 
-    it('returns the original string for an empty string', () => {
+    it('translates NEW_INTEREST to "Nuevo interesado"', () => {
+        expect(translateNotificationType('NEW_INTEREST')).toBe('Nuevo interesado');
+    });
+
+    it('formats unknown types: replaces underscores with spaces and title-cases first word', () => {
+        expect(translateNotificationType('SOME_NEW_TYPE')).toBe('Some new type');
+    });
+
+    it('formats single-word unknown types with title case', () => {
+        expect(translateNotificationType('UNKNOWN')).toBe('Unknown');
+    });
+
+    it('returns an empty string for an empty string input', () => {
         expect(translateNotificationType('')).toBe('');
     });
 });

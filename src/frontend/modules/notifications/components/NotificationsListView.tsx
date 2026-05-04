@@ -71,7 +71,7 @@ export default function NotificationsListView({
                 <div className="text-center">
                     <Link
                         href="/mis-notificaciones/preferencias"
-                        className="inline-flex items-center justify-center min-h-[44px] px-4 text-body font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-[6px]"
+                        className="bg-[#1d4ed8] text-white rounded-[6px] min-h-[44px] min-w-[44px] px-4 inline-flex items-center justify-center font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                     >
                         Gestionar preferencias
                     </Link>
@@ -133,7 +133,7 @@ export default function NotificationsListView({
             <div className="text-center">
                 <Link
                     href="/mis-notificaciones/preferencias"
-                    className="inline-flex items-center justify-center min-h-[44px] px-4 text-body font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-[6px]"
+                    className="bg-[#1d4ed8] text-white rounded-[6px] min-h-[44px] min-w-[44px] px-4 inline-flex items-center justify-center font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
                     Gestionar preferencias
                 </Link>
