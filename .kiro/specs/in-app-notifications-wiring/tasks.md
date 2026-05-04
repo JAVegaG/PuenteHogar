@@ -64,7 +64,7 @@ Replace empty notification port stubs in four backend modules (contracts, paymen
     - Replace `{ provide: PAYMENT_NOTIFICATION_PORT, useValue: { ... } }` with `{ provide: PAYMENT_NOTIFICATION_PORT, useClass: PaymentNotificationAdapter }`
     - _Requirements: 3.3, 3.4, 9.3, 9.6_
 
-  - [~] 3.6 Create `IPortfolioNotificationPort` interface and DI token
+  - [x] 3.6 Create `IPortfolioNotificationPort` interface and DI token
     - Create file `src/backend/modules/landlord-portfolio/domain/ports/notification.port.ts`
     - Export `PORTFOLIO_NOTIFICATION_PORT = 'PORTFOLIO_NOTIFICATION_PORT'`
     - Define `IPortfolioNotificationPort` with `notifyLeaseCreated(tenantUserId, leaseId, unitId): Promise<void>` and `notifyLeaseCancelled(tenantUserId, leaseId): Promise<void>`
