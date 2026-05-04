@@ -45,11 +45,11 @@ This plan implements ten interconnected improvements across backend schema, API 
     - **Property 2: Additional feature filter correctness**
     - **Validates: Requirements 3.5**
 
-- [~] 3. Checkpoint — Ensure backend schema and endpoints compile
+- [x] 3. Checkpoint — Ensure backend schema and endpoints compile
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 4. Backend: CancelLeaseUseCase
-  - [~] 4.1 Create CancelLeaseUseCase
+  - [ ] 4.1 Create CancelLeaseUseCase
     - Create `src/backend/modules/landlord-portfolio/application/use-cases/cancel-lease.use-case.ts`
     - Implement transactional logic: verify portfolio ownership (403 if not owner), verify unit belongs to portfolio, find lease and verify it belongs to unit, check lease status is "Acordado" (409 otherwise), check associated contract status — SIGNED → 409 conflict, PENDING/SIGNATURE_PENDING → soft-delete contract, none → proceed
     - Soft-delete lease (set `deleted_at`), create `LeaseStatusHistory` entry with "Finalizado" status, update `LeaseCurrentStatus` to "Finalizado"
@@ -57,7 +57,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - Follow the same ownership verification pattern as `CreateLeaseUseCase` and `GetLeaseDetailUseCase`
     - _Requirements: 8.3, 8.4, 8.5, 8.7_
 
-  - [~] 4.2 Add DELETE route to LandlordPortfolioController
+  - [ ] 4.2 Add DELETE route to LandlordPortfolioController
     - Add `@Delete(':portfolioId/units/:unitId/leases/:leaseId')` route in `src/backend/modules/landlord-portfolio/landlord-portfolio.controller.ts`
     - Inject `CancelLeaseUseCase` in the controller constructor
     - Register the use case in `landlord-portfolio.module.ts` providers
@@ -77,7 +77,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - **Validates: Requirements 8.7**
 
 - [ ] 5. Backend: Fix contract date validation
-  - [~] 5.1 Add date validation guard in UploadContractUseCase
+  - [ ] 5.1 Add date validation guard in UploadContractUseCase
     - In `src/backend/modules/contracts/application/use-cases/upload-contract.use-case.ts`, add a guard after `new Date(dto.startDate)` that checks `isNaN(parsedStartDate.getTime())` and throws `UnprocessableEntityException` with message "La fecha de inicio no es válida. Use formato ISO 8601 (ej: 2025-01-15)"
     - Apply the same guard for `dto.endDate` if provided
     - _Requirements: 10.2_
@@ -86,17 +86,17 @@ This plan implements ten interconnected improvements across backend schema, API 
     - **Property 10: Backend ISO 8601 date validation**
     - **Validates: Requirements 10.2**
 
-- [~] 6. Checkpoint — Ensure all backend changes compile and tests pass
+- [ ] 6. Checkpoint — Ensure all backend changes compile and tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 7. Frontend: Update ListingFilters type and useFilters hook
-  - [~] 7.1 Extend ListingFilters type with department and additionalFeatures
+  - [ ] 7.1 Extend ListingFilters type with department and additionalFeatures
     - In `src/frontend/modules/property-listings/types.ts`, add `department?: string` and `additionalFeatures?: Record<string, string>` to the `ListingFilters` interface
     - Update `useFilters.ts` to handle the new `additionalFeatures` field — serialize as JSON string for URL params and parse back on read
     - _Requirements: 2.4, 3.5_
 
 - [ ] 8. Frontend: Backend-driven FilterPanel
-  - [~] 8.1 Replace hardcoded CITIES with backend-driven department/city dropdowns
+  - [ ] 8.1 Replace hardcoded CITIES with backend-driven department/city dropdowns
     - In `src/frontend/modules/property-listings/components/FilterPanel.tsx`, remove the hardcoded `CITIES` array
     - Fetch departments from `GET /portfolio/departments` on mount
     - Add a department `<select>` dropdown above the city dropdown
@@ -106,7 +106,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - Handle fetch errors with "No se pudieron cargar las opciones" message and retry button
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.7_
 
-  - [~] 8.2 Add additional features sections to FilterPanel
+  - [ ] 8.2 Add additional features sections to FilterPanel
     - Fetch active additional features from `GET /listings/additional-features` on mount
     - Render `main: true` features in the basic filter section, dynamically creating inputs based on `element` type (text_field → text input, dropdown → select, checkbox → checkbox, number_field → numeric input)
     - Render `main: false && active: true` features in an expandable "Filtros avanzados" section
@@ -115,7 +115,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - _Requirements: 3.3, 3.4_
 
 - [ ] 9. Frontend: KeywordSearchBar component
-  - [~] 9.1 Create KeywordSearchBar component with prefetch and debounce
+  - [ ] 9.1 Create KeywordSearchBar component with prefetch and debounce
     - Create `src/frontend/modules/property-listings/components/KeywordSearchBar.tsx`
     - On mount, prefetch catalogs: departments, cities (for all active departments), property types, and main additional features — store in component state
     - Implement 300ms debounce on input changes using a `useDebounce` hook or `setTimeout`
@@ -123,14 +123,14 @@ This plan implements ten interconnected improvements across backend schema, API 
     - Display suggestion dropdown with structured labels (e.g., "departamento: Antioquia", "ciudad: Cali", "tipo: Apartamento")
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6_
 
-  - [~] 9.2 Implement TagChip pattern and Buscar button
+  - [ ] 9.2 Implement TagChip pattern and Buscar button
     - On suggestion click, add a `TagChip` (pill element with remove button) below the search bar and clear the text input
     - On chip remove, remove the corresponding filter — no API call
     - On "Buscar" button click, convert all active TagChips to `ListingFilters` and call `onSearch` callback
     - Synchronize TagChip filters with FilterPanel state so both reflect the same active filters
     - _Requirements: 5.7, 5.8, 5.9, 5.10, 5.11_
 
-  - [~] 9.3 Integrate KeywordSearchBar into the explore page
+  - [ ] 9.3 Integrate KeywordSearchBar into the explore page
     - In `src/frontend/app/explorar/page.tsx`, add `KeywordSearchBar` above the `ActionBar`
     - Wire `onSearch` to the existing `setFilters` from `useFilters` hook
     - Pass `currentFilters` so the search bar can reflect externally applied filters
@@ -142,7 +142,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - **Validates: Requirements 5.5**
 
 - [ ] 10. Frontend: Landing page
-  - [~] 10.1 Replace redirect with static landing page at /
+  - [ ] 10.1 Replace redirect with static landing page at /
     - Replace the content of `src/frontend/app/page.tsx` (currently `redirect('/explorar')`) with a static landing page component
     - Include a `<nav>` with links to: `/explorar` (Explorar), `/auth/login` (Iniciar sesión), `/auth/registro` (Registrarse)
     - Include a hero section with a brief platform description (facilitating urban housing rental in Colombia)
@@ -151,11 +151,11 @@ This plan implements ten interconnected improvements across backend schema, API 
     - No API calls — fully static page for fast LCP
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6_
 
-- [~] 11. Checkpoint — Ensure frontend builds and all tests pass
+- [ ] 11. Checkpoint — Ensure frontend builds and all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 12. Frontend: Lease detail page redesign with cards
-  - [~] 12.1 Redesign LeaseDetailPage with card-based layout
+  - [ ] 12.1 Redesign LeaseDetailPage with card-based layout
     - Update the lease detail page component to organize information into three card sections: "Inmueble" (property type, rooms, bathrooms, area, address), "Arrendatario" (full name, document, email, phone), and "Acuerdo" (monthly amount, start date, end date, contract link, contract status)
     - Each card section uses visible border/background consistent with platform card styling (`border border-neutral-200 rounded-card bg-white p-4`)
     - Display lease status using `StatusBadge` with `lease` variant at the top
@@ -164,7 +164,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - Follow mobile-first responsive design and WCAG 2.1 AA
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
 
-  - [~] 12.2 Add "Cancelar arriendo" button and cancellation flow
+  - [ ] 12.2 Add "Cancelar arriendo" button and cancellation flow
     - Show "Cancelar arriendo" button only when lease status is "Acordado"
     - On click, display `ConfirmationDialog` explaining consequences of cancellation
     - On confirm, call `DELETE /portfolio/:pid/units/:uid/leases/:lid` with auth token
@@ -173,26 +173,26 @@ This plan implements ten interconnected improvements across backend schema, API 
     - _Requirements: 8.1, 8.2, 8.5, 8.6_
 
 - [ ] 13. Frontend: Contract screens visual consistency
-  - [~] 13.1 Update ContractDetailView with card-based sections
+  - [ ] 13.1 Update ContractDetailView with card-based sections
     - In `src/frontend/modules/landlord-contracts/components/ContractDetailView.tsx`, wrap existing sections in card containers with `border border-neutral-200 rounded-card bg-white p-4`
     - Organize into three card sections: "Términos" (dates, status), "Partes" (landlord and tenant), "Documento" (file download, replace, delete actions)
     - Ensure `StatusBadge` with `contract` variant is used consistently
     - Use design system typography tokens (`text-h2`, `text-h3`, `text-body`, `text-caption`)
     - _Requirements: 9.2, 9.4_
 
-  - [~] 13.2 Update ContractWizard with design system consistency
+  - [ ] 13.2 Update ContractWizard with design system consistency
     - In `src/frontend/modules/landlord-contracts/components/ContractWizard.tsx`, ensure all CTAs use Primary_Button_Style
     - Verify design system typography tokens are used throughout
     - Ensure consistent input field styling matching the platform patterns
     - _Requirements: 9.3, 9.5_
 
 - [ ] 14. Frontend: Fix "Invalid Date" bug
-  - [~] 14.1 Fix formatDate function in ContractDetailView
+  - [ ] 14.1 Fix formatDate function in ContractDetailView
     - In `src/frontend/modules/landlord-contracts/components/ContractDetailView.tsx`, update the `formatDate` function to handle empty, null, or invalid date strings by returning "—" instead of "Invalid Date"
     - Add guard: `if (!dateStr) return '—'; const date = new Date(dateStr); if (isNaN(date.getTime())) return '—';`
     - _Requirements: 10.1, 10.4_
 
-  - [~] 14.2 Add frontend date validation in contract wizard step 2
+  - [ ] 14.2 Add frontend date validation in contract wizard step 2
     - In `src/frontend/modules/landlord-contracts/validation.ts`, update `validateContractStep2` to check for invalid date strings: if `data.startDate` is truthy but `isNaN(new Date(data.startDate).getTime())`, set error "La fecha de inicio es obligatoria"
     - This prevents the form from submitting with a value that would produce "Invalid Date"
     - _Requirements: 10.3_
@@ -208,7 +208,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - **Validates: Requirements 10.3**
 
 - [ ] 15. Additional features in listing creation
-  - [~] 15.1 Update listing creation form to render additional feature fields
+  - [ ] 15.1 Update listing creation form to render additional feature fields
     - In the listing creation/publishing flow, fetch active additional features from `GET /listings/additional-features` and render input fields based on each feature's `element` type
     - Mark fields as required when `required: true`, display the configured `error_message` when validation fails
     - Submit additional feature values as part of the listing creation payload, persisted in `PropertyAdditionalFeature`
@@ -222,7 +222,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - **Property 4: Additional feature type validation**
     - **Validates: Requirements 4.5**
 
-- [~] 16. Final checkpoint — Ensure all tests pass
+- [ ] 16. Final checkpoint — Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
