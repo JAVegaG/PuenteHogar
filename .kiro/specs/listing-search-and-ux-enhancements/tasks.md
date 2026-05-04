@@ -86,7 +86,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - **Property 10: Backend ISO 8601 date validation**
     - **Validates: Requirements 10.2**
 
-- [ ] 6. Checkpoint — Ensure all backend changes compile and tests pass
+- [x] 6. Checkpoint — Ensure all backend changes compile and tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 7. Frontend: Update ListingFilters type and useFilters hook
