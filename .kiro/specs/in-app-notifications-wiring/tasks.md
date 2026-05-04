@@ -29,7 +29,7 @@ Replace empty notification port stubs in four backend modules (contracts, paymen
     - _Requirements: 9.1_
 
 - [ ] 3. Create adapter classes and wire them in each module
-  - [~] 3.1 Extend contracts `INotificationPort` with `notifyContractUploaded`
+  - [x] 3.1 Extend contracts `INotificationPort` with `notifyContractUploaded`
     - Open `src/backend/modules/contracts/domain/ports/notification.port.ts`
     - Add `notifyContractUploaded(tenantUserId: string, contractId: string, leaseId: string): Promise<void>` to the interface
     - _Requirements: 2.3_
