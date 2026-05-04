@@ -123,7 +123,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - Display suggestion dropdown with structured labels (e.g., "departamento: Antioquia", "ciudad: Cali", "tipo: Apartamento")
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6_
 
-  - [ ] 9.2 Implement TagChip pattern and Buscar button
+  - [x] 9.2 Implement TagChip pattern and Buscar button
     - On suggestion click, add a `TagChip` (pill element with remove button) below the search bar and clear the text input
     - On chip remove, remove the corresponding filter — no API call
     - On "Buscar" button click, convert all active TagChips to `ListingFilters` and call `onSearch` callback
