@@ -70,7 +70,7 @@ Replace empty notification port stubs in four backend modules (contracts, paymen
     - Define `IPortfolioNotificationPort` with `notifyLeaseCreated(tenantUserId, leaseId, unitId): Promise<void>` and `notifyLeaseCancelled(tenantUserId, leaseId): Promise<void>`
     - _Requirements: 4.3, 5.3_
 
-  - [~] 3.7 Create `PortfolioNotificationAdapter`
+  - [x] 3.7 Create `PortfolioNotificationAdapter`
     - Create file `src/backend/modules/landlord-portfolio/infrastructure/adapters/portfolio-notification.adapter.ts`
     - Implement `IPortfolioNotificationPort` with `@Injectable()` decorator
     - Inject `SendNotificationUseCase` via constructor
