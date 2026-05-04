@@ -207,8 +207,8 @@ This plan implements ten interconnected improvements across backend schema, API 
     - Test `validateContractStep2` with fast-check: empty/null/NaN-producing strings always return the error message "La fecha de inicio es obligatoria"
     - **Validates: Requirements 10.3**
 
-- [ ] 15. Additional features in listing creation
-  - [ ] 15.1 Update listing creation form to render additional feature fields
+- [x] 15. Additional features in listing creation
+  - [x] 15.1 Update listing creation form to render additional feature fields
     - In the listing creation/publishing flow, fetch active additional features from `GET /listings/additional-features` and render input fields based on each feature's `element` type
     - Mark fields as required when `required: true`, display the configured `error_message` when validation fails
     - Submit additional feature values as part of the listing creation payload, persisted in `PropertyAdditionalFeature`
