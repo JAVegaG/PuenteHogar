@@ -123,7 +123,7 @@ Replace empty notification port stubs in four backend modules (contracts, paymen
     - After the audit log, add fire-and-forget: `if (lease.user_id) { this.notificationPort.notifyLeaseCancelled(lease.user_id, leaseId).catch(() => undefined); }`
     - _Requirements: 5.1, 5.2, 5.4, 7.1, 7.2_
 
-- [~] 5. Checkpoint — build and verify
+- [x] 5. Checkpoint — build and verify
   - Ensure the project compiles with `npm run build` from `src/backend/`
   - Ensure all existing tests pass with `npm run test` from `src/backend/`
   - Ensure all tests pass, ask the user if questions arise.
