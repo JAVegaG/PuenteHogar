@@ -21,7 +21,7 @@
   - Mark task complete when tests are written, run, and failures are documented
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7_
 
-- [~] 2. Write preservation property tests (BEFORE implementing fixes)
+- [x] 2. Write preservation property tests (BEFORE implementing fixes)
   - **Property 2: Preservation** - Existing Behavior Unchanged for Non-Bug Inputs
   - **IMPORTANT**: Follow observation-first methodology
   - Observe: ConfirmationDialog without `variant` prop renders red `bg-red-600` button on unfixed code
