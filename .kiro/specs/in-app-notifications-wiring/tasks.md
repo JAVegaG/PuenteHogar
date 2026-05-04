@@ -34,7 +34,7 @@ Replace empty notification port stubs in four backend modules (contracts, paymen
     - Add `notifyContractUploaded(tenantUserId: string, contractId: string, leaseId: string): Promise<void>` to the interface
     - _Requirements: 2.3_
 
-  - [~] 3.2 Create `ContractNotificationAdapter`
+  - [x] 3.2 Create `ContractNotificationAdapter`
     - Create file `src/backend/modules/contracts/infrastructure/adapters/contract-notification.adapter.ts`
     - Implement `INotificationPort` with `@Injectable()` decorator
     - Inject `SendNotificationUseCase` via constructor
