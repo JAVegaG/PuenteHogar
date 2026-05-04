@@ -113,8 +113,8 @@ export function ContactLandlordButton({ listingId }: ContactLandlordButtonProps)
                     role="alert"
                     aria-live="assertive"
                     className={`mt-3 p-3 rounded-card text-body ${message.type === 'success'
-                            ? 'bg-green-50 text-green-800'
-                            : 'bg-red-50 text-red-800'
+                        ? 'bg-green-50 text-green-800'
+                        : 'bg-red-50 text-red-800'
                         }`}
                 >
                     {message.text}
@@ -130,6 +130,7 @@ export function ContactLandlordButton({ listingId }: ContactLandlordButtonProps)
                 onConfirm={handleConfirm}
                 onCancel={handleCancel}
                 isLoading={isProcessing}
+                variant="primary"
             />
         </div>
     );
