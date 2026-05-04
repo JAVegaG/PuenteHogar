@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@src/shared/prisma/prisma.service';
+import { softDeleteData, softDeleteFilter } from '@src/shared/prisma/soft-delete.utils';
 import { InAppNotificationEntity } from '../../domain/entities/in-app-notification.entity';
 import { NotificationPreferenceEntity } from '../../domain/entities/notification-preference.entity';
 import { NotificationTypeEntity } from '../../domain/entities/notification-type.entity';
@@ -190,6 +191,25 @@ export class PrismaNotificationRepository implements INotificationRepository {
     });
 
     return result.count;
+  }
+
+  async softDeleteNotification(id: string, userId: string): Promise<void> {
+    const notification = await this.prisma.inAppNotification.findFirst({
+      where: { id, ...softDeleteFilter },
+    });
+
+    if (!notification) {
+      throw new NotFoundException(`Notification with id ${id} not found`);
+    }
+
+    if (notification.user_id !== userId) {
+      throw new ForbiddenException('You do not have permission to delete this notification');
+    }
+
+    await this.prisma.inAppNotification.update({
+      where: { id },
+      data: softDeleteData(),
+    });
   }
 
   async findAllNotificationTypes(): Promise<NotificationTypeEntity[]> {

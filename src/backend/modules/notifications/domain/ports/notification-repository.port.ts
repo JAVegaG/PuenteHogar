@@ -44,6 +44,7 @@ export interface INotificationRepository {
   countUnreadByUserId(userId: string): Promise<number>;
   markAsRead(id: string, userId: string): Promise<InAppNotificationEntity | null>;
   markAllAsRead(userId: string): Promise<number>;
+  softDeleteNotification(id: string, userId: string): Promise<void>;
   findAllNotificationTypes(): Promise<NotificationTypeEntity[]>;
   findActiveExternalPreferences(userId: string, notificationTypeId: string): Promise<NotificationPreferenceEntity[]>;
 }
