@@ -19,7 +19,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - Create `src/backend/modules/property-listings/application/use-cases/get-additional-features.use-case.ts` that queries `AdditionalFeature` where `active: true` and `deleted_at: null`, with optional `main` boolean filter
     - _Requirements: 3.2_
 
-  - [~] 2.2 Add GET /listings/additional-features route to PropertyListingsController
+  - [x] 2.2 Add GET /listings/additional-features route to PropertyListingsController
     - Add `@Public() @Get('additional-features')` route in `src/backend/modules/property-listings/property-listings.controller.ts`
     - Accept optional `@Query('main')` boolean parameter
     - Inject and call `GetAdditionalFeaturesUseCase`

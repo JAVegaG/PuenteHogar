@@ -6,6 +6,7 @@ import { S3ClientFactory } from '@src/shared/s3';
 import { PropertyListingsEtlService } from './infrastructure/etl/property-listings-etl.service';
 import { CreateListingUseCase, LISTING_CACHE, LISTING_REPOSITORY, NOTIFICATION_PORT, OBJECT_STORAGE } from './application/use-cases/create-listing.use-case';
 import { FindListingByUnitUseCase } from './application/use-cases/find-listing-by-unit.use-case';
+import { GetAdditionalFeaturesUseCase } from './application/use-cases/get-additional-features.use-case';
 import { GetListingDetailUseCase } from './application/use-cases/get-listing-detail.use-case';
 import { RegisterContactEventUseCase } from './application/use-cases/register-contact-event.use-case';
 import { SearchListingsUseCase } from './application/use-cases/search-listings.use-case';
@@ -26,6 +27,7 @@ import { PropertyListingsController } from './property-listings.controller';
     PropertyListingsEtlService,
     CreateListingUseCase,
     FindListingByUnitUseCase,
+    GetAdditionalFeaturesUseCase,
     SearchListingsUseCase,
     GetListingDetailUseCase,
     UnpublishListingUseCase,

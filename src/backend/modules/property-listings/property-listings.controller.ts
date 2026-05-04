@@ -23,11 +23,13 @@ import { PaginatedListingsResponseDto } from './application/dtos/paginated-listi
 import { ListingDetailResponseDto } from './application/dtos/listing-detail-response.dto';
 import { CreateListingUseCase, UploadedFile } from './application/use-cases/create-listing.use-case';
 import { FindListingByUnitUseCase } from './application/use-cases/find-listing-by-unit.use-case';
+import { GetAdditionalFeaturesUseCase } from './application/use-cases/get-additional-features.use-case';
 import { GetListingDetailUseCase } from './application/use-cases/get-listing-detail.use-case';
 import { RegisterContactEventUseCase } from './application/use-cases/register-contact-event.use-case';
 import { SearchListingsUseCase } from './application/use-cases/search-listings.use-case';
 import { UnpublishListingUseCase } from './application/use-cases/unpublish-listing.use-case';
 import { UpdateListingUseCase } from './application/use-cases/update-listing.use-case';
+import { AdditionalFeatureResponseDto } from './application/dtos/additional-feature-response.dto';
 import { UpdateListingDto } from './application/dtos/update-listing.dto';
 import { Public } from '@src/shared';
 
@@ -52,6 +54,7 @@ export class PropertyListingsController {
     private readonly registerContactEventUseCase: RegisterContactEventUseCase,
     private readonly findListingByUnitUseCase: FindListingByUnitUseCase,
     private readonly updateListingUseCase: UpdateListingUseCase,
+    private readonly getAdditionalFeaturesUseCase: GetAdditionalFeaturesUseCase,
   ) { }
 
   @Public()
@@ -60,6 +63,15 @@ export class PropertyListingsController {
   @ApiOkResponse({ description: 'Listado paginado de inmuebles', type: PaginatedListingsResponseDto })
   search(@Query() filters: ListingFiltersDto) {
     return this.searchListingsUseCase.execute(filters);
+  }
+
+  @Public()
+  @Get('additional-features')
+  @ApiOperation({ summary: 'Listar características adicionales activas' })
+  @ApiOkResponse({ type: [AdditionalFeatureResponseDto] })
+  getAdditionalFeatures(@Query('main') main?: string) {
+    const mainFilter = main === 'true' ? true : main === 'false' ? false : undefined;
+    return this.getAdditionalFeaturesUseCase.execute(mainFilter);
   }
 
   @UseGuards(JwtAuthGuard)
