@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
 import { CircuitBreakerFactory } from '@src/shared/circuit-breaker/circuit-breaker.factory';
@@ -26,9 +26,11 @@ import { ESignatureProviderAdapter } from './infrastructure/adapters/e-signature
 import { ContractObjectStorageAdapter } from './infrastructure/adapters/object-storage.adapter';
 import { ContractsEtlService } from './infrastructure/etl/contracts-etl.service';
 import { PrismaContractRepository } from './infrastructure/repositories/prisma-contract.repository';
+import { ContractsCrossModuleQueryService } from './infrastructure/repositories/contracts-cross-module-query.service';
+import { CONTRACTS_CROSS_MODULE_QUERY } from './domain/ports/cross-module-query.port';
 
 @Module({
-  imports: [ConfigModule, UsersModule],
+  imports: [ConfigModule, forwardRef(() => UsersModule)],
   controllers: [ContractsController],
   providers: [
     PrismaService,
@@ -44,6 +46,7 @@ import { PrismaContractRepository } from './infrastructure/repositories/prisma-c
     GetTenantContractsUseCase,
     InitiateSigningUseCase,
     HandleSigningWebhookUseCase,
+    ContractsCrossModuleQueryService,
     {
       provide: CONTRACT_REPOSITORY,
       useClass: PrismaContractRepository,
@@ -71,12 +74,18 @@ import { PrismaContractRepository } from './infrastructure/repositories/prisma-c
       provide: PII_ENCRYPTOR,
       useClass: AES256PIIEncryptor,
     },
+    {
+      provide: CONTRACTS_CROSS_MODULE_QUERY,
+      useExisting: ContractsCrossModuleQueryService,
+    },
   ],
   exports: [
     UploadContractUseCase,
     GetContractSummaryUseCase,
     InitiateSigningUseCase,
     HandleSigningWebhookUseCase,
+    ContractsCrossModuleQueryService,
+    CONTRACTS_CROSS_MODULE_QUERY,
   ],
 })
 export class ContractsModule { }

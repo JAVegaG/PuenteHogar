@@ -14,6 +14,8 @@ import {
 import { PaymentGatewayAdapter } from './infrastructure/adapters/payment-gateway.adapter';
 import { PaymentsEtlService } from './infrastructure/etl/payments-etl.service';
 import { PrismaPaymentRepository } from './infrastructure/repositories/prisma-payment.repository';
+import { PaymentsCrossModuleQueryService } from './infrastructure/repositories/payments-cross-module-query.service';
+import { PAYMENTS_CROSS_MODULE_QUERY } from './domain/ports/cross-module-query.port';
 import { PaymentsController } from './payments.controller';
 
 @Module({
@@ -27,6 +29,7 @@ import { PaymentsController } from './payments.controller';
     InitiatePaymentUseCase,
     GetPaymentHistoryUseCase,
     HandlePaymentWebhookUseCase,
+    PaymentsCrossModuleQueryService,
     {
       provide: PAYMENT_REPOSITORY,
       useClass: PrismaPaymentRepository,
@@ -43,11 +46,17 @@ import { PaymentsController } from './payments.controller';
         },
       },
     },
+    {
+      provide: PAYMENTS_CROSS_MODULE_QUERY,
+      useExisting: PaymentsCrossModuleQueryService,
+    },
   ],
   exports: [
     InitiatePaymentUseCase,
     GetPaymentHistoryUseCase,
     HandlePaymentWebhookUseCase,
+    PaymentsCrossModuleQueryService,
+    PAYMENTS_CROSS_MODULE_QUERY,
   ],
 })
-export class PaymentsModule {}
+export class PaymentsModule { }

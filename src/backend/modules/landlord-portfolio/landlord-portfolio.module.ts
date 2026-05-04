@@ -18,6 +18,8 @@ import { DeleteUnitUseCase } from './application/use-cases/delete-unit.use-case'
 import { UpdatePortfolioUseCase } from './application/use-cases/update-portfolio.use-case';
 import { LandlordPortfolioEtlService } from './infrastructure/etl/landlord-portfolio-etl.service';
 import { PrismaPortfolioRepository } from './infrastructure/repositories/prisma-portfolio.repository';
+import { PortfolioCrossModuleQueryService } from './infrastructure/repositories/portfolio-cross-module-query.service';
+import { PORTFOLIO_CROSS_MODULE_QUERY } from './domain/ports/cross-module-query.port';
 import { LandlordPortfolioController } from './landlord-portfolio.controller';
 
 @Module({
@@ -39,15 +41,20 @@ import { LandlordPortfolioController } from './landlord-portfolio.controller';
     UpdatePortfolioUseCase,
     DeletePortfolioUseCase,
     DeleteUnitUseCase,
+    PortfolioCrossModuleQueryService,
     {
       provide: PORTFOLIO_REPOSITORY,
       useClass: PrismaPortfolioRepository,
+    },
+    {
+      provide: PORTFOLIO_CROSS_MODULE_QUERY,
+      useExisting: PortfolioCrossModuleQueryService,
     },
     {
       provide: PII_ENCRYPTOR,
       useClass: AES256PIIEncryptor,
     },
   ],
-  exports: [CreatePortfolioUnitUseCase, GetPortfolioUseCase, UpdatePortfolioUnitUseCase, ListPortfoliosUseCase, CreatePortfolioUseCase, CreateEnrichedUnitUseCase, GetUnitLeasesUseCase, GetLeaseDetailUseCase, CreateLeaseUseCase, UpdatePortfolioUseCase, DeletePortfolioUseCase, DeleteUnitUseCase],
+  exports: [CreatePortfolioUnitUseCase, GetPortfolioUseCase, UpdatePortfolioUnitUseCase, ListPortfoliosUseCase, CreatePortfolioUseCase, CreateEnrichedUnitUseCase, GetUnitLeasesUseCase, GetLeaseDetailUseCase, CreateLeaseUseCase, UpdatePortfolioUseCase, DeletePortfolioUseCase, DeleteUnitUseCase, PortfolioCrossModuleQueryService, PORTFOLIO_CROSS_MODULE_QUERY],
 })
 export class LandlordPortfolioModule { }

@@ -50,7 +50,7 @@ export class PrismaPortfolioRepository implements IPortfolioRepository {
 
       await tx.portfolioRaw.create({
         data: {
-          payload: JSON.stringify(data),
+          payload: data as any,
           processed: false,
         },
       });
@@ -87,7 +87,7 @@ export class PrismaPortfolioRepository implements IPortfolioRepository {
       if (data.rawPayload !== undefined) {
         await tx.portfolioRaw.create({
           data: {
-            payload: JSON.stringify({ unitId, ...data.rawPayload }),
+            payload: { unitId, ...data.rawPayload } as any,
             processed: false,
           },
         });
@@ -277,7 +277,7 @@ export class PrismaPortfolioRepository implements IPortfolioRepository {
       // Create PortfolioRaw audit record
       await tx.portfolioRaw.create({
         data: {
-          payload: JSON.stringify(data),
+          payload: data as any,
           processed: false,
         },
       });

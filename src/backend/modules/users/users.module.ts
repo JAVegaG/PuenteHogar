@@ -1,9 +1,18 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
 import { PrismaService } from '@src/shared/prisma/prisma.service';
+import { PORTFOLIO_CROSS_MODULE_QUERY } from '@modules/landlord-portfolio/domain/ports/cross-module-query.port';
+import { PortfolioCrossModuleQueryService } from '@modules/landlord-portfolio/infrastructure/repositories/portfolio-cross-module-query.service';
+import { LandlordPortfolioModule } from '@modules/landlord-portfolio/landlord-portfolio.module';
+import { CONTRACTS_CROSS_MODULE_QUERY } from '@modules/contracts/domain/ports/cross-module-query.port';
+import { ContractsCrossModuleQueryService } from '@modules/contracts/infrastructure/repositories/contracts-cross-module-query.service';
+import { ContractsModule } from '@modules/contracts/contracts.module';
+import { PAYMENTS_CROSS_MODULE_QUERY } from '@modules/payments/domain/ports/cross-module-query.port';
+import { PaymentsCrossModuleQueryService } from '@modules/payments/infrastructure/repositories/payments-cross-module-query.service';
+import { PaymentsModule } from '@modules/payments/payments.module';
 import { GetUserProfileUseCase } from './application/use-cases/get-user-profile.use-case';
 import { LoginUseCase } from './application/use-cases/login.use-case';
 import {
@@ -35,6 +44,9 @@ import ms from 'ms'
         signOptions: { expiresIn: config.get<ms.StringValue>('jwt.expiresIn') },
       }),
     }),
+    LandlordPortfolioModule,
+    forwardRef(() => ContractsModule),
+    PaymentsModule,
   ],
   controllers: [UsersController],
   providers: [
@@ -60,6 +72,18 @@ import ms from 'ms'
     {
       provide: PII_ENCRYPTOR,
       useClass: AES256PIIEncryptor,
+    },
+    {
+      provide: PORTFOLIO_CROSS_MODULE_QUERY,
+      useExisting: PortfolioCrossModuleQueryService,
+    },
+    {
+      provide: CONTRACTS_CROSS_MODULE_QUERY,
+      useExisting: ContractsCrossModuleQueryService,
+    },
+    {
+      provide: PAYMENTS_CROSS_MODULE_QUERY,
+      useExisting: PaymentsCrossModuleQueryService,
     },
   ],
   exports: [JwtModule, CheckAndRevokeAutoAssignedRoleUseCase],

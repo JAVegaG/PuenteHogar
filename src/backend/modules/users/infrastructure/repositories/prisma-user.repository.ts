@@ -1,15 +1,25 @@
-import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma-generated/client';
+import { Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from '@src/shared/prisma/prisma.service';
 import { UserEntity } from '@modules/users/domain/entities/user.entity';
 import {
   CreateUserData,
   IUserRepository,
 } from '@modules/users/domain/ports/user-repository.port';
+import * as PortfolioPort from '@modules/landlord-portfolio/domain/ports/cross-module-query.port';
+import * as ContractsPort from '@modules/contracts/domain/ports/cross-module-query.port';
+import * as PaymentsPort from '@modules/payments/domain/ports/cross-module-query.port';
 
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(PortfolioPort.PORTFOLIO_CROSS_MODULE_QUERY)
+    private readonly portfolioQuery: PortfolioPort.IPortfolioCrossModuleQuery,
+    @Inject(ContractsPort.CONTRACTS_CROSS_MODULE_QUERY)
+    private readonly contractsQuery: ContractsPort.IContractsCrossModuleQuery,
+    @Inject(PaymentsPort.PAYMENTS_CROSS_MODULE_QUERY)
+    private readonly paymentsQuery: PaymentsPort.IPaymentsCrossModuleQuery,
+  ) { }
 
   async findByMail(mail: string): Promise<UserEntity | null> {
     const user = await this.prisma.user.findUnique({
@@ -87,7 +97,7 @@ export class PrismaUserRepository implements IUserRepository {
 
       await tx.usersRaw.create({
         data: {
-          payload: JSON.stringify(data),
+          payload: data as any,
           processed: false,
         },
       });
@@ -170,76 +180,23 @@ export class PrismaUserRepository implements IUserRepository {
   }
 
   async hasActiveLeases(userId: string): Promise<boolean> {
-    const result = await this.prisma.$queryRaw<{ count: bigint }[]>(
-      Prisma.sql`
-        SELECT COUNT(*) as count
-        FROM "landlord_portfolio"."Lease" l
-        INNER JOIN "tracking_process"."LeaseCurrentStatus" lcs ON lcs."lease_id" = l."id"
-        INNER JOIN "tracking_process"."LeaseStatus" ls ON ls."id" = lcs."lease_status_id"
-        WHERE l."user_id" = ${userId}
-          AND ls."name" IN ('Vigente', 'Acordado')
-      `,
-    );
-    return Number(result[0].count) > 0;
+    return this.portfolioQuery.hasActiveLeases(userId);
   }
 
   async hasActiveContractsAsRole(userId: string, role: string): Promise<boolean> {
-    const result = await this.prisma.$queryRaw<{ count: bigint }[]>(
-      Prisma.sql`
-        SELECT COUNT(*) as count
-        FROM "contracts"."ContractParty" cp
-        INNER JOIN "contracts"."Contract" c ON c."id" = cp."contract_id"
-        INNER JOIN "contracts"."ContractStatus" cs ON cs."id" = c."contract_status_id"
-        WHERE cp."user_id" = ${userId}
-          AND cp."role_in_contract" = ${role}
-          AND cs."name" != 'SIGNED'
-      `,
-    );
-    return Number(result[0].count) > 0;
+    return this.contractsQuery.hasActiveContractsAsRole(userId, role);
   }
 
   async hasPendingPayments(userId: string): Promise<boolean> {
-    const result = await this.prisma.$queryRaw<{ count: bigint }[]>(
-      Prisma.sql`
-        SELECT COUNT(*) as count
-        FROM "payments"."ScheduledPayment" sp
-        INNER JOIN "landlord_portfolio"."Lease" l ON l."id" = sp."lease_id"
-        WHERE l."user_id" = ${userId}
-          AND NOT EXISTS (
-            SELECT 1 FROM "payments"."Payment" p
-            WHERE p."scheduled_payment_id" = sp."id"
-          )
-      `,
-    );
-    return Number(result[0].count) > 0;
+    return this.paymentsQuery.hasPendingPayments(userId);
   }
 
   async hasPortfoliosWithUnits(userId: string): Promise<boolean> {
-    const result = await this.prisma.$queryRaw<{ count: bigint }[]>(
-      Prisma.sql`
-        SELECT COUNT(*) as count
-        FROM "landlord_portfolio"."LandlordPortfolio" lp
-        INNER JOIN "landlord_portfolio"."PortfolioUnit" pu ON pu."portfolio_id" = lp."id"
-        WHERE lp."user_id" = ${userId}
-      `,
-    );
-    return Number(result[0].count) > 0;
+    return this.portfolioQuery.hasPortfoliosWithUnits(userId);
   }
 
   async hasActiveLeasesInPortfolios(userId: string): Promise<boolean> {
-    const result = await this.prisma.$queryRaw<{ count: bigint }[]>(
-      Prisma.sql`
-        SELECT COUNT(*) as count
-        FROM "landlord_portfolio"."LandlordPortfolio" lp
-        INNER JOIN "landlord_portfolio"."PortfolioUnit" pu ON pu."portfolio_id" = lp."id"
-        INNER JOIN "landlord_portfolio"."Lease" l ON l."portfolio_unit_id" = pu."id"
-        INNER JOIN "tracking_process"."LeaseCurrentStatus" lcs ON lcs."lease_id" = l."id"
-        INNER JOIN "tracking_process"."LeaseStatus" ls ON ls."id" = lcs."lease_status_id"
-        WHERE lp."user_id" = ${userId}
-          AND ls."name" IN ('Vigente', 'Acordado')
-      `,
-    );
-    return Number(result[0].count) > 0;
+    return this.portfolioQuery.hasActiveLeasesInPortfolios(userId);
   }
 
   async countUserRoles(userId: string): Promise<number> {
