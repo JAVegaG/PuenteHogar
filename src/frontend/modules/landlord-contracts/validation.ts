@@ -37,7 +37,11 @@ export function validateContractStep1(data: ContractFormData): Record<string, st
 
 export function validateContractStep2(data: ContractFormData): Record<string, string> {
     const errors: Record<string, string> = {};
-    if (!data.startDate) errors.startDate = 'La fecha de inicio es obligatoria';
+    if (!data.startDate) {
+        errors.startDate = 'La fecha de inicio es obligatoria';
+    } else if (isNaN(new Date(data.startDate).getTime())) {
+        errors.startDate = 'La fecha de inicio es obligatoria';
+    }
     if (data.startDate && data.endDate && new Date(data.endDate) <= new Date(data.startDate)) {
         errors.endDate = 'La fecha de fin debe ser posterior a la fecha de inicio';
     }

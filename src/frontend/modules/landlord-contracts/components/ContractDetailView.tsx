@@ -16,8 +16,11 @@ interface ContractDetailViewProps {
     contractId: string;
 }
 
-function formatDate(dateStr: string): string {
-    return new Date(dateStr).toLocaleDateString('es-CO', {
+export function formatDate(dateStr: string): string {
+    if (!dateStr) return '—';
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return '—';
+    return date.toLocaleDateString('es-CO', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
