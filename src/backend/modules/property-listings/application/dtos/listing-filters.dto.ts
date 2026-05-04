@@ -3,6 +3,11 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
 export class ListingFiltersDto {
+  @ApiPropertyOptional({ example: '76', description: 'Filtrar por departamento (código DANE)' })
+  @IsOptional()
+  @IsString()
+  department?: string;
+
   @ApiPropertyOptional({ example: 'Cali', description: 'Filtrar por ciudad' })
   @IsOptional()
   @IsString()
@@ -61,6 +66,14 @@ export class ListingFiltersDto {
   @IsNumber()
   @Type(() => Number)
   areaMax?: number;
+
+  @ApiPropertyOptional({
+    example: '{"uuid-1":"piscina","uuid-2":"2"}',
+    description: 'Características adicionales como JSON codificado (Record<string, string>)',
+  })
+  @IsOptional()
+  @IsString()
+  additionalFeatures?: string;
 
   @ApiPropertyOptional({ enum: ['24h', '7d', '30d', '90d', 'any'], description: 'Filtrar por antigüedad de publicación' })
   @IsOptional()

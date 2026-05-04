@@ -10,6 +10,7 @@ export interface CreateListingData {
 }
 
 export interface ListingFilters {
+  department?: string;
   city?: string;
   neighborhood?: string;
   search?: string;
@@ -20,6 +21,7 @@ export interface ListingFilters {
   bathrooms?: number;
   areaMin?: number;
   areaMax?: number;
+  additionalFeatures?: Record<string, string>;
   publishedWithin?: string;
   sortBy?: string;
   sortOrder?: string;
