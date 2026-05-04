@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaService } from '@src/shared/prisma/prisma.service';
 import { RedisService } from '@src/shared/redis/redis.service';
 import { S3ClientFactory } from '@src/shared/s3';
+import { NotificationsModule } from '@modules/notifications';
 import { PropertyListingsEtlService } from './infrastructure/etl/property-listings-etl.service';
 import { CreateListingUseCase, LISTING_CACHE, LISTING_REPOSITORY, NOTIFICATION_PORT, OBJECT_STORAGE } from './application/use-cases/create-listing.use-case';
 import { FindListingByUnitUseCase } from './application/use-cases/find-listing-by-unit.use-case';
@@ -13,12 +14,13 @@ import { SearchListingsUseCase } from './application/use-cases/search-listings.u
 import { UnpublishListingUseCase } from './application/use-cases/unpublish-listing.use-case';
 import { UpdateListingUseCase } from './application/use-cases/update-listing.use-case';
 import { ObjectStorageAdapter } from './infrastructure/adapters/object-storage.adapter';
+import { ListingNotificationAdapter } from './infrastructure/adapters/listing-notification.adapter';
 import { RedisListingCacheAdapter } from './infrastructure/adapters/redis-listing-cache.adapter';
 import { PrismaListingRepository } from './infrastructure/repositories/prisma-listing.repository';
 import { PropertyListingsController } from './property-listings.controller';
 
 @Module({
-  imports: [ConfigModule],
+  imports: [ConfigModule, NotificationsModule],
   controllers: [PropertyListingsController],
   providers: [
     PrismaService,
@@ -47,11 +49,7 @@ import { PropertyListingsController } from './property-listings.controller';
     },
     {
       provide: NOTIFICATION_PORT,
-      useValue: {
-        notifyLandlordOfInterest: async () => {
-          // stub — notifications module will handle this
-        },
-      },
+      useClass: ListingNotificationAdapter,
     },
   ],
   exports: [
