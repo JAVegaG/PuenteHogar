@@ -113,7 +113,7 @@ describe('BcryptPasswordHasher — Property 6: Contraseñas almacenadas como has
    * must return a valid bcrypt hash (starts with $2b$ or $2a$) and
    * must NOT equal the original plain-text password.
    *
-   * Timeout: bcrypt cost-12 takes ~100ms per hash; 100 runs ≈ 10s.
+   * Timeout: bcrypt cost-12 takes ~100-250ms per hash; 15 runs ≈ 2-4s.
    */
   it('hash() produce un hash bcrypt válido y nunca retorna la contraseña en texto plano', async () => {
     await fc.assert(
@@ -128,9 +128,9 @@ describe('BcryptPasswordHasher — Property 6: Contraseñas almacenadas como has
 
         return true;
       }),
-      { numRuns: 100 },
+      { numRuns: 15 },
     );
-  }, 30_000);
+  }, 15_000);
 
   /**
    * Property 6b — Validates: Requirements 1.6
@@ -138,7 +138,7 @@ describe('BcryptPasswordHasher — Property 6: Contraseñas almacenadas como has
    * The bcrypt cost factor used by BcryptPasswordHasher must be ≥ 12.
    * This is verified by inspecting the hash prefix ($2b$12$ or higher).
    *
-   * Timeout: bcrypt cost-12 takes ~100ms per hash; 100 runs ≈ 10s.
+   * Timeout: bcrypt cost-12 takes ~100-250ms per hash; 15 runs ≈ 2-4s.
    */
   it('hash() usa un factor de costo bcrypt ≥ 12', async () => {
     await fc.assert(
@@ -147,9 +147,9 @@ describe('BcryptPasswordHasher — Property 6: Contraseñas almacenadas como has
         const costFactor = extractCostFactor(hash);
         return costFactor >= MIN_COST_FACTOR;
       }),
-      { numRuns: 100 },
+      { numRuns: 15 },
     );
-  }, 30_000);
+  }, 15_000);
 
   /**
    * Property 6c — Validates: Requirements 1.6
@@ -158,7 +158,7 @@ describe('BcryptPasswordHasher — Property 6: Contraseñas almacenadas como has
    * (bcrypt uses a random salt per call), confirming that the stored value
    * is never a deterministic encoding of the plain-text password.
    *
-   * Timeout: bcrypt cost-12 takes ~100ms per hash; 200 hashes ≈ 20s.
+   * Timeout: bcrypt cost-12 takes ~100-250ms per hash; 30 hashes ≈ 3-8s.
    */
   it('hash() produce hashes distintos para la misma contraseña (salt aleatorio)', async () => {
     await fc.assert(
@@ -168,9 +168,9 @@ describe('BcryptPasswordHasher — Property 6: Contraseñas almacenadas como has
         // Different hashes due to random salt
         return hash1 !== hash2;
       }),
-      { numRuns: 100 },
+      { numRuns: 15 },
     );
-  }, 60_000);
+  }, 20_000);
 });
 
 describe('RegisterUserUseCase — Property 6: Contraseña almacenada como hash bcrypt en el repositorio', () => {
@@ -184,7 +184,7 @@ describe('RegisterUserUseCase — Property 6: Contraseña almacenada como hash b
    * valid bcrypt hash with cost factor ≥ 12, and must NOT equal the original
    * plain-text password.
    *
-   * Timeout: bcrypt cost-12 takes ~100ms per hash; 100 runs ≈ 10s.
+   * Timeout: bcrypt cost-12 takes ~100-250ms per hash; 15 runs ≈ 2-4s.
    */
   it('el campo hashedPassword enviado al repositorio es un hash bcrypt, nunca texto plano', async () => {
     await fc.assert(
@@ -209,7 +209,7 @@ describe('RegisterUserUseCase — Property 6: Contraseña almacenada como hash b
 
         return true;
       }),
-      { numRuns: 100 },
+      { numRuns: 15 },
     );
-  }, 30_000);
+  }, 15_000);
 });

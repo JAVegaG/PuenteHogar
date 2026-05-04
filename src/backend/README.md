@@ -191,7 +191,7 @@ npm run lint               # ESLint
 npm run migration:run      # Aplica migraciones Prisma (desde src/backend/)
 npm run migration:generate # Genera nueva migración (desde src/backend/)
 npm run db:studio          # Prisma Studio
-npm run db:seed            # Seed de catálogos (roles, tipos de documento, tipos de propiedad, departamentos/ciudades DANE, estados)
+npm run db:seed            # Seed de catálogos (roles, tipos de documento, tipos de propiedad, departamentos/ciudades DANE, estados, tipos de notificación)
 ```
 
 ## Variables de entorno
