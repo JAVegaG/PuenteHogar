@@ -232,7 +232,7 @@ _These tasks address UX issues discovered during manual testing after the initia
     - Pages to update: `mi-portafolio`, `mis-contratos`, `mis-contratos-arrendatario`, `mis-arriendos`, `mis-pagos`, `mis-ingresos`, `explorar` (when authenticated)
     - _Requirements: 14.2, 14.4_
 
-- [ ] 12. Post-fix checkpoint — build and verify
+- [x] 12. Post-fix checkpoint — build and verify
   - Ensure `npm run build` passes for both frontend and backend
   - Ensure `npm run test` passes for backend
   - Verify notifications display human-readable messages, Spanish labels, delete works, and badge appears on hamburger icon
