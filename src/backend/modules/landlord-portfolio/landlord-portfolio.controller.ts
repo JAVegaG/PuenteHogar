@@ -40,6 +40,7 @@ import { CreateLeaseUseCase } from './application/use-cases/create-lease.use-cas
 import { UpdatePortfolioUseCase } from './application/use-cases/update-portfolio.use-case';
 import { DeletePortfolioUseCase } from './application/use-cases/delete-portfolio.use-case';
 import { DeleteUnitUseCase } from './application/use-cases/delete-unit.use-case';
+import { CancelLeaseUseCase } from './application/use-cases/cancel-lease.use-case';
 import { UpdatePortfolioDto } from './application/dtos/update-portfolio.dto';
 
 interface AuthenticatedRequest extends Request {
@@ -64,6 +65,7 @@ export class LandlordPortfolioController {
     private readonly updatePortfolioUseCase: UpdatePortfolioUseCase,
     private readonly deletePortfolioUseCase: DeletePortfolioUseCase,
     private readonly deleteUnitUseCase: DeleteUnitUseCase,
+    private readonly cancelLeaseUseCase: CancelLeaseUseCase,
   ) { }
 
   @Public()
@@ -233,5 +235,20 @@ export class LandlordPortfolioController {
     @Req() req: AuthenticatedRequest,
   ) {
     return this.deleteUnitUseCase.execute(portfolioId, id, req.user.id);
+  }
+
+  @Delete(':portfolioId/units/:unitId/leases/:leaseId')
+  @ApiOperation({ summary: 'Cancelar arriendo', description: 'Cancela un arriendo en estado Acordado. Si tiene contrato pendiente, lo elimina.' })
+  @ApiOkResponse({ description: 'Arriendo cancelado exitosamente' })
+  @ApiForbiddenResponse({ description: 'No tienes permiso para cancelar este arriendo' })
+  @ApiNotFoundResponse({ description: 'Portafolio, unidad o arriendo no encontrado' })
+  @ApiConflictResponse({ description: 'No se puede cancelar — arriendo no está en estado Acordado o tiene contrato firmado' })
+  cancelLease(
+    @Param('portfolioId') portfolioId: string,
+    @Param('unitId') unitId: string,
+    @Param('leaseId') leaseId: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.cancelLeaseUseCase.execute(portfolioId, unitId, leaseId, req.user.id);
   }
 }
