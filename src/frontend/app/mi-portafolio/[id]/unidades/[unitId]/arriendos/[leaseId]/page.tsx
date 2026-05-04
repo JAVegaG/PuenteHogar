@@ -91,12 +91,12 @@ function LeaseDetailContent() {
         fetchData();
     }, [fetchData]);
 
-    const leasesListPath = `/mi-portafolio/${portfolioId}/unidades/${unitId}/arriendos`;
+    const unitDetailPath = `/mi-portafolio/${portfolioId}/unidades/${unitId}`;
 
     const backButton = (
         <Link
-            href={leasesListPath}
-            aria-label="Volver a arriendos de la unidad"
+            href={unitDetailPath}
+            aria-label="Volver al detalle de la unidad"
             className="flex items-center justify-center w-[44px] h-[44px] rounded-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
             <svg
@@ -138,11 +138,11 @@ function LeaseDetailContent() {
                                     El arriendo que buscas no existe o fue eliminado.
                                 </p>
                                 <Link
-                                    href={leasesListPath}
+                                    href={unitDetailPath}
                                     className="inline-block mt-[16px] text-caption font-medium"
                                     style={{ color: '#1d4ed8' }}
                                 >
-                                    Volver a arriendos de la unidad
+                                    Volver al detalle de la unidad
                                 </Link>
                             </div>
                         ) : error ? (

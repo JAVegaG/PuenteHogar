@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import { StatusBadge } from '@/shared/components/StatusBadge';
 import { formatPrice } from '@/shared/utils/formatPrice';
 import type { LeaseDetail } from '../types';
 
@@ -36,9 +37,16 @@ export function LeaseDetailView({ lease, portfolioId, unitId }: LeaseDetailViewP
 
     return (
         <div className="flex flex-col gap-[24px]">
-            {/* Inmueble */}
-            <section>
-                <h2 className="text-h3 font-semibold mb-[12px]" style={{ color: '#111827' }}>
+            {/* Inmueble Card */}
+            <section
+                className="border border-neutral-200 rounded-card bg-white p-4"
+                aria-labelledby="section-inmueble"
+            >
+                <h2
+                    id="section-inmueble"
+                    className="text-h3 font-semibold mb-[12px]"
+                    style={{ color: '#111827' }}
+                >
                     Inmueble
                 </h2>
                 <div className="flex flex-col gap-[12px]">
@@ -53,9 +61,16 @@ export function LeaseDetailView({ lease, portfolioId, unitId }: LeaseDetailViewP
                 </div>
             </section>
 
-            {/* Arrendatario */}
-            <section>
-                <h2 className="text-h3 font-semibold mb-[12px]" style={{ color: '#111827' }}>
+            {/* Arrendatario Card */}
+            <section
+                className="border border-neutral-200 rounded-card bg-white p-4"
+                aria-labelledby="section-arrendatario"
+            >
+                <h2
+                    id="section-arrendatario"
+                    className="text-h3 font-semibold mb-[12px]"
+                    style={{ color: '#111827' }}
+                >
                     Arrendatario
                 </h2>
                 <div className="flex flex-col gap-[12px]">
@@ -69,9 +84,16 @@ export function LeaseDetailView({ lease, portfolioId, unitId }: LeaseDetailViewP
                 </div>
             </section>
 
-            {/* Acuerdo */}
-            <section>
-                <h2 className="text-h3 font-semibold mb-[12px]" style={{ color: '#111827' }}>
+            {/* Acuerdo Card */}
+            <section
+                className="border border-neutral-200 rounded-card bg-white p-4"
+                aria-labelledby="section-acuerdo"
+            >
+                <h2
+                    id="section-acuerdo"
+                    className="text-h3 font-semibold mb-[12px]"
+                    style={{ color: '#111827' }}
+                >
                     Acuerdo
                 </h2>
                 <div className="flex flex-col gap-[12px]">
@@ -83,21 +105,41 @@ export function LeaseDetailView({ lease, portfolioId, unitId }: LeaseDetailViewP
                             {formatPrice(lease.monthlyAmount)}
                         </span>
                     </div>
-                    <DetailField label="Fecha de acuerdo" value={formatDateDMY(lease.startDate)} />
-                    <DetailField label="Fecha de inicio propuesta" value={formatDateDMY(lease.startDate)} />
+                    <DetailField label="Fecha de inicio" value={formatDateDMY(lease.startDate)} />
+                    {lease.endDate && (
+                        <DetailField label="Fecha de fin" value={formatDateDMY(lease.endDate)} />
+                    )}
+                    {hasContract && (
+                        <>
+                            <div className="flex flex-col gap-[2px]">
+                                <span className="text-caption font-medium" style={{ color: '#4b5563' }}>
+                                    Contrato
+                                </span>
+                                <Link
+                                    href={basePath}
+                                    className="text-body font-medium"
+                                    style={{ color: '#1d4ed8' }}
+                                >
+                                    Ver contrato
+                                </Link>
+                            </div>
+                            {lease.contractStatus && (
+                                <div className="flex flex-col gap-[2px]">
+                                    <span className="text-caption font-medium" style={{ color: '#4b5563' }}>
+                                        Estado del contrato
+                                    </span>
+                                    <div>
+                                        <StatusBadge status={lease.contractStatus} variant="contract" />
+                                    </div>
+                                </div>
+                            )}
+                        </>
+                    )}
                 </div>
             </section>
 
             {/* Bottom action button */}
-            {hasContract ? (
-                <Link
-                    href={basePath}
-                    className="inline-flex items-center justify-center w-full min-h-[44px] px-[16px] py-[12px] text-body font-semibold rounded-[6px] transition-colors text-center"
-                    style={{ backgroundColor: '#1d4ed8', color: '#ffffff' }}
-                >
-                    Ver contrato
-                </Link>
-            ) : (
+            {!hasContract && (
                 <Link
                     href={`${basePath}/crear-contrato`}
                     className="inline-flex items-center justify-center w-full min-h-[44px] px-[16px] py-[12px] text-body font-semibold rounded-[6px] transition-colors text-center"
