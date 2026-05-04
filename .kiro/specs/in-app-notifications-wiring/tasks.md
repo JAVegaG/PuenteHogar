@@ -216,7 +216,7 @@ _These tasks address UX issues discovered during manual testing after the initia
     - Remove the card from the list optimistically
     - _Requirements: 13.4, 13.5_
 
-- [ ] 11. Add notification badge to hamburger menu icon
+- [x] 11. Add notification badge to hamburger menu icon
   - [x] 11.1 Create shared `useUnreadNotificationCount` hook
     - Create a reusable hook that fetches `GET /notifications/count` and returns the unread count
     - Avoid duplicating the fetch logic across every page
@@ -227,7 +227,7 @@ _These tasks address UX issues discovered during manual testing after the initia
     - When > 0, render a small red dot indicator on the hamburger menu button
     - _Requirements: 14.1, 14.3_
 
-  - [~] 11.3 Wire unread count into all authenticated pages
+  - [x] 11.3 Wire unread count into all authenticated pages
     - Update all pages that render `SideMenu` to use the shared hook and pass the count to both `Header` and `SideMenu`
     - Pages to update: `mi-portafolio`, `mis-contratos`, `mis-contratos-arrendatario`, `mis-arriendos`, `mis-pagos`, `mis-ingresos`, `explorar` (when authenticated)
     - _Requirements: 14.2, 14.4_
