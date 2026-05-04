@@ -30,12 +30,12 @@ export class PortfolioNotificationAdapter implements IPortfolioNotificationPort 
         leaseId: string,
     ): Promise<void> {
         if (!tenantUserId) return;
-        const propertyName = await this.resolvePropertyNameFromLease(leaseId);
+        const unitName = await this.resolveUnitNameFromLease(leaseId);
         await this.sendNotification.execute({
             userId: tenantUserId,
             notificationTypeName: 'LEASE_CANCELLED',
             eventSource: 'lease.cancelled',
-            data: { leaseId, propertyName },
+            data: { leaseId, unitName },
         });
     }
 
@@ -66,10 +66,10 @@ export class PortfolioNotificationAdapter implements IPortfolioNotificationPort 
     }
 
     /**
-     * Resolves property name from a lease by following:
-     * Lease → portfolio_unit_id → PortfolioUnit → portfolio_id → LandlordPortfolio.name
+     * Resolves unit name from a lease by following:
+     * Lease → portfolio_unit_id → PortfolioUnit.name
      */
-    private async resolvePropertyNameFromLease(leaseId: string): Promise<string | undefined> {
+    private async resolveUnitNameFromLease(leaseId: string): Promise<string | undefined> {
         try {
             const lease = await this.prisma.lease.findUnique({
                 where: { id: leaseId },
@@ -79,16 +79,10 @@ export class PortfolioNotificationAdapter implements IPortfolioNotificationPort 
 
             const unit = await this.prisma.portfolioUnit.findUnique({
                 where: { id: lease.portfolio_unit_id },
-                select: { portfolio_id: true, name: true },
-            });
-            if (!unit?.portfolio_id) return undefined;
-
-            const portfolio = await this.prisma.landlordPortfolio.findUnique({
-                where: { id: unit.portfolio_id },
                 select: { name: true },
             });
 
-            return unit.name || portfolio?.name || undefined;
+            return unit?.name || undefined;
         } catch {
             return undefined;
         }

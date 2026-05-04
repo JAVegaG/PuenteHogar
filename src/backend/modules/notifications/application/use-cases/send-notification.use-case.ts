@@ -26,7 +26,9 @@ export function buildNotificationContent(
         title: 'Contrato firmado',
         message: data.propertyName
           ? `Un contrato ha sido firmado exitosamente para tu inmueble **${String(data.propertyName)}**.`
-          : 'Un contrato ha sido firmado exitosamente.',
+          : data.unitName
+            ? `Un contrato ha sido firmado exitosamente para tu arriendo en **${String(data.unitName)}**.`
+            : 'Un contrato ha sido firmado exitosamente.',
       };
     case 'PAYMENT_RECEIVED':
       return {
@@ -47,8 +49,8 @@ export function buildNotificationContent(
     case 'CONTRACT_UPLOADED':
       return {
         title: 'Contrato cargado',
-        message: data.propertyName
-          ? `Se ha cargado un contrato para tu arriendo en **${String(data.propertyName)}**.`
+        message: data.unitName
+          ? `Se ha cargado un contrato para tu arriendo en **${String(data.unitName)}**.`
           : 'Se ha cargado un contrato para tu arriendo.',
       };
     case 'NEW_INTEREST':
@@ -61,15 +63,15 @@ export function buildNotificationContent(
     case 'LEASE_CREATED':
       return {
         title: 'Arriendo creado',
-        message: data.propertyName
-          ? `Se ha creado un nuevo arriendo en **${String(data.propertyName)}**${data.unitName ? ` (**${String(data.unitName)}**)` : ''} para ti.`
+        message: data.unitName
+          ? `Se ha creado un nuevo arriendo en **${String(data.unitName)}** para ti.`
           : 'Se ha creado un nuevo arriendo para ti.',
       };
     case 'LEASE_CANCELLED':
       return {
         title: 'Arriendo cancelado',
-        message: data.propertyName
-          ? `El arriendo en **${String(data.propertyName)}** ha sido cancelado.`
+        message: data.unitName
+          ? `El arriendo en **${String(data.unitName)}** ha sido cancelado.`
           : 'Un arriendo ha sido cancelado.',
       };
     default:

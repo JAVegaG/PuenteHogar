@@ -16,24 +16,25 @@ export class ContractNotificationAdapter implements INotificationPort {
         contractId: string,
         signedAt: Date,
     ): Promise<void> {
-        const propertyName = await this.resolvePropertyNameFromContract(contractId);
-        const data = { contractId, signedAt: signedAt.toISOString(), propertyName };
+        const { propertyName, unitName } = await this.resolveNamesFromContract(contractId);
+        const landlordData = { contractId, signedAt: signedAt.toISOString(), propertyName };
+        const tenantData = { contractId, signedAt: signedAt.toISOString(), unitName };
         await this.sendNotification.execute({
             userId: landlordUserId,
             notificationTypeName: 'CONTRACT_SIGNED',
             eventSource: 'contract.signed',
-            data,
+            data: landlordData,
         });
         await this.sendNotification.execute({
             userId: tenantUserId,
             notificationTypeName: 'CONTRACT_SIGNED',
             eventSource: 'contract.signed',
-            data,
+            data: tenantData,
         });
     }
 
     async notifySigningFailed(userId: string, contractId: string): Promise<void> {
-        const propertyName = await this.resolvePropertyNameFromContract(contractId);
+        const { propertyName } = await this.resolveNamesFromContract(contractId);
         await this.sendNotification.execute({
             userId,
             notificationTypeName: 'CONTRACT_SIGNED',
@@ -48,37 +49,68 @@ export class ContractNotificationAdapter implements INotificationPort {
         leaseId: string,
     ): Promise<void> {
         if (!tenantUserId) return;
-        const propertyName = await this.resolvePropertyNameFromLease(leaseId);
+        const unitName = await this.resolveUnitNameFromLease(leaseId);
         await this.sendNotification.execute({
             userId: tenantUserId,
             notificationTypeName: 'CONTRACT_UPLOADED',
             eventSource: 'contract.uploaded',
-            data: { contractId, leaseId, propertyName },
+            data: { contractId, leaseId, unitName },
         });
     }
 
     /**
-     * Resolves property name from a contract by following:
-     * Contract → lease_id → Lease → portfolio_unit_id → PortfolioUnit → portfolio_id → LandlordPortfolio.name
+     * Resolves both portfolio name (for landlord) and unit name (for tenant) from a contract.
+     * Contract → lease_id → Lease → portfolio_unit_id → PortfolioUnit + LandlordPortfolio
      */
-    private async resolvePropertyNameFromContract(contractId: string): Promise<string | undefined> {
+    private async resolveNamesFromContract(contractId: string): Promise<{ propertyName?: string; unitName?: string }> {
         try {
             const contract = await this.prisma.contract.findUnique({
                 where: { id: contractId },
                 select: { lease_id: true },
             });
-            if (!contract?.lease_id) return undefined;
-            return this.resolvePropertyNameFromLease(contract.lease_id);
+            if (!contract?.lease_id) return {};
+            return this.resolveNamesFromLease(contract.lease_id);
         } catch {
-            return undefined;
+            return {};
         }
     }
 
     /**
-     * Resolves property name from a lease by following:
-     * Lease → portfolio_unit_id → PortfolioUnit → portfolio_id → LandlordPortfolio.name
+     * Resolves both portfolio name and unit name from a lease.
+     * Lease → portfolio_unit_id → PortfolioUnit.name + LandlordPortfolio.name
      */
-    private async resolvePropertyNameFromLease(leaseId: string): Promise<string | undefined> {
+    private async resolveNamesFromLease(leaseId: string): Promise<{ propertyName?: string; unitName?: string }> {
+        try {
+            const lease = await this.prisma.lease.findUnique({
+                where: { id: leaseId },
+                select: { portfolio_unit_id: true },
+            });
+            if (!lease?.portfolio_unit_id) return {};
+
+            const unit = await this.prisma.portfolioUnit.findUnique({
+                where: { id: lease.portfolio_unit_id },
+                select: { portfolio_id: true, name: true },
+            });
+            if (!unit?.portfolio_id) return {};
+
+            const portfolio = await this.prisma.landlordPortfolio.findUnique({
+                where: { id: unit.portfolio_id },
+                select: { name: true },
+            });
+
+            return {
+                propertyName: portfolio?.name || undefined,
+                unitName: unit.name || undefined,
+            };
+        } catch {
+            return {};
+        }
+    }
+
+    /**
+     * Resolves only the unit name from a lease (for tenant-facing notifications).
+     */
+    private async resolveUnitNameFromLease(leaseId: string): Promise<string | undefined> {
         try {
             const lease = await this.prisma.lease.findUnique({
                 where: { id: leaseId },
@@ -88,18 +120,10 @@ export class ContractNotificationAdapter implements INotificationPort {
 
             const unit = await this.prisma.portfolioUnit.findUnique({
                 where: { id: lease.portfolio_unit_id },
-                select: { portfolio_id: true, name: true },
-            });
-            if (!unit?.portfolio_id) return undefined;
-
-            const portfolio = await this.prisma.landlordPortfolio.findUnique({
-                where: { id: unit.portfolio_id },
                 select: { name: true },
             });
-            if (!portfolio?.name) return undefined;
 
-            // Use unit name if available, otherwise portfolio name
-            return unit.name || portfolio.name;
+            return unit?.name || undefined;
         } catch {
             return undefined;
         }
