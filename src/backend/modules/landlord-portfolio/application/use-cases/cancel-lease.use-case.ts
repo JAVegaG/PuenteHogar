@@ -1,18 +1,23 @@
 import {
     ConflictException,
     ForbiddenException,
+    Inject,
     Injectable,
     NotFoundException,
 } from '@nestjs/common';
 import { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
 import { PrismaService } from '@src/shared/prisma/prisma.service';
 import { softDeleteData } from '@src/shared/prisma/soft-delete.utils';
+import { PORTFOLIO_NOTIFICATION_PORT } from '../../domain/ports/notification.port';
+import type { IPortfolioNotificationPort } from '../../domain/ports/notification.port';
 
 @Injectable()
 export class CancelLeaseUseCase {
     constructor(
         private readonly prisma: PrismaService,
         private readonly auditLogger: AuditLoggerService,
+        @Inject(PORTFOLIO_NOTIFICATION_PORT)
+        private readonly notificationPort: IPortfolioNotificationPort,
     ) { }
 
     async execute(
@@ -140,5 +145,10 @@ export class CancelLeaseUseCase {
                 contractId: contract?.id ?? null,
             },
         });
+
+        // 8. Fire-and-forget notification to tenant
+        if (lease.user_id) {
+            this.notificationPort.notifyLeaseCancelled(lease.user_id, leaseId).catch(() => undefined);
+        }
     }
 }
