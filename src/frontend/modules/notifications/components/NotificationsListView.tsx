@@ -9,6 +9,7 @@ interface NotificationsListViewProps {
     notifications: InAppNotification[];
     onMarkAsRead: (id: string) => void;
     onMarkAllAsRead: () => void;
+    onDelete?: (id: string) => Promise<void>;
 }
 
 function formatRelativeDate(dateStr: string): string {
@@ -32,14 +33,28 @@ function formatRelativeDate(dateStr: string): string {
     });
 }
 
+function TrashIcon() {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+        </svg>
+    );
+}
+
 export default function NotificationsListView({
     notifications,
     onMarkAsRead,
     onMarkAllAsRead,
+    onDelete,
 }: NotificationsListViewProps) {
     const [readIds, setReadIds] = useState<Set<string>>(new Set());
+    const [removedIds, setRemovedIds] = useState<Set<string>>(new Set());
+    const [deleteError, setDeleteError] = useState<string | null>(null);
 
-    const hasUnread = notifications.some(
+    const visibleNotifications = notifications.filter((n) => !removedIds.has(n.id));
+
+    const hasUnread = visibleNotifications.some(
         (n) => !n.read && !readIds.has(n.id)
     );
 
@@ -53,14 +68,33 @@ export default function NotificationsListView({
 
     function handleMarkAllAsRead() {
         const newReadIds = new Set(readIds);
-        notifications.forEach((n) => {
+        visibleNotifications.forEach((n) => {
             if (!n.read) newReadIds.add(n.id);
         });
         setReadIds(newReadIds);
         onMarkAllAsRead();
     }
 
-    if (notifications.length === 0) {
+    async function handleDelete(e: React.MouseEvent | React.KeyboardEvent, notificationId: string) {
+        e.stopPropagation();
+        if (!onDelete) return;
+
+        setDeleteError(null);
+        setRemovedIds((prev) => new Set(prev).add(notificationId));
+
+        try {
+            await onDelete(notificationId);
+        } catch {
+            setRemovedIds((prev) => {
+                const next = new Set(prev);
+                next.delete(notificationId);
+                return next;
+            });
+            setDeleteError('No se pudo eliminar la notificación. Intenta de nuevo.');
+        }
+    }
+
+    if (visibleNotifications.length === 0) {
         return (
             <div className="flex flex-col gap-6">
                 <div className="text-center py-section-gap" role="status" aria-live="polite">
@@ -94,8 +128,14 @@ export default function NotificationsListView({
                 </div>
             )}
 
+            {deleteError && (
+                <div role="alert" className="text-caption text-red-600 bg-red-50 border border-red-200 rounded-[6px] p-3">
+                    {deleteError}
+                </div>
+            )}
+
             <div className="flex flex-col gap-4" role="list">
-                {notifications.map((notification) => {
+                {visibleNotifications.map((notification) => {
                     const isUnread = !notification.read && !readIds.has(notification.id);
 
                     return (
@@ -110,9 +150,25 @@ export default function NotificationsListView({
                                     handleCardClick(notification);
                                 }
                             }}
-                            className={`border border-neutral-300 rounded-[6px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] bg-white p-4 min-h-[44px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-colors ${isUnread ? 'border-l-4 border-l-primary' : ''
+                            className={`relative border border-neutral-300 rounded-[6px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] bg-white p-4 pr-14 min-h-[44px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-colors ${isUnread ? 'border-l-4 border-l-primary' : ''
                                 }`}
                         >
+                            {onDelete && (
+                                <button
+                                    type="button"
+                                    onClick={(e) => handleDelete(e, notification.id)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault();
+                                            handleDelete(e, notification.id);
+                                        }
+                                    }}
+                                    aria-label={`Eliminar notificación: ${notification.title}`}
+                                    className="absolute top-2 right-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-neutral-400 hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-[6px] transition-colors"
+                                >
+                                    <TrashIcon />
+                                </button>
+                            )}
                             <p className="text-small text-primary font-medium">
                                 {translateNotificationType(notification.notificationType)}
                             </p>

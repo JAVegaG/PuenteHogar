@@ -95,6 +95,18 @@ function NotificationsPageContent() {
         }
     }, [user?.accessToken]);
 
+    const handleDelete = useCallback(async (id: string) => {
+        const token = user?.accessToken;
+        if (!token) return;
+        const notification = notifications.find((n) => n.id === id);
+        const wasUnread = notification && !notification.read;
+        await notificationService.deleteNotification(id, token);
+        setNotifications((prev) => prev.filter((n) => n.id !== id));
+        if (wasUnread) {
+            setUnreadCount((prev) => (prev != null && prev > 0 ? prev - 1 : 0));
+        }
+    }, [user?.accessToken, notifications]);
+
     const sideMenuUser = user
         ? { name: user.displayName, role: translateRole(user.roles[0]), roles: user.roles }
         : null;
@@ -129,6 +141,7 @@ function NotificationsPageContent() {
                             notifications={notifications}
                             onMarkAsRead={handleMarkAsRead}
                             onMarkAllAsRead={handleMarkAllAsRead}
+                            onDelete={handleDelete}
                         />
                     )}
                 </div>
