@@ -85,7 +85,7 @@ Replace empty notification port stubs in four backend modules (contracts, paymen
     - Add `{ provide: PORTFOLIO_NOTIFICATION_PORT, useClass: PortfolioNotificationAdapter }` to `providers`
     - _Requirements: 4.4, 4.5, 9.4, 9.6_
 
-  - [~] 3.9 Create `ListingNotificationAdapter`
+  - [x] 3.9 Create `ListingNotificationAdapter`
     - Create file `src/backend/modules/property-listings/infrastructure/adapters/listing-notification.adapter.ts`
     - Implement `INotificationPort` (from property-listings) with `@Injectable()` decorator
     - Inject `SendNotificationUseCase` via constructor
