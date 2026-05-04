@@ -172,7 +172,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - On success, navigate to unit detail page and display a success toast/message
     - _Requirements: 8.1, 8.2, 8.5, 8.6_
 
-- [ ] 13. Frontend: Contract screens visual consistency
+- [x] 13. Frontend: Contract screens visual consistency
   - [x] 13.1 Update ContractDetailView with card-based sections
     - In `src/frontend/modules/landlord-contracts/components/ContractDetailView.tsx`, wrap existing sections in card containers with `border border-neutral-200 rounded-card bg-white p-4`
     - Organize into three card sections: "Términos" (dates, status), "Partes" (landlord and tenant), "Documento" (file download, replace, delete actions)
@@ -180,7 +180,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - Use design system typography tokens (`text-h2`, `text-h3`, `text-body`, `text-caption`)
     - _Requirements: 9.2, 9.4_
 
-  - [ ] 13.2 Update ContractWizard with design system consistency
+  - [x] 13.2 Update ContractWizard with design system consistency
     - In `src/frontend/modules/landlord-contracts/components/ContractWizard.tsx`, ensure all CTAs use Primary_Button_Style
     - Verify design system typography tokens are used throughout
     - Ensure consistent input field styling matching the platform patterns
