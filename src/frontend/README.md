@@ -156,7 +156,7 @@ src/frontend/
 │   │   └── types.ts                   # Interfaces: Listing, ListingDetail, ListingFilters, AdditionalFeature, etc.
 │   ├── notifications/
 │   │   ├── components/
-│   │   │   ├── NotificationsListView.tsx  # Lista de tarjetas de notificación (leído/no leído, marcar como leída)
+│   │   │   ├── NotificationsListView.tsx  # Lista de tarjetas de notificación (leído/no leído, marcar como leída, eliminar, bold en nombres dinámicos, estado vacío con CTA)
 │   │   │   └── PreferencesView.tsx        # Preferencias de canales externos (toggles EMAIL/WHATSAPP)
 │   │   └── utils/
 │   │       ├── translate-notification-type.test.ts  # Tests de traducción de tipos de notificación
@@ -208,7 +208,8 @@ src/frontend/
 │   │   └── WizardProgress.tsx     # Indicador visual de progreso multi-paso (pasos numerados, checks, conectores)
 │   ├── hooks/
 │   │   ├── useBodyScrollLock.ts   # Bloqueo de scroll para modales/drawers
-│   │   └── useDebounce.ts        # Debounce genérico (default 400ms)
+│   │   ├── useDebounce.ts        # Debounce genérico (default 400ms)
+│   │   └── useUnreadNotificationCount.ts  # Conteo de notificaciones no leídas (reutilizable)
 │   ├── services/
 │   │   ├── accounting.ts         # AccountingService (getAggregatedReport, getIndividualReport)
 │   │   ├── api.ts                # Servicio HTTP listings (fetchListings, fetchListingDetail, createListing)
@@ -293,7 +294,7 @@ Autenticación y perfil de usuario: login con email/contraseña, registro multi-
 
 ### notifications
 
-Notificaciones in-app y preferencias de canales externos: historial de notificaciones con indicador leído/no leído, marcar como leída individual o masiva, enlace a preferencias, página de preferencias con toggles EMAIL/WHATSAPP por tipo de notificación con UI optimista, banner informativo de canal in-app siempre activo, y helper de traducción de tipos de notificación al español (CONTRACT_SIGNED, PAYMENT_RECEIVED, CONTACT_INITIATED, CONTRACT_UPLOADED, PAYMENT_DUE, NEW_INTEREST) con fallback automático para tipos desconocidos. Componentes: NotificationsListView, PreferencesView.
+Notificaciones in-app y preferencias de canales externos: historial de notificaciones con indicador leído/no leído, marcar como leída individual o masiva, eliminación individual de notificaciones (soft-delete con UI optimista), enlace a preferencias, página de preferencias con toggles EMAIL/WHATSAPP por tipo de notificación con UI optimista, banner informativo de canal in-app siempre activo, y helper de traducción de tipos de notificación al español (CONTRACT_SIGNED, PAYMENT_RECEIVED, CONTACT_INITIATED, CONTRACT_UPLOADED, PAYMENT_DUE, NEW_INTEREST, LEASE_CREATED, LEASE_CANCELLED) con fallback automático para tipos desconocidos. Componentes: NotificationsListView, PreferencesView.
 
 ### tenant
 
@@ -326,7 +327,7 @@ Publicación de unidades: formulario para publicar una unidad del portafolio com
 | `Button` | Botón primary/secondary reutilizable |
 | `EmptyState` | Estado vacío (sin resultados) |
 | `ErrorState` | Estado de error con retry |
-| `Header` | Encabezado fijo (hamburguesa/back + título) |
+| `Header` | Encabezado fijo (hamburguesa/back + título, badge de notificaciones no leídas en hamburguesa) |
 | `ListingCardSkeleton` | Skeleton para tarjeta de listing |
 | `ListingDetailSkeleton` | Skeleton para detalle de listing |
 | `ListingGridSkeleton` | Skeleton para grilla de listings |
@@ -348,7 +349,7 @@ Publicación de unidades: formulario para publicar una unidad del portafolio com
 | Accounting | `accounting.ts` | getAggregatedReport, getIndividualReport |
 | Contract | `contract.ts` | createContract, getContract, signContract, getContractsByLandlord |
 | Lease | `lease.ts` | getUnitLeases, getLeaseDetail, createLease, cancelLease |
-| Notification | `notification.ts` | getNotifications, getNotificationCount, markAsRead, markAllAsRead, getPreferences, updatePreference |
+| Notification | `notification.ts` | getNotifications, getNotificationCount, markAsRead, markAllAsRead, getPreferences, updatePreference, deleteNotification |
 | Role | `role.ts` | addRole, removeRole, getRemovableRoles |
 | Tenant | `tenant.ts` | getActiveLeases, getLeaseStatus, getPaymentHistory, initiatePayment, transitionLeaseState, getTenantContracts |
 
@@ -394,6 +395,7 @@ El frontend consume los endpoints REST del backend NestJS:
 - `GET /notifications/count` — Conteo de notificaciones no leídas (requiere JWT)
 - `PATCH /notifications/:id/read` — Marcar notificación como leída (requiere JWT)
 - `PATCH /notifications/read-all` — Marcar todas como leídas (requiere JWT)
+- `DELETE /notifications/:id` — Eliminar notificación (soft-delete, requiere JWT, verifica ownership)
 - `GET /notifications/preferences` — Preferencias de canales externos agrupadas por tipo (requiere JWT)
 - `PUT /notifications/preferences` — Actualizar preferencia de canal externo (requiere JWT)
 - `POST /auth/roles/add` — Agregar rol al usuario (requiere JWT)
