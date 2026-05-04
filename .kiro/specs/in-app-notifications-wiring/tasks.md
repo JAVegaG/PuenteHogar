@@ -167,7 +167,7 @@ Replace empty notification port stubs in four backend modules (contracts, paymen
     - Verify contextual data fields (contractId, amount, leaseId, listingId) appear in the message when present
     - **Validates: Requirements 8.3, 10.3, 10.4**
 
-- [~] 7. Final checkpoint — Ensure all tests pass
+- [x] 7. Final checkpoint — Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
