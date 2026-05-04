@@ -99,7 +99,7 @@ Replace empty notification port stubs in four backend modules (contracts, paymen
     - Replace `{ provide: NOTIFICATION_PORT, useValue: { ... } }` with `{ provide: NOTIFICATION_PORT, useClass: ListingNotificationAdapter }`
     - _Requirements: 6.3, 6.4, 9.5, 9.6_
 
-- [ ] 4. Integrate notification calls into use cases (fire-and-forget)
+- [x] 4. Integrate notification calls into use cases (fire-and-forget)
   - [x] 4.1 Add `notifyContractUploaded` call to `UploadContractUseCase`
     - Open `src/backend/modules/contracts/application/use-cases/upload-contract.use-case.ts`
     - Inject `CONTRACT_NOTIFICATION_PORT` (`INotificationPort`) via constructor using `@Inject(CONTRACT_NOTIFICATION_PORT)`
@@ -117,7 +117,7 @@ Replace empty notification port stubs in four backend modules (contracts, paymen
     - After building the response DTO (before `return result`), add fire-and-forget: `this.notificationPort.notifyLeaseCreated(tenantUser.id, newLease.id, unitId).catch(() => undefined);`
     - _Requirements: 4.1, 4.2, 7.1, 7.2_
 
-  - [~] 4.4 Add notification call to `CancelLeaseUseCase`
+  - [x] 4.4 Add notification call to `CancelLeaseUseCase`
     - Open `src/backend/modules/landlord-portfolio/application/use-cases/cancel-lease.use-case.ts`
     - Inject `PORTFOLIO_NOTIFICATION_PORT` (`IPortfolioNotificationPort`) via constructor using `@Inject(PORTFOLIO_NOTIFICATION_PORT)`
     - After the audit log, add fire-and-forget: `if (lease.user_id) { this.notificationPort.notifyLeaseCancelled(lease.user_id, leaseId).catch(() => undefined); }`
