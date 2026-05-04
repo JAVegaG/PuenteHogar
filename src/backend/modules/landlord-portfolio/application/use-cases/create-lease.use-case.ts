@@ -1,6 +1,7 @@
 import {
     ConflictException,
     ForbiddenException,
+    Inject,
     Injectable,
     Logger,
     NotFoundException,
@@ -9,6 +10,8 @@ import { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
 import { PrismaService } from '@src/shared/prisma/prisma.service';
 import { CreateLeaseDto } from '../dtos/create-lease.dto';
 import { LeaseListItemDto } from '../dtos/lease-list-item.dto';
+import { PORTFOLIO_NOTIFICATION_PORT } from '../../domain/ports/notification.port';
+import type { IPortfolioNotificationPort } from '../../domain/ports/notification.port';
 
 @Injectable()
 export class CreateLeaseUseCase {
@@ -17,6 +20,8 @@ export class CreateLeaseUseCase {
     constructor(
         private readonly prisma: PrismaService,
         private readonly auditLogger: AuditLoggerService,
+        @Inject(PORTFOLIO_NOTIFICATION_PORT)
+        private readonly notificationPort: IPortfolioNotificationPort,
     ) { }
 
     async execute(
@@ -130,6 +135,9 @@ export class CreateLeaseUseCase {
 
         // Resolve tenant name
         result.tenantName = await this.resolveTenantName(tenantUser.id);
+
+        // Fire-and-forget notification
+        this.notificationPort.notifyLeaseCreated(tenantUser.id, newLease.id, unitId).catch(() => undefined);
 
         return result;
     }
