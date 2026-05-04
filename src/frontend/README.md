@@ -1,6 +1,6 @@
 # Frontend — Plataforma de Arriendo
 
-Aplicación Next.js (App Router) con Tailwind CSS y TypeScript para la plataforma de arriendo de vivienda urbana. Incluye los módulos de exploración de inmuebles, autenticación/perfil de usuarios, portafolio del arrendador, contabilidad, gestión de arriendos, gestión de contratos (listado, detalle, creación y firma), publicación de unidades, notificaciones in-app con preferencias de canales externos, experiencia multirole con gestión de roles, y flujos del arrendatario (arriendos activos, pagos, contratos).
+Aplicación Next.js (App Router) con Tailwind CSS y TypeScript para la plataforma de arriendo de vivienda urbana. Incluye los módulos de exploración de inmuebles con filtros backend-driven y barra de búsqueda por palabras clave, autenticación/perfil de usuarios, portafolio del arrendador, contabilidad, gestión de arriendos con cancelación, gestión de contratos (listado, detalle, creación y firma), publicación de unidades, notificaciones in-app con preferencias de canales externos, experiencia multirole con gestión de roles, flujos del arrendatario (arriendos activos, pagos, contratos), y landing page estática.
 
 ## Stack
 
@@ -16,7 +16,7 @@ Aplicación Next.js (App Router) con Tailwind CSS y TypeScript para la plataform
 src/frontend/
 ├── app/
 │   ├── layout.tsx            # Layout raíz (lang="es", Inter, AuthProvider)
-│   ├── page.tsx              # Redirect → /explorar
+│   ├── page.tsx              # Landing page estática (hero + CTA "Buscar inmuebles")
 │   ├── globals.css           # Estilos globales + Tailwind
 │   ├── auth/
 │   │   ├── login/
@@ -141,8 +141,9 @@ src/frontend/
 │   ├── property-listings/
 │   │   ├── components/
 │   │   │   ├── ActionBar.tsx          # Barra de acciones (Filtros + Ordenar)
-│   │   │   ├── FilterPanel.tsx        # Panel de filtros avanzados (Client Component)
+│   │   │   ├── FilterPanel.tsx        # Panel de filtros backend-driven (departamento/ciudad desde API, características adicionales dinámicas)
 │   │   │   ├── GalleryModal.tsx       # Modal fullscreen de imagen ampliada
+│   │   │   ├── KeywordSearchBar.tsx   # Barra de búsqueda con sugerencias prefetched, TagChips y botón Buscar
 │   │   │   ├── ListingCard.tsx        # Tarjeta de inmueble
 │   │   │   ├── ListingDetailView.tsx  # Vista completa del detalle
 │   │   │   ├── ListingGrid.tsx        # Cuadrícula responsive de tarjetas
@@ -150,9 +151,9 @@ src/frontend/
 │   │   │   ├── PropertyInfoGrid.tsx   # Grilla de habitaciones/baños/área
 │   │   │   └── SortPanel.tsx          # Panel de ordenamiento (Client Component)
 │   │   ├── hooks/
-│   │   │   ├── useFilters.ts          # Gestión de filtros vía URL query params
+│   │   │   ├── useFilters.ts          # Gestión de filtros vía URL query params (incluye department y additionalFeatures)
 │   │   │   └── useListings.ts         # Fetch con AbortController + loading state
-│   │   └── types.ts                   # Interfaces: Listing, ListingDetail, ListingFilters, etc.
+│   │   └── types.ts                   # Interfaces: Listing, ListingDetail, ListingFilters, AdditionalFeature, etc.
 │   ├── notifications/
 │   │   ├── components/
 │   │   │   ├── NotificationsListView.tsx  # Lista de tarjetas de notificación (leído/no leído, marcar como leída)
@@ -247,7 +248,7 @@ npm run lint       # Linting
 
 | Ruta | Tipo | Auth | Descripción |
 |------|------|------|-------------|
-| `/` | Redirect | No | Redirect a `/explorar` |
+| `/` | Server Component | No | Landing page estática con hero, descripción de la plataforma y CTA "Buscar inmuebles" |
 | `/explorar` | Server Component | No | Listado de inmuebles con filtros, ordenamiento y paginación |
 | `/explorar/[id]` | Server Component | No | Detalle del inmueble con galería de fotos |
 | `/auth/login` | Client Component | No | Inicio de sesión (email + contraseña) |
@@ -284,7 +285,7 @@ npm run lint       # Linting
 
 ### property-listings
 
-Exploración pública de inmuebles: listado con filtros avanzados (ciudad, barrio, tipo, precio, habitaciones, baños, área, fecha), ordenamiento, paginación y vista de detalle con galería de fotos.
+Exploración pública de inmuebles: listado con filtros backend-driven (departamento, ciudad, barrio, tipo, precio, habitaciones, baños, área, fecha, características adicionales dinámicas), barra de búsqueda por palabras clave con sugerencias prefetched y TagChips, ordenamiento, paginación y vista de detalle con galería de fotos.
 
 ### users
 
@@ -308,11 +309,11 @@ Contabilidad del arrendador: dashboard de ingresos con resumen mensual (ingresos
 
 ### landlord-leases
 
-Gestión de arriendos: historial de arriendos por unidad con tarjetas de estado y acciones contextuales (ver detalle, generar/ver contrato), vista de detalle de arriendo (inmueble, arrendatario, acuerdo), creación de arriendo (email del arrendatario, fechas), encabezado de info de unidad. Componentes: LeaseCard, LeaseDetailView, LeaseCreateForm, UnitInfoHeader.
+Gestión de arriendos: historial de arriendos por unidad con tarjetas de estado y acciones contextuales (ver detalle, generar/ver contrato), vista de detalle de arriendo rediseñada con tarjetas (Inmueble, Arrendatario, Acuerdo), cancelación de arriendo con diálogo de confirmación y cascada de contrato, creación de arriendo (email del arrendatario, fechas), encabezado de info de unidad. Componentes: LeaseCard, LeaseDetailView, LeaseCreateForm, UnitInfoHeader.
 
 ### landlord-contracts
 
-Creación y gestión de contratos: wizard de 3 pasos (arrendatario, términos, documento PDF) con indicador de progreso, validación por paso, pre-población desde datos del arriendo, carga de archivo PDF, y envío al backend. Listado de contratos del arrendador con badges de estado, vista de detalle con acciones contextuales (iniciar firma, ver estado), y página de creación con wrapper del wizard. Componentes: ContractsListView, ContractDetailView, ContractCreationView, ContractWizard, WizardProgress, StepTenant, StepTerms, StepDocument.
+Creación y gestión de contratos: wizard de 3 pasos (arrendatario, términos, documento PDF) con indicador de progreso, validación por paso (incluye validación de fecha para prevenir "Invalid Date"), pre-población desde datos del arriendo, carga de archivo PDF, y envío al backend. Listado de contratos del arrendador con badges de estado en formato tarjeta, vista de detalle con secciones en tarjetas (Términos, Partes, Documento) y acciones contextuales (iniciar firma, ver estado), y página de creación con wrapper del wizard. Componentes: ContractsListView, ContractDetailView, ContractCreationView, ContractWizard, WizardProgress, StepTenant, StepTerms, StepDocument.
 
 ### landlord-publish
 
@@ -341,12 +342,12 @@ Publicación de unidades: formulario para publicar una unidad del portafolio com
 
 | Servicio | Archivo | Descripción |
 |----------|---------|-------------|
-| Listings | `api.ts` | fetchListings, fetchListingDetail, createListing, fetchListingByUnit, updateListing, unpublishListing |
+| Listings | `api.ts` | fetchListings, fetchListingDetail, createListing, fetchListingByUnit, updateListing, unpublishListing, fetchAdditionalFeatures |
 | Auth | `auth.ts` | login, register, getProfile, getDocumentTypes |
 | Portfolio | `portfolio.ts` | getPortfolios, createPortfolio, getUnits, createUnit, createEnrichedUnit, updateUnit, updatePortfolio, deletePortfolio, deleteUnit, getDepartments, getCitiesByDepartment, getPropertyTypes |
 | Accounting | `accounting.ts` | getAggregatedReport, getIndividualReport |
 | Contract | `contract.ts` | createContract, getContract, signContract, getContractsByLandlord |
-| Lease | `lease.ts` | getUnitLeases, getLeaseDetail, createLease |
+| Lease | `lease.ts` | getUnitLeases, getLeaseDetail, createLease, cancelLease |
 | Notification | `notification.ts` | getNotifications, getNotificationCount, markAsRead, markAllAsRead, getPreferences, updatePreference |
 | Role | `role.ts` | addRole, removeRole, getRemovableRoles |
 | Tenant | `tenant.ts` | getActiveLeases, getLeaseStatus, getPaymentHistory, initiatePayment, transitionLeaseState, getTenantContracts |
@@ -363,6 +364,7 @@ El frontend consume los endpoints REST del backend NestJS:
 - `GET /listings/by-unit/:portfolioUnitId` — Listing activo de una unidad (requiere JWT, rol LANDLORD)
 - `PATCH /listings/:id` — Actualizar listing (título, descripción, precio, fotos; requiere JWT, rol LANDLORD)
 - `PATCH /listings/:id/unpublish` — Despublicar listing activo (requiere JWT, rol LANDLORD)
+- `GET /listings/additional-features` — Catálogo de características adicionales activas (público, filtro opcional `?main=true`)
 - `POST /auth/login` — Inicio de sesión (retorna JWT)
 - `POST /auth/register` — Registro de usuario
 - `GET /auth/profile` — Perfil del usuario autenticado (requiere JWT)
@@ -380,6 +382,7 @@ El frontend consume los endpoints REST del backend NestJS:
 - `GET /portfolio/:portfolioId/units/:unitId/leases` — Arriendos de una unidad (requiere JWT, rol LANDLORD)
 - `GET /portfolio/:portfolioId/units/:unitId/leases/:leaseId` — Detalle de arriendo (requiere JWT, rol LANDLORD)
 - `POST /portfolio/:portfolioId/units/:unitId/leases` — Crear arriendo (requiere JWT, rol LANDLORD)
+- `DELETE /portfolio/:portfolioId/units/:unitId/leases/:leaseId` — Cancelar arriendo con cascada de contrato (requiere JWT, rol LANDLORD)
 - `POST /accounting/reports/portfolio/:portfolioId/aggregated` — Reporte agregado de ingresos (requiere JWT, rol LANDLORD)
 - `POST /accounting/reports/portfolio/:portfolioId/unit/:unitId` — Reporte individual de ingresos (requiere JWT, rol LANDLORD)
 - `POST /contracts` — Crear contrato (requiere JWT, rol LANDLORD)
