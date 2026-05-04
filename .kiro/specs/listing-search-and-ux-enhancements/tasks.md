@@ -144,12 +144,13 @@ This plan implements ten interconnected improvements across backend schema, API 
 - [x] 10. Frontend: Landing page
   - [x] 10.1 Replace redirect with static landing page at /
     - Replace the content of `src/frontend/app/page.tsx` (currently `redirect('/explorar')`) with a static landing page component
-    - Include a `<nav>` with links to: `/explorar` (Explorar), `/auth/login` (Iniciar sesión), `/auth/registro` (Registrarse)
-    - Include a hero section with a brief platform description (facilitating urban housing rental in Colombia)
-    - Include a prominent "Buscar inmuebles" CTA button linking to `/explorar` using Primary_Button_Style
-    - Follow mobile-first responsive design, design system tokens (`text-h1`, `text-h2`, `text-body`), WCAG 2.1 AA (contrast ≥ 4.5:1, touch targets ≥ 44px)
-    - No API calls — fully static page for fast LCP
-    - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6_
+    - Include a responsive `<nav>`: desktop shows full links (Explorar, Iniciar sesión, Registrarse); mobile shows compact "Ingresar" text link + "Registrarse" blue button to avoid crowding the logo
+    - Include a hero section with a house icon, heading, platform description, and prominent "Buscar inmuebles" CTA button using Primary_Button_Style
+    - Include a value propositions section with three items (Sencillo, Seguro, Accesible) in a 3-column grid on desktop, stacked on mobile
+    - Include a footer with copyright information
+    - Follow mobile-first responsive design, design system tokens (`text-h1`, `text-h3`, `text-body`, `text-caption`), WCAG 2.1 AA (contrast ≥ 4.5:1, touch targets ≥ 44px)
+    - No API calls — fully static server component for fast LCP
+    - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 6.8, 6.9_
 
 - [x] 11. Checkpoint — Ensure frontend builds and all tests pass
   - Ensure all tests pass, ask the user if questions arise.

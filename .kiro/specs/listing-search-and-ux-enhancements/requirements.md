@@ -99,11 +99,14 @@ This feature spec covers a set of improvements to the Colombian urban housing re
 #### Acceptance Criteria
 
 1. THE Platform SHALL display a Landing_Page at the root URL (`/`) instead of redirecting to `/explorar`.
-2. THE Landing_Page SHALL include a hero section with a brief description of the platform's purpose (facilitating urban housing rental in Colombia).
+2. THE Landing_Page SHALL include a hero section with a visual icon, a heading, and a brief description of the platform's purpose (facilitating urban housing rental in Colombia).
 3. THE Landing_Page SHALL include a prominent "Buscar inmuebles" call-to-action button that navigates to the `/explorar` page.
-4. THE Landing_Page SHALL include a navigation bar with links to: the explore page, login, and registration.
-5. THE Landing_Page SHALL follow the platform's mobile-first responsive design, using the established design system tokens (typography, colors, spacing).
-6. THE Landing_Page SHALL meet WCAG 2.1 AA accessibility standards (contrast ratio ≥ 4.5:1, touch targets ≥ 44px).
+4. THE Landing_Page SHALL include a responsive navigation bar: on desktop, showing links to Explorar, Iniciar sesión, and Registrarse; on mobile, showing compact "Ingresar" and "Registrarse" buttons to avoid crowding the logo.
+5. THE Landing_Page SHALL include a value propositions section with three items (Sencillo, Seguro, Accesible), each with an icon and short description, displayed in a three-column grid on desktop and stacked vertically on mobile.
+6. THE Landing_Page SHALL include a footer with copyright information.
+7. THE Landing_Page SHALL follow the platform's mobile-first responsive design, using the established design system tokens (typography, colors, spacing).
+8. THE Landing_Page SHALL meet WCAG 2.1 AA accessibility standards (contrast ratio ≥ 4.5:1, touch targets ≥ 44px).
+9. THE Landing_Page SHALL NOT make any API calls — it SHALL be a fully static page for fast LCP.
 
 ### Requirement 7: Lease Detail Page Redesign with Cards
 

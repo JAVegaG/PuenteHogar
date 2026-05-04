@@ -294,19 +294,32 @@ interface TagChip {
 
 **New page:** `src/frontend/app/page.tsx` (replace redirect)
 
-```typescript
-// Static page — no API calls
-export default function LandingPage() {
-  return (
-    <>
-      <nav>/* Links: Explorar, Iniciar sesión, Registrarse */</nav>
-      <main>
-        <section>/* Hero: platform description + "Buscar inmuebles" CTA */</section>
-      </main>
-    </>
-  );
-}
+Static server component — no `'use client'`, no API calls.
+
 ```
+LandingPage
+├── <nav> (responsive)
+│   ├── Desktop: PuenteHogar logo + Explorar, Iniciar sesión, Registrarse links
+│   └── Mobile: PuenteHogar logo + compact "Ingresar" text link + "Registrarse" blue button
+├── <main>
+│   ├── Hero Section
+│   │   ├── House icon (blue circle background)
+│   │   ├── Heading: "Encuentra tu hogar ideal en Colombia"
+│   │   ├── Description paragraph
+│   │   └── "Buscar inmuebles" CTA (Primary_Button_Style, wider padding)
+│   └── Value Propositions Section (border-t separator)
+│       ├── "Sencillo" — green icon, description
+│       ├── "Seguro" — blue icon, description
+│       └── "Accesible" — amber icon, description
+│       (3-column grid on desktop, stacked on mobile)
+└── <footer>
+    └── © 2026 PuenteHogar copyright text
+```
+
+Key mobile improvements:
+- Nav uses `hidden md:flex` for full links, `flex md:hidden` for compact mobile buttons
+- Hero is top-aligned (`pt-12`) instead of vertically centered to avoid dead space on mobile
+- Value propositions fill the page with useful content below the fold
 
 #### 8. LeaseDetailPage Redesign
 
@@ -622,7 +635,7 @@ This feature includes pure logic functions and backend use cases suitable for pr
 |------|-------|
 | FilterPanel | Department dropdown populates from API; city dropdown disabled without department; cascading clear on department change; error state on fetch failure |
 | KeywordSearchBar | Renders on explore page; debounce timing; chip add/remove; no auto-search on chip change; Buscar triggers search; sync with FilterPanel |
-| Landing Page | Renders at `/`; hero section content; CTA links to `/explorar`; nav links present |
+| Landing Page | Renders at `/`; hero section with icon and heading; CTA links to `/explorar`; responsive nav (desktop full links, mobile compact buttons); value propositions section; footer |
 | LeaseDetailPage | Three card sections render; StatusBadge with lease variant; all fields present; cancel button for "Acordado" only |
 | ContractScreens | Card format in list; three sections in detail; StatusBadge with contract variant |
 | Date handling | formatDate with valid dates; formatDate with empty/null/invalid; validation step 2 rejects empty startDate |
