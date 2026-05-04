@@ -7,16 +7,18 @@ import LandlordRoute from '@modules/landlord-portfolio/components/LandlordRoute'
 import { Header } from '@/shared/components/Header';
 import { Skeleton } from '@/shared/components/Skeleton';
 import { ErrorState } from '@/shared/components/ErrorState';
+import { StatusBadge } from '@/shared/components/StatusBadge';
 import { Toast } from '@/shared/components/Toast';
 import { useAuth } from '@modules/users/context/AuthContext';
 import { accountingService } from '@/shared/services/accounting';
+import { portfolioService } from '@/shared/services/portfolio';
 import type { AggregatedReportResponse } from '@/shared/services/accounting';
+import type { PortfolioUnit } from '@modules/landlord-portfolio/types';
 import { formatPrice } from '@/shared/utils/formatPrice';
 import { SummaryCard } from '@modules/landlord-accounting/components/SummaryCard';
 import { PeriodFilter } from '@modules/landlord-accounting/components/PeriodFilter';
-import { PropertyDetailTable } from '@modules/landlord-accounting/components/PropertyDetailTable';
 import { computePeriod } from '@modules/landlord-accounting/utils';
-import type { PeriodOption, PeriodRequest, PropertyDetailRow } from '@modules/landlord-accounting/types';
+import type { PeriodOption, PeriodRequest } from '@modules/landlord-accounting/types';
 
 function SummaryCardSkeleton() {
     return (
@@ -44,18 +46,26 @@ function ReportSkeleton() {
     );
 }
 
+/** Resolves the lease status label for a unit based on its unitStatus */
+function getLeaseStatus(unit: PortfolioUnit): string {
+    if (unit.unitStatus === 'Ocupado') return 'Vigente';
+    if (unit.unitStatus === 'Mantenimiento') return 'Finalizado';
+    return 'Acordado';
+}
+
 function PortfolioReportContent() {
     const params = useParams();
     const portfolioId = params.portfolioId as string;
 
     const [selectedPeriod, setSelectedPeriod] = useState<PeriodOption>('1m');
     const [report, setReport] = useState<AggregatedReportResponse | null>(null);
+    const [units, setUnits] = useState<PortfolioUnit[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [toastVisible, setToastVisible] = useState(false);
     const { user, logout } = useAuth();
 
-    const fetchReport = useCallback(
+    const fetchData = useCallback(
         async (period: PeriodRequest) => {
             const token = user?.accessToken;
             if (!token) return;
@@ -64,8 +74,12 @@ function PortfolioReportContent() {
             setError(null);
 
             try {
-                const data = await accountingService.getAggregatedReport(portfolioId, period, token);
-                setReport(data);
+                const [reportData, unitsData] = await Promise.all([
+                    accountingService.getAggregatedReport(portfolioId, period, token),
+                    portfolioService.getUnits(portfolioId, token),
+                ]);
+                setReport(reportData);
+                setUnits(unitsData);
             } catch (err) {
                 const message = err instanceof Error ? err.message : 'Error desconocido';
                 if (message === 'Sesión expirada') {
@@ -82,8 +96,8 @@ function PortfolioReportContent() {
 
     useEffect(() => {
         const initialPeriod = computePeriod('1m');
-        fetchReport(initialPeriod);
-    }, [fetchReport]);
+        fetchData(initialPeriod);
+    }, [fetchData]);
 
     const handlePeriodChange = (period: PeriodRequest) => {
         const option = (['1m', '3m', '6m', '12m'] as PeriodOption[]).find((key) => {
@@ -91,18 +105,8 @@ function PortfolioReportContent() {
             return computed.year === period.year && computed.month === period.month;
         });
         if (option) setSelectedPeriod(option);
-        fetchReport(period);
+        fetchData(period);
     };
-
-    const units: PropertyDetailRow[] = report
-        ? Array.from({ length: report.numberOfUnits }, (_, i) => ({
-            unitId: 'unit-' + i,
-            address: report.message || 'Unidad ' + (i + 1),
-            neighborhood: '-',
-            monthlyIncome: report.numberOfUnits > 0 ? report.totalAmount / report.numberOfUnits : 0,
-            paymentStatus: (report.overdueCount > 0 ? 'Pendiente' : 'Al día') as 'Al día' | 'Pendiente',
-        }))
-        : [];
 
     const backButton = (
         <Link
@@ -144,7 +148,7 @@ function PortfolioReportContent() {
                         {isLoading ? (
                             <ReportSkeleton />
                         ) : error ? (
-                            <ErrorState onRetry={() => fetchReport(computePeriod(selectedPeriod))} />
+                            <ErrorState onRetry={() => fetchData(computePeriod(selectedPeriod))} />
                         ) : (
                             <>
                                 <div className="mb-[24px]">
@@ -166,14 +170,91 @@ function PortfolioReportContent() {
                                     />
                                 </div>
 
-                                <section aria-label="Detalle por propiedad">
+                                <section aria-label="Detalle por inmueble">
                                     <h2
                                         className="text-h3 font-semibold mb-[16px]"
                                         style={{ color: '#111827' }}
                                     >
-                                        Detalle por propiedad
+                                        Detalle por inmueble
                                     </h2>
-                                    <PropertyDetailTable units={units} />
+
+                                    {units.length === 0 ? (
+                                        <p className="text-caption py-[16px] text-center" style={{ color: '#4b5563' }}>
+                                            No hay inmuebles en este portafolio.
+                                        </p>
+                                    ) : (
+                                        <>
+                                            {/* Desktop table */}
+                                            <div className="hidden md:block overflow-x-auto">
+                                                <table className="w-full">
+                                                    <thead>
+                                                        <tr
+                                                            className="text-caption font-medium text-left"
+                                                            style={{ color: '#4b5563', borderBottom: '1px solid #d1d5db' }}
+                                                        >
+                                                            <th className="pb-[8px] pr-[12px] font-medium">Inmueble</th>
+                                                            <th className="pb-[8px] pr-[12px] font-medium">Estado arriendo</th>
+                                                            <th className="pb-[8px] font-medium text-right">Ingreso</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {units.map((unit) => {
+                                                            const income = unit.monthlyRent ?? 0;
+                                                            const leaseStatus = getLeaseStatus(unit);
+                                                            return (
+                                                                <tr
+                                                                    key={unit.id}
+                                                                    className="text-body"
+                                                                    style={{ borderBottom: '1px solid #e5e7eb' }}
+                                                                >
+                                                                    <td className="py-[12px] pr-[12px]" style={{ color: '#111827' }}>
+                                                                        {unit.name}
+                                                                    </td>
+                                                                    <td className="py-[12px] pr-[12px]">
+                                                                        <StatusBadge status={leaseStatus} variant="lease" />
+                                                                    </td>
+                                                                    <td
+                                                                        className="py-[12px] text-body font-semibold text-right"
+                                                                        style={{ color: '#111827' }}
+                                                                    >
+                                                                        ${formatPrice(income)}
+                                                                    </td>
+                                                                </tr>
+                                                            );
+                                                        })}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                            {/* Mobile stacked cards */}
+                                            <div className="flex flex-col gap-[12px] md:hidden">
+                                                {units.map((unit) => {
+                                                    const income = unit.monthlyRent ?? 0;
+                                                    const leaseStatus = getLeaseStatus(unit);
+                                                    return (
+                                                        <div
+                                                            key={unit.id}
+                                                            className="rounded-[6px] p-[16px]"
+                                                            style={{ border: '1px solid #d1d5db' }}
+                                                        >
+                                                            <div className="flex items-center justify-between">
+                                                                <p className="text-body font-semibold" style={{ color: '#111827' }}>
+                                                                    {unit.name}
+                                                                </p>
+                                                                <StatusBadge status={leaseStatus} variant="lease" />
+                                                            </div>
+                                                            <p
+                                                                className="text-body font-semibold mt-[8px]"
+                                                                style={{ color: '#111827' }}
+                                                            >
+                                                                ${formatPrice(income)}
+                                                            </p>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </>
+                                    )}
                                 </section>
 
                                 <button
