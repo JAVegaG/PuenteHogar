@@ -183,7 +183,7 @@ _These tasks address UX issues discovered during manual testing after the initia
     - _Requirements: 12.1, 12.2_
 
 - [ ] 9. Replace raw UUIDs with human-readable names in notification messages
-  - [~] 9.1 Update notification adapters to resolve display names before sending
+  - [x] 9.1 Update notification adapters to resolve display names before sending
     - In each adapter, resolve human-readable context (property name, unit name) from the database before calling `SendNotificationUseCase`
     - Pass resolved names in the `data` payload (e.g., `propertyName`, `unitName`)
     - _Requirements: 11.1, 11.2_
