@@ -196,17 +196,18 @@ The following requirements were identified during manual testing after the initi
 2. THE "Gestionar preferencias" link SHALL NOT appear at the bottom of the notification list
 3. THE "Gestionar preferencias" link SHALL remain visible when the notification list is empty
 
-### Requirement 16: "Gestionar preferencias" Styled as Text Link (not CTA button)
+### Requirement 16: Context-Aware Positioning of "Gestionar preferencias"
 
-**User Story:** As a user, I want the "Gestionar preferencias" link to look like a subtle text action rather than a prominent button, so that it doesn't visually compete with the notification cards.
+**User Story:** As a user, I want the "Gestionar preferencias" button to be positioned naturally depending on whether I have notifications, so that the page feels balanced on mobile.
 
-**Context:** During testing, the "Gestionar preferencias" was styled as a primary blue CTA button (`bg-[#1d4ed8]`), which looked visually heavy and out of place in the action bar — especially on mobile. It should match the "Marcar todas como leídas" text link style for visual consistency.
+**Context:** During testing, the "Gestionar preferencias" link sat at the top-left of the page in both the empty and populated states. On mobile with no notifications, this looked orphaned and awkward — a lone link floating above a vast empty space. The button should be part of the empty state itself (centered), and part of the action bar when notifications exist.
 
 #### Acceptance Criteria
 
-1. THE "Gestionar preferencias" link SHALL be styled as a text link (primary color, no background fill) matching the "Marcar todas como leídas" style
-2. THE action bar SHALL use `flex-wrap` so both actions stack gracefully on narrow mobile screens
-3. BOTH action bar items SHALL maintain 44×44px minimum touch targets for WCAG 2.1 AA compliance
+1. WHEN the notification list is empty, THE "Gestionar preferencias" button SHALL be centered below the "No tienes notificaciones aún" message, styled as a primary CTA button
+2. WHEN the notification list has items, THE "Gestionar preferencias" button SHALL be positioned in the top action bar alongside "Marcar todas como leídas"
+3. THE "Gestionar preferencias" button SHALL use the Primary_Button_Style in both positions
+4. THE action bar SHALL use `flex-wrap` so both actions stack gracefully on narrow mobile screens
 
 ### Requirement 17: Bold Highlighting of Dynamic Names in Notification Messages
 

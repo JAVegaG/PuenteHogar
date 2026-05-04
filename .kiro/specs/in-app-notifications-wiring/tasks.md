@@ -246,11 +246,13 @@ _These tasks address UX issues discovered during manual testing after the initia
     - _Requirements: 15.1, 15.2, 15.3_
 
 - [x] 14. Style "Gestionar preferencias" as text link and add bold highlighting to messages
-  - [x] 14.1 Change "Gestionar preferencias" from CTA button to text link
+  - [x] 14.1 Position "Gestionar preferencias" contextually based on notification state
     - Open `src/frontend/modules/notifications/components/NotificationsListView.tsx`
-    - Replace `bg-[#1d4ed8] text-white ...` button style with `text-body font-medium text-primary hover:underline` text link style
-    - Add `flex-wrap gap-2` to the action bar for mobile stacking
-    - _Requirements: 16.1, 16.2, 16.3_
+    - Empty state: return early with centered layout — empty message + CTA button below
+    - Populated state: CTA button in top action bar alongside "Marcar todas como leídas"
+    - Use Primary_Button_Style in both positions
+    - Action bar uses `flex-wrap gap-2` for mobile stacking
+    - _Requirements: 16.1, 16.2, 16.3, 16.4_
 
   - [x] 14.2 Add `**bold**` markers to dynamic names in `buildNotificationContent`
     - Open `src/backend/modules/notifications/application/use-cases/send-notification.use-case.ts`

@@ -587,11 +587,14 @@ LEASE_CANCELLED: 'Arriendo cancelado',
 
 **Approach**: Move the preferences link to the top action bar, next to "Marcar todas como leídas". Both actions become a top toolbar row. When the list is empty, the preferences link still appears at the top (not centered in the empty state).
 
-### "Gestionar preferencias" Styled as Text Link (Req 16)
+### Context-Aware Positioning of "Gestionar preferencias" (Req 16)
 
-**Problem**: The "Gestionar preferencias" was styled as a primary blue CTA button (`bg-[#1d4ed8]`), which looked visually heavy and out of place in the action bar — especially on mobile where it dominated the screen.
+**Problem**: The "Gestionar preferencias" link sat at the top-left in both empty and populated states. On mobile with no notifications, this looked orphaned — a lone link floating above empty space.
 
-**Approach**: Change the link from a filled CTA button to a subtle text link matching the "Marcar todas como leídas" style. Both actions use `text-body font-medium text-primary hover:underline` for visual consistency. The action bar uses `flex-wrap gap-2` so both items stack gracefully on narrow screens while maintaining 44×44px touch targets.
+**Approach — context-aware positioning**:
+- **Empty state**: The component returns early with a centered layout: "No tienes notificaciones aún" message + "Gestionar preferencias" CTA button centered below it. This feels natural and gives the user a clear action.
+- **Populated state**: The "Gestionar preferencias" button sits in the top action bar (`flex justify-between`) alongside "Marcar todas como leídas". Both use `flex-wrap gap-2` for mobile stacking.
+- The button uses Primary_Button_Style in both positions for consistency.
 
 ### Bold Highlighting of Dynamic Names in Messages (Req 17)
 
