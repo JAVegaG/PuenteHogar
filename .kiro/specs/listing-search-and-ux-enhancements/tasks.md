@@ -26,7 +26,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - Register the use case in `property-listings.module.ts` providers
     - _Requirements: 3.2_
 
-  - [~] 2.3 Extend ListingFiltersDto with department and additionalFeatures params
+  - [x] 2.3 Extend ListingFiltersDto with department and additionalFeatures params
     - Add `department?: string` (DANE department code) to `src/backend/modules/property-listings/application/dtos/listing-filters.dto.ts` with `@IsOptional() @IsString()` and `@ApiPropertyOptional`
     - Add `additionalFeatures?: string` (JSON-encoded `Record<string, string>`) with `@IsOptional() @IsString()` — parsed in the use case
     - Update the `ListingFilters` interface in `src/backend/modules/property-listings/domain/ports/listing-repository.port.ts` to include `department?: string` and `additionalFeatures?: Record<string, string>`
