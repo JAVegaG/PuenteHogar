@@ -94,30 +94,16 @@ export default function NotificationsListView({
         }
     }
 
-    if (visibleNotifications.length === 0) {
-        return (
-            <div className="flex flex-col gap-6">
-                <div className="text-center py-section-gap" role="status" aria-live="polite">
-                    <p className="text-h3 font-medium text-neutral-900">
-                        No tienes notificaciones aún
-                    </p>
-                </div>
-                <div className="text-center">
-                    <Link
-                        href="/mis-notificaciones/preferencias"
-                        className="bg-[#1d4ed8] text-white rounded-[6px] min-h-[44px] min-w-[44px] px-4 inline-flex items-center justify-center font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                    >
-                        Gestionar preferencias
-                    </Link>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className="flex flex-col gap-6">
-            {hasUnread && (
-                <div className="flex justify-end">
+            <div className="flex justify-between items-center">
+                <Link
+                    href="/mis-notificaciones/preferencias"
+                    className="bg-[#1d4ed8] text-white rounded-[6px] min-h-[44px] min-w-[44px] px-4 inline-flex items-center justify-center font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                >
+                    Gestionar preferencias
+                </Link>
+                {hasUnread && (
                     <button
                         type="button"
                         onClick={handleMarkAllAsRead}
@@ -125,75 +111,80 @@ export default function NotificationsListView({
                     >
                         Marcar todas como leídas
                     </button>
+                )}
+            </div>
+
+            {visibleNotifications.length === 0 && (
+                <div className="text-center py-section-gap" role="status" aria-live="polite">
+                    <p className="text-h3 font-medium text-neutral-900">
+                        No tienes notificaciones aún
+                    </p>
                 </div>
             )}
 
-            {deleteError && (
-                <div role="alert" className="text-caption text-red-600 bg-red-50 border border-red-200 rounded-[6px] p-3">
-                    {deleteError}
-                </div>
-            )}
+            {visibleNotifications.length > 0 && (
+                <>
 
-            <div className="flex flex-col gap-4" role="list">
-                {visibleNotifications.map((notification) => {
-                    const isUnread = !notification.read && !readIds.has(notification.id);
+                    {deleteError && (
+                        <div role="alert" className="text-caption text-red-600 bg-red-50 border border-red-200 rounded-[6px] p-3">
+                            {deleteError}
+                        </div>
+                    )}
 
-                    return (
-                        <div
-                            key={notification.id}
-                            role="listitem"
-                            tabIndex={0}
-                            onClick={() => handleCardClick(notification)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' || e.key === ' ') {
-                                    e.preventDefault();
-                                    handleCardClick(notification);
-                                }
-                            }}
-                            className={`relative border border-neutral-300 rounded-[6px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] bg-white p-4 pr-14 min-h-[44px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-colors ${isUnread ? 'border-l-4 border-l-primary' : ''
-                                }`}
-                        >
-                            {onDelete && (
-                                <button
-                                    type="button"
-                                    onClick={(e) => handleDelete(e, notification.id)}
+                    <div className="flex flex-col gap-4" role="list">
+                        {visibleNotifications.map((notification) => {
+                            const isUnread = !notification.read && !readIds.has(notification.id);
+
+                            return (
+                                <div
+                                    key={notification.id}
+                                    role="listitem"
+                                    tabIndex={0}
+                                    onClick={() => handleCardClick(notification)}
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter' || e.key === ' ') {
                                             e.preventDefault();
-                                            handleDelete(e, notification.id);
+                                            handleCardClick(notification);
                                         }
                                     }}
-                                    aria-label={`Eliminar notificación: ${notification.title}`}
-                                    className="absolute top-2 right-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-neutral-400 hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-[6px] transition-colors"
+                                    className={`relative border border-neutral-300 rounded-[6px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] bg-white p-4 pr-14 min-h-[44px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-colors ${isUnread ? 'border-l-4 border-l-primary' : ''
+                                        }`}
                                 >
-                                    <TrashIcon />
-                                </button>
-                            )}
-                            <p className="text-small text-primary font-medium">
-                                {translateNotificationType(notification.notificationType)}
-                            </p>
-                            <p className={`text-body text-neutral-900 mt-1 ${isUnread ? 'font-bold' : 'font-normal'}`}>
-                                {notification.title}
-                            </p>
-                            <p className="text-caption text-neutral-600 mt-1">
-                                {notification.message}
-                            </p>
-                            <p className="text-small text-neutral-600 mt-2">
-                                {formatRelativeDate(notification.createdAt)}
-                            </p>
-                        </div>
-                    );
-                })}
-            </div>
+                                    {onDelete && (
+                                        <button
+                                            type="button"
+                                            onClick={(e) => handleDelete(e, notification.id)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' || e.key === ' ') {
+                                                    e.preventDefault();
+                                                    handleDelete(e, notification.id);
+                                                }
+                                            }}
+                                            aria-label={`Eliminar notificación: ${notification.title}`}
+                                            className="absolute top-2 right-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-neutral-400 hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-[6px] transition-colors"
+                                        >
+                                            <TrashIcon />
+                                        </button>
+                                    )}
+                                    <p className="text-small text-primary font-medium">
+                                        {translateNotificationType(notification.notificationType)}
+                                    </p>
+                                    <p className={`text-body text-neutral-900 mt-1 ${isUnread ? 'font-bold' : 'font-normal'}`}>
+                                        {notification.title}
+                                    </p>
+                                    <p className="text-caption text-neutral-600 mt-1">
+                                        {notification.message}
+                                    </p>
+                                    <p className="text-small text-neutral-600 mt-2">
+                                        {formatRelativeDate(notification.createdAt)}
+                                    </p>
+                                </div>
+                            );
+                        })}
+                    </div>
 
-            <div className="text-center">
-                <Link
-                    href="/mis-notificaciones/preferencias"
-                    className="bg-[#1d4ed8] text-white rounded-[6px] min-h-[44px] min-w-[44px] px-4 inline-flex items-center justify-center font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                >
-                    Gestionar preferencias
-                </Link>
-            </div>
+                </>
+            )}
         </div>
     );
 }
