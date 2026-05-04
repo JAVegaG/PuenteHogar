@@ -2,6 +2,7 @@
 
 import { lazy, Suspense, useState } from 'react';
 import ActionBar from '@modules/property-listings/components/ActionBar';
+import KeywordSearchBar from '@/modules/property-listings/components/KeywordSearchBar';
 import ListingGrid from '@modules/property-listings/components/ListingGrid';
 import { ListingGridSkeleton } from '@/shared/components/ListingGridSkeleton';
 import { EmptyState } from '@/shared/components/EmptyState';
@@ -53,6 +54,10 @@ function ExploreContent() {
           />
         )}
       </Suspense>
+
+      <div className="px-mobile-margin md:px-desktop-margin pt-4">
+        <KeywordSearchBar onSearch={setFilters} currentFilters={filters} />
+      </div>
 
       <ActionBar
         currentFilters={filters}
