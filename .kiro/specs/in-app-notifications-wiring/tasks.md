@@ -182,13 +182,13 @@ _These tasks address UX issues discovered during manual testing after the initia
     - Add `LEASE_CREATED: 'Arriendo creado'` and `LEASE_CANCELLED: 'Arriendo cancelado'` to the translations map
     - _Requirements: 12.1, 12.2_
 
-- [ ] 9. Replace raw UUIDs with human-readable names in notification messages
+- [x] 9. Replace raw UUIDs with human-readable names in notification messages
   - [x] 9.1 Update notification adapters to resolve display names before sending
     - In each adapter, resolve human-readable context (property name, unit name) from the database before calling `SendNotificationUseCase`
     - Pass resolved names in the `data` payload (e.g., `propertyName`, `unitName`)
     - _Requirements: 11.1, 11.2_
 
-  - [~] 9.2 Update `buildNotificationContent` to use display names
+  - [x] 9.2 Update `buildNotificationContent` to use display names
     - Open `src/backend/modules/notifications/application/use-cases/send-notification.use-case.ts`
     - Update each case to prefer `data.propertyName` / `data.unitName` over raw IDs
     - Fall back to generic descriptions (e.g., "un contrato", "un arriendo") when names are unavailable
