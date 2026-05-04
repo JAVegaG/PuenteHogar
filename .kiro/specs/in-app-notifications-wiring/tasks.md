@@ -201,7 +201,7 @@ _These tasks address UX issues discovered during manual testing after the initia
     - Verify ownership: notification's `user_id` must match the requesting user
     - _Requirements: 13.1, 13.2, 13.3_
 
-  - [~] 10.2 Create `DeleteNotificationUseCase`
+  - [x] 10.2 Create `DeleteNotificationUseCase`
     - Create use case that validates ownership and calls repository soft-delete
     - _Requirements: 13.1, 13.2, 13.3_
 
