@@ -15,6 +15,8 @@ const NUMERIC_KEYS: (keyof ListingFilters)[] = [
   'pageSize',
 ];
 
+const ADDITIONAL_FEATURES_KEY = 'additionalFeatures';
+
 export function useFilters() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -23,7 +25,16 @@ export function useFilters() {
   const filters: ListingFilters = useMemo(() => {
     const f: ListingFilters = {};
     searchParams.forEach((value, key) => {
-      if (NUMERIC_KEYS.includes(key as keyof ListingFilters)) {
+      if (key === ADDITIONAL_FEATURES_KEY) {
+        try {
+          const parsed = JSON.parse(value);
+          if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+            f.additionalFeatures = parsed as Record<string, string>;
+          }
+        } catch {
+          // Ignore malformed JSON values
+        }
+      } else if (NUMERIC_KEYS.includes(key as keyof ListingFilters)) {
         (f as Record<string, string | number>)[key] = Number(value);
       } else {
         (f as Record<string, string | number>)[key] = value;
@@ -37,7 +48,11 @@ export function useFilters() {
       const params = new URLSearchParams();
       Object.entries(newFilters).forEach(([key, value]) => {
         if (value !== undefined && value !== '') {
-          params.set(key, String(value));
+          if (key === ADDITIONAL_FEATURES_KEY && typeof value === 'object') {
+            params.set(key, JSON.stringify(value));
+          } else {
+            params.set(key, String(value));
+          }
         }
       });
       router.push(`${pathname}?${params.toString()}`);

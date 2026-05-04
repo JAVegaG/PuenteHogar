@@ -33,6 +33,7 @@ export interface ListingDetail extends Listing {
 }
 
 export interface ListingFilters {
+  department?: string;
   city?: string;
   neighborhood?: string;
   search?: string;
@@ -44,6 +45,7 @@ export interface ListingFilters {
   areaMin?: number;
   areaMax?: number;
   publishedWithin?: '24h' | '7d' | '30d' | '90d' | 'any';
+  additionalFeatures?: Record<string, string>;
   sortBy?: 'date' | 'price';
   sortOrder?: 'asc' | 'desc';
   page?: number;

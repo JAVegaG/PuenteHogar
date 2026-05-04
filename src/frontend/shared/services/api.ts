@@ -9,7 +9,11 @@ export async function fetchListings(
   const params = new URLSearchParams();
   Object.entries(filters).forEach(([key, value]) => {
     if (value !== undefined && value !== '') {
-      params.set(key, String(value));
+      if (key === 'additionalFeatures' && typeof value === 'object') {
+        params.set(key, JSON.stringify(value));
+      } else {
+        params.set(key, String(value));
+      }
     }
   });
   const res = await fetch(`${API_URL}/listings?${params.toString()}`, { signal });
