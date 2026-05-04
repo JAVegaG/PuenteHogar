@@ -115,7 +115,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - _Requirements: 3.3, 3.4_
 
 - [ ] 9. Frontend: KeywordSearchBar component
-  - [ ] 9.1 Create KeywordSearchBar component with prefetch and debounce
+  - [x] 9.1 Create KeywordSearchBar component with prefetch and debounce
     - Create `src/frontend/modules/property-listings/components/KeywordSearchBar.tsx`
     - On mount, prefetch catalogs: departments, cities (for all active departments), property types, and main additional features — store in component state
     - Implement 300ms debounce on input changes using a `useDebounce` hook or `setTimeout`
