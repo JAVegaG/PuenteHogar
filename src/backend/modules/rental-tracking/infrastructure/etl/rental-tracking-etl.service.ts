@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '@src/shared/prisma/prisma.service';
+import { parsePayload } from '@src/shared/etl/parse-payload';
 
 interface LeaseStatusHistoryPayload {
   leaseId: string;
@@ -23,7 +24,7 @@ interface TrackingRawPayload {
 export class RentalTrackingEtlService {
   private readonly logger = new Logger(RentalTrackingEtlService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   @Cron(CronExpression.EVERY_MINUTE)
   async processTrackingRaw(): Promise<void> {
@@ -38,7 +39,7 @@ export class RentalTrackingEtlService {
 
     for (const record of records) {
       try {
-        const payload = record.payload as unknown as TrackingRawPayload;
+        const payload = parsePayload<TrackingRawPayload>(record.payload);
         this.validatePayload(payload);
 
         await this.prisma.$transaction(async (tx) => {

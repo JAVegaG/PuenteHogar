@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '@src/shared/prisma/prisma.service';
+import { parsePayload } from '@src/shared/etl/parse-payload';
 
 interface PhotoPayload {
   fileUrl: string;
@@ -43,7 +44,7 @@ interface PropertyListingsRawPayload {
 export class PropertyListingsEtlService {
   private readonly logger = new Logger(PropertyListingsEtlService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   @Cron(CronExpression.EVERY_MINUTE)
   async processPropertyListingsRaw(): Promise<void> {
@@ -58,7 +59,7 @@ export class PropertyListingsEtlService {
 
     for (const record of records) {
       try {
-        const payload = record.payload as unknown as PropertyListingsRawPayload;
+        const payload = parsePayload<PropertyListingsRawPayload>(record.payload);
         this.validatePayload(payload);
 
         await this.prisma.$transaction(async (tx) => {
