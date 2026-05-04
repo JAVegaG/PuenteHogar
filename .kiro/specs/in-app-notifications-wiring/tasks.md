@@ -78,7 +78,7 @@ Replace empty notification port stubs in four backend modules (contracts, paymen
     - `notifyLeaseCancelled`: guard `if (!tenantUserId) return;`, then call once with `notificationTypeName: 'LEASE_CANCELLED'`, `eventSource: 'lease.cancelled'`, `data: { leaseId }`
     - _Requirements: 4.1, 4.2, 5.1, 5.2, 5.4_
 
-  - [~] 3.8 Wire `PortfolioNotificationAdapter` in `LandlordPortfolioModule`
+  - [x] 3.8 Wire `PortfolioNotificationAdapter` in `LandlordPortfolioModule`
     - Open `src/backend/modules/landlord-portfolio/landlord-portfolio.module.ts`
     - Add `NotificationsModule` to `imports` array
     - Import `PortfolioNotificationAdapter` and `PORTFOLIO_NOTIFICATION_PORT`
