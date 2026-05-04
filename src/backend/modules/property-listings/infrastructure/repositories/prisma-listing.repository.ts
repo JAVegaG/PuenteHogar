@@ -45,25 +45,42 @@ export class PrismaListingRepository implements IListingRepository {
     const page = filters.page ?? 1;
     const pageSize = filters.pageSize ?? 9;
 
+    // --- Step 0: Resolve department code to department name ---
+    let departmentName: string | null = null;
+    if (filters.department) {
+      const dept = await this.prisma.department.findUnique({
+        where: { code: filters.department },
+        select: { name: true },
+      });
+      if (!dept) {
+        // Department code not found — no listings can match
+        return { data: [], total: 0 };
+      }
+      departmentName = dept.name;
+    }
+
     // --- Step 1: Resolve property-level filters via cross-schema lookups ---
     // Determine which portfolio_unit_ids satisfy property/address filters
     let constrainedUnitIds: string[] | null = null; // null = no property-level constraint
     const hasPropertyFilter =
+      departmentName ||
       filters.city ||
       filters.neighborhood ||
       filters.propertyType ||
       filters.rooms !== undefined ||
       filters.bathrooms !== undefined ||
       filters.areaMin !== undefined ||
-      filters.areaMax !== undefined;
+      filters.areaMax !== undefined ||
+      (filters.additionalFeatures && Object.keys(filters.additionalFeatures).length > 0);
 
     if (hasPropertyFilter) {
-      // Start from Address if city/neighborhood filters exist
+      // Start from Address if department/city/neighborhood filters exist
       let propertyIds: string[] | null = null;
 
-      if (filters.city || filters.neighborhood) {
+      if (departmentName || filters.city || filters.neighborhood) {
         const addresses = await this.prisma.address.findMany({
           where: {
+            ...(departmentName && { state: { equals: departmentName, mode: 'insensitive' as const } }),
             ...(filters.city && { city: { contains: filters.city, mode: 'insensitive' as const } }),
             ...(filters.neighborhood && { neighborhood: { contains: filters.neighborhood, mode: 'insensitive' as const } }),
           },
@@ -99,6 +116,29 @@ export class PrismaListingRepository implements IListingRepository {
         .map((p) => p.id);
 
       if (filteredPropertyIds.length === 0) return { data: [], total: 0 };
+
+      // Apply additionalFeatures filter
+      if (filters.additionalFeatures && Object.keys(filters.additionalFeatures).length > 0) {
+        const featureEntries = Object.entries(filters.additionalFeatures);
+
+        // For each feature key-value pair, find properties that have a matching PropertyAdditionalFeature
+        for (const [featureId, featureValue] of featureEntries) {
+          const matchingFeatures = await this.prisma.propertyAdditionalFeature.findMany({
+            where: {
+              property_id: { in: filteredPropertyIds },
+              additional_feature_id: featureId,
+              value: featureValue,
+              deleted_at: null,
+            },
+            select: { property_id: true },
+          });
+
+          const matchingPropertyIds = new Set(matchingFeatures.map((f) => f.property_id));
+          filteredPropertyIds = filteredPropertyIds.filter((id) => matchingPropertyIds.has(id));
+
+          if (filteredPropertyIds.length === 0) return { data: [], total: 0 };
+        }
+      }
 
       // Resolve PortfolioUnit IDs from the filtered properties
       const units = await this.prisma.portfolioUnit.findMany({

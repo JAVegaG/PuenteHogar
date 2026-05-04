@@ -1,7 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { ListingEntity } from '@modules/property-listings/domain/entities/listing.entity';
 import type { IListingCache } from '@modules/property-listings/domain/ports/listing-cache.port';
-import type { IListingRepository } from '@modules/property-listings/domain/ports/listing-repository.port';
+import type { IListingRepository, ListingFilters } from '@modules/property-listings/domain/ports/listing-repository.port';
 import { LISTING_CACHE, LISTING_REPOSITORY } from '@modules/property-listings/application/use-cases/create-listing.use-case';
 import { ListingFiltersDto } from '@modules/property-listings/application/dtos/listing-filters.dto';
 import { ListingResponseDto } from '@modules/property-listings/application/dtos/listing-response.dto';
@@ -16,12 +16,51 @@ export class SearchListingsUseCase {
     private readonly repository: IListingRepository,
     @Inject(LISTING_CACHE)
     private readonly cache: IListingCache,
-  ) {}
+  ) { }
 
   async execute(filters: ListingFiltersDto): Promise<PaginatedListingsResponseDto> {
     const page = filters.page ?? 1;
     const pageSize = filters.pageSize ?? 9;
-    const cacheKey = 'listings:published:' + JSON.stringify(filters);
+
+    // Parse additionalFeatures JSON string into Record<string, string>
+    let parsedAdditionalFeatures: Record<string, string> | undefined;
+    if (filters.additionalFeatures) {
+      try {
+        const parsed = JSON.parse(filters.additionalFeatures);
+        if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+          parsedAdditionalFeatures = parsed as Record<string, string>;
+        } else {
+          throw new Error('Not a valid object');
+        }
+      } catch {
+        throw new BadRequestException(
+          'El parámetro additionalFeatures debe ser un JSON válido con formato Record<string, string>',
+        );
+      }
+    }
+
+    // Build ListingFilters with parsed additionalFeatures
+    const repoFilters: ListingFilters = {
+      department: filters.department,
+      city: filters.city,
+      neighborhood: filters.neighborhood,
+      search: filters.search,
+      propertyType: filters.propertyType,
+      priceMin: filters.priceMin,
+      priceMax: filters.priceMax,
+      rooms: filters.rooms,
+      bathrooms: filters.bathrooms,
+      areaMin: filters.areaMin,
+      areaMax: filters.areaMax,
+      additionalFeatures: parsedAdditionalFeatures,
+      publishedWithin: filters.publishedWithin,
+      sortBy: filters.sortBy,
+      sortOrder: filters.sortOrder,
+      page: filters.page,
+      pageSize: filters.pageSize,
+    };
+
+    const cacheKey = 'listings:published:' + JSON.stringify(repoFilters);
 
     const cached = await this.cache.getListings(cacheKey);
     if (cached) {
@@ -33,7 +72,7 @@ export class SearchListingsUseCase {
       return result;
     }
 
-    const { data, total } = await this.repository.findPublished(filters);
+    const { data, total } = await this.repository.findPublished(repoFilters);
     // Req 3.4, 3.8: only listings with at least one photo
     const withPhotos = data.filter((l) => l.photos.length > 0);
     await this.cache.setListings(cacheKey, withPhotos, CACHE_TTL_SECONDS);
