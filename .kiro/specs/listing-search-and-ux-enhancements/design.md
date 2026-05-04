@@ -21,6 +21,9 @@ The design is organized into three logical groups:
 | DD-05 | Landing page as a static Next.js page (no API calls) | Fast LCP, SEO-friendly; no dynamic data needed |
 | DD-06 | Fix "Invalid Date" at both frontend validation and backend validation layers | Defense in depth — frontend prevents bad UX, backend prevents bad data |
 | DD-07 | All lease queries must include `deleted_at: null` filter | Soft-deleted leases must be excluded from active lease counts, unit status derivation, lease lists, and rental tracking summaries to ensure data consistency after cancellation |
+| DD-08 | All contract list queries must include `deleted_at: null` filter | Soft-deleted contracts (cascade from lease cancellation) must be excluded from landlord and tenant contract lists |
+| DD-09 | Contract party names resolved cross-schema in GetContractSummaryUseCase | Parties section shows human-readable names instead of UUIDs; uses NaturalPersonDetail/LegalPersonDetail lookup |
+| DD-10 | "Ver historial de arriendos" link always visible in UnitCard | Users expect consistent navigation regardless of unit status; both the tenant section chevron and the bottom link are available when occupied |
 
 ---
 

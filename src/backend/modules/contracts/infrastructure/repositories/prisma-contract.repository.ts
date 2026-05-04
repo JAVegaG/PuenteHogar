@@ -157,7 +157,7 @@ export class PrismaContractRepository implements IContractRepository {
 
     // Step 3: Find all leases for those units
     const leases = await this.prisma.lease.findMany({
-      where: { portfolio_unit_id: { in: unitIds } },
+      where: { portfolio_unit_id: { in: unitIds }, deleted_at: null },
       select: { id: true, portfolio_unit_id: true, user_id: true },
     });
     if (leases.length === 0) return [];
@@ -166,7 +166,7 @@ export class PrismaContractRepository implements IContractRepository {
 
     // Step 4: Find all contracts for those leases (include status)
     const contracts = await this.prisma.contract.findMany({
-      where: { lease_id: { in: leaseIds } },
+      where: { lease_id: { in: leaseIds }, deleted_at: null },
       include: { status: true },
     });
     if (contracts.length === 0) return [];
@@ -218,7 +218,7 @@ export class PrismaContractRepository implements IContractRepository {
 
     // Step 2: Find all Contracts by those IDs, include status, order by created_at DESC
     const contracts = await this.prisma.contract.findMany({
-      where: { id: { in: contractIds } },
+      where: { id: { in: contractIds }, deleted_at: null },
       include: { status: true },
       orderBy: { created_at: 'desc' },
     });

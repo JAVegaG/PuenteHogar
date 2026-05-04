@@ -120,6 +120,7 @@ This feature spec covers a set of improvements to the Colombian urban housing re
 3. THE Lease_Detail_Page SHALL display the lease status using the shared `StatusBadge` component with the `lease` variant.
 4. THE Lease_Detail_Page SHALL maintain all existing information fields (property type, rooms, bathrooms, area, address, tenant name, document, email, phone, monthly amount, start date).
 5. THE Lease_Detail_Page SHALL follow the platform's mobile-first responsive design and accessibility standards (WCAG 2.1 AA).
+6. THE UnitCard component SHALL always display the "Ver historial de arriendos" link regardless of unit status (Ocupado or Disponible), providing a consistent navigation path to the lease history.
 
 ### Requirement 8: Lease Cancellation Mechanism
 
@@ -135,6 +136,7 @@ This feature spec covers a set of improvements to the Colombian urban housing re
 6. WHEN a lease is successfully cancelled, THE Platform SHALL navigate the Landlord back to the unit detail page and display a success confirmation message.
 7. THE Backend SHALL verify that the requesting user is the owner of the portfolio containing the lease before allowing cancellation (resource ownership check).
 8. AFTER a lease is cancelled (soft-deleted), THE Platform SHALL exclude it from all active lease counts, unit status derivation, and lease list queries. Specifically: the unit SHALL show as "Disponible" (not "Ocupado"), the portfolio "Arriendos activos" counter SHALL NOT count the cancelled lease, and the unit's lease list SHALL NOT display the cancelled lease.
+9. AFTER a lease is cancelled and its associated contract is soft-deleted, THE Platform SHALL exclude the soft-deleted contract from the landlord's "Mis contratos" list and the tenant's contract list. Soft-deleted contracts SHALL NOT appear with active statuses like "Firma pendiente".
 
 ### Requirement 9: Contract Screens Visual Consistency
 
@@ -147,6 +149,7 @@ This feature spec covers a set of improvements to the Colombian urban housing re
 3. THE Contract_Screen creation wizard SHALL use the platform's established form styling (design system typography tokens, Primary_Button_Style for CTAs, consistent input field styling).
 4. ALL Contract_Screen pages SHALL use the shared `StatusBadge` component with the `contract` variant for displaying contract status.
 5. ALL Contract_Screen pages SHALL follow the platform's mobile-first responsive design and accessibility standards (WCAG 2.1 AA).
+6. THE Contract_Screen detail view SHALL display party names as human-readable names (resolved from NaturalPersonDetail or LegalPersonDetail cross-schema) instead of raw user IDs.
 
 ### Requirement 10: Fix "Fecha de inicio: Invalid Date" Bug in Contract Creation
 
