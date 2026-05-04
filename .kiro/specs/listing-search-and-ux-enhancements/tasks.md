@@ -89,8 +89,8 @@ This plan implements ten interconnected improvements across backend schema, API 
 - [x] 6. Checkpoint — Ensure all backend changes compile and tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 7. Frontend: Update ListingFilters type and useFilters hook
-  - [ ] 7.1 Extend ListingFilters type with department and additionalFeatures
+- [x] 7. Frontend: Update ListingFilters type and useFilters hook
+  - [x] 7.1 Extend ListingFilters type with department and additionalFeatures
     - In `src/frontend/modules/property-listings/types.ts`, add `department?: string` and `additionalFeatures?: Record<string, string>` to the `ListingFilters` interface
     - Update `useFilters.ts` to handle the new `additionalFeatures` field — serialize as JSON string for URL params and parse back on read
     - _Requirements: 2.4, 3.5_
