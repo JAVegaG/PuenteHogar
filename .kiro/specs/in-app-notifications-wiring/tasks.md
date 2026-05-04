@@ -106,7 +106,7 @@ Replace empty notification port stubs in four backend modules (contracts, paymen
     - After the `this.auditLogger.log(...)` call, add fire-and-forget notification: `if (tenantUserId) { this.notificationPort.notifyContractUploaded(tenantUserId, contract.id, dto.leaseId).catch(() => undefined); }`
     - _Requirements: 2.1, 2.4, 7.1, 7.2_
 
-  - [~] 4.2 Add `notifySigningFailed` call to `HandleSigningWebhookUseCase`
+  - [x] 4.2 Add `notifySigningFailed` call to `HandleSigningWebhookUseCase`
     - Open `src/backend/modules/contracts/application/use-cases/handle-signing-webhook.use-case.ts`
     - In the `else` branch (FAILED status), after the audit log, add fire-and-forget: `const parties = await this.repository.findContractParties(contract.id); const landlord = parties.find(p => p.roleInContract === 'LANDLORD'); if (landlord) { this.notificationPort.notifySigningFailed(landlord.userId, contract.id).catch(() => undefined); }`
     - _Requirements: 1.2, 7.1, 7.2_
