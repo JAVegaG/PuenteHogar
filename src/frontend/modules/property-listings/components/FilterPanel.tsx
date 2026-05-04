@@ -126,6 +126,7 @@ export default function FilterPanel({
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchDepartments();
   }, [fetchDepartments]);
 
@@ -144,6 +145,7 @@ export default function FilterPanel({
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchCities(department);
   }, [department, fetchCities]);
 
@@ -246,8 +248,8 @@ export default function FilterPanel({
   // Note: The department change handler below handles the explicit user action.
   // This effect handles the case where department is cleared externally.
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!department) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCity('');
       setNeighborhood('');
     }
