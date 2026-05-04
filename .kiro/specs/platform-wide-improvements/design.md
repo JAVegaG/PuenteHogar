@@ -227,39 +227,32 @@ model User {
 }
 ```
 
-**Repository changes:** All `findMany`, `findUnique`, `findFirst` calls add `where: { deleted_at: null }` to their filters. All `delete`/`deleteMany` calls become `update`/`updateMany` setting `deleted_at: new Date()`.
+**Repository changes:** All `findMany`, `findUnique`, `findFirst` calls spread `softDeleteFilter` into their `where` clauses (or use `withSoftDeleteFilter`). All `delete`/`deleteMany` calls become `update`/`updateMany` using `softDeleteData()`.
 
-**Prisma middleware approach (recommended):** Instead of modifying every repository method, use Prisma middleware to automatically:
-1. Add `deleted_at: null` to all `findMany`/`findFirst`/`findUnique`/`count` queries
-2. Convert `delete` operations to `update` with `deleted_at: new Date()`
+**Prisma soft-delete utilities (recommended):** Since Prisma 6+ does not support the `$use` middleware API, soft delete is implemented as explicit query helpers in `src/backend/src/shared/prisma/soft-delete.utils.ts`:
 
 ```typescript
-// src/backend/src/shared/prisma/soft-delete.middleware.ts
-export function softDeleteMiddleware(params: Prisma.MiddlewareParams, next: Function) {
-  // For find operations: inject deleted_at: null filter
-  if (['findMany', 'findFirst', 'findUnique', 'count'].includes(params.action)) {
-    if (!params.args) params.args = {};
-    if (!params.args.where) params.args.where = {};
-    if (params.args.where.deleted_at === undefined) {
-      params.args.where.deleted_at = null;
-    }
-  }
-  // For delete: convert to update with deleted_at
-  if (params.action === 'delete') {
-    params.action = 'update';
-    params.args.data = { deleted_at: new Date() };
-  }
-  if (params.action === 'deleteMany') {
-    params.action = 'updateMany';
-    if (!params.args) params.args = {};
-    if (!params.args.data) params.args.data = {};
-    params.args.data.deleted_at = new Date();
-  }
-  return next(params);
+// src/backend/src/shared/prisma/soft-delete.utils.ts
+
+/** Spread into where clauses to exclude soft-deleted records */
+export const softDeleteFilter = { deleted_at: null } as const;
+
+/** Returns { deleted_at: new Date() } — use as data payload for soft-delete updates */
+export function softDeleteData(): { deleted_at: Date } {
+  return { deleted_at: new Date() };
+}
+
+/** Injects deleted_at: null into a where clause if not already present */
+export function withSoftDeleteFilter<T extends Record<string, unknown>>(
+  where?: T,
+): T & { deleted_at: null } | T {
+  if (!where) return { deleted_at: null } as any;
+  if ('deleted_at' in where) return where;
+  return { ...where, deleted_at: null } as any;
 }
 ```
 
-**Bypass mechanism:** To include soft-deleted records, pass `deleted_at: undefined` explicitly or use a special sentinel value that the middleware recognizes.
+**Bypass mechanism:** To include soft-deleted records, simply omit `softDeleteFilter` from the where clause, or pass `deleted_at: { not: null }` to find only deleted records.
 
 **Migration:** A single migration adds `deleted_at DateTime?` to all tables. Since the column is nullable with no default, existing rows automatically have `NULL`.
 
@@ -360,7 +353,7 @@ This spec is a mix of UI changes, schema migrations, and architecture refactorin
 | Cross-module service call fails (e.g., `hasActiveLeases`) | Let the exception propagate to the use case layer. The use case decides whether to fail the operation or use a safe default. |
 | ETL encounters a RAW record with invalid/corrupt payload | Log the error, mark the record as `processed: true` to prevent infinite retry loops (existing pattern). |
 | ETL encounters stringified JSON in RAW table (legacy) | `parsePayload` helper detects `typeof === 'string'` and calls `JSON.parse()`. If parsing fails, treat as corrupt payload. |
-| Soft-delete middleware encounters a model without `deleted_at` | The middleware should check if the model has the `deleted_at` field before injecting the filter. RAW tables (`UsersRaw`, `PortfolioRaw`, etc.) may be excluded from soft-delete filtering since they use `processed` flag instead. |
+| Soft-delete utilities used on a model without `deleted_at` | RAW tables (`UsersRaw`, `PortfolioRaw`, etc.) do not have `deleted_at` — repositories for RAW tables should not use `softDeleteFilter` or `withSoftDeleteFilter`. Since the utilities are explicit (not automatic middleware), this is enforced by convention. |
 | Migration fails on a table with existing constraints | The migration only adds a nullable column with no default — this is a non-breaking DDL change. No data migration needed. |
 
 ---
@@ -383,8 +376,8 @@ This spec is a mix of UI changes, schema migrations, and architecture refactorin
 - `PortfolioRaw` record stores proper JSON object after portfolio creation
 - Each cross-module port interface method returns correct boolean for known test scenarios
 - `PrismaUserRepository` no longer contains raw SQL cross-schema queries
-- Soft-delete middleware converts `delete` to `update` with `deleted_at`
-- Soft-delete middleware injects `deleted_at: null` filter on find operations
+- Soft-delete utilities: `softDeleteData()` returns `{ deleted_at: new Date() }` for converting deletes to updates
+- Soft-delete utilities: `softDeleteFilter` / `withSoftDeleteFilter` injects `deleted_at: null` filter on find operations
 
 ### Property-Based Tests
 
