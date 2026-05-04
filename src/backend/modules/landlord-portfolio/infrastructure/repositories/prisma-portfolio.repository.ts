@@ -152,7 +152,7 @@ export class PrismaPortfolioRepository implements IPortfolioRepository {
 
         for (const unit of portfolio.units) {
           const unitActiveLeases = unit.leases.filter(
-            (lease) => lease.end_date === null || lease.end_date > now,
+            (lease) => lease.deleted_at === null && (lease.end_date === null || lease.end_date > now),
           );
           activeLeases += unitActiveLeases.length;
           if (unitActiveLeases.length > 0) {
@@ -191,6 +191,7 @@ export class PrismaPortfolioRepository implements IPortfolioRepository {
 
     const activeLeases = await this.prisma.lease.count({
       where: {
+        deleted_at: null,
         portfolio_unit: {
           portfolio: {
             user_id: userId,
@@ -390,7 +391,7 @@ export class PrismaPortfolioRepository implements IPortfolioRepository {
   async hasActiveLeases(unitId: string): Promise<boolean> {
     // Find leases for this unit, then check if any has an active current status
     const leases = await this.prisma.lease.findMany({
-      where: { portfolio_unit_id: unitId },
+      where: { portfolio_unit_id: unitId, deleted_at: null },
       select: { id: true },
     });
 

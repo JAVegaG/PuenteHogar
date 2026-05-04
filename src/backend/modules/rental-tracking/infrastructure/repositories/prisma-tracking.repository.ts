@@ -12,7 +12,7 @@ import {
 
 @Injectable()
 export class PrismaTrackingRepository implements ITrackingRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async getCurrentStatus(leaseId: string): Promise<LeaseCurrentStatusEntity | null> {
     const current = await this.prisma.leaseCurrentStatus.findUnique({
@@ -80,6 +80,7 @@ export class PrismaTrackingRepository implements ITrackingRepository {
     const [landlordLeases, tenantLeases] = await Promise.all([
       this.prisma.lease.findMany({
         where: {
+          deleted_at: null,
           portfolio_unit: {
             portfolio: { user_id: userId },
           },
@@ -93,7 +94,7 @@ export class PrismaTrackingRepository implements ITrackingRepository {
         },
       }),
       this.prisma.lease.findMany({
-        where: { user_id: userId },
+        where: { user_id: userId, deleted_at: null },
         include: {
           portfolio_unit: {
             include: {
