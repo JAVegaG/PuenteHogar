@@ -1,3 +1,4 @@
+jest.mock("@src/shared/prisma/prisma.service", () => ({ PrismaService: jest.fn() }));
 // Feature: backend-database-implementation, Property 25: Contrato PDF almacenado en object storage con referencia en BD (round-trip)
 // Validates: Requirements 5.1
 
@@ -172,7 +173,7 @@ describe('UploadContractUseCase — Property 25: Contrato PDF almacenado en obje
           const auditLogger = makeAuditLoggerStub();
 
           const uploadUseCase = new UploadContractUseCase(stub, objectStorage, auditLogger);
-          const getUseCase = new GetContractSummaryUseCase(stub, objectStorage);
+          const getUseCase = new GetContractSummaryUseCase(stub, objectStorage, { naturalPersonDetail: { findUnique: jest.fn().mockResolvedValue(null) }, legalPersonDetail: { findUnique: jest.fn().mockResolvedValue(null) } } as any);
 
           const file = makeFileInput();
           const dto = {

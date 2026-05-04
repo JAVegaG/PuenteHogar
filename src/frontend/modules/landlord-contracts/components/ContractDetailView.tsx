@@ -268,7 +268,7 @@ export default function ContractDetailView({ contractId }: ContractDetailViewPro
                                                     className="flex items-center justify-between border border-neutral-300 rounded-[6px] bg-white p-3"
                                                 >
                                                     <span className="text-body text-neutral-700">
-                                                        {party.userId}
+                                                        {party.name || party.userId}
                                                     </span>
                                                     <span className="text-caption font-medium text-neutral-500">
                                                         {getRoleLabel(party.role)}

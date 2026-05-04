@@ -14,6 +14,9 @@ export class ContractPartyDto {
 
   @ApiProperty()
   role!: string;
+
+  @ApiPropertyOptional({ nullable: true, description: 'Nombre de la parte (resuelto cross-schema)' })
+  name!: string | null;
 }
 
 export class ContractSummaryDto {

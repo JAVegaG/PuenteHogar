@@ -348,7 +348,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
               getPresignedUrl: jest.fn().mockResolvedValue('https://presigned.example.com/test'),
             };
 
-            const useCase = new GetContractSummaryUseCase(mockRepo, mockObjectStorage);
+            const useCase = new GetContractSummaryUseCase(mockRepo, mockObjectStorage, { naturalPersonDetail: { findUnique: jest.fn().mockResolvedValue(null) }, legalPersonDetail: { findUnique: jest.fn().mockResolvedValue(null) } } as any);
 
             let threw = false;
             try {
@@ -412,7 +412,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
               getPresignedUrl: jest.fn().mockResolvedValue('https://presigned.example.com/test'),
             };
 
-            const useCase = new GetContractSummaryUseCase(mockRepo, mockObjectStorage2);
+            const useCase = new GetContractSummaryUseCase(mockRepo, mockObjectStorage2, { naturalPersonDetail: { findUnique: jest.fn().mockResolvedValue(null) }, legalPersonDetail: { findUnique: jest.fn().mockResolvedValue(null) } } as any);
 
             let succeeded = false;
             try {

@@ -10,6 +10,7 @@ export interface UploadContractRequest {
 export interface ContractParty {
     userId: string;
     role: string;
+    name: string | null;
 }
 
 export interface ContractSummary {

@@ -1,3 +1,4 @@
+jest.mock("@src/shared/prisma/prisma.service", () => ({ PrismaService: jest.fn() }));
 // Feature: backend-database-implementation, Property 31: Contrato SIGNED es inmutable — no permite modificaciones
 // Validates: Requirements 5.10
 
@@ -239,7 +240,7 @@ describe('Property 31: Contrato SIGNED es inmutable — no permite modificacione
               return `https://presigned.example.com/${objectKey}`;
             },
           };
-          const getUseCase = new GetContractSummaryUseCase(stubs.repository as any, objectStorage);
+          const getUseCase = new GetContractSummaryUseCase(stubs.repository as any, objectStorage, { naturalPersonDetail: { findUnique: jest.fn().mockResolvedValue(null) }, legalPersonDetail: { findUnique: jest.fn().mockResolvedValue(null) } } as any);
 
           // Landlord can query
           const summaryLandlord = await getUseCase.execute(

@@ -115,6 +115,7 @@ export class ReplaceContractFileUseCase {
         dto.parties = parties.map((p) => ({
             userId: p.userId,
             role: p.roleInContract,
+            name: null,
         }));
 
         return dto;

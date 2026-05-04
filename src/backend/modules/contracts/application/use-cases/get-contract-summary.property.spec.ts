@@ -1,3 +1,4 @@
+jest.mock("@src/shared/prisma/prisma.service", () => ({ PrismaService: jest.fn() }));
 // Feature: backend-database-implementation, Property 27: Resumen de contrato contiene campos clave y URL del documento
 // Validates: Requirements 5.4
 
@@ -152,7 +153,7 @@ describe('GetContractSummaryUseCase — Property 27: Resumen de contrato contien
 
           const repo = makeRepositoryStub(input);
           const objectStorage = makeObjectStorageStub();
-          const useCase = new GetContractSummaryUseCase(repo, objectStorage);
+          const useCase = new GetContractSummaryUseCase(repo, objectStorage, { naturalPersonDetail: { findUnique: jest.fn().mockResolvedValue(null) }, legalPersonDetail: { findUnique: jest.fn().mockResolvedValue(null) } } as any);
 
           // Execute as the landlord (a valid party)
           const summary = await useCase.execute(input.contractId, input.landlordUserId);
@@ -222,7 +223,7 @@ describe('GetContractSummaryUseCase — Property 27: Resumen de contrato contien
 
           const repo = makeRepositoryStub(input);
           const objectStorage = makeObjectStorageStub();
-          const useCase = new GetContractSummaryUseCase(repo, objectStorage);
+          const useCase = new GetContractSummaryUseCase(repo, objectStorage, { naturalPersonDetail: { findUnique: jest.fn().mockResolvedValue(null) }, legalPersonDetail: { findUnique: jest.fn().mockResolvedValue(null) } } as any);
 
           const summary = await useCase.execute(input.contractId, input.landlordUserId);
 
@@ -262,7 +263,7 @@ describe('GetContractSummaryUseCase — Property 27: Resumen de contrato contien
 
           const repo = makeRepositoryStub(input);
           const objectStorage = makeObjectStorageStub();
-          const useCase = new GetContractSummaryUseCase(repo, objectStorage);
+          const useCase = new GetContractSummaryUseCase(repo, objectStorage, { naturalPersonDetail: { findUnique: jest.fn().mockResolvedValue(null) }, legalPersonDetail: { findUnique: jest.fn().mockResolvedValue(null) } } as any);
 
           const landlordView = await useCase.execute(input.contractId, input.landlordUserId);
           const tenantView = await useCase.execute(input.contractId, input.tenantUserId);
@@ -305,7 +306,7 @@ describe('GetContractSummaryUseCase — Property 27: Resumen de contrato contien
 
           const repo = makeRepositoryStub(input);
           const objectStorage = makeObjectStorageStub();
-          const useCase = new GetContractSummaryUseCase(repo, objectStorage);
+          const useCase = new GetContractSummaryUseCase(repo, objectStorage, { naturalPersonDetail: { findUnique: jest.fn().mockResolvedValue(null) }, legalPersonDetail: { findUnique: jest.fn().mockResolvedValue(null) } } as any);
 
           const outsiderUserId = uuidv4();
 

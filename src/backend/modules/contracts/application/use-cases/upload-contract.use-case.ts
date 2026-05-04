@@ -148,7 +148,7 @@ export class UploadContractUseCase {
     dto.fileUrl = entity.fileUrl;
     dto.signedAt = entity.signedAt;
     dto.externalSigningId = entity.externalSigningId;
-    dto.parties = parties;
+    dto.parties = parties.map((p) => ({ ...p, name: null }));
     return dto;
   }
 }
@@ -166,6 +166,6 @@ export function toContractSummaryDto(
   dto.fileUrl = entity.fileUrl;
   dto.signedAt = entity.signedAt;
   dto.externalSigningId = entity.externalSigningId;
-  dto.parties = parties.map((p) => ({ userId: p.userId, role: p.roleInContract }));
+  dto.parties = parties.map((p) => ({ userId: p.userId, role: p.roleInContract, name: null }));
   return dto;
 }
