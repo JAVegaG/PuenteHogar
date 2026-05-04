@@ -70,3 +70,15 @@ export interface ListingResponse {
   isActive: boolean;
   photos: { id: string; fileUrl: string; isMain: boolean }[];
 }
+
+export interface AdditionalFeature {
+  id: string;
+  name: string;
+  description: string | null;
+  type: string;
+  element: string;
+  active: boolean;
+  main: boolean;
+  required: boolean;
+  errorMessage: string | null;
+}

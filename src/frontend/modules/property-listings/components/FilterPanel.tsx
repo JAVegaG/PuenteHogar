@@ -3,8 +3,9 @@
 import { useState, useEffect, useId, useMemo, useCallback } from 'react';
 import { Button } from '@/shared/components/Button';
 import { portfolioService } from '@/shared/services/portfolio';
+import { fetchAdditionalFeatures } from '@/shared/services/api';
 import type { PropertyType, Department, City } from '@/modules/landlord-portfolio/types';
-import type { ListingFilters } from '../types';
+import type { ListingFilters, AdditionalFeature } from '../types';
 
 export interface FilterPanelProps {
   isOpen: boolean;
@@ -109,6 +110,13 @@ export default function FilterPanel({
   const [cityError, setCityError] = useState(false);
   const [loadingCities, setLoadingCities] = useState(false);
 
+  // Additional features state
+  const [additionalFeatures, setAdditionalFeatures] = useState<AdditionalFeature[]>([]);
+  const [additionalFeatureValues, setAdditionalFeatureValues] = useState<Record<string, string>>(
+    currentFilters.additionalFeatures ?? {}
+  );
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+
   // Fetch departments from backend on mount
   const fetchDepartments = useCallback(() => {
     setDepartmentError(false);
@@ -152,6 +160,19 @@ export default function FilterPanel({
     return () => { cancelled = true; };
   }, []);
 
+  // Fetch additional features from backend on mount
+  useEffect(() => {
+    let cancelled = false;
+    fetchAdditionalFeatures()
+      .then((features) => {
+        if (!cancelled) setAdditionalFeatures(features);
+      })
+      .catch(() => {
+        // Graceful degradation — show only built-in filters
+      });
+    return () => { cancelled = true; };
+  }, []);
+
   // Track whether user typed invalid characters (for inline error display)
   const [priceMinError, setPriceMinError] = useState<string | null>(null);
   const [priceMaxError, setPriceMaxError] = useState<string | null>(null);
@@ -167,6 +188,28 @@ export default function FilterPanel({
     () => validateMinMax(areaMinRaw, areaMaxRaw),
     [areaMinRaw, areaMaxRaw],
   );
+
+  // Derived additional feature lists
+  const mainFeatures = useMemo(
+    () => additionalFeatures.filter((f) => f.main && f.active),
+    [additionalFeatures],
+  );
+  const advancedFeatures = useMemo(
+    () => additionalFeatures.filter((f) => !f.main && f.active),
+    [additionalFeatures],
+  );
+
+  const handleFeatureValueChange = useCallback((featureId: string, value: string) => {
+    setAdditionalFeatureValues((prev) => {
+      const next = { ...prev };
+      if (value) {
+        next[featureId] = value;
+      } else {
+        delete next[featureId];
+      }
+      return next;
+    });
+  }, []);
 
   // API saturation protection review (task 12.2):
   // ✅ Numeric inputs (price min/max, area min/max) use local state only — no API calls on keystroke.
@@ -190,6 +233,7 @@ export default function FilterPanel({
     setBathrooms(bathroomsToString(currentFilters.bathrooms));
     setAreaMinRaw(currentFilters.areaMin?.toString() ?? '');
     setAreaMaxRaw(currentFilters.areaMax?.toString() ?? '');
+    setAdditionalFeatureValues(currentFilters.additionalFeatures ?? {});
     // Clear errors when filters are synced externally
     setPriceMinError(null);
     setPriceMaxError(null);
@@ -281,6 +325,9 @@ export default function FilterPanel({
     if (bathVal !== undefined) filters.bathrooms = bathVal;
     if (areaMinRaw) filters.areaMin = Number(areaMinRaw);
     if (areaMaxRaw) filters.areaMax = Number(areaMaxRaw);
+    if (Object.keys(additionalFeatureValues).length > 0) {
+      filters.additionalFeatures = additionalFeatureValues;
+    }
     onApply(filters);
     onClose();
   };
@@ -297,6 +344,7 @@ export default function FilterPanel({
     setBathrooms('');
     setAreaMinRaw('');
     setAreaMaxRaw('');
+    setAdditionalFeatureValues({});
     setPriceMinError(null);
     setPriceMaxError(null);
     setAreaMinError(null);
@@ -600,6 +648,139 @@ export default function FilterPanel({
               <p id={areaRangeErrorId} className="text-caption text-error" role="alert">{areaRangeError}</p>
             )}
           </div>
+
+          {/* Main additional features */}
+          {mainFeatures.map((feature) => (
+            <div key={feature.id} className="space-y-element-gap">
+              <label htmlFor={`${uid}-feature-${feature.id}`} className={labelClass}>
+                {feature.name}
+              </label>
+              {feature.element === 'checkbox' ? (
+                <label className="flex items-center gap-2 min-h-[44px] cursor-pointer">
+                  <input
+                    id={`${uid}-feature-${feature.id}`}
+                    type="checkbox"
+                    checked={additionalFeatureValues[feature.id] === 'true'}
+                    onChange={(e) => handleFeatureValueChange(feature.id, e.target.checked ? 'true' : '')}
+                    className="w-5 h-5 rounded border-neutral-300 text-primary focus-visible:ring-2 focus-visible:ring-primary"
+                  />
+                  <span className="text-body text-neutral-700">{feature.description || feature.name}</span>
+                </label>
+              ) : feature.element === 'dropdown' ? (
+                <select
+                  id={`${uid}-feature-${feature.id}`}
+                  value={additionalFeatureValues[feature.id] ?? ''}
+                  onChange={(e) => handleFeatureValueChange(feature.id, e.target.value)}
+                  className={selectClass}
+                >
+                  <option value="">Seleccionar {feature.name.toLowerCase()}</option>
+                  <option value={feature.name}>{feature.name}</option>
+                </select>
+              ) : feature.element === 'number_field' ? (
+                <input
+                  id={`${uid}-feature-${feature.id}`}
+                  type="text"
+                  inputMode="numeric"
+                  placeholder={feature.description || feature.name}
+                  value={additionalFeatureValues[feature.id] ?? ''}
+                  onChange={(e) => handleFeatureValueChange(feature.id, e.target.value.replace(/\D/g, ''))}
+                  className={textInputClass}
+                />
+              ) : (
+                <input
+                  id={`${uid}-feature-${feature.id}`}
+                  type="text"
+                  placeholder={feature.description || feature.name}
+                  value={additionalFeatureValues[feature.id] ?? ''}
+                  onChange={(e) => handleFeatureValueChange(feature.id, e.target.value)}
+                  className={textInputClass}
+                />
+              )}
+            </div>
+          ))}
+
+          {/* Filtros avanzados (advanced additional features) */}
+          {advancedFeatures.length > 0 && (
+            <div className="space-y-element-gap">
+              <button
+                type="button"
+                onClick={() => setAdvancedOpen((prev) => !prev)}
+                className="flex items-center gap-2 min-h-[44px] min-w-[44px] text-body font-semibold text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-card"
+                aria-expanded={advancedOpen}
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  aria-hidden="true"
+                  className={`transition-transform ${advancedOpen ? 'rotate-180' : ''}`}
+                >
+                  <path
+                    d="M5 8l5 5 5-5"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                Filtros avanzados
+              </button>
+
+              {advancedOpen && (
+                <div className="space-y-section-gap pl-2">
+                  {advancedFeatures.map((feature) => (
+                    <div key={feature.id} className="space-y-element-gap">
+                      <label htmlFor={`${uid}-adv-feature-${feature.id}`} className={labelClass}>
+                        {feature.name}
+                      </label>
+                      {feature.element === 'checkbox' ? (
+                        <label className="flex items-center gap-2 min-h-[44px] cursor-pointer">
+                          <input
+                            id={`${uid}-adv-feature-${feature.id}`}
+                            type="checkbox"
+                            checked={additionalFeatureValues[feature.id] === 'true'}
+                            onChange={(e) => handleFeatureValueChange(feature.id, e.target.checked ? 'true' : '')}
+                            className="w-5 h-5 rounded border-neutral-300 text-primary focus-visible:ring-2 focus-visible:ring-primary"
+                          />
+                          <span className="text-body text-neutral-700">{feature.description || feature.name}</span>
+                        </label>
+                      ) : feature.element === 'dropdown' ? (
+                        <select
+                          id={`${uid}-adv-feature-${feature.id}`}
+                          value={additionalFeatureValues[feature.id] ?? ''}
+                          onChange={(e) => handleFeatureValueChange(feature.id, e.target.value)}
+                          className={selectClass}
+                        >
+                          <option value="">Seleccionar {feature.name.toLowerCase()}</option>
+                          <option value={feature.name}>{feature.name}</option>
+                        </select>
+                      ) : feature.element === 'number_field' ? (
+                        <input
+                          id={`${uid}-adv-feature-${feature.id}`}
+                          type="text"
+                          inputMode="numeric"
+                          placeholder={feature.description || feature.name}
+                          value={additionalFeatureValues[feature.id] ?? ''}
+                          onChange={(e) => handleFeatureValueChange(feature.id, e.target.value.replace(/\D/g, ''))}
+                          className={textInputClass}
+                        />
+                      ) : (
+                        <input
+                          id={`${uid}-adv-feature-${feature.id}`}
+                          type="text"
+                          placeholder={feature.description || feature.name}
+                          value={additionalFeatureValues[feature.id] ?? ''}
+                          onChange={(e) => handleFeatureValueChange(feature.id, e.target.value)}
+                          className={textInputClass}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

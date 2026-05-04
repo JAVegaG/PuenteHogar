@@ -63,7 +63,7 @@ export function useFilters() {
   const setFilter = useCallback(
     (key: keyof ListingFilters, value: string | number | undefined) => {
       const newFilters = { ...filters, [key]: value, page: 1 };
-      if (value === undefined || value === '') delete (newFilters as Record<string, string | number | undefined>)[key];
+      if (value === undefined || value === '') delete (newFilters as Record<string, unknown>)[key];
       updateURL(newFilters);
     },
     [filters, updateURL],

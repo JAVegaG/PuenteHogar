@@ -1,4 +1,4 @@
-import type { ListingFilters, PaginatedListings, ListingDetail, ListingResponse } from '@modules/property-listings/types';
+import type { ListingFilters, PaginatedListings, ListingDetail, ListingResponse, AdditionalFeature } from '@modules/property-listings/types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -135,4 +135,24 @@ export async function unpublishListing(
     if (res.status === 404) throw new Error('NOT_FOUND');
     throw new Error('Error del servidor. Intenta de nuevo más tarde.');
   }
+}
+
+
+export async function fetchAdditionalFeatures(): Promise<AdditionalFeature[]> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}/listings/additional-features`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch {
+    throw new Error('No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo.');
+  }
+
+  if (!res.ok) {
+    if (res.status >= 500) throw new Error('Error del servidor. Intenta de nuevo más tarde.');
+    throw new Error('Error del servidor. Intenta de nuevo más tarde.');
+  }
+
+  return res.json();
 }
