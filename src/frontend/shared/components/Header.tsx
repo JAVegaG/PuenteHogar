@@ -4,9 +4,12 @@ interface HeaderProps {
   title: string;
   onMenuClick: () => void;
   leftAction?: React.ReactNode;
+  unreadNotificationCount?: number;
 }
 
-export function Header({ title, onMenuClick, leftAction }: HeaderProps) {
+export function Header({ title, onMenuClick, leftAction, unreadNotificationCount }: HeaderProps) {
+  const hasUnread = typeof unreadNotificationCount === 'number' && unreadNotificationCount > 0;
+
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-neutral-300">
       <div className="flex items-center justify-between min-h-[56px] px-mobile-margin md:px-desktop-margin py-2">
@@ -15,8 +18,12 @@ export function Header({ title, onMenuClick, leftAction }: HeaderProps) {
             <button
               type="button"
               onClick={onMenuClick}
-              aria-label="Abrir menú"
-              className="flex items-center justify-center w-[44px] h-[44px] rounded-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              aria-label={
+                hasUnread
+                  ? `Abrir menú (${unreadNotificationCount} notificaciones sin leer)`
+                  : 'Abrir menú'
+              }
+              className="relative flex items-center justify-center w-[44px] h-[44px] rounded-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <svg
                 width="24"
@@ -33,6 +40,12 @@ export function Header({ title, onMenuClick, leftAction }: HeaderProps) {
                 <line x1="3" y1="12" x2="21" y2="12" />
                 <line x1="3" y1="18" x2="21" y2="18" />
               </svg>
+              {hasUnread && (
+                <span
+                  className="absolute top-[6px] right-[6px] w-[10px] h-[10px] bg-red-500 rounded-full"
+                  aria-hidden="true"
+                />
+              )}
             </button>
           )}
         </div>
