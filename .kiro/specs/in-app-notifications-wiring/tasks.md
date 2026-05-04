@@ -205,7 +205,7 @@ _These tasks address UX issues discovered during manual testing after the initia
     - Create use case that validates ownership and calls repository soft-delete
     - _Requirements: 13.1, 13.2, 13.3_
 
-  - [~] 10.3 Add `DELETE /notifications/:id` endpoint to controller
+  - [x] 10.3 Add `DELETE /notifications/:id` endpoint to controller
     - Add route to `NotificationsController` with JWT guard
     - Add Swagger decorators
     - _Requirements: 13.1, 13.2, 13.3_
