@@ -194,7 +194,7 @@ _These tasks address UX issues discovered during manual testing after the initia
     - Fall back to generic descriptions (e.g., "un contrato", "un arriendo") when names are unavailable
     - _Requirements: 11.1, 11.3, 11.4_
 
-- [ ] 10. Add delete notification endpoint and frontend action
+- [x] 10. Add delete notification endpoint and frontend action
   - [x] 10.1 Add `softDeleteNotification` to notification repository
     - Add method to `INotificationRepository` and `PrismaNotificationRepository`
     - Soft-delete by setting `deleted_at` on the `InAppNotification` record
@@ -210,7 +210,7 @@ _These tasks address UX issues discovered during manual testing after the initia
     - Add Swagger decorators
     - _Requirements: 13.1, 13.2, 13.3_
 
-  - [~] 10.4 Add delete button to frontend notification cards
+  - [x] 10.4 Add delete button to frontend notification cards
     - Add a trash icon button to each notification card in `NotificationsListView`
     - Call `DELETE /notifications/:id` on click
     - Remove the card from the list optimistically
