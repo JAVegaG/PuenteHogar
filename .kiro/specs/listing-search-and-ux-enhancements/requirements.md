@@ -86,11 +86,11 @@ This feature spec covers a set of improvements to the Colombian urban housing re
 4. WHEN the user types text into the Keyword_Search_Bar, THE Platform SHALL apply a debounce of at least 300ms before computing and displaying the filtered suggestion list from the prefetched catalog data.
 5. WHEN the debounced input value changes, THE Platform SHALL display a dropdown of suggested structured filters matching the input (e.g., typing "Cali" suggests "ciudad: Cali") by performing a case-insensitive substring match against the prefetched catalog entries.
 6. THE Platform SHALL generate suggestions from the available filter dimensions: department, city, property type, and additional features marked as `main: true`.
-7. WHEN the user clicks a suggestion, THE Platform SHALL add it as a Tag_Chip below the Keyword_Search_Bar and clear the text input.
-8. WHEN a Tag_Chip is displayed, THE Platform SHALL provide a remove button on the chip that removes the corresponding filter.
-9. THE Platform SHALL NOT trigger the listing search automatically when a Tag_Chip is added or removed.
-10. WHEN the user clicks the Buscar_Button next to the Keyword_Search_Bar, THE Platform SHALL apply all active Tag_Chip filters and trigger the listing search.
-11. WHEN Tag_Chip filters are applied via the Buscar_Button, THE Platform SHALL synchronize them with the Filter_Panel state so both mechanisms reflect the same active filters.
+7. WHEN the user clicks a suggestion, THE Platform SHALL add it as a Tag_Chip below the Keyword_Search_Bar, clear the text input, and immediately trigger the listing search with the updated filters.
+8. WHEN a Tag_Chip is displayed, THE Platform SHALL provide a remove button on the chip that removes the corresponding filter and immediately triggers the listing search with the updated filters.
+9. THE Platform SHALL trigger the listing search automatically when a Tag_Chip is added or removed, so that the visible chips always reflect the active search criteria.
+10. THE Buscar_Button next to the Keyword_Search_Bar SHALL also trigger the listing search with all active Tag_Chip filters (as a redundant explicit action).
+11. WHEN Tag_Chip filters change (via addition or removal), THE Platform SHALL synchronize them with the Filter_Panel state so both mechanisms reflect the same active filters.
 
 ### Requirement 6: Landing Page
 

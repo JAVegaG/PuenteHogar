@@ -124,9 +124,9 @@ This plan implements ten interconnected improvements across backend schema, API 
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6_
 
   - [x] 9.2 Implement TagChip pattern and Buscar button
-    - On suggestion click, add a `TagChip` (pill element with remove button) below the search bar and clear the text input
-    - On chip remove, remove the corresponding filter — no API call
-    - On "Buscar" button click, convert all active TagChips to `ListingFilters` and call `onSearch` callback
+    - On suggestion click, add a `TagChip` (pill element with remove button) below the search bar, clear the text input, and immediately trigger the listing search with updated filters
+    - On chip remove, remove the corresponding filter and immediately trigger the listing search with updated filters
+    - On "Buscar" button click, convert all active TagChips to `ListingFilters` and call `onSearch` callback (redundant explicit trigger)
     - Synchronize TagChip filters with FilterPanel state so both reflect the same active filters
     - _Requirements: 5.7, 5.8, 5.9, 5.10, 5.11_
 

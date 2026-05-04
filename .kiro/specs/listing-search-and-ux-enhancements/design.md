@@ -98,10 +98,11 @@ sequenceDiagram
 
     U->>KSB: Clicks "ciudad: Cali"
     KSB->>KSB: Add Tag_Chip, clear input
-    Note over KSB: No API call yet
+    KSB->>API: GET /listings?city=Cali&... (auto-triggered)
+    API-->>KSB: Paginated results
 
-    U->>KSB: Clicks "Buscar" button
-    KSB->>API: GET /listings?city=Cali&...
+    U->>KSB: Removes Tag_Chip "ciudad: Cali"
+    KSB->>API: GET /listings?... (auto-triggered without city filter)
     API-->>KSB: Paginated results
 ```
 
@@ -275,9 +276,9 @@ interface TagChip {
 **Behavior:**
 - On mount: prefetch departments, cities (for all active departments), property types, and main additional features. Store in component state.
 - On input change: debounce 300ms, then filter prefetched catalogs with case-insensitive substring match.
-- On suggestion click: add TagChip, clear input.
-- On chip remove: remove TagChip. No API call.
-- On "Buscar" button click: convert TagChips to ListingFilters, call `onSearch`.
+- On suggestion click: add TagChip, clear input, and immediately call `onSearch` with updated filters.
+- On chip remove: remove TagChip and immediately call `onSearch` with updated filters.
+- On "Buscar" button click: convert TagChips to ListingFilters, call `onSearch` (redundant explicit trigger).
 
 #### 6. Updated FilterPanel
 

@@ -224,37 +224,10 @@ export default function KeywordSearchBar({ onSearch, currentFilters }: KeywordSe
         };
     }, []);
 
-    const handleSuggestionClick = useCallback((suggestion: Suggestion) => {
-        setChips((prev) => {
-            // Replace existing chip of same dimension (except additionalFeature which can have multiple)
-            if (suggestion.dimension === 'additionalFeature') {
-                const exists = prev.some(
-                    (c) => c.dimension === suggestion.dimension && c.value === suggestion.value
-                );
-                if (exists) return prev;
-                return [...prev, suggestion];
-            }
-            const filtered = prev.filter((c) => c.dimension !== suggestion.dimension);
-            return [...filtered, suggestion];
-        });
-        setInputValue('');
-        setSuggestions([]);
-        setShowDropdown(false);
-        inputRef.current?.focus();
-    }, []);
-
-    const handleChipRemove = useCallback((chipToRemove: Suggestion) => {
-        setChips((prev) =>
-            prev.filter(
-                (c) => !(c.dimension === chipToRemove.dimension && c.value === chipToRemove.value)
-            )
-        );
-    }, []);
-
-    const handleSearch = useCallback(() => {
+    /** Convert a chip array to ListingFilters */
+    const chipsToFilters = useCallback((chipList: Suggestion[]): ListingFilters => {
         const filters: ListingFilters = {};
-
-        for (const chip of chips) {
+        for (const chip of chipList) {
             switch (chip.dimension) {
                 case 'department':
                     filters.department = chip.value;
@@ -273,9 +246,47 @@ export default function KeywordSearchBar({ onSearch, currentFilters }: KeywordSe
                     break;
             }
         }
+        return filters;
+    }, []);
 
-        onSearch(filters);
-    }, [chips, onSearch]);
+    const handleSuggestionClick = useCallback((suggestion: Suggestion) => {
+        setChips((prev) => {
+            let newChips: Suggestion[];
+            // Replace existing chip of same dimension (except additionalFeature which can have multiple)
+            if (suggestion.dimension === 'additionalFeature') {
+                const exists = prev.some(
+                    (c) => c.dimension === suggestion.dimension && c.value === suggestion.value
+                );
+                if (exists) return prev;
+                newChips = [...prev, suggestion];
+            } else {
+                const filtered = prev.filter((c) => c.dimension !== suggestion.dimension);
+                newChips = [...filtered, suggestion];
+            }
+            // Trigger search immediately with updated chips
+            onSearch(chipsToFilters(newChips));
+            return newChips;
+        });
+        setInputValue('');
+        setSuggestions([]);
+        setShowDropdown(false);
+        inputRef.current?.focus();
+    }, [onSearch, chipsToFilters]);
+
+    const handleChipRemove = useCallback((chipToRemove: Suggestion) => {
+        setChips((prev) => {
+            const newChips = prev.filter(
+                (c) => !(c.dimension === chipToRemove.dimension && c.value === chipToRemove.value)
+            );
+            // Trigger search immediately with updated chips
+            onSearch(chipsToFilters(newChips));
+            return newChips;
+        });
+    }, [onSearch, chipsToFilters]);
+
+    const handleSearch = useCallback(() => {
+        onSearch(chipsToFilters(chips));
+    }, [chips, onSearch, chipsToFilters]);
 
     // Close dropdown when clicking outside
     useEffect(() => {
