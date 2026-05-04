@@ -280,6 +280,8 @@ interface TagChip {
 - On suggestion click: add TagChip, clear input, and immediately call `onSearch` with updated filters.
 - On chip remove: remove TagChip and immediately call `onSearch` with updated filters.
 - On "Buscar" button click: convert TagChips to ListingFilters, call `onSearch` (redundant explicit trigger).
+- The Buscar button uses `min-w-[80px] px-6 shrink-0` to maintain visual proportion with the search input.
+- The search bar row uses the same horizontal padding (`px-mobile-margin md:px-desktop-margin`) as the ActionBar below it for visual alignment on mobile.
 
 #### 6. Updated FilterPanel
 

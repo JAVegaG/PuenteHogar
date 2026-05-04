@@ -369,7 +369,7 @@ export default function KeywordSearchBar({ onSearch, currentFilters }: KeywordSe
                 <button
                     type="button"
                     onClick={handleSearch}
-                    className="bg-[#1d4ed8] text-white rounded-[6px] min-h-[44px] min-w-[44px] px-4 inline-flex items-center justify-center font-semibold text-body whitespace-nowrap"
+                    className="bg-[#1d4ed8] text-white rounded-[6px] min-h-[44px] min-w-[80px] px-6 inline-flex items-center justify-center font-semibold text-body whitespace-nowrap shrink-0"
                 >
                     Buscar
                 </button>

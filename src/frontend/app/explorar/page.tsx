@@ -55,7 +55,7 @@ function ExploreContent() {
         )}
       </Suspense>
 
-      <div className="px-mobile-margin md:px-desktop-margin pt-4">
+      <div className="px-mobile-margin md:px-desktop-margin pt-4 pb-1">
         <KeywordSearchBar onSearch={setFilters} currentFilters={filters} />
       </div>
 

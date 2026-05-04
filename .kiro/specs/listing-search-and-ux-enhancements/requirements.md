@@ -91,6 +91,7 @@ This feature spec covers a set of improvements to the Colombian urban housing re
 9. THE Platform SHALL trigger the listing search automatically when a Tag_Chip is added or removed, so that the visible chips always reflect the active search criteria.
 10. THE Buscar_Button next to the Keyword_Search_Bar SHALL also trigger the listing search with all active Tag_Chip filters (as a redundant explicit action).
 11. WHEN Tag_Chip filters change (via addition or removal), THE Platform SHALL synchronize them with the Filter_Panel state so both mechanisms reflect the same active filters.
+12. THE Buscar_Button SHALL be visually proportionate to the search input (minimum width 80px, wider padding) and the search bar row SHALL align horizontally with the Filter/Sort action bar below it.
 
 ### Requirement 6: Landing Page
 
