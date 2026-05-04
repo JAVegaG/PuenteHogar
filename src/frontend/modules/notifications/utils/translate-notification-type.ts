@@ -5,6 +5,8 @@ const NOTIFICATION_TYPE_TRANSLATIONS: Record<string, string> = {
     CONTRACT_UPLOADED: 'Contrato cargado',
     PAYMENT_DUE: 'Pago pendiente',
     NEW_INTEREST: 'Nuevo interesado',
+    LEASE_CREATED: 'Arriendo creado',
+    LEASE_CANCELLED: 'Arriendo cancelado',
 };
 
 function formatFallback(key: string): string {

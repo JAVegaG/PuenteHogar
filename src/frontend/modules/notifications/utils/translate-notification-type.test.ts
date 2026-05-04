@@ -26,6 +26,14 @@ describe('translateNotificationType', () => {
         expect(translateNotificationType('NEW_INTEREST')).toBe('Nuevo interesado');
     });
 
+    it('translates LEASE_CREATED to "Arriendo creado"', () => {
+        expect(translateNotificationType('LEASE_CREATED')).toBe('Arriendo creado');
+    });
+
+    it('translates LEASE_CANCELLED to "Arriendo cancelado"', () => {
+        expect(translateNotificationType('LEASE_CANCELLED')).toBe('Arriendo cancelado');
+    });
+
     it('formats unknown types: replaces underscores with spaces and title-cases first word', () => {
         expect(translateNotificationType('SOME_NEW_TYPE')).toBe('Some new type');
     });
