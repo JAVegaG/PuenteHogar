@@ -95,7 +95,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - Update `useFilters.ts` to handle the new `additionalFeatures` field — serialize as JSON string for URL params and parse back on read
     - _Requirements: 2.4, 3.5_
 
-- [ ] 8. Frontend: Backend-driven FilterPanel
+- [x] 8. Frontend: Backend-driven FilterPanel
   - [x] 8.1 Replace hardcoded CITIES with backend-driven department/city dropdowns
     - In `src/frontend/modules/property-listings/components/FilterPanel.tsx`, remove the hardcoded `CITIES` array
     - Fetch departments from `GET /portfolio/departments` on mount
@@ -106,7 +106,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - Handle fetch errors with "No se pudieron cargar las opciones" message and retry button
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.7_
 
-  - [ ] 8.2 Add additional features sections to FilterPanel
+  - [x] 8.2 Add additional features sections to FilterPanel
     - Fetch active additional features from `GET /listings/additional-features` on mount
     - Render `main: true` features in the basic filter section, dynamically creating inputs based on `element` type (text_field → text input, dropdown → select, checkbox → checkbox, number_field → numeric input)
     - Render `main: false && active: true` features in an expandable "Filtros avanzados" section
