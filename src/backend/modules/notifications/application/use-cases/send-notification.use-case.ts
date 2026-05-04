@@ -44,8 +44,31 @@ export function buildNotificationContent(
       return {
         title: 'Contrato cargado',
         message: data.contractId
-          ? `El contrato ${String(data.contractId)} ha sido cargado.`
+          ? data.leaseId
+            ? `El contrato ${String(data.contractId)} ha sido cargado para el arriendo ${String(data.leaseId)}.`
+            : `El contrato ${String(data.contractId)} ha sido cargado.`
           : 'Un contrato ha sido cargado.',
+      };
+    case 'NEW_INTEREST':
+      return {
+        title: 'Nuevo interesado',
+        message: data.listingId
+          ? `Un arrendatario ha mostrado interés en tu inmueble (publicación ${String(data.listingId)}).`
+          : 'Un arrendatario ha mostrado interés en uno de tus inmuebles.',
+      };
+    case 'LEASE_CREATED':
+      return {
+        title: 'Arriendo creado',
+        message: data.leaseId
+          ? `Se ha creado un nuevo arriendo (${String(data.leaseId)}) para ti.`
+          : 'Se ha creado un nuevo arriendo para ti.',
+      };
+    case 'LEASE_CANCELLED':
+      return {
+        title: 'Arriendo cancelado',
+        message: data.leaseId
+          ? `El arriendo ${String(data.leaseId)} ha sido cancelado.`
+          : 'Un arriendo ha sido cancelado.',
       };
     default:
       return {
