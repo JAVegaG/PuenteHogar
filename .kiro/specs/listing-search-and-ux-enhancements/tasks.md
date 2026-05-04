@@ -114,7 +114,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - Handle fetch failure gracefully — show only built-in filters
     - _Requirements: 3.3, 3.4_
 
-- [ ] 9. Frontend: KeywordSearchBar component
+- [x] 9. Frontend: KeywordSearchBar component
   - [x] 9.1 Create KeywordSearchBar component with prefetch and debounce
     - Create `src/frontend/modules/property-listings/components/KeywordSearchBar.tsx`
     - On mount, prefetch catalogs: departments, cities (for all active departments), property types, and main additional features — store in component state
@@ -130,7 +130,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - Synchronize TagChip filters with FilterPanel state so both reflect the same active filters
     - _Requirements: 5.7, 5.8, 5.9, 5.10, 5.11_
 
-  - [ ] 9.3 Integrate KeywordSearchBar into the explore page
+  - [x] 9.3 Integrate KeywordSearchBar into the explore page
     - In `src/frontend/app/explorar/page.tsx`, add `KeywordSearchBar` above the `ActionBar`
     - Wire `onSearch` to the existing `setFilters` from `useFilters` hook
     - Pass `currentFilters` so the search bar can reflect externally applied filters
