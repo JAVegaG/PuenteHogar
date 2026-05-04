@@ -111,7 +111,7 @@ Replace empty notification port stubs in four backend modules (contracts, paymen
     - In the `else` branch (FAILED status), after the audit log, add fire-and-forget: `const parties = await this.repository.findContractParties(contract.id); const landlord = parties.find(p => p.roleInContract === 'LANDLORD'); if (landlord) { this.notificationPort.notifySigningFailed(landlord.userId, contract.id).catch(() => undefined); }`
     - _Requirements: 1.2, 7.1, 7.2_
 
-  - [~] 4.3 Add notification calls to `CreateLeaseUseCase`
+  - [x] 4.3 Add notification calls to `CreateLeaseUseCase`
     - Open `src/backend/modules/landlord-portfolio/application/use-cases/create-lease.use-case.ts`
     - Inject `PORTFOLIO_NOTIFICATION_PORT` (`IPortfolioNotificationPort`) via constructor using `@Inject(PORTFOLIO_NOTIFICATION_PORT)`
     - After building the response DTO (before `return result`), add fire-and-forget: `this.notificationPort.notifyLeaseCreated(tenantUser.id, newLease.id, unitId).catch(() => undefined);`
