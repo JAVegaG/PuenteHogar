@@ -217,7 +217,7 @@ _These tasks address UX issues discovered during manual testing after the initia
     - _Requirements: 13.4, 13.5_
 
 - [ ] 11. Add notification badge to hamburger menu icon
-  - [~] 11.1 Create shared `useUnreadNotificationCount` hook
+  - [x] 11.1 Create shared `useUnreadNotificationCount` hook
     - Create a reusable hook that fetches `GET /notifications/count` and returns the unread count
     - Avoid duplicating the fetch logic across every page
     - _Requirements: 14.2, 14.4_
