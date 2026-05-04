@@ -1,13 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@modules/users/context/AuthContext';
-import { createListing } from '@/shared/services/api';
+import { createListing, fetchAdditionalFeatures } from '@/shared/services/api';
 import { validatePublishForm } from '../validation';
 import { PhotoUploader } from './PhotoUploader';
 import { Button } from '@/shared/components/Button';
 import type { PhotoFile } from '../types';
 import type { UnitInfo } from '@modules/landlord-leases/types';
+import type { AdditionalFeature } from '@modules/property-listings/types';
 
 /** Format a raw numeric string as COP display: "120000" → "$120.000" */
 function formatCOP(raw: string): string {
@@ -37,6 +38,16 @@ export function PublishForm({ unit, onSuccess }: PublishFormProps) {
     const [serverError, setServerError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [additionalFeatures, setAdditionalFeatures] = useState<AdditionalFeature[]>([]);
+    const [featureValues, setFeatureValues] = useState<Record<string, string>>({});
+
+    useEffect(() => {
+        fetchAdditionalFeatures()
+            .then((features) => setAdditionalFeatures(features))
+            .catch(() => {
+                // Graceful degradation — show form without additional features
+            });
+    }, []);
 
     const clearFieldError = (field: string) => {
         setErrors((prev) => {
@@ -45,6 +56,11 @@ export function PublishForm({ unit, onSuccess }: PublishFormProps) {
             delete next[field];
             return next;
         });
+    };
+
+    const handleFeatureChange = (featureId: string, value: string) => {
+        setFeatureValues((prev) => ({ ...prev, [featureId]: value }));
+        clearFieldError(`feature_${featureId}`);
     };
 
     const handleAddPhotos = (files: File[]) => {
@@ -76,6 +92,18 @@ export function PublishForm({ unit, onSuccess }: PublishFormProps) {
         setSuccessMessage(null);
 
         const validationErrors = validatePublishForm({ photos, title, price });
+
+        // Validate required additional features
+        for (const feature of additionalFeatures) {
+            if (feature.required) {
+                const value = featureValues[feature.id] ?? '';
+                if (!value.trim()) {
+                    validationErrors[`feature_${feature.id}`] =
+                        feature.errorMessage || `${feature.name} es obligatorio`;
+                }
+            }
+        }
+
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
             return;
@@ -102,6 +130,18 @@ export function PublishForm({ unit, onSuccess }: PublishFormProps) {
             photos.forEach((photo) => {
                 formData.append('photos', photo.file);
             });
+
+            // Append additional feature values
+            const featurePayload: Record<string, string> = {};
+            for (const feature of additionalFeatures) {
+                const value = featureValues[feature.id] ?? '';
+                if (value.trim()) {
+                    featurePayload[feature.id] = value.trim();
+                }
+            }
+            if (Object.keys(featurePayload).length > 0) {
+                formData.append('additionalFeatures', JSON.stringify(featurePayload));
+            }
 
             await createListing(formData, token);
             setSuccessMessage('¡Inmueble publicado exitosamente!');
@@ -246,6 +286,155 @@ export function PublishForm({ unit, onSuccess }: PublishFormProps) {
                     </p>
                 )}
             </div>
+
+            {/* Additional Features */}
+            {additionalFeatures.length > 0 && (
+                <fieldset className="flex flex-col gap-4">
+                    <legend className="text-h3 font-semibold text-[#111827] mb-2">
+                        Características adicionales
+                    </legend>
+                    {additionalFeatures.map((feature) => {
+                        const fieldId = `feature_${feature.id}`;
+                        const errorKey = `feature_${feature.id}`;
+                        const value = featureValues[feature.id] ?? '';
+
+                        if (feature.element === 'checkbox') {
+                            return (
+                                <div key={feature.id} className="flex items-center gap-2">
+                                    <input
+                                        id={fieldId}
+                                        type="checkbox"
+                                        checked={value === 'true'}
+                                        onChange={(e) =>
+                                            handleFeatureChange(feature.id, e.target.checked ? 'true' : '')
+                                        }
+                                        disabled={isSubmitting}
+                                        className="h-[20px] w-[20px] min-h-[44px] min-w-[44px] accent-[#1d4ed8] cursor-pointer"
+                                        aria-describedby={errors[errorKey] ? `${fieldId}-error` : undefined}
+                                    />
+                                    <label
+                                        htmlFor={fieldId}
+                                        className="text-caption font-medium text-gray-700 cursor-pointer"
+                                    >
+                                        {feature.name}
+                                        {feature.required && <span className="text-red-600"> *</span>}
+                                    </label>
+                                    {errors[errorKey] && (
+                                        <p
+                                            id={`${fieldId}-error`}
+                                            aria-live="polite"
+                                            className="text-[14px] text-red-600"
+                                        >
+                                            {errors[errorKey]}
+                                        </p>
+                                    )}
+                                </div>
+                            );
+                        }
+
+                        if (feature.element === 'dropdown') {
+                            return (
+                                <div key={feature.id}>
+                                    <label
+                                        htmlFor={fieldId}
+                                        className="block text-caption font-medium text-gray-700 mb-1"
+                                    >
+                                        {feature.name}
+                                        {feature.required && <span className="text-red-600"> *</span>}
+                                    </label>
+                                    <select
+                                        id={fieldId}
+                                        value={value}
+                                        onChange={(e) => handleFeatureChange(feature.id, e.target.value)}
+                                        disabled={isSubmitting}
+                                        aria-describedby={errors[errorKey] ? `${fieldId}-error` : undefined}
+                                        className={`w-full h-[48px] min-h-[44px] rounded-[10px] border px-3 text-body focus:outline-none focus:ring-2 transition-colors ${fieldBorderClass(errorKey)}`}
+                                    >
+                                        <option value="">Seleccionar...</option>
+                                        <option value="Sí">Sí</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                    {errors[errorKey] && (
+                                        <p
+                                            id={`${fieldId}-error`}
+                                            aria-live="polite"
+                                            className="mt-1 text-[14px] text-red-600"
+                                        >
+                                            {errors[errorKey]}
+                                        </p>
+                                    )}
+                                </div>
+                            );
+                        }
+
+                        if (feature.element === 'number_field') {
+                            return (
+                                <div key={feature.id}>
+                                    <label
+                                        htmlFor={fieldId}
+                                        className="block text-caption font-medium text-gray-700 mb-1"
+                                    >
+                                        {feature.name}
+                                        {feature.required && <span className="text-red-600"> *</span>}
+                                    </label>
+                                    <input
+                                        id={fieldId}
+                                        type="text"
+                                        inputMode="numeric"
+                                        value={value}
+                                        onChange={(e) => handleFeatureChange(feature.id, e.target.value)}
+                                        placeholder={feature.description ?? ''}
+                                        disabled={isSubmitting}
+                                        aria-describedby={errors[errorKey] ? `${fieldId}-error` : undefined}
+                                        className={`w-full h-[48px] min-h-[44px] rounded-[10px] border px-3 text-body focus:outline-none focus:ring-2 transition-colors ${fieldBorderClass(errorKey)}`}
+                                    />
+                                    {errors[errorKey] && (
+                                        <p
+                                            id={`${fieldId}-error`}
+                                            aria-live="polite"
+                                            className="mt-1 text-[14px] text-red-600"
+                                        >
+                                            {errors[errorKey]}
+                                        </p>
+                                    )}
+                                </div>
+                            );
+                        }
+
+                        // Default: text_field
+                        return (
+                            <div key={feature.id}>
+                                <label
+                                    htmlFor={fieldId}
+                                    className="block text-caption font-medium text-gray-700 mb-1"
+                                >
+                                    {feature.name}
+                                    {feature.required && <span className="text-red-600"> *</span>}
+                                </label>
+                                <input
+                                    id={fieldId}
+                                    type="text"
+                                    value={value}
+                                    onChange={(e) => handleFeatureChange(feature.id, e.target.value)}
+                                    placeholder={feature.description ?? ''}
+                                    disabled={isSubmitting}
+                                    aria-describedby={errors[errorKey] ? `${fieldId}-error` : undefined}
+                                    className={`w-full h-[48px] min-h-[44px] rounded-[10px] border px-3 text-body focus:outline-none focus:ring-2 transition-colors ${fieldBorderClass(errorKey)}`}
+                                />
+                                {errors[errorKey] && (
+                                    <p
+                                        id={`${fieldId}-error`}
+                                        aria-live="polite"
+                                        className="mt-1 text-[14px] text-red-600"
+                                    >
+                                        {errors[errorKey]}
+                                    </p>
+                                )}
+                            </div>
+                        );
+                    })}
+                </fieldset>
+            )}
 
             {/* Submit */}
             <Button
