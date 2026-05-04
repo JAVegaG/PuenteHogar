@@ -96,7 +96,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - _Requirements: 2.4, 3.5_
 
 - [ ] 8. Frontend: Backend-driven FilterPanel
-  - [ ] 8.1 Replace hardcoded CITIES with backend-driven department/city dropdowns
+  - [x] 8.1 Replace hardcoded CITIES with backend-driven department/city dropdowns
     - In `src/frontend/modules/property-listings/components/FilterPanel.tsx`, remove the hardcoded `CITIES` array
     - Fetch departments from `GET /portfolio/departments` on mount
     - Add a department `<select>` dropdown above the city dropdown
