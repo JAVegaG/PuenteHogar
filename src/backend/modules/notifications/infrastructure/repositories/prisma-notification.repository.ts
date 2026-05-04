@@ -212,6 +212,18 @@ export class PrismaNotificationRepository implements INotificationRepository {
     });
   }
 
+  async softDeleteAllReadByUserId(userId: string): Promise<number> {
+    const result = await this.prisma.inAppNotification.updateMany({
+      where: {
+        user_id: userId,
+        read: true,
+        ...softDeleteFilter,
+      },
+      data: softDeleteData(),
+    });
+    return result.count;
+  }
+
   async findAllNotificationTypes(): Promise<NotificationTypeEntity[]> {
     const records = await this.prisma.notificationType.findMany();
 

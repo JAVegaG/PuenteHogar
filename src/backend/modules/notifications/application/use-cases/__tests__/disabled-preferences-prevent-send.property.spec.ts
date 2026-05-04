@@ -63,6 +63,7 @@ function makeMockRepo(
     markAsRead: jest.fn().mockResolvedValue(null),
     markAllAsRead: jest.fn().mockResolvedValue(0),
     softDeleteNotification: jest.fn().mockResolvedValue(undefined),
+    softDeleteAllReadByUserId: jest.fn().mockResolvedValue(0),
     findAllNotificationTypes: jest.fn().mockResolvedValue([]),
     findActiveExternalPreferences: jest.fn().mockResolvedValue([]),
   };

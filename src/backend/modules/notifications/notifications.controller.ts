@@ -21,6 +21,7 @@ import { MarkAllNotificationsReadUseCase } from './application/use-cases/mark-al
 import { GetNotificationPreferencesUseCase } from './application/use-cases/get-notification-preferences.use-case';
 import { UpdateNotificationPreferencesUseCase } from './application/use-cases/update-notification-preferences.use-case';
 import { DeleteNotificationUseCase } from './application/use-cases/delete-notification.use-case';
+import { DeleteReadNotificationsUseCase } from './application/use-cases/delete-read-notifications.use-case';
 
 interface AuthenticatedRequest extends Request {
   user: { id: string; roles: string[] };
@@ -37,6 +38,7 @@ export class NotificationsController {
     private readonly getNotificationPreferencesUseCase: GetNotificationPreferencesUseCase,
     private readonly updatePreferencesUseCase: UpdateNotificationPreferencesUseCase,
     private readonly deleteNotificationUseCase: DeleteNotificationUseCase,
+    private readonly deleteReadNotificationsUseCase: DeleteReadNotificationsUseCase,
   ) { }
 
   @UseGuards(JwtAuthGuard)
@@ -96,6 +98,15 @@ export class NotificationsController {
     @Req() req: AuthenticatedRequest,
   ) {
     return this.updatePreferencesUseCase.execute(req.user.id, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('read')
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Eliminar todas las notificaciones leídas del usuario autenticado' })
+  @ApiOkResponse({ description: 'Cantidad de notificaciones eliminadas' })
+  deleteReadNotifications(@Req() req: AuthenticatedRequest) {
+    return this.deleteReadNotificationsUseCase.execute(req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)

@@ -13,6 +13,7 @@ import { GetNotificationCountUseCase } from './application/use-cases/get-notific
 import { MarkNotificationReadUseCase } from './application/use-cases/mark-notification-read.use-case';
 import { MarkAllNotificationsReadUseCase } from './application/use-cases/mark-all-notifications-read.use-case';
 import { DeleteNotificationUseCase } from './application/use-cases/delete-notification.use-case';
+import { DeleteReadNotificationsUseCase } from './application/use-cases/delete-read-notifications.use-case';
 import { GetNotificationPreferencesUseCase } from './application/use-cases/get-notification-preferences.use-case';
 import { MessagingChannelAdapter } from './infrastructure/adapters/messaging-channel.adapter';
 import { NotificationsEtlService } from './infrastructure/etl/notifications-etl.service';
@@ -33,6 +34,7 @@ import { NotificationsController } from './notifications.controller';
     MarkNotificationReadUseCase,
     MarkAllNotificationsReadUseCase,
     DeleteNotificationUseCase,
+    DeleteReadNotificationsUseCase,
     GetNotificationPreferencesUseCase,
     {
       provide: NOTIFICATION_REPOSITORY,
