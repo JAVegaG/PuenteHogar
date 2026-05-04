@@ -32,7 +32,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - Update the `ListingFilters` interface in `src/backend/modules/property-listings/domain/ports/listing-repository.port.ts` to include `department?: string` and `additionalFeatures?: Record<string, string>`
     - _Requirements: 2.4, 3.5_
 
-  - [~] 2.4 Update SearchListingsUseCase and repository to filter by department and additionalFeatures
+  - [x] 2.4 Update SearchListingsUseCase and repository to filter by department and additionalFeatures
     - In `SearchListingsUseCase`, parse the `additionalFeatures` JSON string from the DTO into a `Record<string, string>` before passing to the repository
     - Update the Prisma repository's `findPublished` method to add `WHERE` conditions: filter by `Address.state` matching department name (resolve department code → name via `Department` table), and filter by `PropertyAdditionalFeature` entries matching each key-value pair in `additionalFeatures`
     - _Requirements: 2.3, 3.5_
