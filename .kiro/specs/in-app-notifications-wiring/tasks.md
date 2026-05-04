@@ -245,6 +245,26 @@ _These tasks address UX issues discovered during manual testing after the initia
     - Ensure the link is visible in the empty state as well
     - _Requirements: 15.1, 15.2, 15.3_
 
+- [x] 14. Style "Gestionar preferencias" as text link and add bold highlighting to messages
+  - [x] 14.1 Change "Gestionar preferencias" from CTA button to text link
+    - Open `src/frontend/modules/notifications/components/NotificationsListView.tsx`
+    - Replace `bg-[#1d4ed8] text-white ...` button style with `text-body font-medium text-primary hover:underline` text link style
+    - Add `flex-wrap gap-2` to the action bar for mobile stacking
+    - _Requirements: 16.1, 16.2, 16.3_
+
+  - [x] 14.2 Add `**bold**` markers to dynamic names in `buildNotificationContent`
+    - Open `src/backend/modules/notifications/application/use-cases/send-notification.use-case.ts`
+    - Wrap `propertyName`, `unitName`, `propertyTitle`, and `amount` values in `**double asterisks**` in all message templates
+    - Generic fallback messages (no display name) remain without markers
+    - _Requirements: 17.1, 17.3_
+
+  - [x] 14.3 Add `renderMessageWithBold` helper to frontend notification cards
+    - Open `src/frontend/modules/notifications/components/NotificationsListView.tsx`
+    - Add helper that parses `**bold**` markers via `split(/\*\*(.+?)\*\*/g)` and renders `<strong className="font-semibold text-neutral-900">` elements
+    - Replace plain `{notification.message}` with `{renderMessageWithBold(notification.message)}`
+    - Messages without markers render as plain text (backward-compatible)
+    - _Requirements: 17.2, 17.4_
+
 ## Notes
 
 - Tasks marked with `*` are optional and can be skipped for faster MVP

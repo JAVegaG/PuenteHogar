@@ -195,3 +195,28 @@ The following requirements were identified during manual testing after the initi
 1. THE "Gestionar preferencias" link SHALL be positioned at the top of the notifications page, in the action bar area alongside "Marcar todas como leídas"
 2. THE "Gestionar preferencias" link SHALL NOT appear at the bottom of the notification list
 3. THE "Gestionar preferencias" link SHALL remain visible when the notification list is empty
+
+### Requirement 16: "Gestionar preferencias" Styled as Text Link (not CTA button)
+
+**User Story:** As a user, I want the "Gestionar preferencias" link to look like a subtle text action rather than a prominent button, so that it doesn't visually compete with the notification cards.
+
+**Context:** During testing, the "Gestionar preferencias" was styled as a primary blue CTA button (`bg-[#1d4ed8]`), which looked visually heavy and out of place in the action bar — especially on mobile. It should match the "Marcar todas como leídas" text link style for visual consistency.
+
+#### Acceptance Criteria
+
+1. THE "Gestionar preferencias" link SHALL be styled as a text link (primary color, no background fill) matching the "Marcar todas como leídas" style
+2. THE action bar SHALL use `flex-wrap` so both actions stack gracefully on narrow mobile screens
+3. BOTH action bar items SHALL maintain 44×44px minimum touch targets for WCAG 2.1 AA compliance
+
+### Requirement 17: Bold Highlighting of Dynamic Names in Notification Messages
+
+**User Story:** As a user, I want dynamic names (property name, unit name, amount) in notification messages to be visually distinct from the surrounding text, so that I can quickly identify the relevant context.
+
+**Context:** During testing, notification messages like "El arriendo en Mi primer apartamento ha sido cancelado" were hard to parse because the property name blended into the surrounding text. Wrapping dynamic names in bold makes them stand out.
+
+#### Acceptance Criteria
+
+1. THE `buildNotificationContent` function SHALL wrap dynamic display names (propertyName, unitName, propertyTitle, amount) in `**double asterisks**` markdown bold markers
+2. THE frontend notification card message renderer SHALL parse `**bold**` markers and render them as `<strong>` elements with `font-semibold text-neutral-900` styling
+3. WHEN no dynamic name is available (generic fallback message), THE message SHALL NOT contain any bold markers
+4. THE bold rendering SHALL be backward-compatible — messages without `**` markers SHALL render as plain text

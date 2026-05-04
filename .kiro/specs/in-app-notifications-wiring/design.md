@@ -586,3 +586,24 @@ LEASE_CANCELLED: 'Arriendo cancelado',
 **Problem**: The "Gestionar preferencias" button is at the bottom of the notification list in `NotificationsListView`. As notifications accumulate, it gets buried and users may never find it.
 
 **Approach**: Move the preferences link to the top action bar, next to "Marcar todas como leídas". Both actions become a top toolbar row. When the list is empty, the preferences link still appears at the top (not centered in the empty state).
+
+### "Gestionar preferencias" Styled as Text Link (Req 16)
+
+**Problem**: The "Gestionar preferencias" was styled as a primary blue CTA button (`bg-[#1d4ed8]`), which looked visually heavy and out of place in the action bar — especially on mobile where it dominated the screen.
+
+**Approach**: Change the link from a filled CTA button to a subtle text link matching the "Marcar todas como leídas" style. Both actions use `text-body font-medium text-primary hover:underline` for visual consistency. The action bar uses `flex-wrap gap-2` so both items stack gracefully on narrow screens while maintaining 44×44px touch targets.
+
+### Bold Highlighting of Dynamic Names in Messages (Req 17)
+
+**Problem**: Notification messages like "El arriendo en Mi primer apartamento ha sido cancelado" were hard to parse because the dynamic property name blended into the surrounding text. Users couldn't quickly identify the relevant context.
+
+**Approach — two-layer solution**:
+
+1. **Backend** (`buildNotificationContent`): Wraps dynamic display names in `**double asterisks**` (markdown bold syntax). Example: `"El arriendo en **Mi primer apartamento** ha sido cancelado."`. Generic fallback messages (when no name is available) contain no markers.
+
+2. **Frontend** (`NotificationsListView`): A `renderMessageWithBold` helper parses `**bold**` markers using `split(/\*\*(.+?)\*\*/g)` and renders them as `<strong className="font-semibold text-neutral-900">` elements. The surrounding text remains `text-neutral-600`. Messages without markers render as plain text (backward-compatible).
+
+**Message examples** (rendered):
+- "El arriendo en **Mi primer apartamento** ha sido cancelado." → "Mi primer apartamento" appears bold and darker
+- "Se ha recibido un pago por **150000** en **Casa Norte**." → amount and property name both highlighted
+- "Un arriendo ha sido cancelado." → no bold markers, renders as plain text
