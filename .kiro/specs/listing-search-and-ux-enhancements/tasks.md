@@ -76,8 +76,8 @@ This plan implements ten interconnected improvements across backend schema, API 
     - **Property 8: Ownership authorization on cancellation**
     - **Validates: Requirements 8.7**
 
-- [ ] 5. Backend: Fix contract date validation
-  - [ ] 5.1 Add date validation guard in UploadContractUseCase
+- [x] 5. Backend: Fix contract date validation
+  - [x] 5.1 Add date validation guard in UploadContractUseCase
     - In `src/backend/modules/contracts/application/use-cases/upload-contract.use-case.ts`, add a guard after `new Date(dto.startDate)` that checks `isNaN(parsedStartDate.getTime())` and throws `UnprocessableEntityException` with message "La fecha de inicio no es válida. Use formato ISO 8601 (ej: 2025-01-15)"
     - Apply the same guard for `dto.endDate` if provided
     - _Requirements: 10.2_
