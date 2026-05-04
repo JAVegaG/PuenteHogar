@@ -11,6 +11,7 @@ interface ConfirmationDialogProps {
     onConfirm: () => void;
     onCancel: () => void;
     isLoading?: boolean;
+    variant?: 'destructive' | 'primary';
 }
 
 export function ConfirmationDialog({
@@ -22,6 +23,7 @@ export function ConfirmationDialog({
     onConfirm,
     onCancel,
     isLoading = false,
+    variant = 'destructive',
 }: ConfirmationDialogProps) {
     const dialogRef = useRef<HTMLDialogElement>(null);
     const cancelButtonRef = useRef<HTMLButtonElement>(null);
@@ -119,7 +121,10 @@ export function ConfirmationDialog({
                     onClick={onConfirm}
                     disabled={isLoading}
                     aria-busy={isLoading}
-                    className="flex-1 min-h-[44px] min-w-[44px] rounded-[10px] bg-red-600 text-body text-white hover:bg-red-700 active:bg-red-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                    className={`flex-1 min-h-[44px] min-w-[44px] rounded-[10px] text-body text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 ${variant === 'primary'
+                            ? 'bg-[#1d4ed8] hover:bg-blue-800 active:bg-blue-900 focus-visible:ring-[#1d4ed8]'
+                            : 'bg-red-600 hover:bg-red-700 active:bg-red-800 focus-visible:ring-red-600'
+                        }`}
                 >
                     {isLoading && (
                         <svg
