@@ -151,7 +151,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - No API calls — fully static page for fast LCP
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6_
 
-- [ ] 11. Checkpoint — Ensure frontend builds and all tests pass
+- [x] 11. Checkpoint — Ensure frontend builds and all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 12. Frontend: Lease detail page redesign with cards
