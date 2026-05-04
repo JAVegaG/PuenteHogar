@@ -30,6 +30,7 @@ export type NaturalPersonDetailMinAggregateOutputType = {
   first_name: string | null
   last_name: string | null
   preferred_name: string | null
+  deleted_at: Date | null
 }
 
 export type NaturalPersonDetailMaxAggregateOutputType = {
@@ -38,6 +39,7 @@ export type NaturalPersonDetailMaxAggregateOutputType = {
   first_name: string | null
   last_name: string | null
   preferred_name: string | null
+  deleted_at: Date | null
 }
 
 export type NaturalPersonDetailCountAggregateOutputType = {
@@ -46,6 +48,7 @@ export type NaturalPersonDetailCountAggregateOutputType = {
   first_name: number
   last_name: number
   preferred_name: number
+  deleted_at: number
   _all: number
 }
 
@@ -56,6 +59,7 @@ export type NaturalPersonDetailMinAggregateInputType = {
   first_name?: true
   last_name?: true
   preferred_name?: true
+  deleted_at?: true
 }
 
 export type NaturalPersonDetailMaxAggregateInputType = {
@@ -64,6 +68,7 @@ export type NaturalPersonDetailMaxAggregateInputType = {
   first_name?: true
   last_name?: true
   preferred_name?: true
+  deleted_at?: true
 }
 
 export type NaturalPersonDetailCountAggregateInputType = {
@@ -72,6 +77,7 @@ export type NaturalPersonDetailCountAggregateInputType = {
   first_name?: true
   last_name?: true
   preferred_name?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -153,6 +159,7 @@ export type NaturalPersonDetailGroupByOutputType = {
   first_name: string
   last_name: string
   preferred_name: string | null
+  deleted_at: Date | null
   _count: NaturalPersonDetailCountAggregateOutputType | null
   _min: NaturalPersonDetailMinAggregateOutputType | null
   _max: NaturalPersonDetailMaxAggregateOutputType | null
@@ -182,6 +189,7 @@ export type NaturalPersonDetailWhereInput = {
   first_name?: Prisma.StringFilter<"NaturalPersonDetail"> | string
   last_name?: Prisma.StringFilter<"NaturalPersonDetail"> | string
   preferred_name?: Prisma.StringNullableFilter<"NaturalPersonDetail"> | string | null
+  deleted_at?: Prisma.DateTimeNullableFilter<"NaturalPersonDetail"> | Date | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -191,6 +199,7 @@ export type NaturalPersonDetailOrderByWithRelationInput = {
   first_name?: Prisma.SortOrder
   last_name?: Prisma.SortOrder
   preferred_name?: Prisma.SortOrderInput | Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -203,6 +212,7 @@ export type NaturalPersonDetailWhereUniqueInput = Prisma.AtLeast<{
   first_name?: Prisma.StringFilter<"NaturalPersonDetail"> | string
   last_name?: Prisma.StringFilter<"NaturalPersonDetail"> | string
   preferred_name?: Prisma.StringNullableFilter<"NaturalPersonDetail"> | string | null
+  deleted_at?: Prisma.DateTimeNullableFilter<"NaturalPersonDetail"> | Date | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "user_id">
 
@@ -212,6 +222,7 @@ export type NaturalPersonDetailOrderByWithAggregationInput = {
   first_name?: Prisma.SortOrder
   last_name?: Prisma.SortOrder
   preferred_name?: Prisma.SortOrderInput | Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.NaturalPersonDetailCountOrderByAggregateInput
   _max?: Prisma.NaturalPersonDetailMaxOrderByAggregateInput
   _min?: Prisma.NaturalPersonDetailMinOrderByAggregateInput
@@ -226,6 +237,7 @@ export type NaturalPersonDetailScalarWhereWithAggregatesInput = {
   first_name?: Prisma.StringWithAggregatesFilter<"NaturalPersonDetail"> | string
   last_name?: Prisma.StringWithAggregatesFilter<"NaturalPersonDetail"> | string
   preferred_name?: Prisma.StringNullableWithAggregatesFilter<"NaturalPersonDetail"> | string | null
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"NaturalPersonDetail"> | Date | string | null
 }
 
 export type NaturalPersonDetailCreateInput = {
@@ -233,6 +245,7 @@ export type NaturalPersonDetailCreateInput = {
   first_name: string
   last_name: string
   preferred_name?: string | null
+  deleted_at?: Date | string | null
   user: Prisma.UserCreateNestedOneWithoutNatural_personInput
 }
 
@@ -242,6 +255,7 @@ export type NaturalPersonDetailUncheckedCreateInput = {
   first_name: string
   last_name: string
   preferred_name?: string | null
+  deleted_at?: Date | string | null
 }
 
 export type NaturalPersonDetailUpdateInput = {
@@ -249,6 +263,7 @@ export type NaturalPersonDetailUpdateInput = {
   first_name?: Prisma.StringFieldUpdateOperationsInput | string
   last_name?: Prisma.StringFieldUpdateOperationsInput | string
   preferred_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutNatural_personNestedInput
 }
 
@@ -258,6 +273,7 @@ export type NaturalPersonDetailUncheckedUpdateInput = {
   first_name?: Prisma.StringFieldUpdateOperationsInput | string
   last_name?: Prisma.StringFieldUpdateOperationsInput | string
   preferred_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type NaturalPersonDetailCreateManyInput = {
@@ -266,6 +282,7 @@ export type NaturalPersonDetailCreateManyInput = {
   first_name: string
   last_name: string
   preferred_name?: string | null
+  deleted_at?: Date | string | null
 }
 
 export type NaturalPersonDetailUpdateManyMutationInput = {
@@ -273,6 +290,7 @@ export type NaturalPersonDetailUpdateManyMutationInput = {
   first_name?: Prisma.StringFieldUpdateOperationsInput | string
   last_name?: Prisma.StringFieldUpdateOperationsInput | string
   preferred_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type NaturalPersonDetailUncheckedUpdateManyInput = {
@@ -281,6 +299,7 @@ export type NaturalPersonDetailUncheckedUpdateManyInput = {
   first_name?: Prisma.StringFieldUpdateOperationsInput | string
   last_name?: Prisma.StringFieldUpdateOperationsInput | string
   preferred_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type NaturalPersonDetailNullableScalarRelationFilter = {
@@ -294,6 +313,7 @@ export type NaturalPersonDetailCountOrderByAggregateInput = {
   first_name?: Prisma.SortOrder
   last_name?: Prisma.SortOrder
   preferred_name?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type NaturalPersonDetailMaxOrderByAggregateInput = {
@@ -302,6 +322,7 @@ export type NaturalPersonDetailMaxOrderByAggregateInput = {
   first_name?: Prisma.SortOrder
   last_name?: Prisma.SortOrder
   preferred_name?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type NaturalPersonDetailMinOrderByAggregateInput = {
@@ -310,6 +331,7 @@ export type NaturalPersonDetailMinOrderByAggregateInput = {
   first_name?: Prisma.SortOrder
   last_name?: Prisma.SortOrder
   preferred_name?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type NaturalPersonDetailCreateNestedOneWithoutUserInput = {
@@ -353,6 +375,7 @@ export type NaturalPersonDetailCreateWithoutUserInput = {
   first_name: string
   last_name: string
   preferred_name?: string | null
+  deleted_at?: Date | string | null
 }
 
 export type NaturalPersonDetailUncheckedCreateWithoutUserInput = {
@@ -360,6 +383,7 @@ export type NaturalPersonDetailUncheckedCreateWithoutUserInput = {
   first_name: string
   last_name: string
   preferred_name?: string | null
+  deleted_at?: Date | string | null
 }
 
 export type NaturalPersonDetailCreateOrConnectWithoutUserInput = {
@@ -383,6 +407,7 @@ export type NaturalPersonDetailUpdateWithoutUserInput = {
   first_name?: Prisma.StringFieldUpdateOperationsInput | string
   last_name?: Prisma.StringFieldUpdateOperationsInput | string
   preferred_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type NaturalPersonDetailUncheckedUpdateWithoutUserInput = {
@@ -390,6 +415,7 @@ export type NaturalPersonDetailUncheckedUpdateWithoutUserInput = {
   first_name?: Prisma.StringFieldUpdateOperationsInput | string
   last_name?: Prisma.StringFieldUpdateOperationsInput | string
   preferred_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -400,6 +426,7 @@ export type NaturalPersonDetailSelect<ExtArgs extends runtime.Types.Extensions.I
   first_name?: boolean
   last_name?: boolean
   preferred_name?: boolean
+  deleted_at?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["naturalPersonDetail"]>
 
@@ -409,6 +436,7 @@ export type NaturalPersonDetailSelectCreateManyAndReturn<ExtArgs extends runtime
   first_name?: boolean
   last_name?: boolean
   preferred_name?: boolean
+  deleted_at?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["naturalPersonDetail"]>
 
@@ -418,6 +446,7 @@ export type NaturalPersonDetailSelectUpdateManyAndReturn<ExtArgs extends runtime
   first_name?: boolean
   last_name?: boolean
   preferred_name?: boolean
+  deleted_at?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["naturalPersonDetail"]>
 
@@ -427,9 +456,10 @@ export type NaturalPersonDetailSelectScalar = {
   first_name?: boolean
   last_name?: boolean
   preferred_name?: boolean
+  deleted_at?: boolean
 }
 
-export type NaturalPersonDetailOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "first_name" | "last_name" | "preferred_name", ExtArgs["result"]["naturalPersonDetail"]>
+export type NaturalPersonDetailOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "first_name" | "last_name" | "preferred_name" | "deleted_at", ExtArgs["result"]["naturalPersonDetail"]>
 export type NaturalPersonDetailInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -451,6 +481,7 @@ export type $NaturalPersonDetailPayload<ExtArgs extends runtime.Types.Extensions
     first_name: string
     last_name: string
     preferred_name: string | null
+    deleted_at: Date | null
   }, ExtArgs["result"]["naturalPersonDetail"]>
   composites: {}
 }
@@ -880,6 +911,7 @@ export interface NaturalPersonDetailFieldRefs {
   readonly first_name: Prisma.FieldRef<"NaturalPersonDetail", 'String'>
   readonly last_name: Prisma.FieldRef<"NaturalPersonDetail", 'String'>
   readonly preferred_name: Prisma.FieldRef<"NaturalPersonDetail", 'String'>
+  readonly deleted_at: Prisma.FieldRef<"NaturalPersonDetail", 'DateTime'>
 }
     
 

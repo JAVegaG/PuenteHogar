@@ -28,18 +28,21 @@ export type LeaseCurrentStatusMinAggregateOutputType = {
   lease_id: string | null
   lease_status_history_id: string | null
   lease_status_id: string | null
+  deleted_at: Date | null
 }
 
 export type LeaseCurrentStatusMaxAggregateOutputType = {
   lease_id: string | null
   lease_status_history_id: string | null
   lease_status_id: string | null
+  deleted_at: Date | null
 }
 
 export type LeaseCurrentStatusCountAggregateOutputType = {
   lease_id: number
   lease_status_history_id: number
   lease_status_id: number
+  deleted_at: number
   _all: number
 }
 
@@ -48,18 +51,21 @@ export type LeaseCurrentStatusMinAggregateInputType = {
   lease_id?: true
   lease_status_history_id?: true
   lease_status_id?: true
+  deleted_at?: true
 }
 
 export type LeaseCurrentStatusMaxAggregateInputType = {
   lease_id?: true
   lease_status_history_id?: true
   lease_status_id?: true
+  deleted_at?: true
 }
 
 export type LeaseCurrentStatusCountAggregateInputType = {
   lease_id?: true
   lease_status_history_id?: true
   lease_status_id?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -139,6 +145,7 @@ export type LeaseCurrentStatusGroupByOutputType = {
   lease_id: string
   lease_status_history_id: string
   lease_status_id: string
+  deleted_at: Date | null
   _count: LeaseCurrentStatusCountAggregateOutputType | null
   _min: LeaseCurrentStatusMinAggregateOutputType | null
   _max: LeaseCurrentStatusMaxAggregateOutputType | null
@@ -166,6 +173,7 @@ export type LeaseCurrentStatusWhereInput = {
   lease_id?: Prisma.StringFilter<"LeaseCurrentStatus"> | string
   lease_status_history_id?: Prisma.StringFilter<"LeaseCurrentStatus"> | string
   lease_status_id?: Prisma.StringFilter<"LeaseCurrentStatus"> | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"LeaseCurrentStatus"> | Date | string | null
   history?: Prisma.XOR<Prisma.LeaseStatusHistoryScalarRelationFilter, Prisma.LeaseStatusHistoryWhereInput>
   status?: Prisma.XOR<Prisma.LeaseStatusScalarRelationFilter, Prisma.LeaseStatusWhereInput>
 }
@@ -174,6 +182,7 @@ export type LeaseCurrentStatusOrderByWithRelationInput = {
   lease_id?: Prisma.SortOrder
   lease_status_history_id?: Prisma.SortOrder
   lease_status_id?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   history?: Prisma.LeaseStatusHistoryOrderByWithRelationInput
   status?: Prisma.LeaseStatusOrderByWithRelationInput
 }
@@ -185,6 +194,7 @@ export type LeaseCurrentStatusWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.LeaseCurrentStatusWhereInput[]
   NOT?: Prisma.LeaseCurrentStatusWhereInput | Prisma.LeaseCurrentStatusWhereInput[]
   lease_status_id?: Prisma.StringFilter<"LeaseCurrentStatus"> | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"LeaseCurrentStatus"> | Date | string | null
   history?: Prisma.XOR<Prisma.LeaseStatusHistoryScalarRelationFilter, Prisma.LeaseStatusHistoryWhereInput>
   status?: Prisma.XOR<Prisma.LeaseStatusScalarRelationFilter, Prisma.LeaseStatusWhereInput>
 }, "lease_id" | "lease_status_history_id">
@@ -193,6 +203,7 @@ export type LeaseCurrentStatusOrderByWithAggregationInput = {
   lease_id?: Prisma.SortOrder
   lease_status_history_id?: Prisma.SortOrder
   lease_status_id?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.LeaseCurrentStatusCountOrderByAggregateInput
   _max?: Prisma.LeaseCurrentStatusMaxOrderByAggregateInput
   _min?: Prisma.LeaseCurrentStatusMinOrderByAggregateInput
@@ -205,10 +216,12 @@ export type LeaseCurrentStatusScalarWhereWithAggregatesInput = {
   lease_id?: Prisma.StringWithAggregatesFilter<"LeaseCurrentStatus"> | string
   lease_status_history_id?: Prisma.StringWithAggregatesFilter<"LeaseCurrentStatus"> | string
   lease_status_id?: Prisma.StringWithAggregatesFilter<"LeaseCurrentStatus"> | string
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"LeaseCurrentStatus"> | Date | string | null
 }
 
 export type LeaseCurrentStatusCreateInput = {
   lease_id: string
+  deleted_at?: Date | string | null
   history: Prisma.LeaseStatusHistoryCreateNestedOneWithoutCurrentInput
   status: Prisma.LeaseStatusCreateNestedOneWithoutCurrentInput
 }
@@ -217,10 +230,12 @@ export type LeaseCurrentStatusUncheckedCreateInput = {
   lease_id: string
   lease_status_history_id: string
   lease_status_id: string
+  deleted_at?: Date | string | null
 }
 
 export type LeaseCurrentStatusUpdateInput = {
   lease_id?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   history?: Prisma.LeaseStatusHistoryUpdateOneRequiredWithoutCurrentNestedInput
   status?: Prisma.LeaseStatusUpdateOneRequiredWithoutCurrentNestedInput
 }
@@ -229,22 +244,26 @@ export type LeaseCurrentStatusUncheckedUpdateInput = {
   lease_id?: Prisma.StringFieldUpdateOperationsInput | string
   lease_status_history_id?: Prisma.StringFieldUpdateOperationsInput | string
   lease_status_id?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LeaseCurrentStatusCreateManyInput = {
   lease_id: string
   lease_status_history_id: string
   lease_status_id: string
+  deleted_at?: Date | string | null
 }
 
 export type LeaseCurrentStatusUpdateManyMutationInput = {
   lease_id?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LeaseCurrentStatusUncheckedUpdateManyInput = {
   lease_id?: Prisma.StringFieldUpdateOperationsInput | string
   lease_status_history_id?: Prisma.StringFieldUpdateOperationsInput | string
   lease_status_id?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LeaseCurrentStatusListRelationFilter = {
@@ -266,18 +285,21 @@ export type LeaseCurrentStatusCountOrderByAggregateInput = {
   lease_id?: Prisma.SortOrder
   lease_status_history_id?: Prisma.SortOrder
   lease_status_id?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type LeaseCurrentStatusMaxOrderByAggregateInput = {
   lease_id?: Prisma.SortOrder
   lease_status_history_id?: Prisma.SortOrder
   lease_status_id?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type LeaseCurrentStatusMinOrderByAggregateInput = {
   lease_id?: Prisma.SortOrder
   lease_status_history_id?: Prisma.SortOrder
   lease_status_id?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type LeaseCurrentStatusCreateNestedManyWithoutStatusInput = {
@@ -356,12 +378,14 @@ export type LeaseCurrentStatusUncheckedUpdateOneWithoutHistoryNestedInput = {
 
 export type LeaseCurrentStatusCreateWithoutStatusInput = {
   lease_id: string
+  deleted_at?: Date | string | null
   history: Prisma.LeaseStatusHistoryCreateNestedOneWithoutCurrentInput
 }
 
 export type LeaseCurrentStatusUncheckedCreateWithoutStatusInput = {
   lease_id: string
   lease_status_history_id: string
+  deleted_at?: Date | string | null
 }
 
 export type LeaseCurrentStatusCreateOrConnectWithoutStatusInput = {
@@ -397,16 +421,19 @@ export type LeaseCurrentStatusScalarWhereInput = {
   lease_id?: Prisma.StringFilter<"LeaseCurrentStatus"> | string
   lease_status_history_id?: Prisma.StringFilter<"LeaseCurrentStatus"> | string
   lease_status_id?: Prisma.StringFilter<"LeaseCurrentStatus"> | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"LeaseCurrentStatus"> | Date | string | null
 }
 
 export type LeaseCurrentStatusCreateWithoutHistoryInput = {
   lease_id: string
+  deleted_at?: Date | string | null
   status: Prisma.LeaseStatusCreateNestedOneWithoutCurrentInput
 }
 
 export type LeaseCurrentStatusUncheckedCreateWithoutHistoryInput = {
   lease_id: string
   lease_status_id: string
+  deleted_at?: Date | string | null
 }
 
 export type LeaseCurrentStatusCreateOrConnectWithoutHistoryInput = {
@@ -427,32 +454,38 @@ export type LeaseCurrentStatusUpdateToOneWithWhereWithoutHistoryInput = {
 
 export type LeaseCurrentStatusUpdateWithoutHistoryInput = {
   lease_id?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.LeaseStatusUpdateOneRequiredWithoutCurrentNestedInput
 }
 
 export type LeaseCurrentStatusUncheckedUpdateWithoutHistoryInput = {
   lease_id?: Prisma.StringFieldUpdateOperationsInput | string
   lease_status_id?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LeaseCurrentStatusCreateManyStatusInput = {
   lease_id: string
   lease_status_history_id: string
+  deleted_at?: Date | string | null
 }
 
 export type LeaseCurrentStatusUpdateWithoutStatusInput = {
   lease_id?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   history?: Prisma.LeaseStatusHistoryUpdateOneRequiredWithoutCurrentNestedInput
 }
 
 export type LeaseCurrentStatusUncheckedUpdateWithoutStatusInput = {
   lease_id?: Prisma.StringFieldUpdateOperationsInput | string
   lease_status_history_id?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LeaseCurrentStatusUncheckedUpdateManyWithoutStatusInput = {
   lease_id?: Prisma.StringFieldUpdateOperationsInput | string
   lease_status_history_id?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -461,6 +494,7 @@ export type LeaseCurrentStatusSelect<ExtArgs extends runtime.Types.Extensions.In
   lease_id?: boolean
   lease_status_history_id?: boolean
   lease_status_id?: boolean
+  deleted_at?: boolean
   history?: boolean | Prisma.LeaseStatusHistoryDefaultArgs<ExtArgs>
   status?: boolean | Prisma.LeaseStatusDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["leaseCurrentStatus"]>
@@ -469,6 +503,7 @@ export type LeaseCurrentStatusSelectCreateManyAndReturn<ExtArgs extends runtime.
   lease_id?: boolean
   lease_status_history_id?: boolean
   lease_status_id?: boolean
+  deleted_at?: boolean
   history?: boolean | Prisma.LeaseStatusHistoryDefaultArgs<ExtArgs>
   status?: boolean | Prisma.LeaseStatusDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["leaseCurrentStatus"]>
@@ -477,6 +512,7 @@ export type LeaseCurrentStatusSelectUpdateManyAndReturn<ExtArgs extends runtime.
   lease_id?: boolean
   lease_status_history_id?: boolean
   lease_status_id?: boolean
+  deleted_at?: boolean
   history?: boolean | Prisma.LeaseStatusHistoryDefaultArgs<ExtArgs>
   status?: boolean | Prisma.LeaseStatusDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["leaseCurrentStatus"]>
@@ -485,9 +521,10 @@ export type LeaseCurrentStatusSelectScalar = {
   lease_id?: boolean
   lease_status_history_id?: boolean
   lease_status_id?: boolean
+  deleted_at?: boolean
 }
 
-export type LeaseCurrentStatusOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"lease_id" | "lease_status_history_id" | "lease_status_id", ExtArgs["result"]["leaseCurrentStatus"]>
+export type LeaseCurrentStatusOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"lease_id" | "lease_status_history_id" | "lease_status_id" | "deleted_at", ExtArgs["result"]["leaseCurrentStatus"]>
 export type LeaseCurrentStatusInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   history?: boolean | Prisma.LeaseStatusHistoryDefaultArgs<ExtArgs>
   status?: boolean | Prisma.LeaseStatusDefaultArgs<ExtArgs>
@@ -511,6 +548,7 @@ export type $LeaseCurrentStatusPayload<ExtArgs extends runtime.Types.Extensions.
     lease_id: string
     lease_status_history_id: string
     lease_status_id: string
+    deleted_at: Date | null
   }, ExtArgs["result"]["leaseCurrentStatus"]>
   composites: {}
 }
@@ -939,6 +977,7 @@ export interface LeaseCurrentStatusFieldRefs {
   readonly lease_id: Prisma.FieldRef<"LeaseCurrentStatus", 'String'>
   readonly lease_status_history_id: Prisma.FieldRef<"LeaseCurrentStatus", 'String'>
   readonly lease_status_id: Prisma.FieldRef<"LeaseCurrentStatus", 'String'>
+  readonly deleted_at: Prisma.FieldRef<"LeaseCurrentStatus", 'DateTime'>
 }
     
 

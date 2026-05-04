@@ -29,6 +29,7 @@ export type DocumentTypeMinAggregateOutputType = {
   code: string | null
   description: string | null
   is_active: boolean | null
+  deleted_at: Date | null
 }
 
 export type DocumentTypeMaxAggregateOutputType = {
@@ -36,6 +37,7 @@ export type DocumentTypeMaxAggregateOutputType = {
   code: string | null
   description: string | null
   is_active: boolean | null
+  deleted_at: Date | null
 }
 
 export type DocumentTypeCountAggregateOutputType = {
@@ -43,6 +45,7 @@ export type DocumentTypeCountAggregateOutputType = {
   code: number
   description: number
   is_active: number
+  deleted_at: number
   _all: number
 }
 
@@ -52,6 +55,7 @@ export type DocumentTypeMinAggregateInputType = {
   code?: true
   description?: true
   is_active?: true
+  deleted_at?: true
 }
 
 export type DocumentTypeMaxAggregateInputType = {
@@ -59,6 +63,7 @@ export type DocumentTypeMaxAggregateInputType = {
   code?: true
   description?: true
   is_active?: true
+  deleted_at?: true
 }
 
 export type DocumentTypeCountAggregateInputType = {
@@ -66,6 +71,7 @@ export type DocumentTypeCountAggregateInputType = {
   code?: true
   description?: true
   is_active?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -146,6 +152,7 @@ export type DocumentTypeGroupByOutputType = {
   code: string
   description: string
   is_active: boolean
+  deleted_at: Date | null
   _count: DocumentTypeCountAggregateOutputType | null
   _min: DocumentTypeMinAggregateOutputType | null
   _max: DocumentTypeMaxAggregateOutputType | null
@@ -174,6 +181,7 @@ export type DocumentTypeWhereInput = {
   code?: Prisma.StringFilter<"DocumentType"> | string
   description?: Prisma.StringFilter<"DocumentType"> | string
   is_active?: Prisma.BoolFilter<"DocumentType"> | boolean
+  deleted_at?: Prisma.DateTimeNullableFilter<"DocumentType"> | Date | string | null
   users?: Prisma.UserListRelationFilter
 }
 
@@ -182,6 +190,7 @@ export type DocumentTypeOrderByWithRelationInput = {
   code?: Prisma.SortOrder
   description?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   users?: Prisma.UserOrderByRelationAggregateInput
 }
 
@@ -193,6 +202,7 @@ export type DocumentTypeWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.DocumentTypeWhereInput | Prisma.DocumentTypeWhereInput[]
   description?: Prisma.StringFilter<"DocumentType"> | string
   is_active?: Prisma.BoolFilter<"DocumentType"> | boolean
+  deleted_at?: Prisma.DateTimeNullableFilter<"DocumentType"> | Date | string | null
   users?: Prisma.UserListRelationFilter
 }, "id" | "code">
 
@@ -201,6 +211,7 @@ export type DocumentTypeOrderByWithAggregationInput = {
   code?: Prisma.SortOrder
   description?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.DocumentTypeCountOrderByAggregateInput
   _max?: Prisma.DocumentTypeMaxOrderByAggregateInput
   _min?: Prisma.DocumentTypeMinOrderByAggregateInput
@@ -214,6 +225,7 @@ export type DocumentTypeScalarWhereWithAggregatesInput = {
   code?: Prisma.StringWithAggregatesFilter<"DocumentType"> | string
   description?: Prisma.StringWithAggregatesFilter<"DocumentType"> | string
   is_active?: Prisma.BoolWithAggregatesFilter<"DocumentType"> | boolean
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"DocumentType"> | Date | string | null
 }
 
 export type DocumentTypeCreateInput = {
@@ -221,6 +233,7 @@ export type DocumentTypeCreateInput = {
   code: string
   description: string
   is_active?: boolean
+  deleted_at?: Date | string | null
   users?: Prisma.UserCreateNestedManyWithoutDocument_typeInput
 }
 
@@ -229,6 +242,7 @@ export type DocumentTypeUncheckedCreateInput = {
   code: string
   description: string
   is_active?: boolean
+  deleted_at?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutDocument_typeInput
 }
 
@@ -237,6 +251,7 @@ export type DocumentTypeUpdateInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUpdateManyWithoutDocument_typeNestedInput
 }
 
@@ -245,6 +260,7 @@ export type DocumentTypeUncheckedUpdateInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutDocument_typeNestedInput
 }
 
@@ -253,6 +269,7 @@ export type DocumentTypeCreateManyInput = {
   code: string
   description: string
   is_active?: boolean
+  deleted_at?: Date | string | null
 }
 
 export type DocumentTypeUpdateManyMutationInput = {
@@ -260,6 +277,7 @@ export type DocumentTypeUpdateManyMutationInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type DocumentTypeUncheckedUpdateManyInput = {
@@ -267,6 +285,7 @@ export type DocumentTypeUncheckedUpdateManyInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type DocumentTypeScalarRelationFilter = {
@@ -279,6 +298,7 @@ export type DocumentTypeCountOrderByAggregateInput = {
   code?: Prisma.SortOrder
   description?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type DocumentTypeMaxOrderByAggregateInput = {
@@ -286,6 +306,7 @@ export type DocumentTypeMaxOrderByAggregateInput = {
   code?: Prisma.SortOrder
   description?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type DocumentTypeMinOrderByAggregateInput = {
@@ -293,6 +314,7 @@ export type DocumentTypeMinOrderByAggregateInput = {
   code?: Prisma.SortOrder
   description?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type DocumentTypeCreateNestedOneWithoutUsersInput = {
@@ -314,6 +336,7 @@ export type DocumentTypeCreateWithoutUsersInput = {
   code: string
   description: string
   is_active?: boolean
+  deleted_at?: Date | string | null
 }
 
 export type DocumentTypeUncheckedCreateWithoutUsersInput = {
@@ -321,6 +344,7 @@ export type DocumentTypeUncheckedCreateWithoutUsersInput = {
   code: string
   description: string
   is_active?: boolean
+  deleted_at?: Date | string | null
 }
 
 export type DocumentTypeCreateOrConnectWithoutUsersInput = {
@@ -344,6 +368,7 @@ export type DocumentTypeUpdateWithoutUsersInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type DocumentTypeUncheckedUpdateWithoutUsersInput = {
@@ -351,6 +376,7 @@ export type DocumentTypeUncheckedUpdateWithoutUsersInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -389,6 +415,7 @@ export type DocumentTypeSelect<ExtArgs extends runtime.Types.Extensions.Internal
   code?: boolean
   description?: boolean
   is_active?: boolean
+  deleted_at?: boolean
   users?: boolean | Prisma.DocumentType$usersArgs<ExtArgs>
   _count?: boolean | Prisma.DocumentTypeCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["documentType"]>
@@ -398,6 +425,7 @@ export type DocumentTypeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   code?: boolean
   description?: boolean
   is_active?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["documentType"]>
 
 export type DocumentTypeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -405,6 +433,7 @@ export type DocumentTypeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   code?: boolean
   description?: boolean
   is_active?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["documentType"]>
 
 export type DocumentTypeSelectScalar = {
@@ -412,9 +441,10 @@ export type DocumentTypeSelectScalar = {
   code?: boolean
   description?: boolean
   is_active?: boolean
+  deleted_at?: boolean
 }
 
-export type DocumentTypeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "description" | "is_active", ExtArgs["result"]["documentType"]>
+export type DocumentTypeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "description" | "is_active" | "deleted_at", ExtArgs["result"]["documentType"]>
 export type DocumentTypeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.DocumentType$usersArgs<ExtArgs>
   _count?: boolean | Prisma.DocumentTypeCountOutputTypeDefaultArgs<ExtArgs>
@@ -432,6 +462,7 @@ export type $DocumentTypePayload<ExtArgs extends runtime.Types.Extensions.Intern
     code: string
     description: string
     is_active: boolean
+    deleted_at: Date | null
   }, ExtArgs["result"]["documentType"]>
   composites: {}
 }
@@ -860,6 +891,7 @@ export interface DocumentTypeFieldRefs {
   readonly code: Prisma.FieldRef<"DocumentType", 'String'>
   readonly description: Prisma.FieldRef<"DocumentType", 'String'>
   readonly is_active: Prisma.FieldRef<"DocumentType", 'Boolean'>
+  readonly deleted_at: Prisma.FieldRef<"DocumentType", 'DateTime'>
 }
     
 

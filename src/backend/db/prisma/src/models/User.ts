@@ -36,6 +36,7 @@ export type UserMinAggregateOutputType = {
   registration_date: Date | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -50,6 +51,7 @@ export type UserMaxAggregateOutputType = {
   registration_date: Date | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -64,6 +66,7 @@ export type UserCountAggregateOutputType = {
   registration_date: number
   created_at: number
   updated_at: number
+  deleted_at: number
   _all: number
 }
 
@@ -80,6 +83,7 @@ export type UserMinAggregateInputType = {
   registration_date?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -94,6 +98,7 @@ export type UserMaxAggregateInputType = {
   registration_date?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -108,6 +113,7 @@ export type UserCountAggregateInputType = {
   registration_date?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -195,6 +201,7 @@ export type UserGroupByOutputType = {
   registration_date: Date
   created_at: Date
   updated_at: Date
+  deleted_at: Date | null
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -230,6 +237,7 @@ export type UserWhereInput = {
   registration_date?: Prisma.DateTimeFilter<"User"> | Date | string
   created_at?: Prisma.DateTimeFilter<"User"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"User"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   document_type?: Prisma.XOR<Prisma.DocumentTypeScalarRelationFilter, Prisma.DocumentTypeWhereInput>
   natural_person?: Prisma.XOR<Prisma.NaturalPersonDetailNullableScalarRelationFilter, Prisma.NaturalPersonDetailWhereInput> | null
   legal_person?: Prisma.XOR<Prisma.LegalPersonDetailNullableScalarRelationFilter, Prisma.LegalPersonDetailWhereInput> | null
@@ -248,6 +256,7 @@ export type UserOrderByWithRelationInput = {
   registration_date?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   document_type?: Prisma.DocumentTypeOrderByWithRelationInput
   natural_person?: Prisma.NaturalPersonDetailOrderByWithRelationInput
   legal_person?: Prisma.LegalPersonDetailOrderByWithRelationInput
@@ -269,6 +278,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   registration_date?: Prisma.DateTimeFilter<"User"> | Date | string
   created_at?: Prisma.DateTimeFilter<"User"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"User"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   document_type?: Prisma.XOR<Prisma.DocumentTypeScalarRelationFilter, Prisma.DocumentTypeWhereInput>
   natural_person?: Prisma.XOR<Prisma.NaturalPersonDetailNullableScalarRelationFilter, Prisma.NaturalPersonDetailWhereInput> | null
   legal_person?: Prisma.XOR<Prisma.LegalPersonDetailNullableScalarRelationFilter, Prisma.LegalPersonDetailWhereInput> | null
@@ -287,6 +297,7 @@ export type UserOrderByWithAggregationInput = {
   registration_date?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -307,6 +318,7 @@ export type UserScalarWhereWithAggregatesInput = {
   registration_date?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   created_at?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
 }
 
 export type UserCreateInput = {
@@ -320,6 +332,7 @@ export type UserCreateInput = {
   registration_date?: Date | string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   document_type: Prisma.DocumentTypeCreateNestedOneWithoutUsersInput
   natural_person?: Prisma.NaturalPersonDetailCreateNestedOneWithoutUserInput
   legal_person?: Prisma.LegalPersonDetailCreateNestedOneWithoutUserInput
@@ -338,6 +351,7 @@ export type UserUncheckedCreateInput = {
   registration_date?: Date | string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   natural_person?: Prisma.NaturalPersonDetailUncheckedCreateNestedOneWithoutUserInput
   legal_person?: Prisma.LegalPersonDetailUncheckedCreateNestedOneWithoutUserInput
   users_roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -354,6 +368,7 @@ export type UserUpdateInput = {
   registration_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   document_type?: Prisma.DocumentTypeUpdateOneRequiredWithoutUsersNestedInput
   natural_person?: Prisma.NaturalPersonDetailUpdateOneWithoutUserNestedInput
   legal_person?: Prisma.LegalPersonDetailUpdateOneWithoutUserNestedInput
@@ -372,6 +387,7 @@ export type UserUncheckedUpdateInput = {
   registration_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   natural_person?: Prisma.NaturalPersonDetailUncheckedUpdateOneWithoutUserNestedInput
   legal_person?: Prisma.LegalPersonDetailUncheckedUpdateOneWithoutUserNestedInput
   users_roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -389,6 +405,7 @@ export type UserCreateManyInput = {
   registration_date?: Date | string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -402,6 +419,7 @@ export type UserUpdateManyMutationInput = {
   registration_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -416,6 +434,7 @@ export type UserUncheckedUpdateManyInput = {
   registration_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -430,6 +449,7 @@ export type UserCountOrderByAggregateInput = {
   registration_date?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -444,6 +464,7 @@ export type UserMaxOrderByAggregateInput = {
   registration_date?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -458,6 +479,7 @@ export type UserMinOrderByAggregateInput = {
   registration_date?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type UserListRelationFilter = {
@@ -485,6 +507,10 @@ export type BoolFieldUpdateOperationsInput = {
 
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type UserCreateNestedManyWithoutDocument_typeInput = {
@@ -582,6 +608,7 @@ export type UserCreateWithoutDocument_typeInput = {
   registration_date?: Date | string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   natural_person?: Prisma.NaturalPersonDetailCreateNestedOneWithoutUserInput
   legal_person?: Prisma.LegalPersonDetailCreateNestedOneWithoutUserInput
   users_roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -598,6 +625,7 @@ export type UserUncheckedCreateWithoutDocument_typeInput = {
   registration_date?: Date | string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   natural_person?: Prisma.NaturalPersonDetailUncheckedCreateNestedOneWithoutUserInput
   legal_person?: Prisma.LegalPersonDetailUncheckedCreateNestedOneWithoutUserInput
   users_roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
@@ -644,6 +672,7 @@ export type UserScalarWhereInput = {
   registration_date?: Prisma.DateTimeFilter<"User"> | Date | string
   created_at?: Prisma.DateTimeFilter<"User"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"User"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
 }
 
 export type UserCreateWithoutNatural_personInput = {
@@ -657,6 +686,7 @@ export type UserCreateWithoutNatural_personInput = {
   registration_date?: Date | string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   document_type: Prisma.DocumentTypeCreateNestedOneWithoutUsersInput
   legal_person?: Prisma.LegalPersonDetailCreateNestedOneWithoutUserInput
   users_roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -674,6 +704,7 @@ export type UserUncheckedCreateWithoutNatural_personInput = {
   registration_date?: Date | string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   legal_person?: Prisma.LegalPersonDetailUncheckedCreateNestedOneWithoutUserInput
   users_roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
 }
@@ -705,6 +736,7 @@ export type UserUpdateWithoutNatural_personInput = {
   registration_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   document_type?: Prisma.DocumentTypeUpdateOneRequiredWithoutUsersNestedInput
   legal_person?: Prisma.LegalPersonDetailUpdateOneWithoutUserNestedInput
   users_roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -722,6 +754,7 @@ export type UserUncheckedUpdateWithoutNatural_personInput = {
   registration_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   legal_person?: Prisma.LegalPersonDetailUncheckedUpdateOneWithoutUserNestedInput
   users_roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -737,6 +770,7 @@ export type UserCreateWithoutLegal_personInput = {
   registration_date?: Date | string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   document_type: Prisma.DocumentTypeCreateNestedOneWithoutUsersInput
   natural_person?: Prisma.NaturalPersonDetailCreateNestedOneWithoutUserInput
   users_roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
@@ -754,6 +788,7 @@ export type UserUncheckedCreateWithoutLegal_personInput = {
   registration_date?: Date | string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   natural_person?: Prisma.NaturalPersonDetailUncheckedCreateNestedOneWithoutUserInput
   users_roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
 }
@@ -785,6 +820,7 @@ export type UserUpdateWithoutLegal_personInput = {
   registration_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   document_type?: Prisma.DocumentTypeUpdateOneRequiredWithoutUsersNestedInput
   natural_person?: Prisma.NaturalPersonDetailUpdateOneWithoutUserNestedInput
   users_roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -802,6 +838,7 @@ export type UserUncheckedUpdateWithoutLegal_personInput = {
   registration_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   natural_person?: Prisma.NaturalPersonDetailUncheckedUpdateOneWithoutUserNestedInput
   users_roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -817,6 +854,7 @@ export type UserCreateWithoutUsers_rolesInput = {
   registration_date?: Date | string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   document_type: Prisma.DocumentTypeCreateNestedOneWithoutUsersInput
   natural_person?: Prisma.NaturalPersonDetailCreateNestedOneWithoutUserInput
   legal_person?: Prisma.LegalPersonDetailCreateNestedOneWithoutUserInput
@@ -834,6 +872,7 @@ export type UserUncheckedCreateWithoutUsers_rolesInput = {
   registration_date?: Date | string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   natural_person?: Prisma.NaturalPersonDetailUncheckedCreateNestedOneWithoutUserInput
   legal_person?: Prisma.LegalPersonDetailUncheckedCreateNestedOneWithoutUserInput
 }
@@ -865,6 +904,7 @@ export type UserUpdateWithoutUsers_rolesInput = {
   registration_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   document_type?: Prisma.DocumentTypeUpdateOneRequiredWithoutUsersNestedInput
   natural_person?: Prisma.NaturalPersonDetailUpdateOneWithoutUserNestedInput
   legal_person?: Prisma.LegalPersonDetailUpdateOneWithoutUserNestedInput
@@ -882,6 +922,7 @@ export type UserUncheckedUpdateWithoutUsers_rolesInput = {
   registration_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   natural_person?: Prisma.NaturalPersonDetailUncheckedUpdateOneWithoutUserNestedInput
   legal_person?: Prisma.LegalPersonDetailUncheckedUpdateOneWithoutUserNestedInput
 }
@@ -897,6 +938,7 @@ export type UserCreateManyDocument_typeInput = {
   registration_date?: Date | string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type UserUpdateWithoutDocument_typeInput = {
@@ -910,6 +952,7 @@ export type UserUpdateWithoutDocument_typeInput = {
   registration_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   natural_person?: Prisma.NaturalPersonDetailUpdateOneWithoutUserNestedInput
   legal_person?: Prisma.LegalPersonDetailUpdateOneWithoutUserNestedInput
   users_roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
@@ -926,6 +969,7 @@ export type UserUncheckedUpdateWithoutDocument_typeInput = {
   registration_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   natural_person?: Prisma.NaturalPersonDetailUncheckedUpdateOneWithoutUserNestedInput
   legal_person?: Prisma.LegalPersonDetailUncheckedUpdateOneWithoutUserNestedInput
   users_roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
@@ -942,6 +986,7 @@ export type UserUncheckedUpdateManyWithoutDocument_typeInput = {
   registration_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -987,6 +1032,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   registration_date?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
   document_type?: boolean | Prisma.DocumentTypeDefaultArgs<ExtArgs>
   natural_person?: boolean | Prisma.User$natural_personArgs<ExtArgs>
   legal_person?: boolean | Prisma.User$legal_personArgs<ExtArgs>
@@ -1006,6 +1052,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   registration_date?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
   document_type?: boolean | Prisma.DocumentTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1021,6 +1068,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   registration_date?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
   document_type?: boolean | Prisma.DocumentTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1036,9 +1084,10 @@ export type UserSelectScalar = {
   registration_date?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_type" | "document_type_id" | "document_number" | "mail" | "hashed_password" | "phone_number" | "is_active" | "registration_date" | "created_at" | "updated_at", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_type" | "document_type_id" | "document_number" | "mail" | "hashed_password" | "phone_number" | "is_active" | "registration_date" | "created_at" | "updated_at" | "deleted_at", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   document_type?: boolean | Prisma.DocumentTypeDefaultArgs<ExtArgs>
   natural_person?: boolean | Prisma.User$natural_personArgs<ExtArgs>
@@ -1073,6 +1122,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     registration_date: Date
     created_at: Date
     updated_at: Date
+    deleted_at: Date | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -1511,6 +1561,7 @@ export interface UserFieldRefs {
   readonly registration_date: Prisma.FieldRef<"User", 'DateTime'>
   readonly created_at: Prisma.FieldRef<"User", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"User", 'DateTime'>
+  readonly deleted_at: Prisma.FieldRef<"User", 'DateTime'>
 }
     
 

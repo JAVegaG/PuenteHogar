@@ -50,6 +50,7 @@ export type PropertyMinAggregateOutputType = {
   is_active: boolean | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
 }
 
 export type PropertyMaxAggregateOutputType = {
@@ -62,6 +63,7 @@ export type PropertyMaxAggregateOutputType = {
   is_active: boolean | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
 }
 
 export type PropertyCountAggregateOutputType = {
@@ -74,6 +76,7 @@ export type PropertyCountAggregateOutputType = {
   is_active: number
   created_at: number
   updated_at: number
+  deleted_at: number
   _all: number
 }
 
@@ -102,6 +105,7 @@ export type PropertyMinAggregateInputType = {
   is_active?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
 }
 
 export type PropertyMaxAggregateInputType = {
@@ -114,6 +118,7 @@ export type PropertyMaxAggregateInputType = {
   is_active?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
 }
 
 export type PropertyCountAggregateInputType = {
@@ -126,6 +131,7 @@ export type PropertyCountAggregateInputType = {
   is_active?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -225,6 +231,7 @@ export type PropertyGroupByOutputType = {
   is_active: boolean
   created_at: Date
   updated_at: Date
+  deleted_at: Date | null
   _count: PropertyCountAggregateOutputType | null
   _avg: PropertyAvgAggregateOutputType | null
   _sum: PropertySumAggregateOutputType | null
@@ -260,6 +267,7 @@ export type PropertyWhereInput = {
   is_active?: Prisma.BoolFilter<"Property"> | boolean
   created_at?: Prisma.DateTimeFilter<"Property"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Property"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"Property"> | Date | string | null
   address?: Prisma.XOR<Prisma.AddressNullableScalarRelationFilter, Prisma.AddressWhereInput> | null
   additional_features?: Prisma.PropertyAdditionalFeatureListRelationFilter
 }
@@ -274,6 +282,7 @@ export type PropertyOrderByWithRelationInput = {
   is_active?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.AddressOrderByWithRelationInput
   additional_features?: Prisma.PropertyAdditionalFeatureOrderByRelationAggregateInput
 }
@@ -291,6 +300,7 @@ export type PropertyWhereUniqueInput = Prisma.AtLeast<{
   is_active?: Prisma.BoolFilter<"Property"> | boolean
   created_at?: Prisma.DateTimeFilter<"Property"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Property"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"Property"> | Date | string | null
   address?: Prisma.XOR<Prisma.AddressNullableScalarRelationFilter, Prisma.AddressWhereInput> | null
   additional_features?: Prisma.PropertyAdditionalFeatureListRelationFilter
 }, "id">
@@ -305,6 +315,7 @@ export type PropertyOrderByWithAggregationInput = {
   is_active?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PropertyCountOrderByAggregateInput
   _avg?: Prisma.PropertyAvgOrderByAggregateInput
   _max?: Prisma.PropertyMaxOrderByAggregateInput
@@ -325,6 +336,7 @@ export type PropertyScalarWhereWithAggregatesInput = {
   is_active?: Prisma.BoolWithAggregatesFilter<"Property"> | boolean
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Property"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"Property"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"Property"> | Date | string | null
 }
 
 export type PropertyCreateInput = {
@@ -337,6 +349,7 @@ export type PropertyCreateInput = {
   is_active?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   address?: Prisma.AddressCreateNestedOneWithoutPropertyInput
   additional_features?: Prisma.PropertyAdditionalFeatureCreateNestedManyWithoutPropertyInput
 }
@@ -351,6 +364,7 @@ export type PropertyUncheckedCreateInput = {
   is_active?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   address?: Prisma.AddressUncheckedCreateNestedOneWithoutPropertyInput
   additional_features?: Prisma.PropertyAdditionalFeatureUncheckedCreateNestedManyWithoutPropertyInput
 }
@@ -365,6 +379,7 @@ export type PropertyUpdateInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   address?: Prisma.AddressUpdateOneWithoutPropertyNestedInput
   additional_features?: Prisma.PropertyAdditionalFeatureUpdateManyWithoutPropertyNestedInput
 }
@@ -379,6 +394,7 @@ export type PropertyUncheckedUpdateInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   address?: Prisma.AddressUncheckedUpdateOneWithoutPropertyNestedInput
   additional_features?: Prisma.PropertyAdditionalFeatureUncheckedUpdateManyWithoutPropertyNestedInput
 }
@@ -393,6 +409,7 @@ export type PropertyCreateManyInput = {
   is_active?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type PropertyUpdateManyMutationInput = {
@@ -405,6 +422,7 @@ export type PropertyUpdateManyMutationInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PropertyUncheckedUpdateManyInput = {
@@ -417,6 +435,7 @@ export type PropertyUncheckedUpdateManyInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PropertyCountOrderByAggregateInput = {
@@ -429,6 +448,7 @@ export type PropertyCountOrderByAggregateInput = {
   is_active?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type PropertyAvgOrderByAggregateInput = {
@@ -448,6 +468,7 @@ export type PropertyMaxOrderByAggregateInput = {
   is_active?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type PropertyMinOrderByAggregateInput = {
@@ -460,6 +481,7 @@ export type PropertyMinOrderByAggregateInput = {
   is_active?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type PropertySumOrderByAggregateInput = {
@@ -528,6 +550,7 @@ export type PropertyCreateWithoutAddressInput = {
   is_active?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   additional_features?: Prisma.PropertyAdditionalFeatureCreateNestedManyWithoutPropertyInput
 }
 
@@ -541,6 +564,7 @@ export type PropertyUncheckedCreateWithoutAddressInput = {
   is_active?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   additional_features?: Prisma.PropertyAdditionalFeatureUncheckedCreateNestedManyWithoutPropertyInput
 }
 
@@ -570,6 +594,7 @@ export type PropertyUpdateWithoutAddressInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   additional_features?: Prisma.PropertyAdditionalFeatureUpdateManyWithoutPropertyNestedInput
 }
 
@@ -583,6 +608,7 @@ export type PropertyUncheckedUpdateWithoutAddressInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   additional_features?: Prisma.PropertyAdditionalFeatureUncheckedUpdateManyWithoutPropertyNestedInput
 }
 
@@ -596,6 +622,7 @@ export type PropertyCreateWithoutAdditional_featuresInput = {
   is_active?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   address?: Prisma.AddressCreateNestedOneWithoutPropertyInput
 }
 
@@ -609,6 +636,7 @@ export type PropertyUncheckedCreateWithoutAdditional_featuresInput = {
   is_active?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   address?: Prisma.AddressUncheckedCreateNestedOneWithoutPropertyInput
 }
 
@@ -638,6 +666,7 @@ export type PropertyUpdateWithoutAdditional_featuresInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   address?: Prisma.AddressUpdateOneWithoutPropertyNestedInput
 }
 
@@ -651,6 +680,7 @@ export type PropertyUncheckedUpdateWithoutAdditional_featuresInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   address?: Prisma.AddressUncheckedUpdateOneWithoutPropertyNestedInput
 }
 
@@ -695,6 +725,7 @@ export type PropertySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   is_active?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
   address?: boolean | Prisma.Property$addressArgs<ExtArgs>
   additional_features?: boolean | Prisma.Property$additional_featuresArgs<ExtArgs>
   _count?: boolean | Prisma.PropertyCountOutputTypeDefaultArgs<ExtArgs>
@@ -710,6 +741,7 @@ export type PropertySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   is_active?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["property"]>
 
 export type PropertySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -722,6 +754,7 @@ export type PropertySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   is_active?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["property"]>
 
 export type PropertySelectScalar = {
@@ -734,9 +767,10 @@ export type PropertySelectScalar = {
   is_active?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
 }
 
-export type PropertyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "property_type" | "length" | "width" | "number_of_bathrooms" | "number_of_rooms" | "is_active" | "created_at" | "updated_at", ExtArgs["result"]["property"]>
+export type PropertyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "property_type" | "length" | "width" | "number_of_bathrooms" | "number_of_rooms" | "is_active" | "created_at" | "updated_at" | "deleted_at", ExtArgs["result"]["property"]>
 export type PropertyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   address?: boolean | Prisma.Property$addressArgs<ExtArgs>
   additional_features?: boolean | Prisma.Property$additional_featuresArgs<ExtArgs>
@@ -761,6 +795,7 @@ export type $PropertyPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     is_active: boolean
     created_at: Date
     updated_at: Date
+    deleted_at: Date | null
   }, ExtArgs["result"]["property"]>
   composites: {}
 }
@@ -1195,6 +1230,7 @@ export interface PropertyFieldRefs {
   readonly is_active: Prisma.FieldRef<"Property", 'Boolean'>
   readonly created_at: Prisma.FieldRef<"Property", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"Property", 'DateTime'>
+  readonly deleted_at: Prisma.FieldRef<"Property", 'DateTime'>
 }
     
 

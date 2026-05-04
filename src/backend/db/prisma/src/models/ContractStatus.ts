@@ -28,18 +28,21 @@ export type ContractStatusMinAggregateOutputType = {
   id: string | null
   name: string | null
   description: string | null
+  deleted_at: Date | null
 }
 
 export type ContractStatusMaxAggregateOutputType = {
   id: string | null
   name: string | null
   description: string | null
+  deleted_at: Date | null
 }
 
 export type ContractStatusCountAggregateOutputType = {
   id: number
   name: number
   description: number
+  deleted_at: number
   _all: number
 }
 
@@ -48,18 +51,21 @@ export type ContractStatusMinAggregateInputType = {
   id?: true
   name?: true
   description?: true
+  deleted_at?: true
 }
 
 export type ContractStatusMaxAggregateInputType = {
   id?: true
   name?: true
   description?: true
+  deleted_at?: true
 }
 
 export type ContractStatusCountAggregateInputType = {
   id?: true
   name?: true
   description?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -139,6 +145,7 @@ export type ContractStatusGroupByOutputType = {
   id: string
   name: string
   description: string | null
+  deleted_at: Date | null
   _count: ContractStatusCountAggregateOutputType | null
   _min: ContractStatusMinAggregateOutputType | null
   _max: ContractStatusMaxAggregateOutputType | null
@@ -166,6 +173,7 @@ export type ContractStatusWhereInput = {
   id?: Prisma.StringFilter<"ContractStatus"> | string
   name?: Prisma.StringFilter<"ContractStatus"> | string
   description?: Prisma.StringNullableFilter<"ContractStatus"> | string | null
+  deleted_at?: Prisma.DateTimeNullableFilter<"ContractStatus"> | Date | string | null
   contracts?: Prisma.ContractListRelationFilter
 }
 
@@ -173,6 +181,7 @@ export type ContractStatusOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   contracts?: Prisma.ContractOrderByRelationAggregateInput
 }
 
@@ -183,6 +192,7 @@ export type ContractStatusWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.ContractStatusWhereInput[]
   NOT?: Prisma.ContractStatusWhereInput | Prisma.ContractStatusWhereInput[]
   description?: Prisma.StringNullableFilter<"ContractStatus"> | string | null
+  deleted_at?: Prisma.DateTimeNullableFilter<"ContractStatus"> | Date | string | null
   contracts?: Prisma.ContractListRelationFilter
 }, "id" | "name">
 
@@ -190,6 +200,7 @@ export type ContractStatusOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ContractStatusCountOrderByAggregateInput
   _max?: Prisma.ContractStatusMaxOrderByAggregateInput
   _min?: Prisma.ContractStatusMinOrderByAggregateInput
@@ -202,12 +213,14 @@ export type ContractStatusScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"ContractStatus"> | string
   name?: Prisma.StringWithAggregatesFilter<"ContractStatus"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"ContractStatus"> | string | null
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"ContractStatus"> | Date | string | null
 }
 
 export type ContractStatusCreateInput = {
   id?: string
   name: string
   description?: string | null
+  deleted_at?: Date | string | null
   contracts?: Prisma.ContractCreateNestedManyWithoutStatusInput
 }
 
@@ -215,6 +228,7 @@ export type ContractStatusUncheckedCreateInput = {
   id?: string
   name: string
   description?: string | null
+  deleted_at?: Date | string | null
   contracts?: Prisma.ContractUncheckedCreateNestedManyWithoutStatusInput
 }
 
@@ -222,6 +236,7 @@ export type ContractStatusUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contracts?: Prisma.ContractUpdateManyWithoutStatusNestedInput
 }
 
@@ -229,6 +244,7 @@ export type ContractStatusUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contracts?: Prisma.ContractUncheckedUpdateManyWithoutStatusNestedInput
 }
 
@@ -236,36 +252,42 @@ export type ContractStatusCreateManyInput = {
   id?: string
   name: string
   description?: string | null
+  deleted_at?: Date | string | null
 }
 
 export type ContractStatusUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ContractStatusUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ContractStatusCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type ContractStatusMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type ContractStatusMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type ContractStatusScalarRelationFilter = {
@@ -291,12 +313,14 @@ export type ContractStatusCreateWithoutContractsInput = {
   id?: string
   name: string
   description?: string | null
+  deleted_at?: Date | string | null
 }
 
 export type ContractStatusUncheckedCreateWithoutContractsInput = {
   id?: string
   name: string
   description?: string | null
+  deleted_at?: Date | string | null
 }
 
 export type ContractStatusCreateOrConnectWithoutContractsInput = {
@@ -319,12 +343,14 @@ export type ContractStatusUpdateWithoutContractsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ContractStatusUncheckedUpdateWithoutContractsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -362,6 +388,7 @@ export type ContractStatusSelect<ExtArgs extends runtime.Types.Extensions.Intern
   id?: boolean
   name?: boolean
   description?: boolean
+  deleted_at?: boolean
   contracts?: boolean | Prisma.ContractStatus$contractsArgs<ExtArgs>
   _count?: boolean | Prisma.ContractStatusCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["contractStatus"]>
@@ -370,21 +397,24 @@ export type ContractStatusSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   id?: boolean
   name?: boolean
   description?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["contractStatus"]>
 
 export type ContractStatusSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
   description?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["contractStatus"]>
 
 export type ContractStatusSelectScalar = {
   id?: boolean
   name?: boolean
   description?: boolean
+  deleted_at?: boolean
 }
 
-export type ContractStatusOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description", ExtArgs["result"]["contractStatus"]>
+export type ContractStatusOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "deleted_at", ExtArgs["result"]["contractStatus"]>
 export type ContractStatusInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   contracts?: boolean | Prisma.ContractStatus$contractsArgs<ExtArgs>
   _count?: boolean | Prisma.ContractStatusCountOutputTypeDefaultArgs<ExtArgs>
@@ -401,6 +431,7 @@ export type $ContractStatusPayload<ExtArgs extends runtime.Types.Extensions.Inte
     id: string
     name: string
     description: string | null
+    deleted_at: Date | null
   }, ExtArgs["result"]["contractStatus"]>
   composites: {}
 }
@@ -828,6 +859,7 @@ export interface ContractStatusFieldRefs {
   readonly id: Prisma.FieldRef<"ContractStatus", 'String'>
   readonly name: Prisma.FieldRef<"ContractStatus", 'String'>
   readonly description: Prisma.FieldRef<"ContractStatus", 'String'>
+  readonly deleted_at: Prisma.FieldRef<"ContractStatus", 'DateTime'>
 }
     
 

@@ -44,6 +44,7 @@ export type PortfolioUnitMinAggregateOutputType = {
   lease_base_currency: string | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
 }
 
 export type PortfolioUnitMaxAggregateOutputType = {
@@ -56,6 +57,7 @@ export type PortfolioUnitMaxAggregateOutputType = {
   lease_base_currency: string | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
 }
 
 export type PortfolioUnitCountAggregateOutputType = {
@@ -68,6 +70,7 @@ export type PortfolioUnitCountAggregateOutputType = {
   lease_base_currency: number
   created_at: number
   updated_at: number
+  deleted_at: number
   _all: number
 }
 
@@ -90,6 +93,7 @@ export type PortfolioUnitMinAggregateInputType = {
   lease_base_currency?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
 }
 
 export type PortfolioUnitMaxAggregateInputType = {
@@ -102,6 +106,7 @@ export type PortfolioUnitMaxAggregateInputType = {
   lease_base_currency?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
 }
 
 export type PortfolioUnitCountAggregateInputType = {
@@ -114,6 +119,7 @@ export type PortfolioUnitCountAggregateInputType = {
   lease_base_currency?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -213,6 +219,7 @@ export type PortfolioUnitGroupByOutputType = {
   lease_base_currency: string
   created_at: Date
   updated_at: Date
+  deleted_at: Date | null
   _count: PortfolioUnitCountAggregateOutputType | null
   _avg: PortfolioUnitAvgAggregateOutputType | null
   _sum: PortfolioUnitSumAggregateOutputType | null
@@ -248,6 +255,7 @@ export type PortfolioUnitWhereInput = {
   lease_base_currency?: Prisma.StringFilter<"PortfolioUnit"> | string
   created_at?: Prisma.DateTimeFilter<"PortfolioUnit"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"PortfolioUnit"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"PortfolioUnit"> | Date | string | null
   portfolio?: Prisma.XOR<Prisma.LandlordPortfolioScalarRelationFilter, Prisma.LandlordPortfolioWhereInput>
   leases?: Prisma.LeaseListRelationFilter
 }
@@ -262,6 +270,7 @@ export type PortfolioUnitOrderByWithRelationInput = {
   lease_base_currency?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   portfolio?: Prisma.LandlordPortfolioOrderByWithRelationInput
   leases?: Prisma.LeaseOrderByRelationAggregateInput
 }
@@ -279,6 +288,7 @@ export type PortfolioUnitWhereUniqueInput = Prisma.AtLeast<{
   lease_base_currency?: Prisma.StringFilter<"PortfolioUnit"> | string
   created_at?: Prisma.DateTimeFilter<"PortfolioUnit"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"PortfolioUnit"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"PortfolioUnit"> | Date | string | null
   portfolio?: Prisma.XOR<Prisma.LandlordPortfolioScalarRelationFilter, Prisma.LandlordPortfolioWhereInput>
   leases?: Prisma.LeaseListRelationFilter
 }, "id">
@@ -293,6 +303,7 @@ export type PortfolioUnitOrderByWithAggregationInput = {
   lease_base_currency?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PortfolioUnitCountOrderByAggregateInput
   _avg?: Prisma.PortfolioUnitAvgOrderByAggregateInput
   _max?: Prisma.PortfolioUnitMaxOrderByAggregateInput
@@ -313,6 +324,7 @@ export type PortfolioUnitScalarWhereWithAggregatesInput = {
   lease_base_currency?: Prisma.StringWithAggregatesFilter<"PortfolioUnit"> | string
   created_at?: Prisma.DateTimeWithAggregatesFilter<"PortfolioUnit"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"PortfolioUnit"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"PortfolioUnit"> | Date | string | null
 }
 
 export type PortfolioUnitCreateInput = {
@@ -324,6 +336,7 @@ export type PortfolioUnitCreateInput = {
   lease_base_currency?: string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   portfolio: Prisma.LandlordPortfolioCreateNestedOneWithoutUnitsInput
   leases?: Prisma.LeaseCreateNestedManyWithoutPortfolio_unitInput
 }
@@ -338,6 +351,7 @@ export type PortfolioUnitUncheckedCreateInput = {
   lease_base_currency?: string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   leases?: Prisma.LeaseUncheckedCreateNestedManyWithoutPortfolio_unitInput
 }
 
@@ -350,6 +364,7 @@ export type PortfolioUnitUpdateInput = {
   lease_base_currency?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfolio?: Prisma.LandlordPortfolioUpdateOneRequiredWithoutUnitsNestedInput
   leases?: Prisma.LeaseUpdateManyWithoutPortfolio_unitNestedInput
 }
@@ -364,6 +379,7 @@ export type PortfolioUnitUncheckedUpdateInput = {
   lease_base_currency?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   leases?: Prisma.LeaseUncheckedUpdateManyWithoutPortfolio_unitNestedInput
 }
 
@@ -377,6 +393,7 @@ export type PortfolioUnitCreateManyInput = {
   lease_base_currency?: string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type PortfolioUnitUpdateManyMutationInput = {
@@ -388,6 +405,7 @@ export type PortfolioUnitUpdateManyMutationInput = {
   lease_base_currency?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PortfolioUnitUncheckedUpdateManyInput = {
@@ -400,6 +418,7 @@ export type PortfolioUnitUncheckedUpdateManyInput = {
   lease_base_currency?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PortfolioUnitListRelationFilter = {
@@ -422,6 +441,7 @@ export type PortfolioUnitCountOrderByAggregateInput = {
   lease_base_currency?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type PortfolioUnitAvgOrderByAggregateInput = {
@@ -438,6 +458,7 @@ export type PortfolioUnitMaxOrderByAggregateInput = {
   lease_base_currency?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type PortfolioUnitMinOrderByAggregateInput = {
@@ -450,6 +471,7 @@ export type PortfolioUnitMinOrderByAggregateInput = {
   lease_base_currency?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type PortfolioUnitSumOrderByAggregateInput = {
@@ -526,6 +548,7 @@ export type PortfolioUnitCreateWithoutPortfolioInput = {
   lease_base_currency?: string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   leases?: Prisma.LeaseCreateNestedManyWithoutPortfolio_unitInput
 }
 
@@ -538,6 +561,7 @@ export type PortfolioUnitUncheckedCreateWithoutPortfolioInput = {
   lease_base_currency?: string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   leases?: Prisma.LeaseUncheckedCreateNestedManyWithoutPortfolio_unitInput
 }
 
@@ -580,6 +604,7 @@ export type PortfolioUnitScalarWhereInput = {
   lease_base_currency?: Prisma.StringFilter<"PortfolioUnit"> | string
   created_at?: Prisma.DateTimeFilter<"PortfolioUnit"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"PortfolioUnit"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"PortfolioUnit"> | Date | string | null
 }
 
 export type PortfolioUnitCreateWithoutLeasesInput = {
@@ -591,6 +616,7 @@ export type PortfolioUnitCreateWithoutLeasesInput = {
   lease_base_currency?: string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   portfolio: Prisma.LandlordPortfolioCreateNestedOneWithoutUnitsInput
 }
 
@@ -604,6 +630,7 @@ export type PortfolioUnitUncheckedCreateWithoutLeasesInput = {
   lease_base_currency?: string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type PortfolioUnitCreateOrConnectWithoutLeasesInput = {
@@ -631,6 +658,7 @@ export type PortfolioUnitUpdateWithoutLeasesInput = {
   lease_base_currency?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfolio?: Prisma.LandlordPortfolioUpdateOneRequiredWithoutUnitsNestedInput
 }
 
@@ -644,6 +672,7 @@ export type PortfolioUnitUncheckedUpdateWithoutLeasesInput = {
   lease_base_currency?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PortfolioUnitCreateManyPortfolioInput = {
@@ -655,6 +684,7 @@ export type PortfolioUnitCreateManyPortfolioInput = {
   lease_base_currency?: string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type PortfolioUnitUpdateWithoutPortfolioInput = {
@@ -666,6 +696,7 @@ export type PortfolioUnitUpdateWithoutPortfolioInput = {
   lease_base_currency?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   leases?: Prisma.LeaseUpdateManyWithoutPortfolio_unitNestedInput
 }
 
@@ -678,6 +709,7 @@ export type PortfolioUnitUncheckedUpdateWithoutPortfolioInput = {
   lease_base_currency?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   leases?: Prisma.LeaseUncheckedUpdateManyWithoutPortfolio_unitNestedInput
 }
 
@@ -690,6 +722,7 @@ export type PortfolioUnitUncheckedUpdateManyWithoutPortfolioInput = {
   lease_base_currency?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -733,6 +766,7 @@ export type PortfolioUnitSelect<ExtArgs extends runtime.Types.Extensions.Interna
   lease_base_currency?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
   portfolio?: boolean | Prisma.LandlordPortfolioDefaultArgs<ExtArgs>
   leases?: boolean | Prisma.PortfolioUnit$leasesArgs<ExtArgs>
   _count?: boolean | Prisma.PortfolioUnitCountOutputTypeDefaultArgs<ExtArgs>
@@ -748,6 +782,7 @@ export type PortfolioUnitSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   lease_base_currency?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
   portfolio?: boolean | Prisma.LandlordPortfolioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["portfolioUnit"]>
 
@@ -761,6 +796,7 @@ export type PortfolioUnitSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   lease_base_currency?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
   portfolio?: boolean | Prisma.LandlordPortfolioDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["portfolioUnit"]>
 
@@ -774,9 +810,10 @@ export type PortfolioUnitSelectScalar = {
   lease_base_currency?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
 }
 
-export type PortfolioUnitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "portfolio_id" | "property_id" | "name" | "conditions" | "lease_base_amount" | "lease_base_currency" | "created_at" | "updated_at", ExtArgs["result"]["portfolioUnit"]>
+export type PortfolioUnitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "portfolio_id" | "property_id" | "name" | "conditions" | "lease_base_amount" | "lease_base_currency" | "created_at" | "updated_at" | "deleted_at", ExtArgs["result"]["portfolioUnit"]>
 export type PortfolioUnitInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   portfolio?: boolean | Prisma.LandlordPortfolioDefaultArgs<ExtArgs>
   leases?: boolean | Prisma.PortfolioUnit$leasesArgs<ExtArgs>
@@ -805,6 +842,7 @@ export type $PortfolioUnitPayload<ExtArgs extends runtime.Types.Extensions.Inter
     lease_base_currency: string
     created_at: Date
     updated_at: Date
+    deleted_at: Date | null
   }, ExtArgs["result"]["portfolioUnit"]>
   composites: {}
 }
@@ -1239,6 +1277,7 @@ export interface PortfolioUnitFieldRefs {
   readonly lease_base_currency: Prisma.FieldRef<"PortfolioUnit", 'String'>
   readonly created_at: Prisma.FieldRef<"PortfolioUnit", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"PortfolioUnit", 'DateTime'>
+  readonly deleted_at: Prisma.FieldRef<"PortfolioUnit", 'DateTime'>
 }
     
 

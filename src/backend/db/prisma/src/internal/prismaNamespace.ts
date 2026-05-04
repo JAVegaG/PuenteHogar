@@ -4353,7 +4353,8 @@ export const UserScalarFieldEnum = {
   is_active: 'is_active',
   registration_date: 'registration_date',
   created_at: 'created_at',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -4363,7 +4364,8 @@ export const DocumentTypeScalarFieldEnum = {
   id: 'id',
   code: 'code',
   description: 'description',
-  is_active: 'is_active'
+  is_active: 'is_active',
+  deleted_at: 'deleted_at'
 } as const
 
 export type DocumentTypeScalarFieldEnum = (typeof DocumentTypeScalarFieldEnum)[keyof typeof DocumentTypeScalarFieldEnum]
@@ -4374,7 +4376,8 @@ export const NaturalPersonDetailScalarFieldEnum = {
   user_id: 'user_id',
   first_name: 'first_name',
   last_name: 'last_name',
-  preferred_name: 'preferred_name'
+  preferred_name: 'preferred_name',
+  deleted_at: 'deleted_at'
 } as const
 
 export type NaturalPersonDetailScalarFieldEnum = (typeof NaturalPersonDetailScalarFieldEnum)[keyof typeof NaturalPersonDetailScalarFieldEnum]
@@ -4383,7 +4386,8 @@ export type NaturalPersonDetailScalarFieldEnum = (typeof NaturalPersonDetailScal
 export const LegalPersonDetailScalarFieldEnum = {
   id: 'id',
   user_id: 'user_id',
-  business_name: 'business_name'
+  business_name: 'business_name',
+  deleted_at: 'deleted_at'
 } as const
 
 export type LegalPersonDetailScalarFieldEnum = (typeof LegalPersonDetailScalarFieldEnum)[keyof typeof LegalPersonDetailScalarFieldEnum]
@@ -4392,7 +4396,8 @@ export type LegalPersonDetailScalarFieldEnum = (typeof LegalPersonDetailScalarFi
 export const RoleScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  description: 'description'
+  description: 'description',
+  deleted_at: 'deleted_at'
 } as const
 
 export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof RoleScalarFieldEnum]
@@ -4402,7 +4407,8 @@ export const PermissionScalarFieldEnum = {
   id: 'id',
   effect: 'effect',
   action: 'action',
-  resource: 'resource'
+  resource: 'resource',
+  deleted_at: 'deleted_at'
 } as const
 
 export type PermissionScalarFieldEnum = (typeof PermissionScalarFieldEnum)[keyof typeof PermissionScalarFieldEnum]
@@ -4412,7 +4418,8 @@ export const UserRoleScalarFieldEnum = {
   id: 'id',
   user_id: 'user_id',
   role_id: 'role_id',
-  auto_assigned: 'auto_assigned'
+  auto_assigned: 'auto_assigned',
+  deleted_at: 'deleted_at'
 } as const
 
 export type UserRoleScalarFieldEnum = (typeof UserRoleScalarFieldEnum)[keyof typeof UserRoleScalarFieldEnum]
@@ -4420,7 +4427,8 @@ export type UserRoleScalarFieldEnum = (typeof UserRoleScalarFieldEnum)[keyof typ
 
 export const RolePermissionScalarFieldEnum = {
   role_id: 'role_id',
-  permission_id: 'permission_id'
+  permission_id: 'permission_id',
+  deleted_at: 'deleted_at'
 } as const
 
 export type RolePermissionScalarFieldEnum = (typeof RolePermissionScalarFieldEnum)[keyof typeof RolePermissionScalarFieldEnum]
@@ -4445,7 +4453,8 @@ export const PropertyScalarFieldEnum = {
   number_of_rooms: 'number_of_rooms',
   is_active: 'is_active',
   created_at: 'created_at',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
 } as const
 
 export type PropertyScalarFieldEnum = (typeof PropertyScalarFieldEnum)[keyof typeof PropertyScalarFieldEnum]
@@ -4459,7 +4468,8 @@ export const AddressScalarFieldEnum = {
   neighborhood: 'neighborhood',
   address: 'address',
   latitude: 'latitude',
-  longitude: 'longitude'
+  longitude: 'longitude',
+  deleted_at: 'deleted_at'
 } as const
 
 export type AddressScalarFieldEnum = (typeof AddressScalarFieldEnum)[keyof typeof AddressScalarFieldEnum]
@@ -4475,7 +4485,8 @@ export const ListingScalarFieldEnum = {
   currency: 'currency',
   is_active: 'is_active',
   created_at: 'created_at',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
 } as const
 
 export type ListingScalarFieldEnum = (typeof ListingScalarFieldEnum)[keyof typeof ListingScalarFieldEnum]
@@ -4487,7 +4498,8 @@ export const PhotoScalarFieldEnum = {
   file_url: 'file_url',
   is_main: 'is_main',
   tx_hash: 'tx_hash',
-  created_at: 'created_at'
+  created_at: 'created_at',
+  deleted_at: 'deleted_at'
 } as const
 
 export type PhotoScalarFieldEnum = (typeof PhotoScalarFieldEnum)[keyof typeof PhotoScalarFieldEnum]
@@ -4496,7 +4508,8 @@ export type PhotoScalarFieldEnum = (typeof PhotoScalarFieldEnum)[keyof typeof Ph
 export const AdditionalFeatureScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  description: 'description'
+  description: 'description',
+  deleted_at: 'deleted_at'
 } as const
 
 export type AdditionalFeatureScalarFieldEnum = (typeof AdditionalFeatureScalarFieldEnum)[keyof typeof AdditionalFeatureScalarFieldEnum]
@@ -4506,7 +4519,8 @@ export const PropertyAdditionalFeatureScalarFieldEnum = {
   property_id: 'property_id',
   additional_feature_id: 'additional_feature_id',
   value: 'value',
-  order: 'order'
+  order: 'order',
+  deleted_at: 'deleted_at'
 } as const
 
 export type PropertyAdditionalFeatureScalarFieldEnum = (typeof PropertyAdditionalFeatureScalarFieldEnum)[keyof typeof PropertyAdditionalFeatureScalarFieldEnum]
@@ -4516,7 +4530,8 @@ export const PropertyTypeScalarFieldEnum = {
   id: 'id',
   code: 'code',
   description: 'description',
-  is_active: 'is_active'
+  is_active: 'is_active',
+  deleted_at: 'deleted_at'
 } as const
 
 export type PropertyTypeScalarFieldEnum = (typeof PropertyTypeScalarFieldEnum)[keyof typeof PropertyTypeScalarFieldEnum]
@@ -4526,7 +4541,8 @@ export const DepartmentScalarFieldEnum = {
   id: 'id',
   code: 'code',
   name: 'name',
-  is_active: 'is_active'
+  is_active: 'is_active',
+  deleted_at: 'deleted_at'
 } as const
 
 export type DepartmentScalarFieldEnum = (typeof DepartmentScalarFieldEnum)[keyof typeof DepartmentScalarFieldEnum]
@@ -4537,7 +4553,8 @@ export const CityScalarFieldEnum = {
   code: 'code',
   department_code: 'department_code',
   name: 'name',
-  is_active: 'is_active'
+  is_active: 'is_active',
+  deleted_at: 'deleted_at'
 } as const
 
 export type CityScalarFieldEnum = (typeof CityScalarFieldEnum)[keyof typeof CityScalarFieldEnum]
@@ -4560,7 +4577,8 @@ export const LandlordPortfolioScalarFieldEnum = {
   description: 'description',
   creation_date: 'creation_date',
   created_at: 'created_at',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
 } as const
 
 export type LandlordPortfolioScalarFieldEnum = (typeof LandlordPortfolioScalarFieldEnum)[keyof typeof LandlordPortfolioScalarFieldEnum]
@@ -4575,7 +4593,8 @@ export const PortfolioUnitScalarFieldEnum = {
   lease_base_amount: 'lease_base_amount',
   lease_base_currency: 'lease_base_currency',
   created_at: 'created_at',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
 } as const
 
 export type PortfolioUnitScalarFieldEnum = (typeof PortfolioUnitScalarFieldEnum)[keyof typeof PortfolioUnitScalarFieldEnum]
@@ -4589,7 +4608,8 @@ export const LeaseScalarFieldEnum = {
   end_date: 'end_date',
   enc_blob: 'enc_blob',
   created_at: 'created_at',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
 } as const
 
 export type LeaseScalarFieldEnum = (typeof LeaseScalarFieldEnum)[keyof typeof LeaseScalarFieldEnum]
@@ -4608,7 +4628,8 @@ export type PortfolioRawScalarFieldEnum = (typeof PortfolioRawScalarFieldEnum)[k
 export const LeaseStatusScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  description: 'description'
+  description: 'description',
+  deleted_at: 'deleted_at'
 } as const
 
 export type LeaseStatusScalarFieldEnum = (typeof LeaseStatusScalarFieldEnum)[keyof typeof LeaseStatusScalarFieldEnum]
@@ -4618,7 +4639,8 @@ export const LeaseStatusHistoryScalarFieldEnum = {
   id: 'id',
   lease_id: 'lease_id',
   lease_status_id: 'lease_status_id',
-  record_created_at: 'record_created_at'
+  record_created_at: 'record_created_at',
+  deleted_at: 'deleted_at'
 } as const
 
 export type LeaseStatusHistoryScalarFieldEnum = (typeof LeaseStatusHistoryScalarFieldEnum)[keyof typeof LeaseStatusHistoryScalarFieldEnum]
@@ -4627,7 +4649,8 @@ export type LeaseStatusHistoryScalarFieldEnum = (typeof LeaseStatusHistoryScalar
 export const LeaseCurrentStatusScalarFieldEnum = {
   lease_id: 'lease_id',
   lease_status_history_id: 'lease_status_history_id',
-  lease_status_id: 'lease_status_id'
+  lease_status_id: 'lease_status_id',
+  deleted_at: 'deleted_at'
 } as const
 
 export type LeaseCurrentStatusScalarFieldEnum = (typeof LeaseCurrentStatusScalarFieldEnum)[keyof typeof LeaseCurrentStatusScalarFieldEnum]
@@ -4636,7 +4659,8 @@ export type LeaseCurrentStatusScalarFieldEnum = (typeof LeaseCurrentStatusScalar
 export const ListingStatusScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  description: 'description'
+  description: 'description',
+  deleted_at: 'deleted_at'
 } as const
 
 export type ListingStatusScalarFieldEnum = (typeof ListingStatusScalarFieldEnum)[keyof typeof ListingStatusScalarFieldEnum]
@@ -4646,7 +4670,8 @@ export const ListingStatusHistoryScalarFieldEnum = {
   id: 'id',
   listing_id: 'listing_id',
   listing_status_id: 'listing_status_id',
-  record_created_at: 'record_created_at'
+  record_created_at: 'record_created_at',
+  deleted_at: 'deleted_at'
 } as const
 
 export type ListingStatusHistoryScalarFieldEnum = (typeof ListingStatusHistoryScalarFieldEnum)[keyof typeof ListingStatusHistoryScalarFieldEnum]
@@ -4655,7 +4680,8 @@ export type ListingStatusHistoryScalarFieldEnum = (typeof ListingStatusHistorySc
 export const ListingCurrentStatusScalarFieldEnum = {
   listing_id: 'listing_id',
   listing_status_history_id: 'listing_status_history_id',
-  listing_status_id: 'listing_status_id'
+  listing_status_id: 'listing_status_id',
+  deleted_at: 'deleted_at'
 } as const
 
 export type ListingCurrentStatusScalarFieldEnum = (typeof ListingCurrentStatusScalarFieldEnum)[keyof typeof ListingCurrentStatusScalarFieldEnum]
@@ -4678,7 +4704,8 @@ export const ScheduledPaymentScalarFieldEnum = {
   currency: 'currency',
   due_date: 'due_date',
   created_at: 'created_at',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
 } as const
 
 export type ScheduledPaymentScalarFieldEnum = (typeof ScheduledPaymentScalarFieldEnum)[keyof typeof ScheduledPaymentScalarFieldEnum]
@@ -4691,7 +4718,8 @@ export const PaymentScalarFieldEnum = {
   currency: 'currency',
   payment_desc: 'payment_desc',
   created_at: 'created_at',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
 } as const
 
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
@@ -4700,7 +4728,8 @@ export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeo
 export const PaymentStatusScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  description: 'description'
+  description: 'description',
+  deleted_at: 'deleted_at'
 } as const
 
 export type PaymentStatusScalarFieldEnum = (typeof PaymentStatusScalarFieldEnum)[keyof typeof PaymentStatusScalarFieldEnum]
@@ -4713,7 +4742,8 @@ export const PaymentLogScalarFieldEnum = {
   status: 'status',
   platform: 'platform',
   data: 'data',
-  creation_date: 'creation_date'
+  creation_date: 'creation_date',
+  deleted_at: 'deleted_at'
 } as const
 
 export type PaymentLogScalarFieldEnum = (typeof PaymentLogScalarFieldEnum)[keyof typeof PaymentLogScalarFieldEnum]
@@ -4748,7 +4778,8 @@ export const AggregatedPaymentReportScalarFieldEnum = {
   expected_amount: 'expected_amount',
   overdue_count: 'overdue_count',
   created_at: 'created_at',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
 } as const
 
 export type AggregatedPaymentReportScalarFieldEnum = (typeof AggregatedPaymentReportScalarFieldEnum)[keyof typeof AggregatedPaymentReportScalarFieldEnum]
@@ -4771,7 +4802,8 @@ export const IndividualPaymentReportScalarFieldEnum = {
   expected_amount: 'expected_amount',
   overdue_count: 'overdue_count',
   created_at: 'created_at',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
 } as const
 
 export type IndividualPaymentReportScalarFieldEnum = (typeof IndividualPaymentReportScalarFieldEnum)[keyof typeof IndividualPaymentReportScalarFieldEnum]
@@ -4790,7 +4822,8 @@ export type AccountingRawScalarFieldEnum = (typeof AccountingRawScalarFieldEnum)
 export const NotificationTypeScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  description: 'description'
+  description: 'description',
+  deleted_at: 'deleted_at'
 } as const
 
 export type NotificationTypeScalarFieldEnum = (typeof NotificationTypeScalarFieldEnum)[keyof typeof NotificationTypeScalarFieldEnum]
@@ -4805,7 +4838,8 @@ export const InAppNotificationScalarFieldEnum = {
   read: 'read',
   event_source: 'event_source',
   data: 'data',
-  created_at: 'created_at'
+  created_at: 'created_at',
+  deleted_at: 'deleted_at'
 } as const
 
 export type InAppNotificationScalarFieldEnum = (typeof InAppNotificationScalarFieldEnum)[keyof typeof InAppNotificationScalarFieldEnum]
@@ -4818,7 +4852,8 @@ export const NotificationPreferenceScalarFieldEnum = {
   channel: 'channel',
   is_active: 'is_active',
   created_at: 'created_at',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
 } as const
 
 export type NotificationPreferenceScalarFieldEnum = (typeof NotificationPreferenceScalarFieldEnum)[keyof typeof NotificationPreferenceScalarFieldEnum]
@@ -4837,7 +4872,8 @@ export type NotificationsRawScalarFieldEnum = (typeof NotificationsRawScalarFiel
 export const ContractStatusScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  description: 'description'
+  description: 'description',
+  deleted_at: 'deleted_at'
 } as const
 
 export type ContractStatusScalarFieldEnum = (typeof ContractStatusScalarFieldEnum)[keyof typeof ContractStatusScalarFieldEnum]
@@ -4850,7 +4886,8 @@ export const ContractScalarFieldEnum = {
   start_date: 'start_date',
   end_date: 'end_date',
   created_at: 'created_at',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
 } as const
 
 export type ContractScalarFieldEnum = (typeof ContractScalarFieldEnum)[keyof typeof ContractScalarFieldEnum]
@@ -4860,7 +4897,8 @@ export const ContractPartyScalarFieldEnum = {
   id: 'id',
   user_id: 'user_id',
   contract_id: 'contract_id',
-  role_in_contract: 'role_in_contract'
+  role_in_contract: 'role_in_contract',
+  deleted_at: 'deleted_at'
 } as const
 
 export type ContractPartyScalarFieldEnum = (typeof ContractPartyScalarFieldEnum)[keyof typeof ContractPartyScalarFieldEnum]
@@ -4869,7 +4907,8 @@ export type ContractPartyScalarFieldEnum = (typeof ContractPartyScalarFieldEnum)
 export const FileTypeScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  description: 'description'
+  description: 'description',
+  deleted_at: 'deleted_at'
 } as const
 
 export type FileTypeScalarFieldEnum = (typeof FileTypeScalarFieldEnum)[keyof typeof FileTypeScalarFieldEnum]
@@ -4878,7 +4917,8 @@ export type FileTypeScalarFieldEnum = (typeof FileTypeScalarFieldEnum)[keyof typ
 export const FileStatusScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  description: 'description'
+  description: 'description',
+  deleted_at: 'deleted_at'
 } as const
 
 export type FileStatusScalarFieldEnum = (typeof FileStatusScalarFieldEnum)[keyof typeof FileStatusScalarFieldEnum]
@@ -4891,7 +4931,8 @@ export const FileScalarFieldEnum = {
   file_status_id: 'file_status_id',
   file_url: 'file_url',
   created_at: 'created_at',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
 } as const
 
 export type FileScalarFieldEnum = (typeof FileScalarFieldEnum)[keyof typeof FileScalarFieldEnum]
@@ -4900,7 +4941,8 @@ export type FileScalarFieldEnum = (typeof FileScalarFieldEnum)[keyof typeof File
 export const SigningStatusScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  description: 'description'
+  description: 'description',
+  deleted_at: 'deleted_at'
 } as const
 
 export type SigningStatusScalarFieldEnum = (typeof SigningStatusScalarFieldEnum)[keyof typeof SigningStatusScalarFieldEnum]
@@ -4911,7 +4953,8 @@ export const SigningScalarFieldEnum = {
   contract_party_id: 'contract_party_id',
   signing_status_id: 'signing_status_id',
   signing_timestamp: 'signing_timestamp',
-  document_hash: 'document_hash'
+  document_hash: 'document_hash',
+  deleted_at: 'deleted_at'
 } as const
 
 export type SigningScalarFieldEnum = (typeof SigningScalarFieldEnum)[keyof typeof SigningScalarFieldEnum]
@@ -4923,7 +4966,8 @@ export const SigningLogScalarFieldEnum = {
   signing_status_id: 'signing_status_id',
   platform: 'platform',
   data: 'data',
-  creation_date: 'creation_date'
+  creation_date: 'creation_date',
+  deleted_at: 'deleted_at'
 } as const
 
 export type SigningLogScalarFieldEnum = (typeof SigningLogScalarFieldEnum)[keyof typeof SigningLogScalarFieldEnum]

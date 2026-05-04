@@ -28,18 +28,21 @@ export type ListingStatusMinAggregateOutputType = {
   id: string | null
   name: string | null
   description: string | null
+  deleted_at: Date | null
 }
 
 export type ListingStatusMaxAggregateOutputType = {
   id: string | null
   name: string | null
   description: string | null
+  deleted_at: Date | null
 }
 
 export type ListingStatusCountAggregateOutputType = {
   id: number
   name: number
   description: number
+  deleted_at: number
   _all: number
 }
 
@@ -48,18 +51,21 @@ export type ListingStatusMinAggregateInputType = {
   id?: true
   name?: true
   description?: true
+  deleted_at?: true
 }
 
 export type ListingStatusMaxAggregateInputType = {
   id?: true
   name?: true
   description?: true
+  deleted_at?: true
 }
 
 export type ListingStatusCountAggregateInputType = {
   id?: true
   name?: true
   description?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -139,6 +145,7 @@ export type ListingStatusGroupByOutputType = {
   id: string
   name: string
   description: string | null
+  deleted_at: Date | null
   _count: ListingStatusCountAggregateOutputType | null
   _min: ListingStatusMinAggregateOutputType | null
   _max: ListingStatusMaxAggregateOutputType | null
@@ -166,6 +173,7 @@ export type ListingStatusWhereInput = {
   id?: Prisma.StringFilter<"ListingStatus"> | string
   name?: Prisma.StringFilter<"ListingStatus"> | string
   description?: Prisma.StringNullableFilter<"ListingStatus"> | string | null
+  deleted_at?: Prisma.DateTimeNullableFilter<"ListingStatus"> | Date | string | null
   history?: Prisma.ListingStatusHistoryListRelationFilter
   current?: Prisma.ListingCurrentStatusListRelationFilter
 }
@@ -174,6 +182,7 @@ export type ListingStatusOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   history?: Prisma.ListingStatusHistoryOrderByRelationAggregateInput
   current?: Prisma.ListingCurrentStatusOrderByRelationAggregateInput
 }
@@ -185,6 +194,7 @@ export type ListingStatusWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.ListingStatusWhereInput[]
   NOT?: Prisma.ListingStatusWhereInput | Prisma.ListingStatusWhereInput[]
   description?: Prisma.StringNullableFilter<"ListingStatus"> | string | null
+  deleted_at?: Prisma.DateTimeNullableFilter<"ListingStatus"> | Date | string | null
   history?: Prisma.ListingStatusHistoryListRelationFilter
   current?: Prisma.ListingCurrentStatusListRelationFilter
 }, "id" | "name">
@@ -193,6 +203,7 @@ export type ListingStatusOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ListingStatusCountOrderByAggregateInput
   _max?: Prisma.ListingStatusMaxOrderByAggregateInput
   _min?: Prisma.ListingStatusMinOrderByAggregateInput
@@ -205,12 +216,14 @@ export type ListingStatusScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"ListingStatus"> | string
   name?: Prisma.StringWithAggregatesFilter<"ListingStatus"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"ListingStatus"> | string | null
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"ListingStatus"> | Date | string | null
 }
 
 export type ListingStatusCreateInput = {
   id?: string
   name: string
   description?: string | null
+  deleted_at?: Date | string | null
   history?: Prisma.ListingStatusHistoryCreateNestedManyWithoutStatusInput
   current?: Prisma.ListingCurrentStatusCreateNestedManyWithoutStatusInput
 }
@@ -219,6 +232,7 @@ export type ListingStatusUncheckedCreateInput = {
   id?: string
   name: string
   description?: string | null
+  deleted_at?: Date | string | null
   history?: Prisma.ListingStatusHistoryUncheckedCreateNestedManyWithoutStatusInput
   current?: Prisma.ListingCurrentStatusUncheckedCreateNestedManyWithoutStatusInput
 }
@@ -227,6 +241,7 @@ export type ListingStatusUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   history?: Prisma.ListingStatusHistoryUpdateManyWithoutStatusNestedInput
   current?: Prisma.ListingCurrentStatusUpdateManyWithoutStatusNestedInput
 }
@@ -235,6 +250,7 @@ export type ListingStatusUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   history?: Prisma.ListingStatusHistoryUncheckedUpdateManyWithoutStatusNestedInput
   current?: Prisma.ListingCurrentStatusUncheckedUpdateManyWithoutStatusNestedInput
 }
@@ -243,36 +259,42 @@ export type ListingStatusCreateManyInput = {
   id?: string
   name: string
   description?: string | null
+  deleted_at?: Date | string | null
 }
 
 export type ListingStatusUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ListingStatusUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ListingStatusCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type ListingStatusMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type ListingStatusMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type ListingStatusScalarRelationFilter = {
@@ -312,6 +334,7 @@ export type ListingStatusCreateWithoutHistoryInput = {
   id?: string
   name: string
   description?: string | null
+  deleted_at?: Date | string | null
   current?: Prisma.ListingCurrentStatusCreateNestedManyWithoutStatusInput
 }
 
@@ -319,6 +342,7 @@ export type ListingStatusUncheckedCreateWithoutHistoryInput = {
   id?: string
   name: string
   description?: string | null
+  deleted_at?: Date | string | null
   current?: Prisma.ListingCurrentStatusUncheckedCreateNestedManyWithoutStatusInput
 }
 
@@ -342,6 +366,7 @@ export type ListingStatusUpdateWithoutHistoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   current?: Prisma.ListingCurrentStatusUpdateManyWithoutStatusNestedInput
 }
 
@@ -349,6 +374,7 @@ export type ListingStatusUncheckedUpdateWithoutHistoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   current?: Prisma.ListingCurrentStatusUncheckedUpdateManyWithoutStatusNestedInput
 }
 
@@ -356,6 +382,7 @@ export type ListingStatusCreateWithoutCurrentInput = {
   id?: string
   name: string
   description?: string | null
+  deleted_at?: Date | string | null
   history?: Prisma.ListingStatusHistoryCreateNestedManyWithoutStatusInput
 }
 
@@ -363,6 +390,7 @@ export type ListingStatusUncheckedCreateWithoutCurrentInput = {
   id?: string
   name: string
   description?: string | null
+  deleted_at?: Date | string | null
   history?: Prisma.ListingStatusHistoryUncheckedCreateNestedManyWithoutStatusInput
 }
 
@@ -386,6 +414,7 @@ export type ListingStatusUpdateWithoutCurrentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   history?: Prisma.ListingStatusHistoryUpdateManyWithoutStatusNestedInput
 }
 
@@ -393,6 +422,7 @@ export type ListingStatusUncheckedUpdateWithoutCurrentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   history?: Prisma.ListingStatusHistoryUncheckedUpdateManyWithoutStatusNestedInput
 }
 
@@ -440,6 +470,7 @@ export type ListingStatusSelect<ExtArgs extends runtime.Types.Extensions.Interna
   id?: boolean
   name?: boolean
   description?: boolean
+  deleted_at?: boolean
   history?: boolean | Prisma.ListingStatus$historyArgs<ExtArgs>
   current?: boolean | Prisma.ListingStatus$currentArgs<ExtArgs>
   _count?: boolean | Prisma.ListingStatusCountOutputTypeDefaultArgs<ExtArgs>
@@ -449,21 +480,24 @@ export type ListingStatusSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   id?: boolean
   name?: boolean
   description?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["listingStatus"]>
 
 export type ListingStatusSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
   description?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["listingStatus"]>
 
 export type ListingStatusSelectScalar = {
   id?: boolean
   name?: boolean
   description?: boolean
+  deleted_at?: boolean
 }
 
-export type ListingStatusOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description", ExtArgs["result"]["listingStatus"]>
+export type ListingStatusOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "deleted_at", ExtArgs["result"]["listingStatus"]>
 export type ListingStatusInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   history?: boolean | Prisma.ListingStatus$historyArgs<ExtArgs>
   current?: boolean | Prisma.ListingStatus$currentArgs<ExtArgs>
@@ -482,6 +516,7 @@ export type $ListingStatusPayload<ExtArgs extends runtime.Types.Extensions.Inter
     id: string
     name: string
     description: string | null
+    deleted_at: Date | null
   }, ExtArgs["result"]["listingStatus"]>
   composites: {}
 }
@@ -910,6 +945,7 @@ export interface ListingStatusFieldRefs {
   readonly id: Prisma.FieldRef<"ListingStatus", 'String'>
   readonly name: Prisma.FieldRef<"ListingStatus", 'String'>
   readonly description: Prisma.FieldRef<"ListingStatus", 'String'>
+  readonly deleted_at: Prisma.FieldRef<"ListingStatus", 'DateTime'>
 }
     
 

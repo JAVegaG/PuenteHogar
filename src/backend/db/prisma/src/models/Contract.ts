@@ -32,6 +32,7 @@ export type ContractMinAggregateOutputType = {
   end_date: Date | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
 }
 
 export type ContractMaxAggregateOutputType = {
@@ -42,6 +43,7 @@ export type ContractMaxAggregateOutputType = {
   end_date: Date | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
 }
 
 export type ContractCountAggregateOutputType = {
@@ -52,6 +54,7 @@ export type ContractCountAggregateOutputType = {
   end_date: number
   created_at: number
   updated_at: number
+  deleted_at: number
   _all: number
 }
 
@@ -64,6 +67,7 @@ export type ContractMinAggregateInputType = {
   end_date?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
 }
 
 export type ContractMaxAggregateInputType = {
@@ -74,6 +78,7 @@ export type ContractMaxAggregateInputType = {
   end_date?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
 }
 
 export type ContractCountAggregateInputType = {
@@ -84,6 +89,7 @@ export type ContractCountAggregateInputType = {
   end_date?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -167,6 +173,7 @@ export type ContractGroupByOutputType = {
   end_date: Date | null
   created_at: Date
   updated_at: Date
+  deleted_at: Date | null
   _count: ContractCountAggregateOutputType | null
   _min: ContractMinAggregateOutputType | null
   _max: ContractMaxAggregateOutputType | null
@@ -198,6 +205,7 @@ export type ContractWhereInput = {
   end_date?: Prisma.DateTimeNullableFilter<"Contract"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"Contract"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Contract"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"Contract"> | Date | string | null
   status?: Prisma.XOR<Prisma.ContractStatusScalarRelationFilter, Prisma.ContractStatusWhereInput>
   parties?: Prisma.ContractPartyListRelationFilter
   files?: Prisma.FileListRelationFilter
@@ -211,6 +219,7 @@ export type ContractOrderByWithRelationInput = {
   end_date?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.ContractStatusOrderByWithRelationInput
   parties?: Prisma.ContractPartyOrderByRelationAggregateInput
   files?: Prisma.FileOrderByRelationAggregateInput
@@ -227,6 +236,7 @@ export type ContractWhereUniqueInput = Prisma.AtLeast<{
   end_date?: Prisma.DateTimeNullableFilter<"Contract"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"Contract"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Contract"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"Contract"> | Date | string | null
   status?: Prisma.XOR<Prisma.ContractStatusScalarRelationFilter, Prisma.ContractStatusWhereInput>
   parties?: Prisma.ContractPartyListRelationFilter
   files?: Prisma.FileListRelationFilter
@@ -240,6 +250,7 @@ export type ContractOrderByWithAggregationInput = {
   end_date?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ContractCountOrderByAggregateInput
   _max?: Prisma.ContractMaxOrderByAggregateInput
   _min?: Prisma.ContractMinOrderByAggregateInput
@@ -256,6 +267,7 @@ export type ContractScalarWhereWithAggregatesInput = {
   end_date?: Prisma.DateTimeNullableWithAggregatesFilter<"Contract"> | Date | string | null
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Contract"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"Contract"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"Contract"> | Date | string | null
 }
 
 export type ContractCreateInput = {
@@ -265,6 +277,7 @@ export type ContractCreateInput = {
   end_date?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   status: Prisma.ContractStatusCreateNestedOneWithoutContractsInput
   parties?: Prisma.ContractPartyCreateNestedManyWithoutContractInput
   files?: Prisma.FileCreateNestedManyWithoutContractInput
@@ -278,6 +291,7 @@ export type ContractUncheckedCreateInput = {
   end_date?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   parties?: Prisma.ContractPartyUncheckedCreateNestedManyWithoutContractInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutContractInput
 }
@@ -289,6 +303,7 @@ export type ContractUpdateInput = {
   end_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.ContractStatusUpdateOneRequiredWithoutContractsNestedInput
   parties?: Prisma.ContractPartyUpdateManyWithoutContractNestedInput
   files?: Prisma.FileUpdateManyWithoutContractNestedInput
@@ -302,6 +317,7 @@ export type ContractUncheckedUpdateInput = {
   end_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   parties?: Prisma.ContractPartyUncheckedUpdateManyWithoutContractNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutContractNestedInput
 }
@@ -314,6 +330,7 @@ export type ContractCreateManyInput = {
   end_date?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type ContractUpdateManyMutationInput = {
@@ -323,6 +340,7 @@ export type ContractUpdateManyMutationInput = {
   end_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ContractUncheckedUpdateManyInput = {
@@ -333,6 +351,7 @@ export type ContractUncheckedUpdateManyInput = {
   end_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ContractListRelationFilter = {
@@ -353,6 +372,7 @@ export type ContractCountOrderByAggregateInput = {
   end_date?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type ContractMaxOrderByAggregateInput = {
@@ -363,6 +383,7 @@ export type ContractMaxOrderByAggregateInput = {
   end_date?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type ContractMinOrderByAggregateInput = {
@@ -373,6 +394,7 @@ export type ContractMinOrderByAggregateInput = {
   end_date?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type ContractScalarRelationFilter = {
@@ -457,6 +479,7 @@ export type ContractCreateWithoutStatusInput = {
   end_date?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   parties?: Prisma.ContractPartyCreateNestedManyWithoutContractInput
   files?: Prisma.FileCreateNestedManyWithoutContractInput
 }
@@ -468,6 +491,7 @@ export type ContractUncheckedCreateWithoutStatusInput = {
   end_date?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   parties?: Prisma.ContractPartyUncheckedCreateNestedManyWithoutContractInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutContractInput
 }
@@ -509,6 +533,7 @@ export type ContractScalarWhereInput = {
   end_date?: Prisma.DateTimeNullableFilter<"Contract"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"Contract"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Contract"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"Contract"> | Date | string | null
 }
 
 export type ContractCreateWithoutPartiesInput = {
@@ -518,6 +543,7 @@ export type ContractCreateWithoutPartiesInput = {
   end_date?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   status: Prisma.ContractStatusCreateNestedOneWithoutContractsInput
   files?: Prisma.FileCreateNestedManyWithoutContractInput
 }
@@ -530,6 +556,7 @@ export type ContractUncheckedCreateWithoutPartiesInput = {
   end_date?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   files?: Prisma.FileUncheckedCreateNestedManyWithoutContractInput
 }
 
@@ -556,6 +583,7 @@ export type ContractUpdateWithoutPartiesInput = {
   end_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.ContractStatusUpdateOneRequiredWithoutContractsNestedInput
   files?: Prisma.FileUpdateManyWithoutContractNestedInput
 }
@@ -568,6 +596,7 @@ export type ContractUncheckedUpdateWithoutPartiesInput = {
   end_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   files?: Prisma.FileUncheckedUpdateManyWithoutContractNestedInput
 }
 
@@ -578,6 +607,7 @@ export type ContractCreateWithoutFilesInput = {
   end_date?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   status: Prisma.ContractStatusCreateNestedOneWithoutContractsInput
   parties?: Prisma.ContractPartyCreateNestedManyWithoutContractInput
 }
@@ -590,6 +620,7 @@ export type ContractUncheckedCreateWithoutFilesInput = {
   end_date?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   parties?: Prisma.ContractPartyUncheckedCreateNestedManyWithoutContractInput
 }
 
@@ -616,6 +647,7 @@ export type ContractUpdateWithoutFilesInput = {
   end_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.ContractStatusUpdateOneRequiredWithoutContractsNestedInput
   parties?: Prisma.ContractPartyUpdateManyWithoutContractNestedInput
 }
@@ -628,6 +660,7 @@ export type ContractUncheckedUpdateWithoutFilesInput = {
   end_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   parties?: Prisma.ContractPartyUncheckedUpdateManyWithoutContractNestedInput
 }
 
@@ -638,6 +671,7 @@ export type ContractCreateManyStatusInput = {
   end_date?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type ContractUpdateWithoutStatusInput = {
@@ -647,6 +681,7 @@ export type ContractUpdateWithoutStatusInput = {
   end_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   parties?: Prisma.ContractPartyUpdateManyWithoutContractNestedInput
   files?: Prisma.FileUpdateManyWithoutContractNestedInput
 }
@@ -658,6 +693,7 @@ export type ContractUncheckedUpdateWithoutStatusInput = {
   end_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   parties?: Prisma.ContractPartyUncheckedUpdateManyWithoutContractNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutContractNestedInput
 }
@@ -669,6 +705,7 @@ export type ContractUncheckedUpdateManyWithoutStatusInput = {
   end_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -719,6 +756,7 @@ export type ContractSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   end_date?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
   status?: boolean | Prisma.ContractStatusDefaultArgs<ExtArgs>
   parties?: boolean | Prisma.Contract$partiesArgs<ExtArgs>
   files?: boolean | Prisma.Contract$filesArgs<ExtArgs>
@@ -733,6 +771,7 @@ export type ContractSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   end_date?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
   status?: boolean | Prisma.ContractStatusDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["contract"]>
 
@@ -744,6 +783,7 @@ export type ContractSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   end_date?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
   status?: boolean | Prisma.ContractStatusDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["contract"]>
 
@@ -755,9 +795,10 @@ export type ContractSelectScalar = {
   end_date?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
 }
 
-export type ContractOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "lease_id" | "contract_status_id" | "start_date" | "end_date" | "created_at" | "updated_at", ExtArgs["result"]["contract"]>
+export type ContractOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "lease_id" | "contract_status_id" | "start_date" | "end_date" | "created_at" | "updated_at" | "deleted_at", ExtArgs["result"]["contract"]>
 export type ContractInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   status?: boolean | Prisma.ContractStatusDefaultArgs<ExtArgs>
   parties?: boolean | Prisma.Contract$partiesArgs<ExtArgs>
@@ -786,6 +827,7 @@ export type $ContractPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     end_date: Date | null
     created_at: Date
     updated_at: Date
+    deleted_at: Date | null
   }, ExtArgs["result"]["contract"]>
   composites: {}
 }
@@ -1219,6 +1261,7 @@ export interface ContractFieldRefs {
   readonly end_date: Prisma.FieldRef<"Contract", 'DateTime'>
   readonly created_at: Prisma.FieldRef<"Contract", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"Contract", 'DateTime'>
+  readonly deleted_at: Prisma.FieldRef<"Contract", 'DateTime'>
 }
     
 

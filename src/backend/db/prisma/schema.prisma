@@ -25,6 +25,7 @@ model User {
   registration_date DateTime             @default(now())
   created_at        DateTime             @default(now())
   updated_at        DateTime             @updatedAt
+  deleted_at        DateTime?
 
   document_type  DocumentType         @relation(fields: [document_type_id], references: [id])
   natural_person NaturalPersonDetail?
@@ -39,6 +40,7 @@ model DocumentType {
   code        String  @unique  // ej: CC, NIT, CE, PP
   description String           // ej: Cédula de Ciudadanía, NIT, Cédula de Extranjería, Pasaporte
   is_active   Boolean @default(true)
+  deleted_at  DateTime?
 
   users User[]
 
@@ -51,6 +53,7 @@ model NaturalPersonDetail {
   first_name     String
   last_name      String
   preferred_name String?
+  deleted_at     DateTime?
 
   user User @relation(fields: [user_id], references: [id])
 
@@ -58,9 +61,10 @@ model NaturalPersonDetail {
 }
 
 model LegalPersonDetail {
-  id            String @id @default(uuid())
-  user_id       String @unique
+  id            String    @id @default(uuid())
+  user_id       String    @unique
   business_name String
+  deleted_at    DateTime?
 
   user User @relation(fields: [user_id], references: [id])
 
@@ -71,6 +75,7 @@ model Role {
   id          String           @id @default(uuid())
   name        String           @unique
   description String?
+  deleted_at  DateTime?
 
   users_roles UserRole[]
   roles_perms RolePermission[]
@@ -79,10 +84,11 @@ model Role {
 }
 
 model Permission {
-  id       String @id @default(uuid())
-  effect   String // ALLOW | DENY
-  action   String
-  resource String
+  id         String    @id @default(uuid())
+  effect     String    // ALLOW | DENY
+  action     String
+  resource   String
+  deleted_at DateTime?
 
   roles_perms RolePermission[]
 
@@ -90,10 +96,11 @@ model Permission {
 }
 
 model UserRole {
-  id            String  @id @default(uuid())
+  id            String    @id @default(uuid())
   user_id       String
   role_id       String
-  auto_assigned Boolean @default(false)
+  auto_assigned Boolean   @default(false)
+  deleted_at    DateTime?
 
   user User @relation(fields: [user_id], references: [id])
   role Role @relation(fields: [role_id], references: [id])
@@ -105,6 +112,7 @@ model UserRole {
 model RolePermission {
   role_id       String
   permission_id String
+  deleted_at    DateTime?
 
   role       Role       @relation(fields: [role_id], references: [id])
   permission Permission @relation(fields: [permission_id], references: [id])
@@ -136,6 +144,7 @@ model Property {
   is_active           Boolean  @default(true)
   created_at          DateTime @default(now())
   updated_at          DateTime @updatedAt
+  deleted_at          DateTime?
 
   address             Address?
   additional_features PropertyAdditionalFeature[]
@@ -144,14 +153,15 @@ model Property {
 }
 
 model Address {
-  id           String   @id @default(uuid())
-  property_id  String   @unique
+  id           String    @id @default(uuid())
+  property_id  String    @unique
   state        String
   city         String
   neighborhood String
   address      String
   latitude     Decimal?
   longitude    Decimal?
+  deleted_at   DateTime?
 
   property Property @relation(fields: [property_id], references: [id])
 
@@ -159,16 +169,17 @@ model Address {
 }
 
 model Listing {
-  id                String   @id @default(uuid())
-  portfolio_unit_id String   // cross-schema ref — no FK
+  id                String    @id @default(uuid())
+  portfolio_unit_id String    // cross-schema ref — no FK
   title             String
   description       String?
-  listing_date      DateTime @default(now())
+  listing_date      DateTime  @default(now())
   price             Decimal
-  currency          String   @default("COP")
-  is_active         Boolean  @default(true)
-  created_at        DateTime @default(now())
-  updated_at        DateTime @updatedAt
+  currency          String    @default("COP")
+  is_active         Boolean   @default(true)
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+  deleted_at        DateTime?
 
   photos Photo[]
 
@@ -177,12 +188,13 @@ model Listing {
 }
 
 model Photo {
-  id         String   @id @default(uuid())
+  id         String    @id @default(uuid())
   listing_id String
   file_url   String
-  is_main    Boolean  @default(false)
+  is_main    Boolean   @default(false)
   tx_hash    String?
-  created_at DateTime @default(now())
+  created_at DateTime  @default(now())
+  deleted_at DateTime?
 
   listing Listing @relation(fields: [listing_id], references: [id])
 
@@ -190,9 +202,10 @@ model Photo {
 }
 
 model AdditionalFeature {
-  id          String  @id @default(uuid())
+  id          String    @id @default(uuid())
   name        String
   description String?
+  deleted_at  DateTime?
 
   properties PropertyAdditionalFeature[]
 
@@ -204,6 +217,7 @@ model PropertyAdditionalFeature {
   additional_feature_id String
   value                 String?
   order                 Int?
+  deleted_at            DateTime?
 
   property Property          @relation(fields: [property_id], references: [id])
   feature  AdditionalFeature @relation(fields: [additional_feature_id], references: [id])
@@ -213,19 +227,21 @@ model PropertyAdditionalFeature {
 }
 
 model PropertyType {
-  id          String  @id @default(uuid())
-  code        String  @unique
+  id          String    @id @default(uuid())
+  code        String    @unique
   description String
-  is_active   Boolean @default(true)
+  is_active   Boolean   @default(true)
+  deleted_at  DateTime?
 
   @@schema("property_listings")
 }
 
 model Department {
-  id        String  @id @default(uuid())
-  code      String  @unique   // 2-digit DANE code, e.g. "05"
-  name      String            // e.g. "ANTIOQUIA"
-  is_active Boolean @default(true)
+  id        String    @id @default(uuid())
+  code      String    @unique   // 2-digit DANE code, e.g. "05"
+  name      String              // e.g. "ANTIOQUIA"
+  is_active Boolean   @default(true)
+  deleted_at DateTime?
 
   cities City[]
 
@@ -233,11 +249,12 @@ model Department {
 }
 
 model City {
-  id              String  @id @default(uuid())
-  code            String  @unique   // 5-digit DANE code, e.g. "05001"
-  department_code String            // references Department.code
-  name            String            // e.g. "MEDELLÍN"
-  is_active       Boolean @default(true)
+  id              String    @id @default(uuid())
+  code            String    @unique   // 5-digit DANE code, e.g. "05001"
+  department_code String              // references Department.code
+  name            String              // e.g. "MEDELLÍN"
+  is_active       Boolean   @default(true)
+  deleted_at      DateTime?
 
   department Department @relation(fields: [department_code], references: [code])
 
@@ -258,13 +275,14 @@ model PropertyListingsRaw {
 // ─────────────────────────────────────────────
 
 model LandlordPortfolio {
-  id            String   @id @default(uuid())
-  user_id       String   // cross-schema ref — no FK
+  id            String    @id @default(uuid())
+  user_id       String    // cross-schema ref — no FK
   name          String
   description   String?
-  creation_date DateTime @default(now())
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
+  creation_date DateTime  @default(now())
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime?
 
   units PortfolioUnit[]
 
@@ -272,15 +290,16 @@ model LandlordPortfolio {
 }
 
 model PortfolioUnit {
-  id                  String   @id @default(uuid())
+  id                  String    @id @default(uuid())
   portfolio_id        String
-  property_id         String   // cross-schema ref — no FK
-  name                String   @default("")
+  property_id         String    // cross-schema ref — no FK
+  name                String    @default("")
   conditions          String?
   lease_base_amount   Decimal
-  lease_base_currency String   @default("COP")
-  created_at          DateTime @default(now())
-  updated_at          DateTime @updatedAt
+  lease_base_currency String    @default("COP")
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+  deleted_at          DateTime?
 
   portfolio LandlordPortfolio @relation(fields: [portfolio_id], references: [id])
   leases    Lease[]
@@ -289,14 +308,15 @@ model PortfolioUnit {
 }
 
 model Lease {
-  id                String   @id @default(uuid())
+  id                String    @id @default(uuid())
   portfolio_unit_id String
-  user_id           String   // cross-schema ref — no FK (arrendatario)
+  user_id           String    // cross-schema ref — no FK (arrendatario)
   start_date        DateTime
   end_date          DateTime?
-  enc_blob          String?  // datos sensibles cifrados
-  created_at        DateTime @default(now())
-  updated_at        DateTime @updatedAt
+  enc_blob          String?   // datos sensibles cifrados
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+  deleted_at        DateTime?
 
   portfolio_unit PortfolioUnit @relation(fields: [portfolio_unit_id], references: [id])
 
@@ -318,9 +338,10 @@ model PortfolioRaw {
 // ─────────────────────────────────────────────
 
 model LeaseStatus {
-  id          String  @id @default(uuid())
-  name        String  @unique
+  id          String    @id @default(uuid())
+  name        String    @unique
   description String?
+  deleted_at  DateTime?
 
   history LeaseStatusHistory[]
   current LeaseCurrentStatus[]
@@ -329,10 +350,11 @@ model LeaseStatus {
 }
 
 model LeaseStatusHistory {
-  id                String   @id @default(uuid())
-  lease_id          String   // cross-schema ref — no FK
+  id                String    @id @default(uuid())
+  lease_id          String    // cross-schema ref — no FK
   lease_status_id   String
-  record_created_at DateTime @default(now())
+  record_created_at DateTime  @default(now())
+  deleted_at        DateTime?
 
   status  LeaseStatus        @relation(fields: [lease_status_id], references: [id])
   current LeaseCurrentStatus?
@@ -341,9 +363,10 @@ model LeaseStatusHistory {
 }
 
 model LeaseCurrentStatus {
-  lease_id                String @id // cross-schema ref — no FK
-  lease_status_history_id String @unique
+  lease_id                String    @id // cross-schema ref — no FK
+  lease_status_history_id String    @unique
   lease_status_id         String
+  deleted_at              DateTime?
 
   history LeaseStatusHistory @relation(fields: [lease_status_history_id], references: [id])
   status  LeaseStatus        @relation(fields: [lease_status_id], references: [id])
@@ -352,9 +375,10 @@ model LeaseCurrentStatus {
 }
 
 model ListingStatus {
-  id          String  @id @default(uuid())
-  name        String  @unique
+  id          String    @id @default(uuid())
+  name        String    @unique
   description String?
+  deleted_at  DateTime?
 
   history ListingStatusHistory[]
   current ListingCurrentStatus[]
@@ -363,10 +387,11 @@ model ListingStatus {
 }
 
 model ListingStatusHistory {
-  id                String   @id @default(uuid())
-  listing_id        String   // cross-schema ref — no FK
+  id                String    @id @default(uuid())
+  listing_id        String    // cross-schema ref — no FK
   listing_status_id String
-  record_created_at DateTime @default(now())
+  record_created_at DateTime  @default(now())
+  deleted_at        DateTime?
 
   status  ListingStatus        @relation(fields: [listing_status_id], references: [id])
   current ListingCurrentStatus?
@@ -375,9 +400,10 @@ model ListingStatusHistory {
 }
 
 model ListingCurrentStatus {
-  listing_id                String @id // cross-schema ref — no FK
-  listing_status_history_id String @unique
+  listing_id                String    @id // cross-schema ref — no FK
+  listing_status_history_id String    @unique
   listing_status_id         String
+  deleted_at                DateTime?
 
   history ListingStatusHistory @relation(fields: [listing_status_history_id], references: [id])
   status  ListingStatus        @relation(fields: [listing_status_id], references: [id])
@@ -399,13 +425,14 @@ model TrackingRaw {
 // ─────────────────────────────────────────────
 
 model ScheduledPayment {
-  id         String   @id @default(uuid())
-  lease_id   String   // cross-schema ref — no FK
+  id         String    @id @default(uuid())
+  lease_id   String    // cross-schema ref — no FK
   amount     Decimal
-  currency   String   @default("COP")
+  currency   String    @default("COP")
   due_date   DateTime
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
 
   payments Payment[]
 
@@ -413,13 +440,14 @@ model ScheduledPayment {
 }
 
 model Payment {
-  id                   String   @id @default(uuid())
+  id                   String    @id @default(uuid())
   scheduled_payment_id String
   amount               Decimal
-  currency             String   @default("COP")
+  currency             String    @default("COP")
   payment_desc         String?
-  created_at           DateTime @default(now())
-  updated_at           DateTime @updatedAt
+  created_at           DateTime  @default(now())
+  updated_at           DateTime  @updatedAt
+  deleted_at           DateTime?
 
   scheduled_payment ScheduledPayment @relation(fields: [scheduled_payment_id], references: [id])
   logs              PaymentLog[]
@@ -428,9 +456,10 @@ model Payment {
 }
 
 model PaymentStatus {
-  id          String  @id @default(uuid())
-  name        String  @unique
+  id          String    @id @default(uuid())
+  name        String    @unique
   description String?
+  deleted_at  DateTime?
 
   logs PaymentLog[]
 
@@ -438,13 +467,14 @@ model PaymentStatus {
 }
 
 model PaymentLog {
-  id                String   @id @default(uuid())
+  id                String    @id @default(uuid())
   payment_id        String
   payment_status_id String
   status            String
   platform          String?
   data              Json?
-  creation_date     DateTime @default(now())
+  creation_date     DateTime  @default(now())
+  deleted_at        DateTime?
 
   payment        Payment       @relation(fields: [payment_id], references: [id])
   payment_status PaymentStatus @relation(fields: [payment_status_id], references: [id])
@@ -485,6 +515,7 @@ model AggregatedPaymentReport {
   overdue_count    Int
   created_at       DateTime  @default(now())
   updated_at       DateTime  @updatedAt
+  deleted_at       DateTime?
 
   @@schema("accounting")
 }
@@ -507,6 +538,7 @@ model IndividualPaymentReport {
   overdue_count     Int
   created_at        DateTime  @default(now())
   updated_at        DateTime  @updatedAt
+  deleted_at        DateTime?
 
   @@schema("accounting")
 }
@@ -525,9 +557,10 @@ model AccountingRaw {
 // ─────────────────────────────────────────────
 
 model NotificationType {
-  id          String  @id @default(uuid())
-  name        String  @unique
+  id          String    @id @default(uuid())
+  name        String    @unique
   description String?
+  deleted_at  DateTime?
 
   preferences          NotificationPreference[]
   in_app_notifications InAppNotification[]
@@ -536,15 +569,16 @@ model NotificationType {
 }
 
 model InAppNotification {
-  id                   String   @id @default(uuid())
+  id                   String    @id @default(uuid())
   user_id              String
   notification_type_id String
   title                String
   message              String
-  read                 Boolean  @default(false)
+  read                 Boolean   @default(false)
   event_source         String
-  data                 Json     @default("{}")
-  created_at           DateTime @default(now())
+  data                 Json      @default("{}")
+  created_at           DateTime  @default(now())
+  deleted_at           DateTime?
 
   notification_type NotificationType @relation(fields: [notification_type_id], references: [id])
 
@@ -554,13 +588,14 @@ model InAppNotification {
 }
 
 model NotificationPreference {
-  id                   String   @id @default(uuid())
-  user_id              String   // cross-schema ref — no FK
+  id                   String    @id @default(uuid())
+  user_id              String    // cross-schema ref — no FK
   notification_type_id String
-  channel              String   // EMAIL | WHATSAPP
-  is_active            Boolean  @default(true)
-  created_at           DateTime @default(now())
-  updated_at           DateTime @updatedAt
+  channel              String    // EMAIL | WHATSAPP
+  is_active            Boolean   @default(true)
+  created_at           DateTime  @default(now())
+  updated_at           DateTime  @updatedAt
+  deleted_at           DateTime?
 
   notification_type NotificationType @relation(fields: [notification_type_id], references: [id])
 
@@ -581,9 +616,10 @@ model NotificationsRaw {
 // ─────────────────────────────────────────────
 
 model ContractStatus {
-  id          String  @id @default(uuid())
-  name        String  @unique // PENDING | SIGNATURE_PENDING | SIGNED
+  id          String    @id @default(uuid())
+  name        String    @unique // PENDING | SIGNATURE_PENDING | SIGNED
   description String?
+  deleted_at  DateTime?
 
   contracts Contract[]
 
@@ -598,6 +634,7 @@ model Contract {
   end_date           DateTime?
   created_at         DateTime  @default(now())
   updated_at         DateTime  @updatedAt
+  deleted_at         DateTime?
 
   status  ContractStatus  @relation(fields: [contract_status_id], references: [id])
   parties ContractParty[]
@@ -607,10 +644,11 @@ model Contract {
 }
 
 model ContractParty {
-  id               String @id @default(uuid())
-  user_id          String // cross-schema ref — no FK
+  id               String    @id @default(uuid())
+  user_id          String    // cross-schema ref — no FK
   contract_id      String
   role_in_contract String
+  deleted_at       DateTime?
 
   contract Contract  @relation(fields: [contract_id], references: [id])
   signings Signing[]
@@ -619,9 +657,10 @@ model ContractParty {
 }
 
 model FileType {
-  id          String  @id @default(uuid())
-  name        String  @unique
+  id          String    @id @default(uuid())
+  name        String    @unique
   description String?
+  deleted_at  DateTime?
 
   files File[]
 
@@ -629,9 +668,10 @@ model FileType {
 }
 
 model FileStatus {
-  id          String  @id @default(uuid())
-  name        String  @unique
+  id          String    @id @default(uuid())
+  name        String    @unique
   description String?
+  deleted_at  DateTime?
 
   files File[]
 
@@ -639,13 +679,14 @@ model FileStatus {
 }
 
 model File {
-  id             String   @id @default(uuid())
+  id             String    @id @default(uuid())
   contract_id    String
   file_type_id   String
   file_status_id String
   file_url       String
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+  deleted_at     DateTime?
 
   contract    Contract   @relation(fields: [contract_id], references: [id])
   file_type   FileType   @relation(fields: [file_type_id], references: [id])
@@ -655,9 +696,10 @@ model File {
 }
 
 model SigningStatus {
-  id          String  @id @default(uuid())
-  name        String  @unique
+  id          String    @id @default(uuid())
+  name        String    @unique
   description String?
+  deleted_at  DateTime?
 
   signings Signing[]
   logs     SigningLog[]
@@ -671,6 +713,7 @@ model Signing {
   signing_status_id String
   signing_timestamp DateTime?
   document_hash     String?
+  deleted_at        DateTime?
 
   contract_party ContractParty @relation(fields: [contract_party_id], references: [id])
   signing_status SigningStatus  @relation(fields: [signing_status_id], references: [id])
@@ -680,12 +723,13 @@ model Signing {
 }
 
 model SigningLog {
-  id                String   @id @default(uuid())
+  id                String    @id @default(uuid())
   signing_id        String
   signing_status_id String
   platform          String?
   data              Json?
-  creation_date     DateTime @default(now())
+  creation_date     DateTime  @default(now())
+  deleted_at        DateTime?
 
   signing        Signing      @relation(fields: [signing_id], references: [id])
   signing_status SigningStatus @relation(fields: [signing_status_id], references: [id])

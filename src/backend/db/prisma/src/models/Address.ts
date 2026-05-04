@@ -45,6 +45,7 @@ export type AddressMinAggregateOutputType = {
   address: string | null
   latitude: runtime.Decimal | null
   longitude: runtime.Decimal | null
+  deleted_at: Date | null
 }
 
 export type AddressMaxAggregateOutputType = {
@@ -56,6 +57,7 @@ export type AddressMaxAggregateOutputType = {
   address: string | null
   latitude: runtime.Decimal | null
   longitude: runtime.Decimal | null
+  deleted_at: Date | null
 }
 
 export type AddressCountAggregateOutputType = {
@@ -67,6 +69,7 @@ export type AddressCountAggregateOutputType = {
   address: number
   latitude: number
   longitude: number
+  deleted_at: number
   _all: number
 }
 
@@ -90,6 +93,7 @@ export type AddressMinAggregateInputType = {
   address?: true
   latitude?: true
   longitude?: true
+  deleted_at?: true
 }
 
 export type AddressMaxAggregateInputType = {
@@ -101,6 +105,7 @@ export type AddressMaxAggregateInputType = {
   address?: true
   latitude?: true
   longitude?: true
+  deleted_at?: true
 }
 
 export type AddressCountAggregateInputType = {
@@ -112,6 +117,7 @@ export type AddressCountAggregateInputType = {
   address?: true
   latitude?: true
   longitude?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -210,6 +216,7 @@ export type AddressGroupByOutputType = {
   address: string
   latitude: runtime.Decimal | null
   longitude: runtime.Decimal | null
+  deleted_at: Date | null
   _count: AddressCountAggregateOutputType | null
   _avg: AddressAvgAggregateOutputType | null
   _sum: AddressSumAggregateOutputType | null
@@ -244,6 +251,7 @@ export type AddressWhereInput = {
   address?: Prisma.StringFilter<"Address"> | string
   latitude?: Prisma.DecimalNullableFilter<"Address"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.DecimalNullableFilter<"Address"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deleted_at?: Prisma.DateTimeNullableFilter<"Address"> | Date | string | null
   property?: Prisma.XOR<Prisma.PropertyScalarRelationFilter, Prisma.PropertyWhereInput>
 }
 
@@ -256,6 +264,7 @@ export type AddressOrderByWithRelationInput = {
   address?: Prisma.SortOrder
   latitude?: Prisma.SortOrderInput | Prisma.SortOrder
   longitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   property?: Prisma.PropertyOrderByWithRelationInput
 }
 
@@ -271,6 +280,7 @@ export type AddressWhereUniqueInput = Prisma.AtLeast<{
   address?: Prisma.StringFilter<"Address"> | string
   latitude?: Prisma.DecimalNullableFilter<"Address"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.DecimalNullableFilter<"Address"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deleted_at?: Prisma.DateTimeNullableFilter<"Address"> | Date | string | null
   property?: Prisma.XOR<Prisma.PropertyScalarRelationFilter, Prisma.PropertyWhereInput>
 }, "id" | "property_id">
 
@@ -283,6 +293,7 @@ export type AddressOrderByWithAggregationInput = {
   address?: Prisma.SortOrder
   latitude?: Prisma.SortOrderInput | Prisma.SortOrder
   longitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.AddressCountOrderByAggregateInput
   _avg?: Prisma.AddressAvgOrderByAggregateInput
   _max?: Prisma.AddressMaxOrderByAggregateInput
@@ -302,6 +313,7 @@ export type AddressScalarWhereWithAggregatesInput = {
   address?: Prisma.StringWithAggregatesFilter<"Address"> | string
   latitude?: Prisma.DecimalNullableWithAggregatesFilter<"Address"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.DecimalNullableWithAggregatesFilter<"Address"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"Address"> | Date | string | null
 }
 
 export type AddressCreateInput = {
@@ -312,6 +324,7 @@ export type AddressCreateInput = {
   address: string
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deleted_at?: Date | string | null
   property: Prisma.PropertyCreateNestedOneWithoutAddressInput
 }
 
@@ -324,6 +337,7 @@ export type AddressUncheckedCreateInput = {
   address: string
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deleted_at?: Date | string | null
 }
 
 export type AddressUpdateInput = {
@@ -334,6 +348,7 @@ export type AddressUpdateInput = {
   address?: Prisma.StringFieldUpdateOperationsInput | string
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   property?: Prisma.PropertyUpdateOneRequiredWithoutAddressNestedInput
 }
 
@@ -346,6 +361,7 @@ export type AddressUncheckedUpdateInput = {
   address?: Prisma.StringFieldUpdateOperationsInput | string
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type AddressCreateManyInput = {
@@ -357,6 +373,7 @@ export type AddressCreateManyInput = {
   address: string
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deleted_at?: Date | string | null
 }
 
 export type AddressUpdateManyMutationInput = {
@@ -367,6 +384,7 @@ export type AddressUpdateManyMutationInput = {
   address?: Prisma.StringFieldUpdateOperationsInput | string
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type AddressUncheckedUpdateManyInput = {
@@ -378,6 +396,7 @@ export type AddressUncheckedUpdateManyInput = {
   address?: Prisma.StringFieldUpdateOperationsInput | string
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type AddressNullableScalarRelationFilter = {
@@ -394,6 +413,7 @@ export type AddressCountOrderByAggregateInput = {
   address?: Prisma.SortOrder
   latitude?: Prisma.SortOrder
   longitude?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type AddressAvgOrderByAggregateInput = {
@@ -410,6 +430,7 @@ export type AddressMaxOrderByAggregateInput = {
   address?: Prisma.SortOrder
   latitude?: Prisma.SortOrder
   longitude?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type AddressMinOrderByAggregateInput = {
@@ -421,6 +442,7 @@ export type AddressMinOrderByAggregateInput = {
   address?: Prisma.SortOrder
   latitude?: Prisma.SortOrder
   longitude?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type AddressSumOrderByAggregateInput = {
@@ -468,6 +490,7 @@ export type AddressCreateWithoutPropertyInput = {
   address: string
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deleted_at?: Date | string | null
 }
 
 export type AddressUncheckedCreateWithoutPropertyInput = {
@@ -478,6 +501,7 @@ export type AddressUncheckedCreateWithoutPropertyInput = {
   address: string
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deleted_at?: Date | string | null
 }
 
 export type AddressCreateOrConnectWithoutPropertyInput = {
@@ -504,6 +528,7 @@ export type AddressUpdateWithoutPropertyInput = {
   address?: Prisma.StringFieldUpdateOperationsInput | string
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type AddressUncheckedUpdateWithoutPropertyInput = {
@@ -514,6 +539,7 @@ export type AddressUncheckedUpdateWithoutPropertyInput = {
   address?: Prisma.StringFieldUpdateOperationsInput | string
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -527,6 +553,7 @@ export type AddressSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   address?: boolean
   latitude?: boolean
   longitude?: boolean
+  deleted_at?: boolean
   property?: boolean | Prisma.PropertyDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["address"]>
 
@@ -539,6 +566,7 @@ export type AddressSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   address?: boolean
   latitude?: boolean
   longitude?: boolean
+  deleted_at?: boolean
   property?: boolean | Prisma.PropertyDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["address"]>
 
@@ -551,6 +579,7 @@ export type AddressSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   address?: boolean
   latitude?: boolean
   longitude?: boolean
+  deleted_at?: boolean
   property?: boolean | Prisma.PropertyDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["address"]>
 
@@ -563,9 +592,10 @@ export type AddressSelectScalar = {
   address?: boolean
   latitude?: boolean
   longitude?: boolean
+  deleted_at?: boolean
 }
 
-export type AddressOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "property_id" | "state" | "city" | "neighborhood" | "address" | "latitude" | "longitude", ExtArgs["result"]["address"]>
+export type AddressOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "property_id" | "state" | "city" | "neighborhood" | "address" | "latitude" | "longitude" | "deleted_at", ExtArgs["result"]["address"]>
 export type AddressInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   property?: boolean | Prisma.PropertyDefaultArgs<ExtArgs>
 }
@@ -590,6 +620,7 @@ export type $AddressPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     address: string
     latitude: runtime.Decimal | null
     longitude: runtime.Decimal | null
+    deleted_at: Date | null
   }, ExtArgs["result"]["address"]>
   composites: {}
 }
@@ -1022,6 +1053,7 @@ export interface AddressFieldRefs {
   readonly address: Prisma.FieldRef<"Address", 'String'>
   readonly latitude: Prisma.FieldRef<"Address", 'Decimal'>
   readonly longitude: Prisma.FieldRef<"Address", 'Decimal'>
+  readonly deleted_at: Prisma.FieldRef<"Address", 'DateTime'>
 }
     
 

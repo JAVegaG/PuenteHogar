@@ -32,6 +32,7 @@ export type NotificationPreferenceMinAggregateOutputType = {
   is_active: boolean | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
 }
 
 export type NotificationPreferenceMaxAggregateOutputType = {
@@ -42,6 +43,7 @@ export type NotificationPreferenceMaxAggregateOutputType = {
   is_active: boolean | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
 }
 
 export type NotificationPreferenceCountAggregateOutputType = {
@@ -52,6 +54,7 @@ export type NotificationPreferenceCountAggregateOutputType = {
   is_active: number
   created_at: number
   updated_at: number
+  deleted_at: number
   _all: number
 }
 
@@ -64,6 +67,7 @@ export type NotificationPreferenceMinAggregateInputType = {
   is_active?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
 }
 
 export type NotificationPreferenceMaxAggregateInputType = {
@@ -74,6 +78,7 @@ export type NotificationPreferenceMaxAggregateInputType = {
   is_active?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
 }
 
 export type NotificationPreferenceCountAggregateInputType = {
@@ -84,6 +89,7 @@ export type NotificationPreferenceCountAggregateInputType = {
   is_active?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -167,6 +173,7 @@ export type NotificationPreferenceGroupByOutputType = {
   is_active: boolean
   created_at: Date
   updated_at: Date
+  deleted_at: Date | null
   _count: NotificationPreferenceCountAggregateOutputType | null
   _min: NotificationPreferenceMinAggregateOutputType | null
   _max: NotificationPreferenceMaxAggregateOutputType | null
@@ -198,6 +205,7 @@ export type NotificationPreferenceWhereInput = {
   is_active?: Prisma.BoolFilter<"NotificationPreference"> | boolean
   created_at?: Prisma.DateTimeFilter<"NotificationPreference"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"NotificationPreference"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"NotificationPreference"> | Date | string | null
   notification_type?: Prisma.XOR<Prisma.NotificationTypeScalarRelationFilter, Prisma.NotificationTypeWhereInput>
 }
 
@@ -209,6 +217,7 @@ export type NotificationPreferenceOrderByWithRelationInput = {
   is_active?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   notification_type?: Prisma.NotificationTypeOrderByWithRelationInput
 }
 
@@ -223,6 +232,7 @@ export type NotificationPreferenceWhereUniqueInput = Prisma.AtLeast<{
   is_active?: Prisma.BoolFilter<"NotificationPreference"> | boolean
   created_at?: Prisma.DateTimeFilter<"NotificationPreference"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"NotificationPreference"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"NotificationPreference"> | Date | string | null
   notification_type?: Prisma.XOR<Prisma.NotificationTypeScalarRelationFilter, Prisma.NotificationTypeWhereInput>
 }, "id">
 
@@ -234,6 +244,7 @@ export type NotificationPreferenceOrderByWithAggregationInput = {
   is_active?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.NotificationPreferenceCountOrderByAggregateInput
   _max?: Prisma.NotificationPreferenceMaxOrderByAggregateInput
   _min?: Prisma.NotificationPreferenceMinOrderByAggregateInput
@@ -250,6 +261,7 @@ export type NotificationPreferenceScalarWhereWithAggregatesInput = {
   is_active?: Prisma.BoolWithAggregatesFilter<"NotificationPreference"> | boolean
   created_at?: Prisma.DateTimeWithAggregatesFilter<"NotificationPreference"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"NotificationPreference"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"NotificationPreference"> | Date | string | null
 }
 
 export type NotificationPreferenceCreateInput = {
@@ -259,6 +271,7 @@ export type NotificationPreferenceCreateInput = {
   is_active?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   notification_type: Prisma.NotificationTypeCreateNestedOneWithoutPreferencesInput
 }
 
@@ -270,6 +283,7 @@ export type NotificationPreferenceUncheckedCreateInput = {
   is_active?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type NotificationPreferenceUpdateInput = {
@@ -279,6 +293,7 @@ export type NotificationPreferenceUpdateInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   notification_type?: Prisma.NotificationTypeUpdateOneRequiredWithoutPreferencesNestedInput
 }
 
@@ -290,6 +305,7 @@ export type NotificationPreferenceUncheckedUpdateInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type NotificationPreferenceCreateManyInput = {
@@ -300,6 +316,7 @@ export type NotificationPreferenceCreateManyInput = {
   is_active?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type NotificationPreferenceUpdateManyMutationInput = {
@@ -309,6 +326,7 @@ export type NotificationPreferenceUpdateManyMutationInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type NotificationPreferenceUncheckedUpdateManyInput = {
@@ -319,6 +337,7 @@ export type NotificationPreferenceUncheckedUpdateManyInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type NotificationPreferenceListRelationFilter = {
@@ -339,6 +358,7 @@ export type NotificationPreferenceCountOrderByAggregateInput = {
   is_active?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type NotificationPreferenceMaxOrderByAggregateInput = {
@@ -349,6 +369,7 @@ export type NotificationPreferenceMaxOrderByAggregateInput = {
   is_active?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type NotificationPreferenceMinOrderByAggregateInput = {
@@ -359,6 +380,7 @@ export type NotificationPreferenceMinOrderByAggregateInput = {
   is_active?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type NotificationPreferenceCreateNestedManyWithoutNotification_typeInput = {
@@ -410,6 +432,7 @@ export type NotificationPreferenceCreateWithoutNotification_typeInput = {
   is_active?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type NotificationPreferenceUncheckedCreateWithoutNotification_typeInput = {
@@ -419,6 +442,7 @@ export type NotificationPreferenceUncheckedCreateWithoutNotification_typeInput =
   is_active?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type NotificationPreferenceCreateOrConnectWithoutNotification_typeInput = {
@@ -458,6 +482,7 @@ export type NotificationPreferenceScalarWhereInput = {
   is_active?: Prisma.BoolFilter<"NotificationPreference"> | boolean
   created_at?: Prisma.DateTimeFilter<"NotificationPreference"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"NotificationPreference"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"NotificationPreference"> | Date | string | null
 }
 
 export type NotificationPreferenceCreateManyNotification_typeInput = {
@@ -467,6 +492,7 @@ export type NotificationPreferenceCreateManyNotification_typeInput = {
   is_active?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type NotificationPreferenceUpdateWithoutNotification_typeInput = {
@@ -476,6 +502,7 @@ export type NotificationPreferenceUpdateWithoutNotification_typeInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type NotificationPreferenceUncheckedUpdateWithoutNotification_typeInput = {
@@ -485,6 +512,7 @@ export type NotificationPreferenceUncheckedUpdateWithoutNotification_typeInput =
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type NotificationPreferenceUncheckedUpdateManyWithoutNotification_typeInput = {
@@ -494,6 +522,7 @@ export type NotificationPreferenceUncheckedUpdateManyWithoutNotification_typeInp
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -506,6 +535,7 @@ export type NotificationPreferenceSelect<ExtArgs extends runtime.Types.Extension
   is_active?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
   notification_type?: boolean | Prisma.NotificationTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["notificationPreference"]>
 
@@ -517,6 +547,7 @@ export type NotificationPreferenceSelectCreateManyAndReturn<ExtArgs extends runt
   is_active?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
   notification_type?: boolean | Prisma.NotificationTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["notificationPreference"]>
 
@@ -528,6 +559,7 @@ export type NotificationPreferenceSelectUpdateManyAndReturn<ExtArgs extends runt
   is_active?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
   notification_type?: boolean | Prisma.NotificationTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["notificationPreference"]>
 
@@ -539,9 +571,10 @@ export type NotificationPreferenceSelectScalar = {
   is_active?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
 }
 
-export type NotificationPreferenceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "notification_type_id" | "channel" | "is_active" | "created_at" | "updated_at", ExtArgs["result"]["notificationPreference"]>
+export type NotificationPreferenceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "notification_type_id" | "channel" | "is_active" | "created_at" | "updated_at" | "deleted_at", ExtArgs["result"]["notificationPreference"]>
 export type NotificationPreferenceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   notification_type?: boolean | Prisma.NotificationTypeDefaultArgs<ExtArgs>
 }
@@ -565,6 +598,7 @@ export type $NotificationPreferencePayload<ExtArgs extends runtime.Types.Extensi
     is_active: boolean
     created_at: Date
     updated_at: Date
+    deleted_at: Date | null
   }, ExtArgs["result"]["notificationPreference"]>
   composites: {}
 }
@@ -996,6 +1030,7 @@ export interface NotificationPreferenceFieldRefs {
   readonly is_active: Prisma.FieldRef<"NotificationPreference", 'Boolean'>
   readonly created_at: Prisma.FieldRef<"NotificationPreference", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"NotificationPreference", 'DateTime'>
+  readonly deleted_at: Prisma.FieldRef<"NotificationPreference", 'DateTime'>
 }
     
 

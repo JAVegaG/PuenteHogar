@@ -31,6 +31,7 @@ export type PhotoMinAggregateOutputType = {
   is_main: boolean | null
   tx_hash: string | null
   created_at: Date | null
+  deleted_at: Date | null
 }
 
 export type PhotoMaxAggregateOutputType = {
@@ -40,6 +41,7 @@ export type PhotoMaxAggregateOutputType = {
   is_main: boolean | null
   tx_hash: string | null
   created_at: Date | null
+  deleted_at: Date | null
 }
 
 export type PhotoCountAggregateOutputType = {
@@ -49,6 +51,7 @@ export type PhotoCountAggregateOutputType = {
   is_main: number
   tx_hash: number
   created_at: number
+  deleted_at: number
   _all: number
 }
 
@@ -60,6 +63,7 @@ export type PhotoMinAggregateInputType = {
   is_main?: true
   tx_hash?: true
   created_at?: true
+  deleted_at?: true
 }
 
 export type PhotoMaxAggregateInputType = {
@@ -69,6 +73,7 @@ export type PhotoMaxAggregateInputType = {
   is_main?: true
   tx_hash?: true
   created_at?: true
+  deleted_at?: true
 }
 
 export type PhotoCountAggregateInputType = {
@@ -78,6 +83,7 @@ export type PhotoCountAggregateInputType = {
   is_main?: true
   tx_hash?: true
   created_at?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -160,6 +166,7 @@ export type PhotoGroupByOutputType = {
   is_main: boolean
   tx_hash: string | null
   created_at: Date
+  deleted_at: Date | null
   _count: PhotoCountAggregateOutputType | null
   _min: PhotoMinAggregateOutputType | null
   _max: PhotoMaxAggregateOutputType | null
@@ -190,6 +197,7 @@ export type PhotoWhereInput = {
   is_main?: Prisma.BoolFilter<"Photo"> | boolean
   tx_hash?: Prisma.StringNullableFilter<"Photo"> | string | null
   created_at?: Prisma.DateTimeFilter<"Photo"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"Photo"> | Date | string | null
   listing?: Prisma.XOR<Prisma.ListingScalarRelationFilter, Prisma.ListingWhereInput>
 }
 
@@ -200,6 +208,7 @@ export type PhotoOrderByWithRelationInput = {
   is_main?: Prisma.SortOrder
   tx_hash?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   listing?: Prisma.ListingOrderByWithRelationInput
 }
 
@@ -213,6 +222,7 @@ export type PhotoWhereUniqueInput = Prisma.AtLeast<{
   is_main?: Prisma.BoolFilter<"Photo"> | boolean
   tx_hash?: Prisma.StringNullableFilter<"Photo"> | string | null
   created_at?: Prisma.DateTimeFilter<"Photo"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"Photo"> | Date | string | null
   listing?: Prisma.XOR<Prisma.ListingScalarRelationFilter, Prisma.ListingWhereInput>
 }, "id">
 
@@ -223,6 +233,7 @@ export type PhotoOrderByWithAggregationInput = {
   is_main?: Prisma.SortOrder
   tx_hash?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PhotoCountOrderByAggregateInput
   _max?: Prisma.PhotoMaxOrderByAggregateInput
   _min?: Prisma.PhotoMinOrderByAggregateInput
@@ -238,6 +249,7 @@ export type PhotoScalarWhereWithAggregatesInput = {
   is_main?: Prisma.BoolWithAggregatesFilter<"Photo"> | boolean
   tx_hash?: Prisma.StringNullableWithAggregatesFilter<"Photo"> | string | null
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Photo"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"Photo"> | Date | string | null
 }
 
 export type PhotoCreateInput = {
@@ -246,6 +258,7 @@ export type PhotoCreateInput = {
   is_main?: boolean
   tx_hash?: string | null
   created_at?: Date | string
+  deleted_at?: Date | string | null
   listing: Prisma.ListingCreateNestedOneWithoutPhotosInput
 }
 
@@ -256,6 +269,7 @@ export type PhotoUncheckedCreateInput = {
   is_main?: boolean
   tx_hash?: string | null
   created_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type PhotoUpdateInput = {
@@ -264,6 +278,7 @@ export type PhotoUpdateInput = {
   is_main?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tx_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   listing?: Prisma.ListingUpdateOneRequiredWithoutPhotosNestedInput
 }
 
@@ -274,6 +289,7 @@ export type PhotoUncheckedUpdateInput = {
   is_main?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tx_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PhotoCreateManyInput = {
@@ -283,6 +299,7 @@ export type PhotoCreateManyInput = {
   is_main?: boolean
   tx_hash?: string | null
   created_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type PhotoUpdateManyMutationInput = {
@@ -291,6 +308,7 @@ export type PhotoUpdateManyMutationInput = {
   is_main?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tx_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PhotoUncheckedUpdateManyInput = {
@@ -300,6 +318,7 @@ export type PhotoUncheckedUpdateManyInput = {
   is_main?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tx_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PhotoListRelationFilter = {
@@ -319,6 +338,7 @@ export type PhotoCountOrderByAggregateInput = {
   is_main?: Prisma.SortOrder
   tx_hash?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type PhotoMaxOrderByAggregateInput = {
@@ -328,6 +348,7 @@ export type PhotoMaxOrderByAggregateInput = {
   is_main?: Prisma.SortOrder
   tx_hash?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type PhotoMinOrderByAggregateInput = {
@@ -337,6 +358,7 @@ export type PhotoMinOrderByAggregateInput = {
   is_main?: Prisma.SortOrder
   tx_hash?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type PhotoCreateNestedManyWithoutListingInput = {
@@ -387,6 +409,7 @@ export type PhotoCreateWithoutListingInput = {
   is_main?: boolean
   tx_hash?: string | null
   created_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type PhotoUncheckedCreateWithoutListingInput = {
@@ -395,6 +418,7 @@ export type PhotoUncheckedCreateWithoutListingInput = {
   is_main?: boolean
   tx_hash?: string | null
   created_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type PhotoCreateOrConnectWithoutListingInput = {
@@ -433,6 +457,7 @@ export type PhotoScalarWhereInput = {
   is_main?: Prisma.BoolFilter<"Photo"> | boolean
   tx_hash?: Prisma.StringNullableFilter<"Photo"> | string | null
   created_at?: Prisma.DateTimeFilter<"Photo"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"Photo"> | Date | string | null
 }
 
 export type PhotoCreateManyListingInput = {
@@ -441,6 +466,7 @@ export type PhotoCreateManyListingInput = {
   is_main?: boolean
   tx_hash?: string | null
   created_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type PhotoUpdateWithoutListingInput = {
@@ -449,6 +475,7 @@ export type PhotoUpdateWithoutListingInput = {
   is_main?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tx_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PhotoUncheckedUpdateWithoutListingInput = {
@@ -457,6 +484,7 @@ export type PhotoUncheckedUpdateWithoutListingInput = {
   is_main?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tx_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PhotoUncheckedUpdateManyWithoutListingInput = {
@@ -465,6 +493,7 @@ export type PhotoUncheckedUpdateManyWithoutListingInput = {
   is_main?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tx_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -476,6 +505,7 @@ export type PhotoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   is_main?: boolean
   tx_hash?: boolean
   created_at?: boolean
+  deleted_at?: boolean
   listing?: boolean | Prisma.ListingDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["photo"]>
 
@@ -486,6 +516,7 @@ export type PhotoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   is_main?: boolean
   tx_hash?: boolean
   created_at?: boolean
+  deleted_at?: boolean
   listing?: boolean | Prisma.ListingDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["photo"]>
 
@@ -496,6 +527,7 @@ export type PhotoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   is_main?: boolean
   tx_hash?: boolean
   created_at?: boolean
+  deleted_at?: boolean
   listing?: boolean | Prisma.ListingDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["photo"]>
 
@@ -506,9 +538,10 @@ export type PhotoSelectScalar = {
   is_main?: boolean
   tx_hash?: boolean
   created_at?: boolean
+  deleted_at?: boolean
 }
 
-export type PhotoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "listing_id" | "file_url" | "is_main" | "tx_hash" | "created_at", ExtArgs["result"]["photo"]>
+export type PhotoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "listing_id" | "file_url" | "is_main" | "tx_hash" | "created_at" | "deleted_at", ExtArgs["result"]["photo"]>
 export type PhotoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   listing?: boolean | Prisma.ListingDefaultArgs<ExtArgs>
 }
@@ -531,6 +564,7 @@ export type $PhotoPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     is_main: boolean
     tx_hash: string | null
     created_at: Date
+    deleted_at: Date | null
   }, ExtArgs["result"]["photo"]>
   composites: {}
 }
@@ -961,6 +995,7 @@ export interface PhotoFieldRefs {
   readonly is_main: Prisma.FieldRef<"Photo", 'Boolean'>
   readonly tx_hash: Prisma.FieldRef<"Photo", 'String'>
   readonly created_at: Prisma.FieldRef<"Photo", 'DateTime'>
+  readonly deleted_at: Prisma.FieldRef<"Photo", 'DateTime'>
 }
     
 

@@ -29,6 +29,7 @@ export type DepartmentMinAggregateOutputType = {
   code: string | null
   name: string | null
   is_active: boolean | null
+  deleted_at: Date | null
 }
 
 export type DepartmentMaxAggregateOutputType = {
@@ -36,6 +37,7 @@ export type DepartmentMaxAggregateOutputType = {
   code: string | null
   name: string | null
   is_active: boolean | null
+  deleted_at: Date | null
 }
 
 export type DepartmentCountAggregateOutputType = {
@@ -43,6 +45,7 @@ export type DepartmentCountAggregateOutputType = {
   code: number
   name: number
   is_active: number
+  deleted_at: number
   _all: number
 }
 
@@ -52,6 +55,7 @@ export type DepartmentMinAggregateInputType = {
   code?: true
   name?: true
   is_active?: true
+  deleted_at?: true
 }
 
 export type DepartmentMaxAggregateInputType = {
@@ -59,6 +63,7 @@ export type DepartmentMaxAggregateInputType = {
   code?: true
   name?: true
   is_active?: true
+  deleted_at?: true
 }
 
 export type DepartmentCountAggregateInputType = {
@@ -66,6 +71,7 @@ export type DepartmentCountAggregateInputType = {
   code?: true
   name?: true
   is_active?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -146,6 +152,7 @@ export type DepartmentGroupByOutputType = {
   code: string
   name: string
   is_active: boolean
+  deleted_at: Date | null
   _count: DepartmentCountAggregateOutputType | null
   _min: DepartmentMinAggregateOutputType | null
   _max: DepartmentMaxAggregateOutputType | null
@@ -174,6 +181,7 @@ export type DepartmentWhereInput = {
   code?: Prisma.StringFilter<"Department"> | string
   name?: Prisma.StringFilter<"Department"> | string
   is_active?: Prisma.BoolFilter<"Department"> | boolean
+  deleted_at?: Prisma.DateTimeNullableFilter<"Department"> | Date | string | null
   cities?: Prisma.CityListRelationFilter
 }
 
@@ -182,6 +190,7 @@ export type DepartmentOrderByWithRelationInput = {
   code?: Prisma.SortOrder
   name?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   cities?: Prisma.CityOrderByRelationAggregateInput
 }
 
@@ -193,6 +202,7 @@ export type DepartmentWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.DepartmentWhereInput | Prisma.DepartmentWhereInput[]
   name?: Prisma.StringFilter<"Department"> | string
   is_active?: Prisma.BoolFilter<"Department"> | boolean
+  deleted_at?: Prisma.DateTimeNullableFilter<"Department"> | Date | string | null
   cities?: Prisma.CityListRelationFilter
 }, "id" | "code">
 
@@ -201,6 +211,7 @@ export type DepartmentOrderByWithAggregationInput = {
   code?: Prisma.SortOrder
   name?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.DepartmentCountOrderByAggregateInput
   _max?: Prisma.DepartmentMaxOrderByAggregateInput
   _min?: Prisma.DepartmentMinOrderByAggregateInput
@@ -214,6 +225,7 @@ export type DepartmentScalarWhereWithAggregatesInput = {
   code?: Prisma.StringWithAggregatesFilter<"Department"> | string
   name?: Prisma.StringWithAggregatesFilter<"Department"> | string
   is_active?: Prisma.BoolWithAggregatesFilter<"Department"> | boolean
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"Department"> | Date | string | null
 }
 
 export type DepartmentCreateInput = {
@@ -221,6 +233,7 @@ export type DepartmentCreateInput = {
   code: string
   name: string
   is_active?: boolean
+  deleted_at?: Date | string | null
   cities?: Prisma.CityCreateNestedManyWithoutDepartmentInput
 }
 
@@ -229,6 +242,7 @@ export type DepartmentUncheckedCreateInput = {
   code: string
   name: string
   is_active?: boolean
+  deleted_at?: Date | string | null
   cities?: Prisma.CityUncheckedCreateNestedManyWithoutDepartmentInput
 }
 
@@ -237,6 +251,7 @@ export type DepartmentUpdateInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cities?: Prisma.CityUpdateManyWithoutDepartmentNestedInput
 }
 
@@ -245,6 +260,7 @@ export type DepartmentUncheckedUpdateInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cities?: Prisma.CityUncheckedUpdateManyWithoutDepartmentNestedInput
 }
 
@@ -253,6 +269,7 @@ export type DepartmentCreateManyInput = {
   code: string
   name: string
   is_active?: boolean
+  deleted_at?: Date | string | null
 }
 
 export type DepartmentUpdateManyMutationInput = {
@@ -260,6 +277,7 @@ export type DepartmentUpdateManyMutationInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type DepartmentUncheckedUpdateManyInput = {
@@ -267,6 +285,7 @@ export type DepartmentUncheckedUpdateManyInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type DepartmentCountOrderByAggregateInput = {
@@ -274,6 +293,7 @@ export type DepartmentCountOrderByAggregateInput = {
   code?: Prisma.SortOrder
   name?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type DepartmentMaxOrderByAggregateInput = {
@@ -281,6 +301,7 @@ export type DepartmentMaxOrderByAggregateInput = {
   code?: Prisma.SortOrder
   name?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type DepartmentMinOrderByAggregateInput = {
@@ -288,6 +309,7 @@ export type DepartmentMinOrderByAggregateInput = {
   code?: Prisma.SortOrder
   name?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type DepartmentScalarRelationFilter = {
@@ -314,6 +336,7 @@ export type DepartmentCreateWithoutCitiesInput = {
   code: string
   name: string
   is_active?: boolean
+  deleted_at?: Date | string | null
 }
 
 export type DepartmentUncheckedCreateWithoutCitiesInput = {
@@ -321,6 +344,7 @@ export type DepartmentUncheckedCreateWithoutCitiesInput = {
   code: string
   name: string
   is_active?: boolean
+  deleted_at?: Date | string | null
 }
 
 export type DepartmentCreateOrConnectWithoutCitiesInput = {
@@ -344,6 +368,7 @@ export type DepartmentUpdateWithoutCitiesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type DepartmentUncheckedUpdateWithoutCitiesInput = {
@@ -351,6 +376,7 @@ export type DepartmentUncheckedUpdateWithoutCitiesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -389,6 +415,7 @@ export type DepartmentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   code?: boolean
   name?: boolean
   is_active?: boolean
+  deleted_at?: boolean
   cities?: boolean | Prisma.Department$citiesArgs<ExtArgs>
   _count?: boolean | Prisma.DepartmentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["department"]>
@@ -398,6 +425,7 @@ export type DepartmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   code?: boolean
   name?: boolean
   is_active?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["department"]>
 
 export type DepartmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -405,6 +433,7 @@ export type DepartmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   code?: boolean
   name?: boolean
   is_active?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["department"]>
 
 export type DepartmentSelectScalar = {
@@ -412,9 +441,10 @@ export type DepartmentSelectScalar = {
   code?: boolean
   name?: boolean
   is_active?: boolean
+  deleted_at?: boolean
 }
 
-export type DepartmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "name" | "is_active", ExtArgs["result"]["department"]>
+export type DepartmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "name" | "is_active" | "deleted_at", ExtArgs["result"]["department"]>
 export type DepartmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   cities?: boolean | Prisma.Department$citiesArgs<ExtArgs>
   _count?: boolean | Prisma.DepartmentCountOutputTypeDefaultArgs<ExtArgs>
@@ -432,6 +462,7 @@ export type $DepartmentPayload<ExtArgs extends runtime.Types.Extensions.Internal
     code: string
     name: string
     is_active: boolean
+    deleted_at: Date | null
   }, ExtArgs["result"]["department"]>
   composites: {}
 }
@@ -860,6 +891,7 @@ export interface DepartmentFieldRefs {
   readonly code: Prisma.FieldRef<"Department", 'String'>
   readonly name: Prisma.FieldRef<"Department", 'String'>
   readonly is_active: Prisma.FieldRef<"Department", 'Boolean'>
+  readonly deleted_at: Prisma.FieldRef<"Department", 'DateTime'>
 }
     
 

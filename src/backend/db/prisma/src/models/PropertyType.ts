@@ -29,6 +29,7 @@ export type PropertyTypeMinAggregateOutputType = {
   code: string | null
   description: string | null
   is_active: boolean | null
+  deleted_at: Date | null
 }
 
 export type PropertyTypeMaxAggregateOutputType = {
@@ -36,6 +37,7 @@ export type PropertyTypeMaxAggregateOutputType = {
   code: string | null
   description: string | null
   is_active: boolean | null
+  deleted_at: Date | null
 }
 
 export type PropertyTypeCountAggregateOutputType = {
@@ -43,6 +45,7 @@ export type PropertyTypeCountAggregateOutputType = {
   code: number
   description: number
   is_active: number
+  deleted_at: number
   _all: number
 }
 
@@ -52,6 +55,7 @@ export type PropertyTypeMinAggregateInputType = {
   code?: true
   description?: true
   is_active?: true
+  deleted_at?: true
 }
 
 export type PropertyTypeMaxAggregateInputType = {
@@ -59,6 +63,7 @@ export type PropertyTypeMaxAggregateInputType = {
   code?: true
   description?: true
   is_active?: true
+  deleted_at?: true
 }
 
 export type PropertyTypeCountAggregateInputType = {
@@ -66,6 +71,7 @@ export type PropertyTypeCountAggregateInputType = {
   code?: true
   description?: true
   is_active?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -146,6 +152,7 @@ export type PropertyTypeGroupByOutputType = {
   code: string
   description: string
   is_active: boolean
+  deleted_at: Date | null
   _count: PropertyTypeCountAggregateOutputType | null
   _min: PropertyTypeMinAggregateOutputType | null
   _max: PropertyTypeMaxAggregateOutputType | null
@@ -174,6 +181,7 @@ export type PropertyTypeWhereInput = {
   code?: Prisma.StringFilter<"PropertyType"> | string
   description?: Prisma.StringFilter<"PropertyType"> | string
   is_active?: Prisma.BoolFilter<"PropertyType"> | boolean
+  deleted_at?: Prisma.DateTimeNullableFilter<"PropertyType"> | Date | string | null
 }
 
 export type PropertyTypeOrderByWithRelationInput = {
@@ -181,6 +189,7 @@ export type PropertyTypeOrderByWithRelationInput = {
   code?: Prisma.SortOrder
   description?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
 }
 
 export type PropertyTypeWhereUniqueInput = Prisma.AtLeast<{
@@ -191,6 +200,7 @@ export type PropertyTypeWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.PropertyTypeWhereInput | Prisma.PropertyTypeWhereInput[]
   description?: Prisma.StringFilter<"PropertyType"> | string
   is_active?: Prisma.BoolFilter<"PropertyType"> | boolean
+  deleted_at?: Prisma.DateTimeNullableFilter<"PropertyType"> | Date | string | null
 }, "id" | "code">
 
 export type PropertyTypeOrderByWithAggregationInput = {
@@ -198,6 +208,7 @@ export type PropertyTypeOrderByWithAggregationInput = {
   code?: Prisma.SortOrder
   description?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PropertyTypeCountOrderByAggregateInput
   _max?: Prisma.PropertyTypeMaxOrderByAggregateInput
   _min?: Prisma.PropertyTypeMinOrderByAggregateInput
@@ -211,6 +222,7 @@ export type PropertyTypeScalarWhereWithAggregatesInput = {
   code?: Prisma.StringWithAggregatesFilter<"PropertyType"> | string
   description?: Prisma.StringWithAggregatesFilter<"PropertyType"> | string
   is_active?: Prisma.BoolWithAggregatesFilter<"PropertyType"> | boolean
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"PropertyType"> | Date | string | null
 }
 
 export type PropertyTypeCreateInput = {
@@ -218,6 +230,7 @@ export type PropertyTypeCreateInput = {
   code: string
   description: string
   is_active?: boolean
+  deleted_at?: Date | string | null
 }
 
 export type PropertyTypeUncheckedCreateInput = {
@@ -225,6 +238,7 @@ export type PropertyTypeUncheckedCreateInput = {
   code: string
   description: string
   is_active?: boolean
+  deleted_at?: Date | string | null
 }
 
 export type PropertyTypeUpdateInput = {
@@ -232,6 +246,7 @@ export type PropertyTypeUpdateInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PropertyTypeUncheckedUpdateInput = {
@@ -239,6 +254,7 @@ export type PropertyTypeUncheckedUpdateInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PropertyTypeCreateManyInput = {
@@ -246,6 +262,7 @@ export type PropertyTypeCreateManyInput = {
   code: string
   description: string
   is_active?: boolean
+  deleted_at?: Date | string | null
 }
 
 export type PropertyTypeUpdateManyMutationInput = {
@@ -253,6 +270,7 @@ export type PropertyTypeUpdateManyMutationInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PropertyTypeUncheckedUpdateManyInput = {
@@ -260,6 +278,7 @@ export type PropertyTypeUncheckedUpdateManyInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PropertyTypeCountOrderByAggregateInput = {
@@ -267,6 +286,7 @@ export type PropertyTypeCountOrderByAggregateInput = {
   code?: Prisma.SortOrder
   description?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type PropertyTypeMaxOrderByAggregateInput = {
@@ -274,6 +294,7 @@ export type PropertyTypeMaxOrderByAggregateInput = {
   code?: Prisma.SortOrder
   description?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type PropertyTypeMinOrderByAggregateInput = {
@@ -281,6 +302,7 @@ export type PropertyTypeMinOrderByAggregateInput = {
   code?: Prisma.SortOrder
   description?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 
@@ -290,6 +312,7 @@ export type PropertyTypeSelect<ExtArgs extends runtime.Types.Extensions.Internal
   code?: boolean
   description?: boolean
   is_active?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["propertyType"]>
 
 export type PropertyTypeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -297,6 +320,7 @@ export type PropertyTypeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   code?: boolean
   description?: boolean
   is_active?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["propertyType"]>
 
 export type PropertyTypeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -304,6 +328,7 @@ export type PropertyTypeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   code?: boolean
   description?: boolean
   is_active?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["propertyType"]>
 
 export type PropertyTypeSelectScalar = {
@@ -311,9 +336,10 @@ export type PropertyTypeSelectScalar = {
   code?: boolean
   description?: boolean
   is_active?: boolean
+  deleted_at?: boolean
 }
 
-export type PropertyTypeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "description" | "is_active", ExtArgs["result"]["propertyType"]>
+export type PropertyTypeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "description" | "is_active" | "deleted_at", ExtArgs["result"]["propertyType"]>
 
 export type $PropertyTypePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PropertyType"
@@ -323,6 +349,7 @@ export type $PropertyTypePayload<ExtArgs extends runtime.Types.Extensions.Intern
     code: string
     description: string
     is_active: boolean
+    deleted_at: Date | null
   }, ExtArgs["result"]["propertyType"]>
   composites: {}
 }
@@ -750,6 +777,7 @@ export interface PropertyTypeFieldRefs {
   readonly code: Prisma.FieldRef<"PropertyType", 'String'>
   readonly description: Prisma.FieldRef<"PropertyType", 'String'>
   readonly is_active: Prisma.FieldRef<"PropertyType", 'Boolean'>
+  readonly deleted_at: Prisma.FieldRef<"PropertyType", 'DateTime'>
 }
     
 

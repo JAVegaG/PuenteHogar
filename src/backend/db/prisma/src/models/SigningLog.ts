@@ -30,6 +30,7 @@ export type SigningLogMinAggregateOutputType = {
   signing_status_id: string | null
   platform: string | null
   creation_date: Date | null
+  deleted_at: Date | null
 }
 
 export type SigningLogMaxAggregateOutputType = {
@@ -38,6 +39,7 @@ export type SigningLogMaxAggregateOutputType = {
   signing_status_id: string | null
   platform: string | null
   creation_date: Date | null
+  deleted_at: Date | null
 }
 
 export type SigningLogCountAggregateOutputType = {
@@ -47,6 +49,7 @@ export type SigningLogCountAggregateOutputType = {
   platform: number
   data: number
   creation_date: number
+  deleted_at: number
   _all: number
 }
 
@@ -57,6 +60,7 @@ export type SigningLogMinAggregateInputType = {
   signing_status_id?: true
   platform?: true
   creation_date?: true
+  deleted_at?: true
 }
 
 export type SigningLogMaxAggregateInputType = {
@@ -65,6 +69,7 @@ export type SigningLogMaxAggregateInputType = {
   signing_status_id?: true
   platform?: true
   creation_date?: true
+  deleted_at?: true
 }
 
 export type SigningLogCountAggregateInputType = {
@@ -74,6 +79,7 @@ export type SigningLogCountAggregateInputType = {
   platform?: true
   data?: true
   creation_date?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -156,6 +162,7 @@ export type SigningLogGroupByOutputType = {
   platform: string | null
   data: runtime.JsonValue | null
   creation_date: Date
+  deleted_at: Date | null
   _count: SigningLogCountAggregateOutputType | null
   _min: SigningLogMinAggregateOutputType | null
   _max: SigningLogMaxAggregateOutputType | null
@@ -186,6 +193,7 @@ export type SigningLogWhereInput = {
   platform?: Prisma.StringNullableFilter<"SigningLog"> | string | null
   data?: Prisma.JsonNullableFilter<"SigningLog">
   creation_date?: Prisma.DateTimeFilter<"SigningLog"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"SigningLog"> | Date | string | null
   signing?: Prisma.XOR<Prisma.SigningScalarRelationFilter, Prisma.SigningWhereInput>
   signing_status?: Prisma.XOR<Prisma.SigningStatusScalarRelationFilter, Prisma.SigningStatusWhereInput>
 }
@@ -197,6 +205,7 @@ export type SigningLogOrderByWithRelationInput = {
   platform?: Prisma.SortOrderInput | Prisma.SortOrder
   data?: Prisma.SortOrderInput | Prisma.SortOrder
   creation_date?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   signing?: Prisma.SigningOrderByWithRelationInput
   signing_status?: Prisma.SigningStatusOrderByWithRelationInput
 }
@@ -211,6 +220,7 @@ export type SigningLogWhereUniqueInput = Prisma.AtLeast<{
   platform?: Prisma.StringNullableFilter<"SigningLog"> | string | null
   data?: Prisma.JsonNullableFilter<"SigningLog">
   creation_date?: Prisma.DateTimeFilter<"SigningLog"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"SigningLog"> | Date | string | null
   signing?: Prisma.XOR<Prisma.SigningScalarRelationFilter, Prisma.SigningWhereInput>
   signing_status?: Prisma.XOR<Prisma.SigningStatusScalarRelationFilter, Prisma.SigningStatusWhereInput>
 }, "id">
@@ -222,6 +232,7 @@ export type SigningLogOrderByWithAggregationInput = {
   platform?: Prisma.SortOrderInput | Prisma.SortOrder
   data?: Prisma.SortOrderInput | Prisma.SortOrder
   creation_date?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.SigningLogCountOrderByAggregateInput
   _max?: Prisma.SigningLogMaxOrderByAggregateInput
   _min?: Prisma.SigningLogMinOrderByAggregateInput
@@ -237,6 +248,7 @@ export type SigningLogScalarWhereWithAggregatesInput = {
   platform?: Prisma.StringNullableWithAggregatesFilter<"SigningLog"> | string | null
   data?: Prisma.JsonNullableWithAggregatesFilter<"SigningLog">
   creation_date?: Prisma.DateTimeWithAggregatesFilter<"SigningLog"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"SigningLog"> | Date | string | null
 }
 
 export type SigningLogCreateInput = {
@@ -244,6 +256,7 @@ export type SigningLogCreateInput = {
   platform?: string | null
   data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   creation_date?: Date | string
+  deleted_at?: Date | string | null
   signing: Prisma.SigningCreateNestedOneWithoutLogsInput
   signing_status: Prisma.SigningStatusCreateNestedOneWithoutLogsInput
 }
@@ -255,6 +268,7 @@ export type SigningLogUncheckedCreateInput = {
   platform?: string | null
   data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   creation_date?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type SigningLogUpdateInput = {
@@ -262,6 +276,7 @@ export type SigningLogUpdateInput = {
   platform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   creation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   signing?: Prisma.SigningUpdateOneRequiredWithoutLogsNestedInput
   signing_status?: Prisma.SigningStatusUpdateOneRequiredWithoutLogsNestedInput
 }
@@ -273,6 +288,7 @@ export type SigningLogUncheckedUpdateInput = {
   platform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   creation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type SigningLogCreateManyInput = {
@@ -282,6 +298,7 @@ export type SigningLogCreateManyInput = {
   platform?: string | null
   data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   creation_date?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type SigningLogUpdateManyMutationInput = {
@@ -289,6 +306,7 @@ export type SigningLogUpdateManyMutationInput = {
   platform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   creation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type SigningLogUncheckedUpdateManyInput = {
@@ -298,6 +316,7 @@ export type SigningLogUncheckedUpdateManyInput = {
   platform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   creation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type SigningLogListRelationFilter = {
@@ -317,6 +336,7 @@ export type SigningLogCountOrderByAggregateInput = {
   platform?: Prisma.SortOrder
   data?: Prisma.SortOrder
   creation_date?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type SigningLogMaxOrderByAggregateInput = {
@@ -325,6 +345,7 @@ export type SigningLogMaxOrderByAggregateInput = {
   signing_status_id?: Prisma.SortOrder
   platform?: Prisma.SortOrder
   creation_date?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type SigningLogMinOrderByAggregateInput = {
@@ -333,6 +354,7 @@ export type SigningLogMinOrderByAggregateInput = {
   signing_status_id?: Prisma.SortOrder
   platform?: Prisma.SortOrder
   creation_date?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type SigningLogCreateNestedManyWithoutSigning_statusInput = {
@@ -424,6 +446,7 @@ export type SigningLogCreateWithoutSigning_statusInput = {
   platform?: string | null
   data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   creation_date?: Date | string
+  deleted_at?: Date | string | null
   signing: Prisma.SigningCreateNestedOneWithoutLogsInput
 }
 
@@ -433,6 +456,7 @@ export type SigningLogUncheckedCreateWithoutSigning_statusInput = {
   platform?: string | null
   data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   creation_date?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type SigningLogCreateOrConnectWithoutSigning_statusInput = {
@@ -471,6 +495,7 @@ export type SigningLogScalarWhereInput = {
   platform?: Prisma.StringNullableFilter<"SigningLog"> | string | null
   data?: Prisma.JsonNullableFilter<"SigningLog">
   creation_date?: Prisma.DateTimeFilter<"SigningLog"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"SigningLog"> | Date | string | null
 }
 
 export type SigningLogCreateWithoutSigningInput = {
@@ -478,6 +503,7 @@ export type SigningLogCreateWithoutSigningInput = {
   platform?: string | null
   data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   creation_date?: Date | string
+  deleted_at?: Date | string | null
   signing_status: Prisma.SigningStatusCreateNestedOneWithoutLogsInput
 }
 
@@ -487,6 +513,7 @@ export type SigningLogUncheckedCreateWithoutSigningInput = {
   platform?: string | null
   data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   creation_date?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type SigningLogCreateOrConnectWithoutSigningInput = {
@@ -521,6 +548,7 @@ export type SigningLogCreateManySigning_statusInput = {
   platform?: string | null
   data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   creation_date?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type SigningLogUpdateWithoutSigning_statusInput = {
@@ -528,6 +556,7 @@ export type SigningLogUpdateWithoutSigning_statusInput = {
   platform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   creation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   signing?: Prisma.SigningUpdateOneRequiredWithoutLogsNestedInput
 }
 
@@ -537,6 +566,7 @@ export type SigningLogUncheckedUpdateWithoutSigning_statusInput = {
   platform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   creation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type SigningLogUncheckedUpdateManyWithoutSigning_statusInput = {
@@ -545,6 +575,7 @@ export type SigningLogUncheckedUpdateManyWithoutSigning_statusInput = {
   platform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   creation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type SigningLogCreateManySigningInput = {
@@ -553,6 +584,7 @@ export type SigningLogCreateManySigningInput = {
   platform?: string | null
   data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   creation_date?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type SigningLogUpdateWithoutSigningInput = {
@@ -560,6 +592,7 @@ export type SigningLogUpdateWithoutSigningInput = {
   platform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   creation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   signing_status?: Prisma.SigningStatusUpdateOneRequiredWithoutLogsNestedInput
 }
 
@@ -569,6 +602,7 @@ export type SigningLogUncheckedUpdateWithoutSigningInput = {
   platform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   creation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type SigningLogUncheckedUpdateManyWithoutSigningInput = {
@@ -577,6 +611,7 @@ export type SigningLogUncheckedUpdateManyWithoutSigningInput = {
   platform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   data?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   creation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -588,6 +623,7 @@ export type SigningLogSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   platform?: boolean
   data?: boolean
   creation_date?: boolean
+  deleted_at?: boolean
   signing?: boolean | Prisma.SigningDefaultArgs<ExtArgs>
   signing_status?: boolean | Prisma.SigningStatusDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["signingLog"]>
@@ -599,6 +635,7 @@ export type SigningLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   platform?: boolean
   data?: boolean
   creation_date?: boolean
+  deleted_at?: boolean
   signing?: boolean | Prisma.SigningDefaultArgs<ExtArgs>
   signing_status?: boolean | Prisma.SigningStatusDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["signingLog"]>
@@ -610,6 +647,7 @@ export type SigningLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   platform?: boolean
   data?: boolean
   creation_date?: boolean
+  deleted_at?: boolean
   signing?: boolean | Prisma.SigningDefaultArgs<ExtArgs>
   signing_status?: boolean | Prisma.SigningStatusDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["signingLog"]>
@@ -621,9 +659,10 @@ export type SigningLogSelectScalar = {
   platform?: boolean
   data?: boolean
   creation_date?: boolean
+  deleted_at?: boolean
 }
 
-export type SigningLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "signing_id" | "signing_status_id" | "platform" | "data" | "creation_date", ExtArgs["result"]["signingLog"]>
+export type SigningLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "signing_id" | "signing_status_id" | "platform" | "data" | "creation_date" | "deleted_at", ExtArgs["result"]["signingLog"]>
 export type SigningLogInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   signing?: boolean | Prisma.SigningDefaultArgs<ExtArgs>
   signing_status?: boolean | Prisma.SigningStatusDefaultArgs<ExtArgs>
@@ -650,6 +689,7 @@ export type $SigningLogPayload<ExtArgs extends runtime.Types.Extensions.Internal
     platform: string | null
     data: runtime.JsonValue | null
     creation_date: Date
+    deleted_at: Date | null
   }, ExtArgs["result"]["signingLog"]>
   composites: {}
 }
@@ -1081,6 +1121,7 @@ export interface SigningLogFieldRefs {
   readonly platform: Prisma.FieldRef<"SigningLog", 'String'>
   readonly data: Prisma.FieldRef<"SigningLog", 'Json'>
   readonly creation_date: Prisma.FieldRef<"SigningLog", 'DateTime'>
+  readonly deleted_at: Prisma.FieldRef<"SigningLog", 'DateTime'>
 }
     
 

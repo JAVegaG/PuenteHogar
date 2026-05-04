@@ -28,18 +28,21 @@ export type AdditionalFeatureMinAggregateOutputType = {
   id: string | null
   name: string | null
   description: string | null
+  deleted_at: Date | null
 }
 
 export type AdditionalFeatureMaxAggregateOutputType = {
   id: string | null
   name: string | null
   description: string | null
+  deleted_at: Date | null
 }
 
 export type AdditionalFeatureCountAggregateOutputType = {
   id: number
   name: number
   description: number
+  deleted_at: number
   _all: number
 }
 
@@ -48,18 +51,21 @@ export type AdditionalFeatureMinAggregateInputType = {
   id?: true
   name?: true
   description?: true
+  deleted_at?: true
 }
 
 export type AdditionalFeatureMaxAggregateInputType = {
   id?: true
   name?: true
   description?: true
+  deleted_at?: true
 }
 
 export type AdditionalFeatureCountAggregateInputType = {
   id?: true
   name?: true
   description?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -139,6 +145,7 @@ export type AdditionalFeatureGroupByOutputType = {
   id: string
   name: string
   description: string | null
+  deleted_at: Date | null
   _count: AdditionalFeatureCountAggregateOutputType | null
   _min: AdditionalFeatureMinAggregateOutputType | null
   _max: AdditionalFeatureMaxAggregateOutputType | null
@@ -166,6 +173,7 @@ export type AdditionalFeatureWhereInput = {
   id?: Prisma.StringFilter<"AdditionalFeature"> | string
   name?: Prisma.StringFilter<"AdditionalFeature"> | string
   description?: Prisma.StringNullableFilter<"AdditionalFeature"> | string | null
+  deleted_at?: Prisma.DateTimeNullableFilter<"AdditionalFeature"> | Date | string | null
   properties?: Prisma.PropertyAdditionalFeatureListRelationFilter
 }
 
@@ -173,6 +181,7 @@ export type AdditionalFeatureOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   properties?: Prisma.PropertyAdditionalFeatureOrderByRelationAggregateInput
 }
 
@@ -183,6 +192,7 @@ export type AdditionalFeatureWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.AdditionalFeatureWhereInput | Prisma.AdditionalFeatureWhereInput[]
   name?: Prisma.StringFilter<"AdditionalFeature"> | string
   description?: Prisma.StringNullableFilter<"AdditionalFeature"> | string | null
+  deleted_at?: Prisma.DateTimeNullableFilter<"AdditionalFeature"> | Date | string | null
   properties?: Prisma.PropertyAdditionalFeatureListRelationFilter
 }, "id">
 
@@ -190,6 +200,7 @@ export type AdditionalFeatureOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.AdditionalFeatureCountOrderByAggregateInput
   _max?: Prisma.AdditionalFeatureMaxOrderByAggregateInput
   _min?: Prisma.AdditionalFeatureMinOrderByAggregateInput
@@ -202,12 +213,14 @@ export type AdditionalFeatureScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"AdditionalFeature"> | string
   name?: Prisma.StringWithAggregatesFilter<"AdditionalFeature"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"AdditionalFeature"> | string | null
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"AdditionalFeature"> | Date | string | null
 }
 
 export type AdditionalFeatureCreateInput = {
   id?: string
   name: string
   description?: string | null
+  deleted_at?: Date | string | null
   properties?: Prisma.PropertyAdditionalFeatureCreateNestedManyWithoutFeatureInput
 }
 
@@ -215,6 +228,7 @@ export type AdditionalFeatureUncheckedCreateInput = {
   id?: string
   name: string
   description?: string | null
+  deleted_at?: Date | string | null
   properties?: Prisma.PropertyAdditionalFeatureUncheckedCreateNestedManyWithoutFeatureInput
 }
 
@@ -222,6 +236,7 @@ export type AdditionalFeatureUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   properties?: Prisma.PropertyAdditionalFeatureUpdateManyWithoutFeatureNestedInput
 }
 
@@ -229,6 +244,7 @@ export type AdditionalFeatureUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   properties?: Prisma.PropertyAdditionalFeatureUncheckedUpdateManyWithoutFeatureNestedInput
 }
 
@@ -236,36 +252,42 @@ export type AdditionalFeatureCreateManyInput = {
   id?: string
   name: string
   description?: string | null
+  deleted_at?: Date | string | null
 }
 
 export type AdditionalFeatureUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type AdditionalFeatureUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type AdditionalFeatureCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type AdditionalFeatureMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type AdditionalFeatureMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type AdditionalFeatureScalarRelationFilter = {
@@ -291,12 +313,14 @@ export type AdditionalFeatureCreateWithoutPropertiesInput = {
   id?: string
   name: string
   description?: string | null
+  deleted_at?: Date | string | null
 }
 
 export type AdditionalFeatureUncheckedCreateWithoutPropertiesInput = {
   id?: string
   name: string
   description?: string | null
+  deleted_at?: Date | string | null
 }
 
 export type AdditionalFeatureCreateOrConnectWithoutPropertiesInput = {
@@ -319,12 +343,14 @@ export type AdditionalFeatureUpdateWithoutPropertiesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type AdditionalFeatureUncheckedUpdateWithoutPropertiesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -362,6 +388,7 @@ export type AdditionalFeatureSelect<ExtArgs extends runtime.Types.Extensions.Int
   id?: boolean
   name?: boolean
   description?: boolean
+  deleted_at?: boolean
   properties?: boolean | Prisma.AdditionalFeature$propertiesArgs<ExtArgs>
   _count?: boolean | Prisma.AdditionalFeatureCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["additionalFeature"]>
@@ -370,21 +397,24 @@ export type AdditionalFeatureSelectCreateManyAndReturn<ExtArgs extends runtime.T
   id?: boolean
   name?: boolean
   description?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["additionalFeature"]>
 
 export type AdditionalFeatureSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
   description?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["additionalFeature"]>
 
 export type AdditionalFeatureSelectScalar = {
   id?: boolean
   name?: boolean
   description?: boolean
+  deleted_at?: boolean
 }
 
-export type AdditionalFeatureOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description", ExtArgs["result"]["additionalFeature"]>
+export type AdditionalFeatureOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "deleted_at", ExtArgs["result"]["additionalFeature"]>
 export type AdditionalFeatureInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   properties?: boolean | Prisma.AdditionalFeature$propertiesArgs<ExtArgs>
   _count?: boolean | Prisma.AdditionalFeatureCountOutputTypeDefaultArgs<ExtArgs>
@@ -401,6 +431,7 @@ export type $AdditionalFeaturePayload<ExtArgs extends runtime.Types.Extensions.I
     id: string
     name: string
     description: string | null
+    deleted_at: Date | null
   }, ExtArgs["result"]["additionalFeature"]>
   composites: {}
 }
@@ -828,6 +859,7 @@ export interface AdditionalFeatureFieldRefs {
   readonly id: Prisma.FieldRef<"AdditionalFeature", 'String'>
   readonly name: Prisma.FieldRef<"AdditionalFeature", 'String'>
   readonly description: Prisma.FieldRef<"AdditionalFeature", 'String'>
+  readonly deleted_at: Prisma.FieldRef<"AdditionalFeature", 'DateTime'>
 }
     
 

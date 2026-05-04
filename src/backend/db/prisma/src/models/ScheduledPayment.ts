@@ -42,6 +42,7 @@ export type ScheduledPaymentMinAggregateOutputType = {
   due_date: Date | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
 }
 
 export type ScheduledPaymentMaxAggregateOutputType = {
@@ -52,6 +53,7 @@ export type ScheduledPaymentMaxAggregateOutputType = {
   due_date: Date | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
 }
 
 export type ScheduledPaymentCountAggregateOutputType = {
@@ -62,6 +64,7 @@ export type ScheduledPaymentCountAggregateOutputType = {
   due_date: number
   created_at: number
   updated_at: number
+  deleted_at: number
   _all: number
 }
 
@@ -82,6 +85,7 @@ export type ScheduledPaymentMinAggregateInputType = {
   due_date?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
 }
 
 export type ScheduledPaymentMaxAggregateInputType = {
@@ -92,6 +96,7 @@ export type ScheduledPaymentMaxAggregateInputType = {
   due_date?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
 }
 
 export type ScheduledPaymentCountAggregateInputType = {
@@ -102,6 +107,7 @@ export type ScheduledPaymentCountAggregateInputType = {
   due_date?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -199,6 +205,7 @@ export type ScheduledPaymentGroupByOutputType = {
   due_date: Date
   created_at: Date
   updated_at: Date
+  deleted_at: Date | null
   _count: ScheduledPaymentCountAggregateOutputType | null
   _avg: ScheduledPaymentAvgAggregateOutputType | null
   _sum: ScheduledPaymentSumAggregateOutputType | null
@@ -232,6 +239,7 @@ export type ScheduledPaymentWhereInput = {
   due_date?: Prisma.DateTimeFilter<"ScheduledPayment"> | Date | string
   created_at?: Prisma.DateTimeFilter<"ScheduledPayment"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"ScheduledPayment"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"ScheduledPayment"> | Date | string | null
   payments?: Prisma.PaymentListRelationFilter
 }
 
@@ -243,6 +251,7 @@ export type ScheduledPaymentOrderByWithRelationInput = {
   due_date?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   payments?: Prisma.PaymentOrderByRelationAggregateInput
 }
 
@@ -257,6 +266,7 @@ export type ScheduledPaymentWhereUniqueInput = Prisma.AtLeast<{
   due_date?: Prisma.DateTimeFilter<"ScheduledPayment"> | Date | string
   created_at?: Prisma.DateTimeFilter<"ScheduledPayment"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"ScheduledPayment"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"ScheduledPayment"> | Date | string | null
   payments?: Prisma.PaymentListRelationFilter
 }, "id">
 
@@ -268,6 +278,7 @@ export type ScheduledPaymentOrderByWithAggregationInput = {
   due_date?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ScheduledPaymentCountOrderByAggregateInput
   _avg?: Prisma.ScheduledPaymentAvgOrderByAggregateInput
   _max?: Prisma.ScheduledPaymentMaxOrderByAggregateInput
@@ -286,6 +297,7 @@ export type ScheduledPaymentScalarWhereWithAggregatesInput = {
   due_date?: Prisma.DateTimeWithAggregatesFilter<"ScheduledPayment"> | Date | string
   created_at?: Prisma.DateTimeWithAggregatesFilter<"ScheduledPayment"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"ScheduledPayment"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"ScheduledPayment"> | Date | string | null
 }
 
 export type ScheduledPaymentCreateInput = {
@@ -296,6 +308,7 @@ export type ScheduledPaymentCreateInput = {
   due_date: Date | string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   payments?: Prisma.PaymentCreateNestedManyWithoutScheduled_paymentInput
 }
 
@@ -307,6 +320,7 @@ export type ScheduledPaymentUncheckedCreateInput = {
   due_date: Date | string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutScheduled_paymentInput
 }
 
@@ -318,6 +332,7 @@ export type ScheduledPaymentUpdateInput = {
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payments?: Prisma.PaymentUpdateManyWithoutScheduled_paymentNestedInput
 }
 
@@ -329,6 +344,7 @@ export type ScheduledPaymentUncheckedUpdateInput = {
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutScheduled_paymentNestedInput
 }
 
@@ -340,6 +356,7 @@ export type ScheduledPaymentCreateManyInput = {
   due_date: Date | string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type ScheduledPaymentUpdateManyMutationInput = {
@@ -350,6 +367,7 @@ export type ScheduledPaymentUpdateManyMutationInput = {
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ScheduledPaymentUncheckedUpdateManyInput = {
@@ -360,6 +378,7 @@ export type ScheduledPaymentUncheckedUpdateManyInput = {
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ScheduledPaymentCountOrderByAggregateInput = {
@@ -370,6 +389,7 @@ export type ScheduledPaymentCountOrderByAggregateInput = {
   due_date?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type ScheduledPaymentAvgOrderByAggregateInput = {
@@ -384,6 +404,7 @@ export type ScheduledPaymentMaxOrderByAggregateInput = {
   due_date?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type ScheduledPaymentMinOrderByAggregateInput = {
@@ -394,6 +415,7 @@ export type ScheduledPaymentMinOrderByAggregateInput = {
   due_date?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type ScheduledPaymentSumOrderByAggregateInput = {
@@ -427,6 +449,7 @@ export type ScheduledPaymentCreateWithoutPaymentsInput = {
   due_date: Date | string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type ScheduledPaymentUncheckedCreateWithoutPaymentsInput = {
@@ -437,6 +460,7 @@ export type ScheduledPaymentUncheckedCreateWithoutPaymentsInput = {
   due_date: Date | string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type ScheduledPaymentCreateOrConnectWithoutPaymentsInput = {
@@ -463,6 +487,7 @@ export type ScheduledPaymentUpdateWithoutPaymentsInput = {
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ScheduledPaymentUncheckedUpdateWithoutPaymentsInput = {
@@ -473,6 +498,7 @@ export type ScheduledPaymentUncheckedUpdateWithoutPaymentsInput = {
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -514,6 +540,7 @@ export type ScheduledPaymentSelect<ExtArgs extends runtime.Types.Extensions.Inte
   due_date?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
   payments?: boolean | Prisma.ScheduledPayment$paymentsArgs<ExtArgs>
   _count?: boolean | Prisma.ScheduledPaymentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["scheduledPayment"]>
@@ -526,6 +553,7 @@ export type ScheduledPaymentSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   due_date?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["scheduledPayment"]>
 
 export type ScheduledPaymentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -536,6 +564,7 @@ export type ScheduledPaymentSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   due_date?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["scheduledPayment"]>
 
 export type ScheduledPaymentSelectScalar = {
@@ -546,9 +575,10 @@ export type ScheduledPaymentSelectScalar = {
   due_date?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
 }
 
-export type ScheduledPaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "lease_id" | "amount" | "currency" | "due_date" | "created_at" | "updated_at", ExtArgs["result"]["scheduledPayment"]>
+export type ScheduledPaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "lease_id" | "amount" | "currency" | "due_date" | "created_at" | "updated_at" | "deleted_at", ExtArgs["result"]["scheduledPayment"]>
 export type ScheduledPaymentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   payments?: boolean | Prisma.ScheduledPayment$paymentsArgs<ExtArgs>
   _count?: boolean | Prisma.ScheduledPaymentCountOutputTypeDefaultArgs<ExtArgs>
@@ -569,6 +599,7 @@ export type $ScheduledPaymentPayload<ExtArgs extends runtime.Types.Extensions.In
     due_date: Date
     created_at: Date
     updated_at: Date
+    deleted_at: Date | null
   }, ExtArgs["result"]["scheduledPayment"]>
   composites: {}
 }
@@ -1000,6 +1031,7 @@ export interface ScheduledPaymentFieldRefs {
   readonly due_date: Prisma.FieldRef<"ScheduledPayment", 'DateTime'>
   readonly created_at: Prisma.FieldRef<"ScheduledPayment", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"ScheduledPayment", 'DateTime'>
+  readonly deleted_at: Prisma.FieldRef<"ScheduledPayment", 'DateTime'>
 }
     
 

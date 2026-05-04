@@ -28,18 +28,21 @@ export type FileStatusMinAggregateOutputType = {
   id: string | null
   name: string | null
   description: string | null
+  deleted_at: Date | null
 }
 
 export type FileStatusMaxAggregateOutputType = {
   id: string | null
   name: string | null
   description: string | null
+  deleted_at: Date | null
 }
 
 export type FileStatusCountAggregateOutputType = {
   id: number
   name: number
   description: number
+  deleted_at: number
   _all: number
 }
 
@@ -48,18 +51,21 @@ export type FileStatusMinAggregateInputType = {
   id?: true
   name?: true
   description?: true
+  deleted_at?: true
 }
 
 export type FileStatusMaxAggregateInputType = {
   id?: true
   name?: true
   description?: true
+  deleted_at?: true
 }
 
 export type FileStatusCountAggregateInputType = {
   id?: true
   name?: true
   description?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -139,6 +145,7 @@ export type FileStatusGroupByOutputType = {
   id: string
   name: string
   description: string | null
+  deleted_at: Date | null
   _count: FileStatusCountAggregateOutputType | null
   _min: FileStatusMinAggregateOutputType | null
   _max: FileStatusMaxAggregateOutputType | null
@@ -166,6 +173,7 @@ export type FileStatusWhereInput = {
   id?: Prisma.StringFilter<"FileStatus"> | string
   name?: Prisma.StringFilter<"FileStatus"> | string
   description?: Prisma.StringNullableFilter<"FileStatus"> | string | null
+  deleted_at?: Prisma.DateTimeNullableFilter<"FileStatus"> | Date | string | null
   files?: Prisma.FileListRelationFilter
 }
 
@@ -173,6 +181,7 @@ export type FileStatusOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   files?: Prisma.FileOrderByRelationAggregateInput
 }
 
@@ -183,6 +192,7 @@ export type FileStatusWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.FileStatusWhereInput[]
   NOT?: Prisma.FileStatusWhereInput | Prisma.FileStatusWhereInput[]
   description?: Prisma.StringNullableFilter<"FileStatus"> | string | null
+  deleted_at?: Prisma.DateTimeNullableFilter<"FileStatus"> | Date | string | null
   files?: Prisma.FileListRelationFilter
 }, "id" | "name">
 
@@ -190,6 +200,7 @@ export type FileStatusOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.FileStatusCountOrderByAggregateInput
   _max?: Prisma.FileStatusMaxOrderByAggregateInput
   _min?: Prisma.FileStatusMinOrderByAggregateInput
@@ -202,12 +213,14 @@ export type FileStatusScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"FileStatus"> | string
   name?: Prisma.StringWithAggregatesFilter<"FileStatus"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"FileStatus"> | string | null
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"FileStatus"> | Date | string | null
 }
 
 export type FileStatusCreateInput = {
   id?: string
   name: string
   description?: string | null
+  deleted_at?: Date | string | null
   files?: Prisma.FileCreateNestedManyWithoutFile_statusInput
 }
 
@@ -215,6 +228,7 @@ export type FileStatusUncheckedCreateInput = {
   id?: string
   name: string
   description?: string | null
+  deleted_at?: Date | string | null
   files?: Prisma.FileUncheckedCreateNestedManyWithoutFile_statusInput
 }
 
@@ -222,6 +236,7 @@ export type FileStatusUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   files?: Prisma.FileUpdateManyWithoutFile_statusNestedInput
 }
 
@@ -229,6 +244,7 @@ export type FileStatusUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   files?: Prisma.FileUncheckedUpdateManyWithoutFile_statusNestedInput
 }
 
@@ -236,36 +252,42 @@ export type FileStatusCreateManyInput = {
   id?: string
   name: string
   description?: string | null
+  deleted_at?: Date | string | null
 }
 
 export type FileStatusUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type FileStatusUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type FileStatusCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type FileStatusMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type FileStatusMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type FileStatusScalarRelationFilter = {
@@ -291,12 +313,14 @@ export type FileStatusCreateWithoutFilesInput = {
   id?: string
   name: string
   description?: string | null
+  deleted_at?: Date | string | null
 }
 
 export type FileStatusUncheckedCreateWithoutFilesInput = {
   id?: string
   name: string
   description?: string | null
+  deleted_at?: Date | string | null
 }
 
 export type FileStatusCreateOrConnectWithoutFilesInput = {
@@ -319,12 +343,14 @@ export type FileStatusUpdateWithoutFilesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type FileStatusUncheckedUpdateWithoutFilesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -362,6 +388,7 @@ export type FileStatusSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   id?: boolean
   name?: boolean
   description?: boolean
+  deleted_at?: boolean
   files?: boolean | Prisma.FileStatus$filesArgs<ExtArgs>
   _count?: boolean | Prisma.FileStatusCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["fileStatus"]>
@@ -370,21 +397,24 @@ export type FileStatusSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   id?: boolean
   name?: boolean
   description?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["fileStatus"]>
 
 export type FileStatusSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
   description?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["fileStatus"]>
 
 export type FileStatusSelectScalar = {
   id?: boolean
   name?: boolean
   description?: boolean
+  deleted_at?: boolean
 }
 
-export type FileStatusOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description", ExtArgs["result"]["fileStatus"]>
+export type FileStatusOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "deleted_at", ExtArgs["result"]["fileStatus"]>
 export type FileStatusInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   files?: boolean | Prisma.FileStatus$filesArgs<ExtArgs>
   _count?: boolean | Prisma.FileStatusCountOutputTypeDefaultArgs<ExtArgs>
@@ -401,6 +431,7 @@ export type $FileStatusPayload<ExtArgs extends runtime.Types.Extensions.Internal
     id: string
     name: string
     description: string | null
+    deleted_at: Date | null
   }, ExtArgs["result"]["fileStatus"]>
   composites: {}
 }
@@ -828,6 +859,7 @@ export interface FileStatusFieldRefs {
   readonly id: Prisma.FieldRef<"FileStatus", 'String'>
   readonly name: Prisma.FieldRef<"FileStatus", 'String'>
   readonly description: Prisma.FieldRef<"FileStatus", 'String'>
+  readonly deleted_at: Prisma.FieldRef<"FileStatus", 'DateTime'>
 }
     
 

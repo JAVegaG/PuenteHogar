@@ -33,6 +33,7 @@ export type LeaseMinAggregateOutputType = {
   enc_blob: string | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
 }
 
 export type LeaseMaxAggregateOutputType = {
@@ -44,6 +45,7 @@ export type LeaseMaxAggregateOutputType = {
   enc_blob: string | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
 }
 
 export type LeaseCountAggregateOutputType = {
@@ -55,6 +57,7 @@ export type LeaseCountAggregateOutputType = {
   enc_blob: number
   created_at: number
   updated_at: number
+  deleted_at: number
   _all: number
 }
 
@@ -68,6 +71,7 @@ export type LeaseMinAggregateInputType = {
   enc_blob?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
 }
 
 export type LeaseMaxAggregateInputType = {
@@ -79,6 +83,7 @@ export type LeaseMaxAggregateInputType = {
   enc_blob?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
 }
 
 export type LeaseCountAggregateInputType = {
@@ -90,6 +95,7 @@ export type LeaseCountAggregateInputType = {
   enc_blob?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -174,6 +180,7 @@ export type LeaseGroupByOutputType = {
   enc_blob: string | null
   created_at: Date
   updated_at: Date
+  deleted_at: Date | null
   _count: LeaseCountAggregateOutputType | null
   _min: LeaseMinAggregateOutputType | null
   _max: LeaseMaxAggregateOutputType | null
@@ -206,6 +213,7 @@ export type LeaseWhereInput = {
   enc_blob?: Prisma.StringNullableFilter<"Lease"> | string | null
   created_at?: Prisma.DateTimeFilter<"Lease"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Lease"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"Lease"> | Date | string | null
   portfolio_unit?: Prisma.XOR<Prisma.PortfolioUnitScalarRelationFilter, Prisma.PortfolioUnitWhereInput>
 }
 
@@ -218,6 +226,7 @@ export type LeaseOrderByWithRelationInput = {
   enc_blob?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   portfolio_unit?: Prisma.PortfolioUnitOrderByWithRelationInput
 }
 
@@ -234,6 +243,7 @@ export type LeaseWhereUniqueInput = Prisma.AtLeast<{
   enc_blob?: Prisma.StringNullableFilter<"Lease"> | string | null
   created_at?: Prisma.DateTimeFilter<"Lease"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Lease"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"Lease"> | Date | string | null
   portfolio_unit?: Prisma.XOR<Prisma.PortfolioUnitScalarRelationFilter, Prisma.PortfolioUnitWhereInput>
 }, "id" | "portfolio_unit_id_end_date">
 
@@ -246,6 +256,7 @@ export type LeaseOrderByWithAggregationInput = {
   enc_blob?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.LeaseCountOrderByAggregateInput
   _max?: Prisma.LeaseMaxOrderByAggregateInput
   _min?: Prisma.LeaseMinOrderByAggregateInput
@@ -263,6 +274,7 @@ export type LeaseScalarWhereWithAggregatesInput = {
   enc_blob?: Prisma.StringNullableWithAggregatesFilter<"Lease"> | string | null
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Lease"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"Lease"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"Lease"> | Date | string | null
 }
 
 export type LeaseCreateInput = {
@@ -273,6 +285,7 @@ export type LeaseCreateInput = {
   enc_blob?: string | null
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   portfolio_unit: Prisma.PortfolioUnitCreateNestedOneWithoutLeasesInput
 }
 
@@ -285,6 +298,7 @@ export type LeaseUncheckedCreateInput = {
   enc_blob?: string | null
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type LeaseUpdateInput = {
@@ -295,6 +309,7 @@ export type LeaseUpdateInput = {
   enc_blob?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   portfolio_unit?: Prisma.PortfolioUnitUpdateOneRequiredWithoutLeasesNestedInput
 }
 
@@ -307,6 +322,7 @@ export type LeaseUncheckedUpdateInput = {
   enc_blob?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LeaseCreateManyInput = {
@@ -318,6 +334,7 @@ export type LeaseCreateManyInput = {
   enc_blob?: string | null
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type LeaseUpdateManyMutationInput = {
@@ -328,6 +345,7 @@ export type LeaseUpdateManyMutationInput = {
   enc_blob?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LeaseUncheckedUpdateManyInput = {
@@ -339,6 +357,7 @@ export type LeaseUncheckedUpdateManyInput = {
   enc_blob?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LeaseListRelationFilter = {
@@ -365,6 +384,7 @@ export type LeaseCountOrderByAggregateInput = {
   enc_blob?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type LeaseMaxOrderByAggregateInput = {
@@ -376,6 +396,7 @@ export type LeaseMaxOrderByAggregateInput = {
   enc_blob?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type LeaseMinOrderByAggregateInput = {
@@ -387,6 +408,7 @@ export type LeaseMinOrderByAggregateInput = {
   enc_blob?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type LeaseCreateNestedManyWithoutPortfolio_unitInput = {
@@ -431,10 +453,6 @@ export type LeaseUncheckedUpdateManyWithoutPortfolio_unitNestedInput = {
   deleteMany?: Prisma.LeaseScalarWhereInput | Prisma.LeaseScalarWhereInput[]
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type LeaseCreateWithoutPortfolio_unitInput = {
   id?: string
   user_id: string
@@ -443,6 +461,7 @@ export type LeaseCreateWithoutPortfolio_unitInput = {
   enc_blob?: string | null
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type LeaseUncheckedCreateWithoutPortfolio_unitInput = {
@@ -453,6 +472,7 @@ export type LeaseUncheckedCreateWithoutPortfolio_unitInput = {
   enc_blob?: string | null
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type LeaseCreateOrConnectWithoutPortfolio_unitInput = {
@@ -493,6 +513,7 @@ export type LeaseScalarWhereInput = {
   enc_blob?: Prisma.StringNullableFilter<"Lease"> | string | null
   created_at?: Prisma.DateTimeFilter<"Lease"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Lease"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"Lease"> | Date | string | null
 }
 
 export type LeaseCreateManyPortfolio_unitInput = {
@@ -503,6 +524,7 @@ export type LeaseCreateManyPortfolio_unitInput = {
   enc_blob?: string | null
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type LeaseUpdateWithoutPortfolio_unitInput = {
@@ -513,6 +535,7 @@ export type LeaseUpdateWithoutPortfolio_unitInput = {
   enc_blob?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LeaseUncheckedUpdateWithoutPortfolio_unitInput = {
@@ -523,6 +546,7 @@ export type LeaseUncheckedUpdateWithoutPortfolio_unitInput = {
   enc_blob?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LeaseUncheckedUpdateManyWithoutPortfolio_unitInput = {
@@ -533,6 +557,7 @@ export type LeaseUncheckedUpdateManyWithoutPortfolio_unitInput = {
   enc_blob?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -546,6 +571,7 @@ export type LeaseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   enc_blob?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
   portfolio_unit?: boolean | Prisma.PortfolioUnitDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["lease"]>
 
@@ -558,6 +584,7 @@ export type LeaseSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   enc_blob?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
   portfolio_unit?: boolean | Prisma.PortfolioUnitDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["lease"]>
 
@@ -570,6 +597,7 @@ export type LeaseSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   enc_blob?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
   portfolio_unit?: boolean | Prisma.PortfolioUnitDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["lease"]>
 
@@ -582,9 +610,10 @@ export type LeaseSelectScalar = {
   enc_blob?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
 }
 
-export type LeaseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "portfolio_unit_id" | "user_id" | "start_date" | "end_date" | "enc_blob" | "created_at" | "updated_at", ExtArgs["result"]["lease"]>
+export type LeaseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "portfolio_unit_id" | "user_id" | "start_date" | "end_date" | "enc_blob" | "created_at" | "updated_at" | "deleted_at", ExtArgs["result"]["lease"]>
 export type LeaseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   portfolio_unit?: boolean | Prisma.PortfolioUnitDefaultArgs<ExtArgs>
 }
@@ -609,6 +638,7 @@ export type $LeasePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     enc_blob: string | null
     created_at: Date
     updated_at: Date
+    deleted_at: Date | null
   }, ExtArgs["result"]["lease"]>
   composites: {}
 }
@@ -1041,6 +1071,7 @@ export interface LeaseFieldRefs {
   readonly enc_blob: Prisma.FieldRef<"Lease", 'String'>
   readonly created_at: Prisma.FieldRef<"Lease", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"Lease", 'DateTime'>
+  readonly deleted_at: Prisma.FieldRef<"Lease", 'DateTime'>
 }
     
 

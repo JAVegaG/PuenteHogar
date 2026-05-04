@@ -28,18 +28,21 @@ export type LegalPersonDetailMinAggregateOutputType = {
   id: string | null
   user_id: string | null
   business_name: string | null
+  deleted_at: Date | null
 }
 
 export type LegalPersonDetailMaxAggregateOutputType = {
   id: string | null
   user_id: string | null
   business_name: string | null
+  deleted_at: Date | null
 }
 
 export type LegalPersonDetailCountAggregateOutputType = {
   id: number
   user_id: number
   business_name: number
+  deleted_at: number
   _all: number
 }
 
@@ -48,18 +51,21 @@ export type LegalPersonDetailMinAggregateInputType = {
   id?: true
   user_id?: true
   business_name?: true
+  deleted_at?: true
 }
 
 export type LegalPersonDetailMaxAggregateInputType = {
   id?: true
   user_id?: true
   business_name?: true
+  deleted_at?: true
 }
 
 export type LegalPersonDetailCountAggregateInputType = {
   id?: true
   user_id?: true
   business_name?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -139,6 +145,7 @@ export type LegalPersonDetailGroupByOutputType = {
   id: string
   user_id: string
   business_name: string
+  deleted_at: Date | null
   _count: LegalPersonDetailCountAggregateOutputType | null
   _min: LegalPersonDetailMinAggregateOutputType | null
   _max: LegalPersonDetailMaxAggregateOutputType | null
@@ -166,6 +173,7 @@ export type LegalPersonDetailWhereInput = {
   id?: Prisma.StringFilter<"LegalPersonDetail"> | string
   user_id?: Prisma.StringFilter<"LegalPersonDetail"> | string
   business_name?: Prisma.StringFilter<"LegalPersonDetail"> | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"LegalPersonDetail"> | Date | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -173,6 +181,7 @@ export type LegalPersonDetailOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
   business_name?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -183,6 +192,7 @@ export type LegalPersonDetailWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.LegalPersonDetailWhereInput[]
   NOT?: Prisma.LegalPersonDetailWhereInput | Prisma.LegalPersonDetailWhereInput[]
   business_name?: Prisma.StringFilter<"LegalPersonDetail"> | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"LegalPersonDetail"> | Date | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "user_id">
 
@@ -190,6 +200,7 @@ export type LegalPersonDetailOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
   business_name?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.LegalPersonDetailCountOrderByAggregateInput
   _max?: Prisma.LegalPersonDetailMaxOrderByAggregateInput
   _min?: Prisma.LegalPersonDetailMinOrderByAggregateInput
@@ -202,11 +213,13 @@ export type LegalPersonDetailScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"LegalPersonDetail"> | string
   user_id?: Prisma.StringWithAggregatesFilter<"LegalPersonDetail"> | string
   business_name?: Prisma.StringWithAggregatesFilter<"LegalPersonDetail"> | string
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"LegalPersonDetail"> | Date | string | null
 }
 
 export type LegalPersonDetailCreateInput = {
   id?: string
   business_name: string
+  deleted_at?: Date | string | null
   user: Prisma.UserCreateNestedOneWithoutLegal_personInput
 }
 
@@ -214,11 +227,13 @@ export type LegalPersonDetailUncheckedCreateInput = {
   id?: string
   user_id: string
   business_name: string
+  deleted_at?: Date | string | null
 }
 
 export type LegalPersonDetailUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutLegal_personNestedInput
 }
 
@@ -226,23 +241,27 @@ export type LegalPersonDetailUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LegalPersonDetailCreateManyInput = {
   id?: string
   user_id: string
   business_name: string
+  deleted_at?: Date | string | null
 }
 
 export type LegalPersonDetailUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LegalPersonDetailUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LegalPersonDetailNullableScalarRelationFilter = {
@@ -254,18 +273,21 @@ export type LegalPersonDetailCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
   business_name?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type LegalPersonDetailMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
   business_name?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type LegalPersonDetailMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
   business_name?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type LegalPersonDetailCreateNestedOneWithoutUserInput = {
@@ -303,11 +325,13 @@ export type LegalPersonDetailUncheckedUpdateOneWithoutUserNestedInput = {
 export type LegalPersonDetailCreateWithoutUserInput = {
   id?: string
   business_name: string
+  deleted_at?: Date | string | null
 }
 
 export type LegalPersonDetailUncheckedCreateWithoutUserInput = {
   id?: string
   business_name: string
+  deleted_at?: Date | string | null
 }
 
 export type LegalPersonDetailCreateOrConnectWithoutUserInput = {
@@ -329,11 +353,13 @@ export type LegalPersonDetailUpdateToOneWithWhereWithoutUserInput = {
 export type LegalPersonDetailUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type LegalPersonDetailUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   business_name?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -342,6 +368,7 @@ export type LegalPersonDetailSelect<ExtArgs extends runtime.Types.Extensions.Int
   id?: boolean
   user_id?: boolean
   business_name?: boolean
+  deleted_at?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["legalPersonDetail"]>
 
@@ -349,6 +376,7 @@ export type LegalPersonDetailSelectCreateManyAndReturn<ExtArgs extends runtime.T
   id?: boolean
   user_id?: boolean
   business_name?: boolean
+  deleted_at?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["legalPersonDetail"]>
 
@@ -356,6 +384,7 @@ export type LegalPersonDetailSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   id?: boolean
   user_id?: boolean
   business_name?: boolean
+  deleted_at?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["legalPersonDetail"]>
 
@@ -363,9 +392,10 @@ export type LegalPersonDetailSelectScalar = {
   id?: boolean
   user_id?: boolean
   business_name?: boolean
+  deleted_at?: boolean
 }
 
-export type LegalPersonDetailOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "business_name", ExtArgs["result"]["legalPersonDetail"]>
+export type LegalPersonDetailOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "business_name" | "deleted_at", ExtArgs["result"]["legalPersonDetail"]>
 export type LegalPersonDetailInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -385,6 +415,7 @@ export type $LegalPersonDetailPayload<ExtArgs extends runtime.Types.Extensions.I
     id: string
     user_id: string
     business_name: string
+    deleted_at: Date | null
   }, ExtArgs["result"]["legalPersonDetail"]>
   composites: {}
 }
@@ -812,6 +843,7 @@ export interface LegalPersonDetailFieldRefs {
   readonly id: Prisma.FieldRef<"LegalPersonDetail", 'String'>
   readonly user_id: Prisma.FieldRef<"LegalPersonDetail", 'String'>
   readonly business_name: Prisma.FieldRef<"LegalPersonDetail", 'String'>
+  readonly deleted_at: Prisma.FieldRef<"LegalPersonDetail", 'DateTime'>
 }
     
 

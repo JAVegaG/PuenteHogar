@@ -30,6 +30,7 @@ export type SigningMinAggregateOutputType = {
   signing_status_id: string | null
   signing_timestamp: Date | null
   document_hash: string | null
+  deleted_at: Date | null
 }
 
 export type SigningMaxAggregateOutputType = {
@@ -38,6 +39,7 @@ export type SigningMaxAggregateOutputType = {
   signing_status_id: string | null
   signing_timestamp: Date | null
   document_hash: string | null
+  deleted_at: Date | null
 }
 
 export type SigningCountAggregateOutputType = {
@@ -46,6 +48,7 @@ export type SigningCountAggregateOutputType = {
   signing_status_id: number
   signing_timestamp: number
   document_hash: number
+  deleted_at: number
   _all: number
 }
 
@@ -56,6 +59,7 @@ export type SigningMinAggregateInputType = {
   signing_status_id?: true
   signing_timestamp?: true
   document_hash?: true
+  deleted_at?: true
 }
 
 export type SigningMaxAggregateInputType = {
@@ -64,6 +68,7 @@ export type SigningMaxAggregateInputType = {
   signing_status_id?: true
   signing_timestamp?: true
   document_hash?: true
+  deleted_at?: true
 }
 
 export type SigningCountAggregateInputType = {
@@ -72,6 +77,7 @@ export type SigningCountAggregateInputType = {
   signing_status_id?: true
   signing_timestamp?: true
   document_hash?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -153,6 +159,7 @@ export type SigningGroupByOutputType = {
   signing_status_id: string
   signing_timestamp: Date | null
   document_hash: string | null
+  deleted_at: Date | null
   _count: SigningCountAggregateOutputType | null
   _min: SigningMinAggregateOutputType | null
   _max: SigningMaxAggregateOutputType | null
@@ -182,6 +189,7 @@ export type SigningWhereInput = {
   signing_status_id?: Prisma.StringFilter<"Signing"> | string
   signing_timestamp?: Prisma.DateTimeNullableFilter<"Signing"> | Date | string | null
   document_hash?: Prisma.StringNullableFilter<"Signing"> | string | null
+  deleted_at?: Prisma.DateTimeNullableFilter<"Signing"> | Date | string | null
   contract_party?: Prisma.XOR<Prisma.ContractPartyScalarRelationFilter, Prisma.ContractPartyWhereInput>
   signing_status?: Prisma.XOR<Prisma.SigningStatusScalarRelationFilter, Prisma.SigningStatusWhereInput>
   logs?: Prisma.SigningLogListRelationFilter
@@ -193,6 +201,7 @@ export type SigningOrderByWithRelationInput = {
   signing_status_id?: Prisma.SortOrder
   signing_timestamp?: Prisma.SortOrderInput | Prisma.SortOrder
   document_hash?: Prisma.SortOrderInput | Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   contract_party?: Prisma.ContractPartyOrderByWithRelationInput
   signing_status?: Prisma.SigningStatusOrderByWithRelationInput
   logs?: Prisma.SigningLogOrderByRelationAggregateInput
@@ -207,6 +216,7 @@ export type SigningWhereUniqueInput = Prisma.AtLeast<{
   signing_status_id?: Prisma.StringFilter<"Signing"> | string
   signing_timestamp?: Prisma.DateTimeNullableFilter<"Signing"> | Date | string | null
   document_hash?: Prisma.StringNullableFilter<"Signing"> | string | null
+  deleted_at?: Prisma.DateTimeNullableFilter<"Signing"> | Date | string | null
   contract_party?: Prisma.XOR<Prisma.ContractPartyScalarRelationFilter, Prisma.ContractPartyWhereInput>
   signing_status?: Prisma.XOR<Prisma.SigningStatusScalarRelationFilter, Prisma.SigningStatusWhereInput>
   logs?: Prisma.SigningLogListRelationFilter
@@ -218,6 +228,7 @@ export type SigningOrderByWithAggregationInput = {
   signing_status_id?: Prisma.SortOrder
   signing_timestamp?: Prisma.SortOrderInput | Prisma.SortOrder
   document_hash?: Prisma.SortOrderInput | Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.SigningCountOrderByAggregateInput
   _max?: Prisma.SigningMaxOrderByAggregateInput
   _min?: Prisma.SigningMinOrderByAggregateInput
@@ -232,12 +243,14 @@ export type SigningScalarWhereWithAggregatesInput = {
   signing_status_id?: Prisma.StringWithAggregatesFilter<"Signing"> | string
   signing_timestamp?: Prisma.DateTimeNullableWithAggregatesFilter<"Signing"> | Date | string | null
   document_hash?: Prisma.StringNullableWithAggregatesFilter<"Signing"> | string | null
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"Signing"> | Date | string | null
 }
 
 export type SigningCreateInput = {
   id?: string
   signing_timestamp?: Date | string | null
   document_hash?: string | null
+  deleted_at?: Date | string | null
   contract_party: Prisma.ContractPartyCreateNestedOneWithoutSigningsInput
   signing_status: Prisma.SigningStatusCreateNestedOneWithoutSigningsInput
   logs?: Prisma.SigningLogCreateNestedManyWithoutSigningInput
@@ -249,6 +262,7 @@ export type SigningUncheckedCreateInput = {
   signing_status_id: string
   signing_timestamp?: Date | string | null
   document_hash?: string | null
+  deleted_at?: Date | string | null
   logs?: Prisma.SigningLogUncheckedCreateNestedManyWithoutSigningInput
 }
 
@@ -256,6 +270,7 @@ export type SigningUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   signing_timestamp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   document_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contract_party?: Prisma.ContractPartyUpdateOneRequiredWithoutSigningsNestedInput
   signing_status?: Prisma.SigningStatusUpdateOneRequiredWithoutSigningsNestedInput
   logs?: Prisma.SigningLogUpdateManyWithoutSigningNestedInput
@@ -267,6 +282,7 @@ export type SigningUncheckedUpdateInput = {
   signing_status_id?: Prisma.StringFieldUpdateOperationsInput | string
   signing_timestamp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   document_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   logs?: Prisma.SigningLogUncheckedUpdateManyWithoutSigningNestedInput
 }
 
@@ -276,12 +292,14 @@ export type SigningCreateManyInput = {
   signing_status_id: string
   signing_timestamp?: Date | string | null
   document_hash?: string | null
+  deleted_at?: Date | string | null
 }
 
 export type SigningUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   signing_timestamp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   document_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type SigningUncheckedUpdateManyInput = {
@@ -290,6 +308,7 @@ export type SigningUncheckedUpdateManyInput = {
   signing_status_id?: Prisma.StringFieldUpdateOperationsInput | string
   signing_timestamp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   document_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type SigningListRelationFilter = {
@@ -308,6 +327,7 @@ export type SigningCountOrderByAggregateInput = {
   signing_status_id?: Prisma.SortOrder
   signing_timestamp?: Prisma.SortOrder
   document_hash?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type SigningMaxOrderByAggregateInput = {
@@ -316,6 +336,7 @@ export type SigningMaxOrderByAggregateInput = {
   signing_status_id?: Prisma.SortOrder
   signing_timestamp?: Prisma.SortOrder
   document_hash?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type SigningMinOrderByAggregateInput = {
@@ -324,6 +345,7 @@ export type SigningMinOrderByAggregateInput = {
   signing_status_id?: Prisma.SortOrder
   signing_timestamp?: Prisma.SortOrder
   document_hash?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type SigningScalarRelationFilter = {
@@ -433,6 +455,7 @@ export type SigningCreateWithoutContract_partyInput = {
   id?: string
   signing_timestamp?: Date | string | null
   document_hash?: string | null
+  deleted_at?: Date | string | null
   signing_status: Prisma.SigningStatusCreateNestedOneWithoutSigningsInput
   logs?: Prisma.SigningLogCreateNestedManyWithoutSigningInput
 }
@@ -442,6 +465,7 @@ export type SigningUncheckedCreateWithoutContract_partyInput = {
   signing_status_id: string
   signing_timestamp?: Date | string | null
   document_hash?: string | null
+  deleted_at?: Date | string | null
   logs?: Prisma.SigningLogUncheckedCreateNestedManyWithoutSigningInput
 }
 
@@ -480,12 +504,14 @@ export type SigningScalarWhereInput = {
   signing_status_id?: Prisma.StringFilter<"Signing"> | string
   signing_timestamp?: Prisma.DateTimeNullableFilter<"Signing"> | Date | string | null
   document_hash?: Prisma.StringNullableFilter<"Signing"> | string | null
+  deleted_at?: Prisma.DateTimeNullableFilter<"Signing"> | Date | string | null
 }
 
 export type SigningCreateWithoutSigning_statusInput = {
   id?: string
   signing_timestamp?: Date | string | null
   document_hash?: string | null
+  deleted_at?: Date | string | null
   contract_party: Prisma.ContractPartyCreateNestedOneWithoutSigningsInput
   logs?: Prisma.SigningLogCreateNestedManyWithoutSigningInput
 }
@@ -495,6 +521,7 @@ export type SigningUncheckedCreateWithoutSigning_statusInput = {
   contract_party_id: string
   signing_timestamp?: Date | string | null
   document_hash?: string | null
+  deleted_at?: Date | string | null
   logs?: Prisma.SigningLogUncheckedCreateNestedManyWithoutSigningInput
 }
 
@@ -528,6 +555,7 @@ export type SigningCreateWithoutLogsInput = {
   id?: string
   signing_timestamp?: Date | string | null
   document_hash?: string | null
+  deleted_at?: Date | string | null
   contract_party: Prisma.ContractPartyCreateNestedOneWithoutSigningsInput
   signing_status: Prisma.SigningStatusCreateNestedOneWithoutSigningsInput
 }
@@ -538,6 +566,7 @@ export type SigningUncheckedCreateWithoutLogsInput = {
   signing_status_id: string
   signing_timestamp?: Date | string | null
   document_hash?: string | null
+  deleted_at?: Date | string | null
 }
 
 export type SigningCreateOrConnectWithoutLogsInput = {
@@ -560,6 +589,7 @@ export type SigningUpdateWithoutLogsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   signing_timestamp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   document_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contract_party?: Prisma.ContractPartyUpdateOneRequiredWithoutSigningsNestedInput
   signing_status?: Prisma.SigningStatusUpdateOneRequiredWithoutSigningsNestedInput
 }
@@ -570,6 +600,7 @@ export type SigningUncheckedUpdateWithoutLogsInput = {
   signing_status_id?: Prisma.StringFieldUpdateOperationsInput | string
   signing_timestamp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   document_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type SigningCreateManyContract_partyInput = {
@@ -577,12 +608,14 @@ export type SigningCreateManyContract_partyInput = {
   signing_status_id: string
   signing_timestamp?: Date | string | null
   document_hash?: string | null
+  deleted_at?: Date | string | null
 }
 
 export type SigningUpdateWithoutContract_partyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   signing_timestamp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   document_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   signing_status?: Prisma.SigningStatusUpdateOneRequiredWithoutSigningsNestedInput
   logs?: Prisma.SigningLogUpdateManyWithoutSigningNestedInput
 }
@@ -592,6 +625,7 @@ export type SigningUncheckedUpdateWithoutContract_partyInput = {
   signing_status_id?: Prisma.StringFieldUpdateOperationsInput | string
   signing_timestamp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   document_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   logs?: Prisma.SigningLogUncheckedUpdateManyWithoutSigningNestedInput
 }
 
@@ -600,6 +634,7 @@ export type SigningUncheckedUpdateManyWithoutContract_partyInput = {
   signing_status_id?: Prisma.StringFieldUpdateOperationsInput | string
   signing_timestamp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   document_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type SigningCreateManySigning_statusInput = {
@@ -607,12 +642,14 @@ export type SigningCreateManySigning_statusInput = {
   contract_party_id: string
   signing_timestamp?: Date | string | null
   document_hash?: string | null
+  deleted_at?: Date | string | null
 }
 
 export type SigningUpdateWithoutSigning_statusInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   signing_timestamp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   document_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contract_party?: Prisma.ContractPartyUpdateOneRequiredWithoutSigningsNestedInput
   logs?: Prisma.SigningLogUpdateManyWithoutSigningNestedInput
 }
@@ -622,6 +659,7 @@ export type SigningUncheckedUpdateWithoutSigning_statusInput = {
   contract_party_id?: Prisma.StringFieldUpdateOperationsInput | string
   signing_timestamp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   document_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   logs?: Prisma.SigningLogUncheckedUpdateManyWithoutSigningNestedInput
 }
 
@@ -630,6 +668,7 @@ export type SigningUncheckedUpdateManyWithoutSigning_statusInput = {
   contract_party_id?: Prisma.StringFieldUpdateOperationsInput | string
   signing_timestamp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   document_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -669,6 +708,7 @@ export type SigningSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   signing_status_id?: boolean
   signing_timestamp?: boolean
   document_hash?: boolean
+  deleted_at?: boolean
   contract_party?: boolean | Prisma.ContractPartyDefaultArgs<ExtArgs>
   signing_status?: boolean | Prisma.SigningStatusDefaultArgs<ExtArgs>
   logs?: boolean | Prisma.Signing$logsArgs<ExtArgs>
@@ -681,6 +721,7 @@ export type SigningSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   signing_status_id?: boolean
   signing_timestamp?: boolean
   document_hash?: boolean
+  deleted_at?: boolean
   contract_party?: boolean | Prisma.ContractPartyDefaultArgs<ExtArgs>
   signing_status?: boolean | Prisma.SigningStatusDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["signing"]>
@@ -691,6 +732,7 @@ export type SigningSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   signing_status_id?: boolean
   signing_timestamp?: boolean
   document_hash?: boolean
+  deleted_at?: boolean
   contract_party?: boolean | Prisma.ContractPartyDefaultArgs<ExtArgs>
   signing_status?: boolean | Prisma.SigningStatusDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["signing"]>
@@ -701,9 +743,10 @@ export type SigningSelectScalar = {
   signing_status_id?: boolean
   signing_timestamp?: boolean
   document_hash?: boolean
+  deleted_at?: boolean
 }
 
-export type SigningOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "contract_party_id" | "signing_status_id" | "signing_timestamp" | "document_hash", ExtArgs["result"]["signing"]>
+export type SigningOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "contract_party_id" | "signing_status_id" | "signing_timestamp" | "document_hash" | "deleted_at", ExtArgs["result"]["signing"]>
 export type SigningInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   contract_party?: boolean | Prisma.ContractPartyDefaultArgs<ExtArgs>
   signing_status?: boolean | Prisma.SigningStatusDefaultArgs<ExtArgs>
@@ -732,6 +775,7 @@ export type $SigningPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     signing_status_id: string
     signing_timestamp: Date | null
     document_hash: string | null
+    deleted_at: Date | null
   }, ExtArgs["result"]["signing"]>
   composites: {}
 }
@@ -1163,6 +1207,7 @@ export interface SigningFieldRefs {
   readonly signing_status_id: Prisma.FieldRef<"Signing", 'String'>
   readonly signing_timestamp: Prisma.FieldRef<"Signing", 'DateTime'>
   readonly document_hash: Prisma.FieldRef<"Signing", 'String'>
+  readonly deleted_at: Prisma.FieldRef<"Signing", 'DateTime'>
 }
     
 

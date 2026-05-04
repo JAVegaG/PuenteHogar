@@ -29,6 +29,7 @@ export type ContractPartyMinAggregateOutputType = {
   user_id: string | null
   contract_id: string | null
   role_in_contract: string | null
+  deleted_at: Date | null
 }
 
 export type ContractPartyMaxAggregateOutputType = {
@@ -36,6 +37,7 @@ export type ContractPartyMaxAggregateOutputType = {
   user_id: string | null
   contract_id: string | null
   role_in_contract: string | null
+  deleted_at: Date | null
 }
 
 export type ContractPartyCountAggregateOutputType = {
@@ -43,6 +45,7 @@ export type ContractPartyCountAggregateOutputType = {
   user_id: number
   contract_id: number
   role_in_contract: number
+  deleted_at: number
   _all: number
 }
 
@@ -52,6 +55,7 @@ export type ContractPartyMinAggregateInputType = {
   user_id?: true
   contract_id?: true
   role_in_contract?: true
+  deleted_at?: true
 }
 
 export type ContractPartyMaxAggregateInputType = {
@@ -59,6 +63,7 @@ export type ContractPartyMaxAggregateInputType = {
   user_id?: true
   contract_id?: true
   role_in_contract?: true
+  deleted_at?: true
 }
 
 export type ContractPartyCountAggregateInputType = {
@@ -66,6 +71,7 @@ export type ContractPartyCountAggregateInputType = {
   user_id?: true
   contract_id?: true
   role_in_contract?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -146,6 +152,7 @@ export type ContractPartyGroupByOutputType = {
   user_id: string
   contract_id: string
   role_in_contract: string
+  deleted_at: Date | null
   _count: ContractPartyCountAggregateOutputType | null
   _min: ContractPartyMinAggregateOutputType | null
   _max: ContractPartyMaxAggregateOutputType | null
@@ -174,6 +181,7 @@ export type ContractPartyWhereInput = {
   user_id?: Prisma.StringFilter<"ContractParty"> | string
   contract_id?: Prisma.StringFilter<"ContractParty"> | string
   role_in_contract?: Prisma.StringFilter<"ContractParty"> | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"ContractParty"> | Date | string | null
   contract?: Prisma.XOR<Prisma.ContractScalarRelationFilter, Prisma.ContractWhereInput>
   signings?: Prisma.SigningListRelationFilter
 }
@@ -183,6 +191,7 @@ export type ContractPartyOrderByWithRelationInput = {
   user_id?: Prisma.SortOrder
   contract_id?: Prisma.SortOrder
   role_in_contract?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   contract?: Prisma.ContractOrderByWithRelationInput
   signings?: Prisma.SigningOrderByRelationAggregateInput
 }
@@ -195,6 +204,7 @@ export type ContractPartyWhereUniqueInput = Prisma.AtLeast<{
   user_id?: Prisma.StringFilter<"ContractParty"> | string
   contract_id?: Prisma.StringFilter<"ContractParty"> | string
   role_in_contract?: Prisma.StringFilter<"ContractParty"> | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"ContractParty"> | Date | string | null
   contract?: Prisma.XOR<Prisma.ContractScalarRelationFilter, Prisma.ContractWhereInput>
   signings?: Prisma.SigningListRelationFilter
 }, "id">
@@ -204,6 +214,7 @@ export type ContractPartyOrderByWithAggregationInput = {
   user_id?: Prisma.SortOrder
   contract_id?: Prisma.SortOrder
   role_in_contract?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ContractPartyCountOrderByAggregateInput
   _max?: Prisma.ContractPartyMaxOrderByAggregateInput
   _min?: Prisma.ContractPartyMinOrderByAggregateInput
@@ -217,12 +228,14 @@ export type ContractPartyScalarWhereWithAggregatesInput = {
   user_id?: Prisma.StringWithAggregatesFilter<"ContractParty"> | string
   contract_id?: Prisma.StringWithAggregatesFilter<"ContractParty"> | string
   role_in_contract?: Prisma.StringWithAggregatesFilter<"ContractParty"> | string
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"ContractParty"> | Date | string | null
 }
 
 export type ContractPartyCreateInput = {
   id?: string
   user_id: string
   role_in_contract: string
+  deleted_at?: Date | string | null
   contract: Prisma.ContractCreateNestedOneWithoutPartiesInput
   signings?: Prisma.SigningCreateNestedManyWithoutContract_partyInput
 }
@@ -232,6 +245,7 @@ export type ContractPartyUncheckedCreateInput = {
   user_id: string
   contract_id: string
   role_in_contract: string
+  deleted_at?: Date | string | null
   signings?: Prisma.SigningUncheckedCreateNestedManyWithoutContract_partyInput
 }
 
@@ -239,6 +253,7 @@ export type ContractPartyUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   role_in_contract?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contract?: Prisma.ContractUpdateOneRequiredWithoutPartiesNestedInput
   signings?: Prisma.SigningUpdateManyWithoutContract_partyNestedInput
 }
@@ -248,6 +263,7 @@ export type ContractPartyUncheckedUpdateInput = {
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   contract_id?: Prisma.StringFieldUpdateOperationsInput | string
   role_in_contract?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   signings?: Prisma.SigningUncheckedUpdateManyWithoutContract_partyNestedInput
 }
 
@@ -256,12 +272,14 @@ export type ContractPartyCreateManyInput = {
   user_id: string
   contract_id: string
   role_in_contract: string
+  deleted_at?: Date | string | null
 }
 
 export type ContractPartyUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   role_in_contract?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ContractPartyUncheckedUpdateManyInput = {
@@ -269,6 +287,7 @@ export type ContractPartyUncheckedUpdateManyInput = {
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   contract_id?: Prisma.StringFieldUpdateOperationsInput | string
   role_in_contract?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ContractPartyListRelationFilter = {
@@ -286,6 +305,7 @@ export type ContractPartyCountOrderByAggregateInput = {
   user_id?: Prisma.SortOrder
   contract_id?: Prisma.SortOrder
   role_in_contract?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type ContractPartyMaxOrderByAggregateInput = {
@@ -293,6 +313,7 @@ export type ContractPartyMaxOrderByAggregateInput = {
   user_id?: Prisma.SortOrder
   contract_id?: Prisma.SortOrder
   role_in_contract?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type ContractPartyMinOrderByAggregateInput = {
@@ -300,6 +321,7 @@ export type ContractPartyMinOrderByAggregateInput = {
   user_id?: Prisma.SortOrder
   contract_id?: Prisma.SortOrder
   role_in_contract?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type ContractPartyScalarRelationFilter = {
@@ -367,6 +389,7 @@ export type ContractPartyCreateWithoutContractInput = {
   id?: string
   user_id: string
   role_in_contract: string
+  deleted_at?: Date | string | null
   signings?: Prisma.SigningCreateNestedManyWithoutContract_partyInput
 }
 
@@ -374,6 +397,7 @@ export type ContractPartyUncheckedCreateWithoutContractInput = {
   id?: string
   user_id: string
   role_in_contract: string
+  deleted_at?: Date | string | null
   signings?: Prisma.SigningUncheckedCreateNestedManyWithoutContract_partyInput
 }
 
@@ -411,12 +435,14 @@ export type ContractPartyScalarWhereInput = {
   user_id?: Prisma.StringFilter<"ContractParty"> | string
   contract_id?: Prisma.StringFilter<"ContractParty"> | string
   role_in_contract?: Prisma.StringFilter<"ContractParty"> | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"ContractParty"> | Date | string | null
 }
 
 export type ContractPartyCreateWithoutSigningsInput = {
   id?: string
   user_id: string
   role_in_contract: string
+  deleted_at?: Date | string | null
   contract: Prisma.ContractCreateNestedOneWithoutPartiesInput
 }
 
@@ -425,6 +451,7 @@ export type ContractPartyUncheckedCreateWithoutSigningsInput = {
   user_id: string
   contract_id: string
   role_in_contract: string
+  deleted_at?: Date | string | null
 }
 
 export type ContractPartyCreateOrConnectWithoutSigningsInput = {
@@ -447,6 +474,7 @@ export type ContractPartyUpdateWithoutSigningsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   role_in_contract?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contract?: Prisma.ContractUpdateOneRequiredWithoutPartiesNestedInput
 }
 
@@ -455,18 +483,21 @@ export type ContractPartyUncheckedUpdateWithoutSigningsInput = {
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   contract_id?: Prisma.StringFieldUpdateOperationsInput | string
   role_in_contract?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ContractPartyCreateManyContractInput = {
   id?: string
   user_id: string
   role_in_contract: string
+  deleted_at?: Date | string | null
 }
 
 export type ContractPartyUpdateWithoutContractInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   role_in_contract?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   signings?: Prisma.SigningUpdateManyWithoutContract_partyNestedInput
 }
 
@@ -474,6 +505,7 @@ export type ContractPartyUncheckedUpdateWithoutContractInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   role_in_contract?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   signings?: Prisma.SigningUncheckedUpdateManyWithoutContract_partyNestedInput
 }
 
@@ -481,6 +513,7 @@ export type ContractPartyUncheckedUpdateManyWithoutContractInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   role_in_contract?: Prisma.StringFieldUpdateOperationsInput | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -519,6 +552,7 @@ export type ContractPartySelect<ExtArgs extends runtime.Types.Extensions.Interna
   user_id?: boolean
   contract_id?: boolean
   role_in_contract?: boolean
+  deleted_at?: boolean
   contract?: boolean | Prisma.ContractDefaultArgs<ExtArgs>
   signings?: boolean | Prisma.ContractParty$signingsArgs<ExtArgs>
   _count?: boolean | Prisma.ContractPartyCountOutputTypeDefaultArgs<ExtArgs>
@@ -529,6 +563,7 @@ export type ContractPartySelectCreateManyAndReturn<ExtArgs extends runtime.Types
   user_id?: boolean
   contract_id?: boolean
   role_in_contract?: boolean
+  deleted_at?: boolean
   contract?: boolean | Prisma.ContractDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["contractParty"]>
 
@@ -537,6 +572,7 @@ export type ContractPartySelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   user_id?: boolean
   contract_id?: boolean
   role_in_contract?: boolean
+  deleted_at?: boolean
   contract?: boolean | Prisma.ContractDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["contractParty"]>
 
@@ -545,9 +581,10 @@ export type ContractPartySelectScalar = {
   user_id?: boolean
   contract_id?: boolean
   role_in_contract?: boolean
+  deleted_at?: boolean
 }
 
-export type ContractPartyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "contract_id" | "role_in_contract", ExtArgs["result"]["contractParty"]>
+export type ContractPartyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "contract_id" | "role_in_contract" | "deleted_at", ExtArgs["result"]["contractParty"]>
 export type ContractPartyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   contract?: boolean | Prisma.ContractDefaultArgs<ExtArgs>
   signings?: boolean | Prisma.ContractParty$signingsArgs<ExtArgs>
@@ -571,6 +608,7 @@ export type $ContractPartyPayload<ExtArgs extends runtime.Types.Extensions.Inter
     user_id: string
     contract_id: string
     role_in_contract: string
+    deleted_at: Date | null
   }, ExtArgs["result"]["contractParty"]>
   composites: {}
 }
@@ -1000,6 +1038,7 @@ export interface ContractPartyFieldRefs {
   readonly user_id: Prisma.FieldRef<"ContractParty", 'String'>
   readonly contract_id: Prisma.FieldRef<"ContractParty", 'String'>
   readonly role_in_contract: Prisma.FieldRef<"ContractParty", 'String'>
+  readonly deleted_at: Prisma.FieldRef<"ContractParty", 'DateTime'>
 }
     
 

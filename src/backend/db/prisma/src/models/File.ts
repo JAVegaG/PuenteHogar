@@ -32,6 +32,7 @@ export type FileMinAggregateOutputType = {
   file_url: string | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
 }
 
 export type FileMaxAggregateOutputType = {
@@ -42,6 +43,7 @@ export type FileMaxAggregateOutputType = {
   file_url: string | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
 }
 
 export type FileCountAggregateOutputType = {
@@ -52,6 +54,7 @@ export type FileCountAggregateOutputType = {
   file_url: number
   created_at: number
   updated_at: number
+  deleted_at: number
   _all: number
 }
 
@@ -64,6 +67,7 @@ export type FileMinAggregateInputType = {
   file_url?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
 }
 
 export type FileMaxAggregateInputType = {
@@ -74,6 +78,7 @@ export type FileMaxAggregateInputType = {
   file_url?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
 }
 
 export type FileCountAggregateInputType = {
@@ -84,6 +89,7 @@ export type FileCountAggregateInputType = {
   file_url?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -167,6 +173,7 @@ export type FileGroupByOutputType = {
   file_url: string
   created_at: Date
   updated_at: Date
+  deleted_at: Date | null
   _count: FileCountAggregateOutputType | null
   _min: FileMinAggregateOutputType | null
   _max: FileMaxAggregateOutputType | null
@@ -198,6 +205,7 @@ export type FileWhereInput = {
   file_url?: Prisma.StringFilter<"File"> | string
   created_at?: Prisma.DateTimeFilter<"File"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"File"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"File"> | Date | string | null
   contract?: Prisma.XOR<Prisma.ContractScalarRelationFilter, Prisma.ContractWhereInput>
   file_type?: Prisma.XOR<Prisma.FileTypeScalarRelationFilter, Prisma.FileTypeWhereInput>
   file_status?: Prisma.XOR<Prisma.FileStatusScalarRelationFilter, Prisma.FileStatusWhereInput>
@@ -211,6 +219,7 @@ export type FileOrderByWithRelationInput = {
   file_url?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   contract?: Prisma.ContractOrderByWithRelationInput
   file_type?: Prisma.FileTypeOrderByWithRelationInput
   file_status?: Prisma.FileStatusOrderByWithRelationInput
@@ -227,6 +236,7 @@ export type FileWhereUniqueInput = Prisma.AtLeast<{
   file_url?: Prisma.StringFilter<"File"> | string
   created_at?: Prisma.DateTimeFilter<"File"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"File"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"File"> | Date | string | null
   contract?: Prisma.XOR<Prisma.ContractScalarRelationFilter, Prisma.ContractWhereInput>
   file_type?: Prisma.XOR<Prisma.FileTypeScalarRelationFilter, Prisma.FileTypeWhereInput>
   file_status?: Prisma.XOR<Prisma.FileStatusScalarRelationFilter, Prisma.FileStatusWhereInput>
@@ -240,6 +250,7 @@ export type FileOrderByWithAggregationInput = {
   file_url?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.FileCountOrderByAggregateInput
   _max?: Prisma.FileMaxOrderByAggregateInput
   _min?: Prisma.FileMinOrderByAggregateInput
@@ -256,6 +267,7 @@ export type FileScalarWhereWithAggregatesInput = {
   file_url?: Prisma.StringWithAggregatesFilter<"File"> | string
   created_at?: Prisma.DateTimeWithAggregatesFilter<"File"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"File"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"File"> | Date | string | null
 }
 
 export type FileCreateInput = {
@@ -263,6 +275,7 @@ export type FileCreateInput = {
   file_url: string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   contract: Prisma.ContractCreateNestedOneWithoutFilesInput
   file_type: Prisma.FileTypeCreateNestedOneWithoutFilesInput
   file_status: Prisma.FileStatusCreateNestedOneWithoutFilesInput
@@ -276,6 +289,7 @@ export type FileUncheckedCreateInput = {
   file_url: string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type FileUpdateInput = {
@@ -283,6 +297,7 @@ export type FileUpdateInput = {
   file_url?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contract?: Prisma.ContractUpdateOneRequiredWithoutFilesNestedInput
   file_type?: Prisma.FileTypeUpdateOneRequiredWithoutFilesNestedInput
   file_status?: Prisma.FileStatusUpdateOneRequiredWithoutFilesNestedInput
@@ -296,6 +311,7 @@ export type FileUncheckedUpdateInput = {
   file_url?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type FileCreateManyInput = {
@@ -306,6 +322,7 @@ export type FileCreateManyInput = {
   file_url: string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type FileUpdateManyMutationInput = {
@@ -313,6 +330,7 @@ export type FileUpdateManyMutationInput = {
   file_url?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type FileUncheckedUpdateManyInput = {
@@ -323,6 +341,7 @@ export type FileUncheckedUpdateManyInput = {
   file_url?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type FileListRelationFilter = {
@@ -343,6 +362,7 @@ export type FileCountOrderByAggregateInput = {
   file_url?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type FileMaxOrderByAggregateInput = {
@@ -353,6 +373,7 @@ export type FileMaxOrderByAggregateInput = {
   file_url?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type FileMinOrderByAggregateInput = {
@@ -363,6 +384,7 @@ export type FileMinOrderByAggregateInput = {
   file_url?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type FileCreateNestedManyWithoutContractInput = {
@@ -496,6 +518,7 @@ export type FileCreateWithoutContractInput = {
   file_url: string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   file_type: Prisma.FileTypeCreateNestedOneWithoutFilesInput
   file_status: Prisma.FileStatusCreateNestedOneWithoutFilesInput
 }
@@ -507,6 +530,7 @@ export type FileUncheckedCreateWithoutContractInput = {
   file_url: string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type FileCreateOrConnectWithoutContractInput = {
@@ -546,6 +570,7 @@ export type FileScalarWhereInput = {
   file_url?: Prisma.StringFilter<"File"> | string
   created_at?: Prisma.DateTimeFilter<"File"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"File"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"File"> | Date | string | null
 }
 
 export type FileCreateWithoutFile_typeInput = {
@@ -553,6 +578,7 @@ export type FileCreateWithoutFile_typeInput = {
   file_url: string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   contract: Prisma.ContractCreateNestedOneWithoutFilesInput
   file_status: Prisma.FileStatusCreateNestedOneWithoutFilesInput
 }
@@ -564,6 +590,7 @@ export type FileUncheckedCreateWithoutFile_typeInput = {
   file_url: string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type FileCreateOrConnectWithoutFile_typeInput = {
@@ -597,6 +624,7 @@ export type FileCreateWithoutFile_statusInput = {
   file_url: string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   contract: Prisma.ContractCreateNestedOneWithoutFilesInput
   file_type: Prisma.FileTypeCreateNestedOneWithoutFilesInput
 }
@@ -608,6 +636,7 @@ export type FileUncheckedCreateWithoutFile_statusInput = {
   file_url: string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type FileCreateOrConnectWithoutFile_statusInput = {
@@ -643,6 +672,7 @@ export type FileCreateManyContractInput = {
   file_url: string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type FileUpdateWithoutContractInput = {
@@ -650,6 +680,7 @@ export type FileUpdateWithoutContractInput = {
   file_url?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   file_type?: Prisma.FileTypeUpdateOneRequiredWithoutFilesNestedInput
   file_status?: Prisma.FileStatusUpdateOneRequiredWithoutFilesNestedInput
 }
@@ -661,6 +692,7 @@ export type FileUncheckedUpdateWithoutContractInput = {
   file_url?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type FileUncheckedUpdateManyWithoutContractInput = {
@@ -670,6 +702,7 @@ export type FileUncheckedUpdateManyWithoutContractInput = {
   file_url?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type FileCreateManyFile_typeInput = {
@@ -679,6 +712,7 @@ export type FileCreateManyFile_typeInput = {
   file_url: string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type FileUpdateWithoutFile_typeInput = {
@@ -686,6 +720,7 @@ export type FileUpdateWithoutFile_typeInput = {
   file_url?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contract?: Prisma.ContractUpdateOneRequiredWithoutFilesNestedInput
   file_status?: Prisma.FileStatusUpdateOneRequiredWithoutFilesNestedInput
 }
@@ -697,6 +732,7 @@ export type FileUncheckedUpdateWithoutFile_typeInput = {
   file_url?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type FileUncheckedUpdateManyWithoutFile_typeInput = {
@@ -706,6 +742,7 @@ export type FileUncheckedUpdateManyWithoutFile_typeInput = {
   file_url?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type FileCreateManyFile_statusInput = {
@@ -715,6 +752,7 @@ export type FileCreateManyFile_statusInput = {
   file_url: string
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type FileUpdateWithoutFile_statusInput = {
@@ -722,6 +760,7 @@ export type FileUpdateWithoutFile_statusInput = {
   file_url?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contract?: Prisma.ContractUpdateOneRequiredWithoutFilesNestedInput
   file_type?: Prisma.FileTypeUpdateOneRequiredWithoutFilesNestedInput
 }
@@ -733,6 +772,7 @@ export type FileUncheckedUpdateWithoutFile_statusInput = {
   file_url?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type FileUncheckedUpdateManyWithoutFile_statusInput = {
@@ -742,6 +782,7 @@ export type FileUncheckedUpdateManyWithoutFile_statusInput = {
   file_url?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -754,6 +795,7 @@ export type FileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   file_url?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
   contract?: boolean | Prisma.ContractDefaultArgs<ExtArgs>
   file_type?: boolean | Prisma.FileTypeDefaultArgs<ExtArgs>
   file_status?: boolean | Prisma.FileStatusDefaultArgs<ExtArgs>
@@ -767,6 +809,7 @@ export type FileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   file_url?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
   contract?: boolean | Prisma.ContractDefaultArgs<ExtArgs>
   file_type?: boolean | Prisma.FileTypeDefaultArgs<ExtArgs>
   file_status?: boolean | Prisma.FileStatusDefaultArgs<ExtArgs>
@@ -780,6 +823,7 @@ export type FileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   file_url?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
   contract?: boolean | Prisma.ContractDefaultArgs<ExtArgs>
   file_type?: boolean | Prisma.FileTypeDefaultArgs<ExtArgs>
   file_status?: boolean | Prisma.FileStatusDefaultArgs<ExtArgs>
@@ -793,9 +837,10 @@ export type FileSelectScalar = {
   file_url?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
 }
 
-export type FileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "contract_id" | "file_type_id" | "file_status_id" | "file_url" | "created_at" | "updated_at", ExtArgs["result"]["file"]>
+export type FileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "contract_id" | "file_type_id" | "file_status_id" | "file_url" | "created_at" | "updated_at" | "deleted_at", ExtArgs["result"]["file"]>
 export type FileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   contract?: boolean | Prisma.ContractDefaultArgs<ExtArgs>
   file_type?: boolean | Prisma.FileTypeDefaultArgs<ExtArgs>
@@ -827,6 +872,7 @@ export type $FilePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     file_url: string
     created_at: Date
     updated_at: Date
+    deleted_at: Date | null
   }, ExtArgs["result"]["file"]>
   composites: {}
 }
@@ -1260,6 +1306,7 @@ export interface FileFieldRefs {
   readonly file_url: Prisma.FieldRef<"File", 'String'>
   readonly created_at: Prisma.FieldRef<"File", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"File", 'DateTime'>
+  readonly deleted_at: Prisma.FieldRef<"File", 'DateTime'>
 }
     
 

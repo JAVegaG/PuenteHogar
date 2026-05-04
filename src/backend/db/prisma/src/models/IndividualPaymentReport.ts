@@ -64,6 +64,7 @@ export type IndividualPaymentReportMinAggregateOutputType = {
   overdue_count: number | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
 }
 
 export type IndividualPaymentReportMaxAggregateOutputType = {
@@ -84,6 +85,7 @@ export type IndividualPaymentReportMaxAggregateOutputType = {
   overdue_count: number | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
 }
 
 export type IndividualPaymentReportCountAggregateOutputType = {
@@ -104,6 +106,7 @@ export type IndividualPaymentReportCountAggregateOutputType = {
   overdue_count: number
   created_at: number
   updated_at: number
+  deleted_at: number
   _all: number
 }
 
@@ -146,6 +149,7 @@ export type IndividualPaymentReportMinAggregateInputType = {
   overdue_count?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
 }
 
 export type IndividualPaymentReportMaxAggregateInputType = {
@@ -166,6 +170,7 @@ export type IndividualPaymentReportMaxAggregateInputType = {
   overdue_count?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
 }
 
 export type IndividualPaymentReportCountAggregateInputType = {
@@ -186,6 +191,7 @@ export type IndividualPaymentReportCountAggregateInputType = {
   overdue_count?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -293,6 +299,7 @@ export type IndividualPaymentReportGroupByOutputType = {
   overdue_count: number
   created_at: Date
   updated_at: Date
+  deleted_at: Date | null
   _count: IndividualPaymentReportCountAggregateOutputType | null
   _avg: IndividualPaymentReportAvgAggregateOutputType | null
   _sum: IndividualPaymentReportSumAggregateOutputType | null
@@ -336,6 +343,7 @@ export type IndividualPaymentReportWhereInput = {
   overdue_count?: Prisma.IntFilter<"IndividualPaymentReport"> | number
   created_at?: Prisma.DateTimeFilter<"IndividualPaymentReport"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"IndividualPaymentReport"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"IndividualPaymentReport"> | Date | string | null
 }
 
 export type IndividualPaymentReportOrderByWithRelationInput = {
@@ -356,6 +364,7 @@ export type IndividualPaymentReportOrderByWithRelationInput = {
   overdue_count?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
 }
 
 export type IndividualPaymentReportWhereUniqueInput = Prisma.AtLeast<{
@@ -379,6 +388,7 @@ export type IndividualPaymentReportWhereUniqueInput = Prisma.AtLeast<{
   overdue_count?: Prisma.IntFilter<"IndividualPaymentReport"> | number
   created_at?: Prisma.DateTimeFilter<"IndividualPaymentReport"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"IndividualPaymentReport"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"IndividualPaymentReport"> | Date | string | null
 }, "id">
 
 export type IndividualPaymentReportOrderByWithAggregationInput = {
@@ -399,6 +409,7 @@ export type IndividualPaymentReportOrderByWithAggregationInput = {
   overdue_count?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.IndividualPaymentReportCountOrderByAggregateInput
   _avg?: Prisma.IndividualPaymentReportAvgOrderByAggregateInput
   _max?: Prisma.IndividualPaymentReportMaxOrderByAggregateInput
@@ -427,6 +438,7 @@ export type IndividualPaymentReportScalarWhereWithAggregatesInput = {
   overdue_count?: Prisma.IntWithAggregatesFilter<"IndividualPaymentReport"> | number
   created_at?: Prisma.DateTimeWithAggregatesFilter<"IndividualPaymentReport"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"IndividualPaymentReport"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"IndividualPaymentReport"> | Date | string | null
 }
 
 export type IndividualPaymentReportCreateInput = {
@@ -447,6 +459,7 @@ export type IndividualPaymentReportCreateInput = {
   overdue_count: number
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type IndividualPaymentReportUncheckedCreateInput = {
@@ -467,6 +480,7 @@ export type IndividualPaymentReportUncheckedCreateInput = {
   overdue_count: number
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type IndividualPaymentReportUpdateInput = {
@@ -487,6 +501,7 @@ export type IndividualPaymentReportUpdateInput = {
   overdue_count?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type IndividualPaymentReportUncheckedUpdateInput = {
@@ -507,6 +522,7 @@ export type IndividualPaymentReportUncheckedUpdateInput = {
   overdue_count?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type IndividualPaymentReportCreateManyInput = {
@@ -527,6 +543,7 @@ export type IndividualPaymentReportCreateManyInput = {
   overdue_count: number
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type IndividualPaymentReportUpdateManyMutationInput = {
@@ -547,6 +564,7 @@ export type IndividualPaymentReportUpdateManyMutationInput = {
   overdue_count?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type IndividualPaymentReportUncheckedUpdateManyInput = {
@@ -567,6 +585,7 @@ export type IndividualPaymentReportUncheckedUpdateManyInput = {
   overdue_count?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type IndividualPaymentReportCountOrderByAggregateInput = {
@@ -587,6 +606,7 @@ export type IndividualPaymentReportCountOrderByAggregateInput = {
   overdue_count?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type IndividualPaymentReportAvgOrderByAggregateInput = {
@@ -617,6 +637,7 @@ export type IndividualPaymentReportMaxOrderByAggregateInput = {
   overdue_count?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type IndividualPaymentReportMinOrderByAggregateInput = {
@@ -637,6 +658,7 @@ export type IndividualPaymentReportMinOrderByAggregateInput = {
   overdue_count?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type IndividualPaymentReportSumOrderByAggregateInput = {
@@ -669,6 +691,7 @@ export type IndividualPaymentReportSelect<ExtArgs extends runtime.Types.Extensio
   overdue_count?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["individualPaymentReport"]>
 
 export type IndividualPaymentReportSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -689,6 +712,7 @@ export type IndividualPaymentReportSelectCreateManyAndReturn<ExtArgs extends run
   overdue_count?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["individualPaymentReport"]>
 
 export type IndividualPaymentReportSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -709,6 +733,7 @@ export type IndividualPaymentReportSelectUpdateManyAndReturn<ExtArgs extends run
   overdue_count?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["individualPaymentReport"]>
 
 export type IndividualPaymentReportSelectScalar = {
@@ -729,9 +754,10 @@ export type IndividualPaymentReportSelectScalar = {
   overdue_count?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
 }
 
-export type IndividualPaymentReportOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "portfolio_unit_id" | "as_of_date" | "window_months" | "period_start" | "period_end" | "currency" | "total_amount" | "min_amount" | "max_amount" | "payment_count" | "last_payment_at" | "first_payment_at" | "expected_amount" | "overdue_count" | "created_at" | "updated_at", ExtArgs["result"]["individualPaymentReport"]>
+export type IndividualPaymentReportOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "portfolio_unit_id" | "as_of_date" | "window_months" | "period_start" | "period_end" | "currency" | "total_amount" | "min_amount" | "max_amount" | "payment_count" | "last_payment_at" | "first_payment_at" | "expected_amount" | "overdue_count" | "created_at" | "updated_at" | "deleted_at", ExtArgs["result"]["individualPaymentReport"]>
 
 export type $IndividualPaymentReportPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "IndividualPaymentReport"
@@ -754,6 +780,7 @@ export type $IndividualPaymentReportPayload<ExtArgs extends runtime.Types.Extens
     overdue_count: number
     created_at: Date
     updated_at: Date
+    deleted_at: Date | null
   }, ExtArgs["result"]["individualPaymentReport"]>
   composites: {}
 }
@@ -1194,6 +1221,7 @@ export interface IndividualPaymentReportFieldRefs {
   readonly overdue_count: Prisma.FieldRef<"IndividualPaymentReport", 'Int'>
   readonly created_at: Prisma.FieldRef<"IndividualPaymentReport", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"IndividualPaymentReport", 'DateTime'>
+  readonly deleted_at: Prisma.FieldRef<"IndividualPaymentReport", 'DateTime'>
 }
     
 

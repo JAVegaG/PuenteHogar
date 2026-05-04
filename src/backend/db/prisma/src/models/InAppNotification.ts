@@ -33,6 +33,7 @@ export type InAppNotificationMinAggregateOutputType = {
   read: boolean | null
   event_source: string | null
   created_at: Date | null
+  deleted_at: Date | null
 }
 
 export type InAppNotificationMaxAggregateOutputType = {
@@ -44,6 +45,7 @@ export type InAppNotificationMaxAggregateOutputType = {
   read: boolean | null
   event_source: string | null
   created_at: Date | null
+  deleted_at: Date | null
 }
 
 export type InAppNotificationCountAggregateOutputType = {
@@ -56,6 +58,7 @@ export type InAppNotificationCountAggregateOutputType = {
   event_source: number
   data: number
   created_at: number
+  deleted_at: number
   _all: number
 }
 
@@ -69,6 +72,7 @@ export type InAppNotificationMinAggregateInputType = {
   read?: true
   event_source?: true
   created_at?: true
+  deleted_at?: true
 }
 
 export type InAppNotificationMaxAggregateInputType = {
@@ -80,6 +84,7 @@ export type InAppNotificationMaxAggregateInputType = {
   read?: true
   event_source?: true
   created_at?: true
+  deleted_at?: true
 }
 
 export type InAppNotificationCountAggregateInputType = {
@@ -92,6 +97,7 @@ export type InAppNotificationCountAggregateInputType = {
   event_source?: true
   data?: true
   created_at?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -177,6 +183,7 @@ export type InAppNotificationGroupByOutputType = {
   event_source: string
   data: runtime.JsonValue
   created_at: Date
+  deleted_at: Date | null
   _count: InAppNotificationCountAggregateOutputType | null
   _min: InAppNotificationMinAggregateOutputType | null
   _max: InAppNotificationMaxAggregateOutputType | null
@@ -210,6 +217,7 @@ export type InAppNotificationWhereInput = {
   event_source?: Prisma.StringFilter<"InAppNotification"> | string
   data?: Prisma.JsonFilter<"InAppNotification">
   created_at?: Prisma.DateTimeFilter<"InAppNotification"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"InAppNotification"> | Date | string | null
   notification_type?: Prisma.XOR<Prisma.NotificationTypeScalarRelationFilter, Prisma.NotificationTypeWhereInput>
 }
 
@@ -223,6 +231,7 @@ export type InAppNotificationOrderByWithRelationInput = {
   event_source?: Prisma.SortOrder
   data?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   notification_type?: Prisma.NotificationTypeOrderByWithRelationInput
 }
 
@@ -239,6 +248,7 @@ export type InAppNotificationWhereUniqueInput = Prisma.AtLeast<{
   event_source?: Prisma.StringFilter<"InAppNotification"> | string
   data?: Prisma.JsonFilter<"InAppNotification">
   created_at?: Prisma.DateTimeFilter<"InAppNotification"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"InAppNotification"> | Date | string | null
   notification_type?: Prisma.XOR<Prisma.NotificationTypeScalarRelationFilter, Prisma.NotificationTypeWhereInput>
 }, "id">
 
@@ -252,6 +262,7 @@ export type InAppNotificationOrderByWithAggregationInput = {
   event_source?: Prisma.SortOrder
   data?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.InAppNotificationCountOrderByAggregateInput
   _max?: Prisma.InAppNotificationMaxOrderByAggregateInput
   _min?: Prisma.InAppNotificationMinOrderByAggregateInput
@@ -270,6 +281,7 @@ export type InAppNotificationScalarWhereWithAggregatesInput = {
   event_source?: Prisma.StringWithAggregatesFilter<"InAppNotification"> | string
   data?: Prisma.JsonWithAggregatesFilter<"InAppNotification">
   created_at?: Prisma.DateTimeWithAggregatesFilter<"InAppNotification"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"InAppNotification"> | Date | string | null
 }
 
 export type InAppNotificationCreateInput = {
@@ -281,6 +293,7 @@ export type InAppNotificationCreateInput = {
   event_source: string
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
+  deleted_at?: Date | string | null
   notification_type: Prisma.NotificationTypeCreateNestedOneWithoutIn_app_notificationsInput
 }
 
@@ -294,6 +307,7 @@ export type InAppNotificationUncheckedCreateInput = {
   event_source: string
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type InAppNotificationUpdateInput = {
@@ -305,6 +319,7 @@ export type InAppNotificationUpdateInput = {
   event_source?: Prisma.StringFieldUpdateOperationsInput | string
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   notification_type?: Prisma.NotificationTypeUpdateOneRequiredWithoutIn_app_notificationsNestedInput
 }
 
@@ -318,6 +333,7 @@ export type InAppNotificationUncheckedUpdateInput = {
   event_source?: Prisma.StringFieldUpdateOperationsInput | string
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type InAppNotificationCreateManyInput = {
@@ -330,6 +346,7 @@ export type InAppNotificationCreateManyInput = {
   event_source: string
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type InAppNotificationUpdateManyMutationInput = {
@@ -341,6 +358,7 @@ export type InAppNotificationUpdateManyMutationInput = {
   event_source?: Prisma.StringFieldUpdateOperationsInput | string
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type InAppNotificationUncheckedUpdateManyInput = {
@@ -353,6 +371,7 @@ export type InAppNotificationUncheckedUpdateManyInput = {
   event_source?: Prisma.StringFieldUpdateOperationsInput | string
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type InAppNotificationListRelationFilter = {
@@ -375,6 +394,7 @@ export type InAppNotificationCountOrderByAggregateInput = {
   event_source?: Prisma.SortOrder
   data?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type InAppNotificationMaxOrderByAggregateInput = {
@@ -386,6 +406,7 @@ export type InAppNotificationMaxOrderByAggregateInput = {
   read?: Prisma.SortOrder
   event_source?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type InAppNotificationMinOrderByAggregateInput = {
@@ -397,6 +418,7 @@ export type InAppNotificationMinOrderByAggregateInput = {
   read?: Prisma.SortOrder
   event_source?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type InAppNotificationCreateNestedManyWithoutNotification_typeInput = {
@@ -450,6 +472,7 @@ export type InAppNotificationCreateWithoutNotification_typeInput = {
   event_source: string
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type InAppNotificationUncheckedCreateWithoutNotification_typeInput = {
@@ -461,6 +484,7 @@ export type InAppNotificationUncheckedCreateWithoutNotification_typeInput = {
   event_source: string
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type InAppNotificationCreateOrConnectWithoutNotification_typeInput = {
@@ -502,6 +526,7 @@ export type InAppNotificationScalarWhereInput = {
   event_source?: Prisma.StringFilter<"InAppNotification"> | string
   data?: Prisma.JsonFilter<"InAppNotification">
   created_at?: Prisma.DateTimeFilter<"InAppNotification"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"InAppNotification"> | Date | string | null
 }
 
 export type InAppNotificationCreateManyNotification_typeInput = {
@@ -513,6 +538,7 @@ export type InAppNotificationCreateManyNotification_typeInput = {
   event_source: string
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type InAppNotificationUpdateWithoutNotification_typeInput = {
@@ -524,6 +550,7 @@ export type InAppNotificationUpdateWithoutNotification_typeInput = {
   event_source?: Prisma.StringFieldUpdateOperationsInput | string
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type InAppNotificationUncheckedUpdateWithoutNotification_typeInput = {
@@ -535,6 +562,7 @@ export type InAppNotificationUncheckedUpdateWithoutNotification_typeInput = {
   event_source?: Prisma.StringFieldUpdateOperationsInput | string
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type InAppNotificationUncheckedUpdateManyWithoutNotification_typeInput = {
@@ -546,6 +574,7 @@ export type InAppNotificationUncheckedUpdateManyWithoutNotification_typeInput = 
   event_source?: Prisma.StringFieldUpdateOperationsInput | string
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -560,6 +589,7 @@ export type InAppNotificationSelect<ExtArgs extends runtime.Types.Extensions.Int
   event_source?: boolean
   data?: boolean
   created_at?: boolean
+  deleted_at?: boolean
   notification_type?: boolean | Prisma.NotificationTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["inAppNotification"]>
 
@@ -573,6 +603,7 @@ export type InAppNotificationSelectCreateManyAndReturn<ExtArgs extends runtime.T
   event_source?: boolean
   data?: boolean
   created_at?: boolean
+  deleted_at?: boolean
   notification_type?: boolean | Prisma.NotificationTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["inAppNotification"]>
 
@@ -586,6 +617,7 @@ export type InAppNotificationSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   event_source?: boolean
   data?: boolean
   created_at?: boolean
+  deleted_at?: boolean
   notification_type?: boolean | Prisma.NotificationTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["inAppNotification"]>
 
@@ -599,9 +631,10 @@ export type InAppNotificationSelectScalar = {
   event_source?: boolean
   data?: boolean
   created_at?: boolean
+  deleted_at?: boolean
 }
 
-export type InAppNotificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "notification_type_id" | "title" | "message" | "read" | "event_source" | "data" | "created_at", ExtArgs["result"]["inAppNotification"]>
+export type InAppNotificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "notification_type_id" | "title" | "message" | "read" | "event_source" | "data" | "created_at" | "deleted_at", ExtArgs["result"]["inAppNotification"]>
 export type InAppNotificationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   notification_type?: boolean | Prisma.NotificationTypeDefaultArgs<ExtArgs>
 }
@@ -627,6 +660,7 @@ export type $InAppNotificationPayload<ExtArgs extends runtime.Types.Extensions.I
     event_source: string
     data: runtime.JsonValue
     created_at: Date
+    deleted_at: Date | null
   }, ExtArgs["result"]["inAppNotification"]>
   composites: {}
 }
@@ -1060,6 +1094,7 @@ export interface InAppNotificationFieldRefs {
   readonly event_source: Prisma.FieldRef<"InAppNotification", 'String'>
   readonly data: Prisma.FieldRef<"InAppNotification", 'Json'>
   readonly created_at: Prisma.FieldRef<"InAppNotification", 'DateTime'>
+  readonly deleted_at: Prisma.FieldRef<"InAppNotification", 'DateTime'>
 }
     
 

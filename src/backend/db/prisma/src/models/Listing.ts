@@ -45,6 +45,7 @@ export type ListingMinAggregateOutputType = {
   is_active: boolean | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
 }
 
 export type ListingMaxAggregateOutputType = {
@@ -58,6 +59,7 @@ export type ListingMaxAggregateOutputType = {
   is_active: boolean | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
 }
 
 export type ListingCountAggregateOutputType = {
@@ -71,6 +73,7 @@ export type ListingCountAggregateOutputType = {
   is_active: number
   created_at: number
   updated_at: number
+  deleted_at: number
   _all: number
 }
 
@@ -94,6 +97,7 @@ export type ListingMinAggregateInputType = {
   is_active?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
 }
 
 export type ListingMaxAggregateInputType = {
@@ -107,6 +111,7 @@ export type ListingMaxAggregateInputType = {
   is_active?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
 }
 
 export type ListingCountAggregateInputType = {
@@ -120,6 +125,7 @@ export type ListingCountAggregateInputType = {
   is_active?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -220,6 +226,7 @@ export type ListingGroupByOutputType = {
   is_active: boolean
   created_at: Date
   updated_at: Date
+  deleted_at: Date | null
   _count: ListingCountAggregateOutputType | null
   _avg: ListingAvgAggregateOutputType | null
   _sum: ListingSumAggregateOutputType | null
@@ -256,6 +263,7 @@ export type ListingWhereInput = {
   is_active?: Prisma.BoolFilter<"Listing"> | boolean
   created_at?: Prisma.DateTimeFilter<"Listing"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Listing"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"Listing"> | Date | string | null
   photos?: Prisma.PhotoListRelationFilter
 }
 
@@ -270,6 +278,7 @@ export type ListingOrderByWithRelationInput = {
   is_active?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   photos?: Prisma.PhotoOrderByRelationAggregateInput
 }
 
@@ -288,6 +297,7 @@ export type ListingWhereUniqueInput = Prisma.AtLeast<{
   is_active?: Prisma.BoolFilter<"Listing"> | boolean
   created_at?: Prisma.DateTimeFilter<"Listing"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Listing"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"Listing"> | Date | string | null
   photos?: Prisma.PhotoListRelationFilter
 }, "id" | "portfolio_unit_id_is_active">
 
@@ -302,6 +312,7 @@ export type ListingOrderByWithAggregationInput = {
   is_active?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ListingCountOrderByAggregateInput
   _avg?: Prisma.ListingAvgOrderByAggregateInput
   _max?: Prisma.ListingMaxOrderByAggregateInput
@@ -323,6 +334,7 @@ export type ListingScalarWhereWithAggregatesInput = {
   is_active?: Prisma.BoolWithAggregatesFilter<"Listing"> | boolean
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Listing"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"Listing"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"Listing"> | Date | string | null
 }
 
 export type ListingCreateInput = {
@@ -336,6 +348,7 @@ export type ListingCreateInput = {
   is_active?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   photos?: Prisma.PhotoCreateNestedManyWithoutListingInput
 }
 
@@ -350,6 +363,7 @@ export type ListingUncheckedCreateInput = {
   is_active?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
   photos?: Prisma.PhotoUncheckedCreateNestedManyWithoutListingInput
 }
 
@@ -364,6 +378,7 @@ export type ListingUpdateInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   photos?: Prisma.PhotoUpdateManyWithoutListingNestedInput
 }
 
@@ -378,6 +393,7 @@ export type ListingUncheckedUpdateInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   photos?: Prisma.PhotoUncheckedUpdateManyWithoutListingNestedInput
 }
 
@@ -392,6 +408,7 @@ export type ListingCreateManyInput = {
   is_active?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type ListingUpdateManyMutationInput = {
@@ -405,6 +422,7 @@ export type ListingUpdateManyMutationInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ListingUncheckedUpdateManyInput = {
@@ -418,6 +436,7 @@ export type ListingUncheckedUpdateManyInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ListingPortfolio_unit_idIs_activeCompoundUniqueInput = {
@@ -436,6 +455,7 @@ export type ListingCountOrderByAggregateInput = {
   is_active?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type ListingAvgOrderByAggregateInput = {
@@ -453,6 +473,7 @@ export type ListingMaxOrderByAggregateInput = {
   is_active?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type ListingMinOrderByAggregateInput = {
@@ -466,6 +487,7 @@ export type ListingMinOrderByAggregateInput = {
   is_active?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type ListingSumOrderByAggregateInput = {
@@ -510,6 +532,7 @@ export type ListingCreateWithoutPhotosInput = {
   is_active?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type ListingUncheckedCreateWithoutPhotosInput = {
@@ -523,6 +546,7 @@ export type ListingUncheckedCreateWithoutPhotosInput = {
   is_active?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type ListingCreateOrConnectWithoutPhotosInput = {
@@ -552,6 +576,7 @@ export type ListingUpdateWithoutPhotosInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ListingUncheckedUpdateWithoutPhotosInput = {
@@ -565,6 +590,7 @@ export type ListingUncheckedUpdateWithoutPhotosInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -609,6 +635,7 @@ export type ListingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   is_active?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
   photos?: boolean | Prisma.Listing$photosArgs<ExtArgs>
   _count?: boolean | Prisma.ListingCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["listing"]>
@@ -624,6 +651,7 @@ export type ListingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   is_active?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["listing"]>
 
 export type ListingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -637,6 +665,7 @@ export type ListingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   is_active?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["listing"]>
 
 export type ListingSelectScalar = {
@@ -650,9 +679,10 @@ export type ListingSelectScalar = {
   is_active?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
 }
 
-export type ListingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "portfolio_unit_id" | "title" | "description" | "listing_date" | "price" | "currency" | "is_active" | "created_at" | "updated_at", ExtArgs["result"]["listing"]>
+export type ListingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "portfolio_unit_id" | "title" | "description" | "listing_date" | "price" | "currency" | "is_active" | "created_at" | "updated_at" | "deleted_at", ExtArgs["result"]["listing"]>
 export type ListingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   photos?: boolean | Prisma.Listing$photosArgs<ExtArgs>
   _count?: boolean | Prisma.ListingCountOutputTypeDefaultArgs<ExtArgs>
@@ -676,6 +706,7 @@ export type $ListingPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     is_active: boolean
     created_at: Date
     updated_at: Date
+    deleted_at: Date | null
   }, ExtArgs["result"]["listing"]>
   composites: {}
 }
@@ -1110,6 +1141,7 @@ export interface ListingFieldRefs {
   readonly is_active: Prisma.FieldRef<"Listing", 'Boolean'>
   readonly created_at: Prisma.FieldRef<"Listing", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"Listing", 'DateTime'>
+  readonly deleted_at: Prisma.FieldRef<"Listing", 'DateTime'>
 }
     
 
