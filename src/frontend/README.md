@@ -16,7 +16,7 @@ Aplicación Next.js (App Router) con Tailwind CSS y TypeScript para la plataform
 src/frontend/
 ├── app/
 │   ├── layout.tsx            # Layout raíz (lang="es", Inter, AuthProvider)
-│   ├── page.tsx              # Landing page estática (hero + CTA "Buscar inmuebles")
+│   ├── page.tsx              # Landing page estática (nav responsive, hero + CTA "Buscar inmuebles", propuestas de valor, footer)
 │   ├── globals.css           # Estilos globales + Tailwind
 │   ├── auth/
 │   │   ├── login/
@@ -248,7 +248,7 @@ npm run lint       # Linting
 
 | Ruta | Tipo | Auth | Descripción |
 |------|------|------|-------------|
-| `/` | Server Component | No | Landing page estática con hero, descripción de la plataforma y CTA "Buscar inmuebles" |
+| `/` | Server Component | No | Landing page estática con nav responsive (desktop/mobile), hero con icono e descripción de la plataforma, CTA "Buscar inmuebles", sección de propuestas de valor (Sencillo, Seguro, Accesible) y footer |
 | `/explorar` | Server Component | No | Listado de inmuebles con filtros, ordenamiento y paginación |
 | `/explorar/[id]` | Server Component | No | Detalle del inmueble con galería de fotos |
 | `/auth/login` | Client Component | No | Inicio de sesión (email + contraseña) |
