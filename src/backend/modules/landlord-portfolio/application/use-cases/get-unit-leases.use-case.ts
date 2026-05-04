@@ -32,7 +32,7 @@ export class GetUnitLeasesUseCase {
 
         // 3. Query leases for the unit
         const leases = await this.prisma.lease.findMany({
-            where: { portfolio_unit_id: unitId },
+            where: { portfolio_unit_id: unitId, deleted_at: null },
             orderBy: { start_date: 'desc' },
         });
 
@@ -93,7 +93,7 @@ export class GetUnitLeasesUseCase {
         leaseId: string,
     ): Promise<{ contractId: string | null; contractStatus: string | null }> {
         const contract = await this.prisma.contract.findFirst({
-            where: { lease_id: leaseId },
+            where: { lease_id: leaseId, deleted_at: null },
             include: { status: true },
             orderBy: { created_at: 'desc' },
         });

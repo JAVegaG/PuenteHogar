@@ -49,7 +49,7 @@ export class GetPortfolioUseCase {
 
     // Resolve active lease (same schema — Lease has portfolio_unit_id)
     const activeLease = await this.prisma.lease.findFirst({
-      where: { portfolio_unit_id: entity.id, end_date: null },
+      where: { portfolio_unit_id: entity.id, end_date: null, deleted_at: null },
     });
 
     if (activeLease) {
