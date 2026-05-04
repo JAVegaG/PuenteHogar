@@ -141,8 +141,8 @@ This plan implements ten interconnected improvements across backend schema, API 
     - Export the `filterSuggestions` pure function from KeywordSearchBar and test it with fast-check
     - **Validates: Requirements 5.5**
 
-- [ ] 10. Frontend: Landing page
-  - [ ] 10.1 Replace redirect with static landing page at /
+- [x] 10. Frontend: Landing page
+  - [x] 10.1 Replace redirect with static landing page at /
     - Replace the content of `src/frontend/app/page.tsx` (currently `redirect('/explorar')`) with a static landing page component
     - Include a `<nav>` with links to: `/explorar` (Explorar), `/auth/login` (Iniciar sesión), `/auth/registro` (Registrarse)
     - Include a hero section with a brief platform description (facilitating urban housing rental in Colombia)
