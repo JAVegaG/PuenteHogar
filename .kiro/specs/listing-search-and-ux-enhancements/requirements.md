@@ -130,6 +130,7 @@ This feature spec covers a set of improvements to the Colombian urban housing re
 5. IF the lease has an associated contract with status "SIGNED", THEN THE Platform SHALL prevent cancellation and display a message indicating that a signed contract cannot be cancelled through this mechanism.
 6. WHEN a lease is successfully cancelled, THE Platform SHALL navigate the Landlord back to the unit detail page and display a success confirmation message.
 7. THE Backend SHALL verify that the requesting user is the owner of the portfolio containing the lease before allowing cancellation (resource ownership check).
+8. AFTER a lease is cancelled (soft-deleted), THE Platform SHALL exclude it from all active lease counts, unit status derivation, and lease list queries. Specifically: the unit SHALL show as "Disponible" (not "Ocupado"), the portfolio "Arriendos activos" counter SHALL NOT count the cancelled lease, and the unit's lease list SHALL NOT display the cancelled lease.
 
 ### Requirement 9: Contract Screens Visual Consistency
 
