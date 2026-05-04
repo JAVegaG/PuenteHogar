@@ -217,7 +217,7 @@ function PortfolioReportContent() {
                                                                         className="py-[12px] text-body font-semibold text-right"
                                                                         style={{ color: '#111827' }}
                                                                     >
-                                                                        ${formatPrice(income)}
+                                                                        {formatPrice(income)}
                                                                     </td>
                                                                 </tr>
                                                             );
@@ -247,7 +247,7 @@ function PortfolioReportContent() {
                                                                 className="text-body font-semibold mt-[8px]"
                                                                 style={{ color: '#111827' }}
                                                             >
-                                                                ${formatPrice(income)}
+                                                                {formatPrice(income)}
                                                             </p>
                                                         </div>
                                                     );

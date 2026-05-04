@@ -160,7 +160,7 @@ function IncomeOverviewContent() {
                                 <div className="grid grid-cols-1 gap-[12px] mb-[24px]">
                                     <SummaryCard
                                         label="Ingresos del mes"
-                                        value={`$${formatPrice(totalMonthlyIncome)}`}
+                                        value={formatPrice(totalMonthlyIncome)}
                                     />
                                     <SummaryCard
                                         label="Total inmuebles"

@@ -20,7 +20,7 @@ export function PortfolioIncomeCard({ portfolio }: PortfolioIncomeCardProps) {
                 {portfolio.totalUnits} {portfolio.totalUnits === 1 ? 'inmueble' : 'inmuebles'}
             </p>
             <p className="text-h3 font-semibold mt-[8px]" style={{ color: '#1d4ed8' }}>
-                ${formatPrice(portfolio.monthlyIncome)}
+                {formatPrice(portfolio.monthlyIncome)}
             </p>
 
             <div className="flex gap-[8px] mt-[16px]">
