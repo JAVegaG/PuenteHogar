@@ -57,7 +57,7 @@ Replace empty notification port stubs in four backend modules (contracts, paymen
     - `notifyPaymentReceived`: call once with `notificationTypeName: 'PAYMENT_RECEIVED'`, `eventSource: 'payment.received'`, `data: { amount, currency, leaseId }`
     - _Requirements: 3.1, 3.2_
 
-  - [~] 3.5 Wire `PaymentNotificationAdapter` in `PaymentsModule`
+  - [x] 3.5 Wire `PaymentNotificationAdapter` in `PaymentsModule`
     - Open `src/backend/modules/payments/payments.module.ts`
     - Add `NotificationsModule` to `imports` array
     - Import `PaymentNotificationAdapter`
