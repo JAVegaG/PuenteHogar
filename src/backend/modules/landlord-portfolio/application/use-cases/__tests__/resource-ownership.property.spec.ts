@@ -25,6 +25,7 @@ import type { IListingRepository } from '@modules/property-listings/domain/ports
 import type { IListingCache } from '@modules/property-listings/domain/ports/listing-cache.port';
 import type { IContractRepository } from '@modules/contracts/domain/ports/contract-repository.port';
 import type { IObjectStorage } from '@modules/contracts/domain/ports/object-storage.port';
+import type { INotificationPort } from '@modules/contracts/domain/ports/notification.port';
 import type { IPaymentRepository } from '@modules/payments/domain/ports/payment-repository.port';
 import type { ITrackingRepository } from '@modules/rental-tracking/domain/ports/tracking-repository.port';
 import { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
@@ -274,7 +275,11 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
           };
           const auditLogger = makeAuditLogger();
 
-          const useCase = new UploadContractUseCase(mockRepo, mockObjectStorage, auditLogger);
+          const useCase = new UploadContractUseCase(mockRepo, mockObjectStorage, {
+            notifyContractSigned: jest.fn(),
+            notifySigningFailed: jest.fn(),
+            notifyContractUploaded: jest.fn(),
+          } as INotificationPort, auditLogger);
 
           let threw = false;
           try {
