@@ -16,7 +16,7 @@ export class HandleSigningWebhookUseCase {
     @Inject(CONTRACT_NOTIFICATION_PORT)
     private readonly notificationPort: INotificationPort,
     private readonly auditLogger: AuditLoggerService,
-  ) {}
+  ) { }
 
   async execute(dto: SigningWebhookDto): Promise<void> {
     const contract = await this.repository.findById(dto.contractId);
@@ -63,6 +63,14 @@ export class HandleSigningWebhookUseCase {
         timestamp: new Date(),
         metadata: { externalSigningId: dto.externalSigningId },
       });
+
+      const parties = await this.repository.findContractParties(contract.id);
+      const landlord = parties.find((p) => p.roleInContract === 'LANDLORD');
+      if (landlord) {
+        this.notificationPort
+          .notifySigningFailed(landlord.userId, contract.id)
+          .catch(() => undefined);
+      }
     }
   }
 }
