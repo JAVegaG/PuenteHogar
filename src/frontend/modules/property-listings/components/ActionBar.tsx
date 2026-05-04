@@ -66,7 +66,7 @@ export default function ActionBar({
         <button
           type="button"
           onClick={openSort}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-neutral-300 rounded-card bg-white text-body text-neutral-900 min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 border border-neutral-300 rounded-card bg-white text-body text-neutral-900 min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           aria-label="Abrir ordenamiento"
         >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
