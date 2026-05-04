@@ -128,4 +128,35 @@ export const leaseService = {
 
         return res.json();
     },
+
+    async cancelLease(
+        portfolioId: string,
+        unitId: string,
+        leaseId: string,
+        token: string
+    ): Promise<void> {
+        let res: Response;
+        try {
+            res = await fetch(`${API_URL}/portfolio/${portfolioId}/units/${unitId}/leases/${leaseId}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+        } catch {
+            throw new Error('No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo.');
+        }
+
+        if (!res.ok) {
+            if (res.status === 401) throw new Error('Sesión expirada');
+            if (res.status === 403) throw new Error('No tienes permiso para cancelar este arriendo');
+            if (res.status === 409) {
+                const body = await res.json().catch(() => null);
+                const message = body?.message || 'No se puede cancelar un arriendo con contrato firmado';
+                throw new Error(message);
+            }
+            if (res.status === 404) throw new Error('Arriendo no encontrado');
+            throw new Error('Error del servidor. Intenta de nuevo más tarde.');
+        }
+    },
 };

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import LandlordRoute from '@modules/landlord-portfolio/components/LandlordRoute';
 import UnitDetailView from '@modules/landlord-portfolio/components/UnitDetailView';
 import { useAuth } from '@modules/users/context/AuthContext';
@@ -14,6 +14,7 @@ import type { PortfolioUnit } from '@modules/landlord-portfolio/types';
 
 function UnitDetailContent() {
     const params = useParams();
+    const searchParams = useSearchParams();
     const portfolioId = params.id as string;
     const unitId = params.unitId as string;
     const { user, logout } = useAuth();
@@ -21,6 +22,13 @@ function UnitDetailContent() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [notFound, setNotFound] = useState(false);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (searchParams.get('cancelado') === '1') {
+            setSuccessMessage('El arriendo fue cancelado exitosamente.');
+        }
+    }, [searchParams]);
 
     const fetchUnit = useCallback(async () => {
         const token = user?.accessToken;
@@ -87,6 +95,17 @@ function UnitDetailContent() {
 
             <main className="flex justify-center px-mobile-margin md:px-desktop-margin py-section-gap">
                 <div className="w-full max-w-[560px]">
+                    {successMessage && (
+                        <div
+                            role="status"
+                            aria-live="polite"
+                            className="mb-[16px] p-3 rounded-[6px] text-caption"
+                            style={{ backgroundColor: '#F0FDF4', color: '#166534' }}
+                        >
+                            {successMessage}
+                        </div>
+                    )}
+
                     {isLoading && (
                         <div aria-busy="true" aria-live="polite">
                             <section aria-label="Cargando detalle de unidad">

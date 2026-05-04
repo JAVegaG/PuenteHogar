@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import LandlordRoute from '@modules/landlord-portfolio/components/LandlordRoute';
 import { Header } from '@/shared/components/Header';
 import { Skeleton } from '@/shared/components/Skeleton';
 import { ErrorState } from '@/shared/components/ErrorState';
 import { StatusBadge } from '@/shared/components/StatusBadge';
+import { ConfirmationDialog } from '@/shared/components/ConfirmationDialog';
 import { useAuth } from '@modules/users/context/AuthContext';
 import { leaseService } from '@/shared/services/lease';
 import { LeaseDetailView } from '@modules/landlord-leases/components/LeaseDetailView';
@@ -50,6 +51,7 @@ function LeaseDetailSkeleton() {
 
 function LeaseDetailContent() {
     const params = useParams();
+    const router = useRouter();
     const portfolioId = params.id as string;
     const unitId = params.unitId as string;
     const leaseId = params.leaseId as string;
@@ -59,6 +61,11 @@ function LeaseDetailContent() {
     const [error, setError] = useState<string | null>(null);
     const [notFound, setNotFound] = useState(false);
     const { user, logout } = useAuth();
+
+    // Cancellation state
+    const [showCancelDialog, setShowCancelDialog] = useState(false);
+    const [isCancelling, setIsCancelling] = useState(false);
+    const [cancelError, setCancelError] = useState<string | null>(null);
 
     const fetchData = useCallback(async () => {
         const token = user?.accessToken;
@@ -91,6 +98,29 @@ function LeaseDetailContent() {
         fetchData();
     }, [fetchData]);
 
+    const handleCancelLease = useCallback(async () => {
+        const token = user?.accessToken;
+        if (!token) return;
+
+        setIsCancelling(true);
+        setCancelError(null);
+
+        try {
+            await leaseService.cancelLease(portfolioId, unitId, leaseId, token);
+            setShowCancelDialog(false);
+            router.push(`/mi-portafolio/${portfolioId}/unidades/${unitId}?cancelado=1`);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Error desconocido';
+            if (message === 'Sesión expirada') {
+                logout();
+                return;
+            }
+            setCancelError(message);
+        } finally {
+            setIsCancelling(false);
+        }
+    }, [portfolioId, unitId, leaseId, user?.accessToken, logout, router]);
+
     const unitDetailPath = `/mi-portafolio/${portfolioId}/unidades/${unitId}`;
 
     const backButton = (
@@ -115,6 +145,8 @@ function LeaseDetailContent() {
             </svg>
         </Link>
     );
+
+    const canCancel = lease?.status === 'Acordado';
 
     return (
         <>
@@ -157,11 +189,51 @@ function LeaseDetailContent() {
                                     portfolioId={portfolioId}
                                     unitId={unitId}
                                 />
+
+                                {/* Cancel lease button - only for "Acordado" status */}
+                                {canCancel && (
+                                    <div className="mt-[24px]">
+                                        {cancelError && (
+                                            <div
+                                                role="alert"
+                                                className="mb-[12px] p-3 rounded-[6px] text-caption"
+                                                style={{ backgroundColor: '#FEF2F2', color: '#991B1B' }}
+                                            >
+                                                {cancelError}
+                                            </div>
+                                        )}
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setCancelError(null);
+                                                setShowCancelDialog(true);
+                                            }}
+                                            className="inline-flex items-center justify-center w-full min-h-[44px] px-[16px] py-[12px] text-body font-semibold rounded-[6px] transition-colors text-center border border-red-600 text-red-600 hover:bg-red-50 active:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2"
+                                        >
+                                            Cancelar arriendo
+                                        </button>
+                                    </div>
+                                )}
                             </>
                         ) : null}
                     </section>
                 </div>
             </main>
+
+            {/* Cancellation confirmation dialog */}
+            <ConfirmationDialog
+                isOpen={showCancelDialog}
+                title="Cancelar arriendo"
+                message="¿Estás seguro de que deseas cancelar este arriendo? Esta acción eliminará el arriendo y, si existe un contrato pendiente de firma, también será eliminado. La unidad volverá a estar disponible."
+                confirmLabel="Sí, cancelar"
+                cancelLabel="No, volver"
+                onConfirm={handleCancelLease}
+                onCancel={() => {
+                    setShowCancelDialog(false);
+                    setCancelError(null);
+                }}
+                isLoading={isCancelling}
+            />
         </>
     );
 }
