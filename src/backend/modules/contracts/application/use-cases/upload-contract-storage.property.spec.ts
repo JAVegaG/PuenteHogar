@@ -11,6 +11,7 @@ import type { IObjectStorage } from '@modules/contracts/domain/ports/object-stor
 import { ContractEntity, ContractStatus } from '@modules/contracts/domain/entities/contract.entity';
 import { ContractPartyEntity } from '@modules/contracts/domain/entities/contract-party.entity';
 import { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
+import type { INotificationPort } from '@modules/contracts/domain/ports/notification.port';
 
 function uuidv4(): string {
   return crypto.randomUUID();
@@ -117,6 +118,14 @@ function makeAuditLoggerStub(): AuditLoggerService {
   return new AuditLoggerService();
 }
 
+function makeNotificationPortStub(): INotificationPort {
+  return {
+    async notifyContractSigned() { },
+    async notifySigningFailed() { },
+    async notifyContractUploaded() { },
+  };
+}
+
 function makeFileInput(originalname = 'contrato.pdf') {
   return {
     buffer: Buffer.from('fake-pdf-content'),
@@ -137,7 +146,7 @@ describe('UploadContractUseCase — Property 25: Contrato PDF almacenado en obje
           const { stub, capturedData } = makeRepositoryStub(input.landlordUserId, input.tenantUserId);
           const objectStorage = makeObjectStorageStub(input.objectKey);
           const auditLogger = makeAuditLoggerStub();
-          const useCase = new UploadContractUseCase(stub, objectStorage, auditLogger);
+          const useCase = new UploadContractUseCase(stub, objectStorage, makeNotificationPortStub(), auditLogger);
 
           const file = makeFileInput();
           const dto = {
@@ -172,7 +181,7 @@ describe('UploadContractUseCase — Property 25: Contrato PDF almacenado en obje
           const objectStorage = makeObjectStorageStub(input.objectKey);
           const auditLogger = makeAuditLoggerStub();
 
-          const uploadUseCase = new UploadContractUseCase(stub, objectStorage, auditLogger);
+          const uploadUseCase = new UploadContractUseCase(stub, objectStorage, makeNotificationPortStub(), auditLogger);
           const getUseCase = new GetContractSummaryUseCase(stub, objectStorage, { naturalPersonDetail: { findUnique: jest.fn().mockResolvedValue(null) }, legalPersonDetail: { findUnique: jest.fn().mockResolvedValue(null) } } as any);
 
           const file = makeFileInput();
@@ -210,7 +219,7 @@ describe('UploadContractUseCase — Property 25: Contrato PDF almacenado en obje
           const { stub, storedContracts } = makeRepositoryStub(input.landlordUserId, input.tenantUserId);
           const objectStorage = makeObjectStorageStub(input.objectKey);
           const auditLogger = makeAuditLoggerStub();
-          const useCase = new UploadContractUseCase(stub, objectStorage, auditLogger);
+          const useCase = new UploadContractUseCase(stub, objectStorage, makeNotificationPortStub(), auditLogger);
 
           const file = makeFileInput();
           const dto = {
