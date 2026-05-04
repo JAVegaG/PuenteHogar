@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useId, useMemo } from 'react';
+import { useState, useEffect, useId, useMemo, useCallback } from 'react';
 import { Button } from '@/shared/components/Button';
 import { portfolioService } from '@/shared/services/portfolio';
-import type { PropertyType } from '@/modules/landlord-portfolio/types';
+import type { PropertyType, Department, City } from '@/modules/landlord-portfolio/types';
 import type { ListingFilters } from '../types';
 
 export interface FilterPanelProps {
@@ -13,8 +13,6 @@ export interface FilterPanelProps {
   onApply: (filters: ListingFilters) => void;
   onClear: () => void;
 }
-
-const CITIES = ['Cali', 'Palmira', 'Buenaventura', 'Tuluá', 'Cartago'];
 
 const PUBLISHED_OPTIONS: { label: string; value: ListingFilters['publishedWithin'] }[] = [
   { label: 'Últimas 24 horas', value: '24h' },
@@ -92,6 +90,7 @@ export default function FilterPanel({
 }: FilterPanelProps) {
   const uid = useId();
 
+  const [department, setDepartment] = useState(currentFilters.department ?? '');
   const [city, setCity] = useState(currentFilters.city ?? '');
   const [neighborhood, setNeighborhood] = useState(currentFilters.neighborhood ?? '');
   const [publishedWithin, setPublishedWithin] = useState<string>(currentFilters.publishedWithin ?? '');
@@ -104,6 +103,41 @@ export default function FilterPanel({
   const [areaMaxRaw, setAreaMaxRaw] = useState(currentFilters.areaMax?.toString() ?? '');
 
   const [propertyTypes, setPropertyTypes] = useState<PropertyType[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [cities, setCities] = useState<City[]>([]);
+  const [departmentError, setDepartmentError] = useState(false);
+  const [cityError, setCityError] = useState(false);
+  const [loadingCities, setLoadingCities] = useState(false);
+
+  // Fetch departments from backend on mount
+  const fetchDepartments = useCallback(() => {
+    setDepartmentError(false);
+    portfolioService.getDepartments()
+      .then((deps) => setDepartments(deps))
+      .catch(() => setDepartmentError(true));
+  }, []);
+
+  useEffect(() => {
+    fetchDepartments();
+  }, [fetchDepartments]);
+
+  // Fetch cities when department changes
+  const fetchCities = useCallback((deptCode: string) => {
+    if (!deptCode) {
+      setCities([]);
+      return;
+    }
+    setCityError(false);
+    setLoadingCities(true);
+    portfolioService.getCitiesByDepartment(deptCode)
+      .then((c) => setCities(c))
+      .catch(() => setCityError(true))
+      .finally(() => setLoadingCities(false));
+  }, []);
+
+  useEffect(() => {
+    fetchCities(department);
+  }, [department, fetchCities]);
 
   // Fetch property types from catalog on mount
   useEffect(() => {
@@ -145,6 +179,7 @@ export default function FilterPanel({
   // Sync local state when currentFilters change externally
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDepartment(currentFilters.department ?? '');
     setCity(currentFilters.city ?? '');
     setNeighborhood(currentFilters.neighborhood ?? '');
     setPublishedWithin(currentFilters.publishedWithin ?? '');
@@ -162,6 +197,18 @@ export default function FilterPanel({
     setAreaMaxError(null);
   }, [currentFilters]);
 
+  // Reset city and neighborhood when department is cleared
+  // (This handles the cascading clear when department changes)
+  // Note: The department change handler below handles the explicit user action.
+  // This effect handles the case where department is cleared externally.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (!department) {
+      setCity('');
+      setNeighborhood('');
+    }
+  }, [department]);
+
   // Reset neighborhood when city is cleared
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -177,6 +224,13 @@ export default function FilterPanel({
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
+
+  const handleDepartmentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newDept = e.target.value;
+    setDepartment(newDept);
+    setCity('');
+    setNeighborhood('');
+  };
 
   const handlePriceMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawInput = e.target.value;
@@ -214,6 +268,7 @@ export default function FilterPanel({
     if (hasErrors) return;
 
     const filters: ListingFilters = {};
+    if (department) filters.department = department;
     if (city) filters.city = city;
     if (neighborhood) filters.neighborhood = neighborhood;
     if (publishedWithin) filters.publishedWithin = publishedWithin as ListingFilters['publishedWithin'];
@@ -231,6 +286,7 @@ export default function FilterPanel({
   };
 
   const handleClear = () => {
+    setDepartment('');
     setCity('');
     setNeighborhood('');
     setPublishedWithin('');
@@ -261,6 +317,7 @@ export default function FilterPanel({
   const inputErrorClass = '!border-error';
   const labelClass = 'text-body font-semibold text-neutral-900';
 
+  const departmentId = `${uid}-department`;
   const cityId = `${uid}-city`;
   const neighborhoodId = `${uid}-neighborhood`;
   const publishedId = `${uid}-published`;
@@ -307,20 +364,72 @@ export default function FilterPanel({
       {/* Scrollable fields */}
       <div className="flex-1 overflow-y-auto overscroll-contain px-mobile-margin md:px-desktop-margin py-section-gap">
         <div className="max-w-[416px] mx-auto space-y-section-gap">
+          {/* Departamento */}
+          <div className="space-y-element-gap">
+            <label htmlFor={departmentId} className={labelClass}>Departamento</label>
+            {departmentError ? (
+              <div className="space-y-2">
+                <p className="text-caption text-error">No se pudieron cargar las opciones</p>
+                <button
+                  type="button"
+                  onClick={fetchDepartments}
+                  className="text-caption font-medium text-primary underline min-h-[44px] min-w-[44px] inline-flex items-center"
+                >
+                  Reintentar
+                </button>
+              </div>
+            ) : (
+              <select
+                id={departmentId}
+                value={department}
+                onChange={handleDepartmentChange}
+                className={selectClass}
+              >
+                <option value="">Seleccionar departamento</option>
+                {departments.map((d) => (
+                  <option key={d.code} value={d.code}>{d.name}</option>
+                ))}
+              </select>
+            )}
+          </div>
+
           {/* Ciudad */}
           <div className="space-y-element-gap">
             <label htmlFor={cityId} className={labelClass}>Ciudad</label>
-            <select
-              id={cityId}
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              className={selectClass}
-            >
-              <option value="">Seleccionar ciudad</option>
-              {CITIES.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
+            {cityError ? (
+              <div className="space-y-2">
+                <p className="text-caption text-error">No se pudieron cargar las opciones</p>
+                <button
+                  type="button"
+                  onClick={() => fetchCities(department)}
+                  className="text-caption font-medium text-primary underline min-h-[44px] min-w-[44px] inline-flex items-center"
+                >
+                  Reintentar
+                </button>
+              </div>
+            ) : (
+              <select
+                id={cityId}
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                disabled={!department || loadingCities}
+                className={`${selectClass} ${!department ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                <option value="">
+                  {!department
+                    ? 'Primero selecciona un departamento'
+                    : loadingCities
+                      ? 'Cargando ciudades...'
+                      : 'Seleccionar ciudad'}
+                </option>
+                {cities.map((c) => (
+                  <option key={c.code} value={c.name}>{c.name}</option>
+                ))}
+              </select>
+            )}
+            {!department && !departmentError && (
+              <p className="text-small text-neutral-600">Primero selecciona un departamento</p>
+            )}
           </div>
 
           {/* Zona / Barrio */}
