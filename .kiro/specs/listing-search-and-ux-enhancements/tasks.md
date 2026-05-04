@@ -173,7 +173,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - _Requirements: 8.1, 8.2, 8.5, 8.6_
 
 - [ ] 13. Frontend: Contract screens visual consistency
-  - [ ] 13.1 Update ContractDetailView with card-based sections
+  - [x] 13.1 Update ContractDetailView with card-based sections
     - In `src/frontend/modules/landlord-contracts/components/ContractDetailView.tsx`, wrap existing sections in card containers with `border border-neutral-200 rounded-card bg-white p-4`
     - Organize into three card sections: "Términos" (dates, status), "Partes" (landlord and tenant), "Documento" (file download, replace, delete actions)
     - Ensure `StatusBadge` with `contract` variant is used consistently
