@@ -6,14 +6,14 @@ Replace empty notification port stubs in four backend modules (contracts, paymen
 
 ## Tasks
 
-- [ ] 1. Seed data and buildNotificationContent updates (foundation)
+- [x] 1. Seed data and buildNotificationContent updates (foundation)
   - [x] 1.1 Add missing notification types to the seed script
     - Open `src/backend/db/seeds/seed.ts`
     - Add `CONTRACT_UPLOADED`, `LEASE_CREATED`, and `LEASE_CANCELLED` to the `notificationTypes` array (keep existing `NEW_INTEREST`, `CONTRACT_SIGNED`, `PAYMENT_RECEIVED`, `PAYMENT_DUE`)
     - Use `upsert` to avoid duplicates, matching the existing seed pattern
     - _Requirements: 8.1, 8.2_
 
-  - [-] 1.2 Add new cases to `buildNotificationContent` in `SendNotificationUseCase`
+  - [x] 1.2 Add new cases to `buildNotificationContent` in `SendNotificationUseCase`
     - Open `src/backend/modules/notifications/application/use-cases/send-notification.use-case.ts`
     - Add `case 'NEW_INTEREST'` with title `'Nuevo interesado'` and message referencing `data.listingId`
     - Add `case 'LEASE_CREATED'` with title `'Arriendo creado'` and message referencing `data.leaseId`
@@ -21,8 +21,8 @@ Replace empty notification port stubs in four backend modules (contracts, paymen
     - Update existing `case 'CONTRACT_UPLOADED'` message to also reference `data.leaseId` if present
     - _Requirements: 8.3, 10.3, 10.4_
 
-- [ ] 2. NotificationsModule export (enables DI for all adapters)
-  - [~] 2.1 Verify and update `NotificationsModule` exports
+- [x] 2. NotificationsModule export (enables DI for all adapters)
+  - [x] 2.1 Verify and update `NotificationsModule` exports
     - Open `src/backend/modules/notifications/notifications.module.ts`
     - Confirm `SendNotificationUseCase` is in the `exports` array (it already is — verify no changes needed)
     - Ensure the module can be imported by contracts, payments, landlord-portfolio, and property-listings modules
