@@ -171,4 +171,24 @@ export const notificationService = {
             handleNotificationError(res.status);
         }
     },
+
+    async deleteReadNotifications(token: string): Promise<{ deletedCount: number }> {
+        let res: Response;
+        try {
+            res = await fetch(`${API_URL}/notifications/read`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+        } catch {
+            throw new Error('No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo.');
+        }
+
+        if (!res.ok) {
+            handleNotificationError(res.status);
+        }
+
+        return res.json();
+    },
 };

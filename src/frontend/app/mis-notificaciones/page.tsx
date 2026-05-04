@@ -107,6 +107,13 @@ function NotificationsPageContent() {
         }
     }, [user?.accessToken, notifications]);
 
+    const handleDeleteRead = useCallback(async () => {
+        const token = user?.accessToken;
+        if (!token) return;
+        await notificationService.deleteReadNotifications(token);
+        setNotifications((prev) => prev.filter((n) => !n.read));
+    }, [user?.accessToken]);
+
     const sideMenuUser = user
         ? { name: user.displayName, role: translateRole(user.roles[0]), roles: user.roles }
         : null;
@@ -142,6 +149,7 @@ function NotificationsPageContent() {
                             onMarkAsRead={handleMarkAsRead}
                             onMarkAllAsRead={handleMarkAllAsRead}
                             onDelete={handleDelete}
+                            onDeleteRead={handleDeleteRead}
                         />
                     )}
                 </div>

@@ -10,6 +10,7 @@ interface NotificationsListViewProps {
     onMarkAsRead: (id: string) => void;
     onMarkAllAsRead: () => void;
     onDelete?: (id: string) => Promise<void>;
+    onDeleteRead?: () => Promise<void>;
 }
 
 function formatRelativeDate(dateStr: string): string {
@@ -65,15 +66,21 @@ export default function NotificationsListView({
     onMarkAsRead,
     onMarkAllAsRead,
     onDelete,
+    onDeleteRead,
 }: NotificationsListViewProps) {
     const [readIds, setReadIds] = useState<Set<string>>(new Set());
     const [removedIds, setRemovedIds] = useState<Set<string>>(new Set());
     const [deleteError, setDeleteError] = useState<string | null>(null);
+    const [isDeletingRead, setIsDeletingRead] = useState(false);
 
     const visibleNotifications = notifications.filter((n) => !removedIds.has(n.id));
 
     const hasUnread = visibleNotifications.some(
         (n) => !n.read && !readIds.has(n.id)
+    );
+
+    const hasRead = visibleNotifications.some(
+        (n) => n.read || readIds.has(n.id)
     );
 
     function handleCardClick(notification: InAppNotification) {
@@ -112,6 +119,36 @@ export default function NotificationsListView({
         }
     }
 
+    async function handleDeleteRead() {
+        if (!onDeleteRead) return;
+        setDeleteError(null);
+        setIsDeletingRead(true);
+
+        // Optimistically remove read notifications
+        const readNotificationIds = visibleNotifications
+            .filter((n) => n.read || readIds.has(n.id))
+            .map((n) => n.id);
+        setRemovedIds((prev) => {
+            const next = new Set(prev);
+            readNotificationIds.forEach((id) => next.add(id));
+            return next;
+        });
+
+        try {
+            await onDeleteRead();
+        } catch {
+            // Restore on failure
+            setRemovedIds((prev) => {
+                const next = new Set(prev);
+                readNotificationIds.forEach((id) => next.delete(id));
+                return next;
+            });
+            setDeleteError('No se pudieron eliminar las notificaciones leídas. Intenta de nuevo.');
+        } finally {
+            setIsDeletingRead(false);
+        }
+    }
+
     if (visibleNotifications.length === 0) {
         return (
             <div className="flex flex-col items-center gap-6 py-section-gap" role="status" aria-live="polite">
@@ -144,6 +181,16 @@ export default function NotificationsListView({
                         className="min-h-[44px] min-w-[44px] px-2 text-body font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-[6px]"
                     >
                         Marcar todas como leídas
+                    </button>
+                )}
+                {hasRead && onDeleteRead && (
+                    <button
+                        type="button"
+                        onClick={handleDeleteRead}
+                        disabled={isDeletingRead}
+                        className="min-h-[44px] min-w-[44px] px-2 text-body font-medium text-red-600 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-[6px] disabled:opacity-50"
+                    >
+                        Eliminar leídas
                     </button>
                 )}
             </div>
