@@ -76,6 +76,19 @@ export function ContactLandlordButton({ listingId }: ContactLandlordButtonProps)
 
     return (
         <div className="px-mobile-margin md:px-desktop-margin">
+            {message && (
+                <div
+                    role="alert"
+                    aria-live="assertive"
+                    className={`mb-3 p-3 text-body ${message.type === 'success'
+                        ? 'rounded-card bg-green-50 text-green-800'
+                        : 'rounded-md border border-red-200 bg-red-50 text-red-700'
+                        }`}
+                >
+                    {message.text}
+                </div>
+            )}
+
             <button
                 type="button"
                 onClick={handleClick}
@@ -107,19 +120,6 @@ export function ContactLandlordButton({ listingId }: ContactLandlordButtonProps)
                 )}
                 Contactar arrendador
             </button>
-
-            {message && (
-                <div
-                    role="alert"
-                    aria-live="assertive"
-                    className={`mt-3 p-3 rounded-card text-body ${message.type === 'success'
-                        ? 'bg-green-50 text-green-800'
-                        : 'bg-red-50 text-red-800'
-                        }`}
-                >
-                    {message.text}
-                </div>
-            )}
 
             <ConfirmationDialog
                 isOpen={isDialogOpen}
