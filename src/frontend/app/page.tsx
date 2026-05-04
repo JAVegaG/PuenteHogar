@@ -10,7 +10,7 @@ export default function LandingPage() {
             PuenteHogar
           </Link>
           {/* Desktop nav links */}
-          <ul className="hidden md:flex items-center gap-6">
+          <ul className="hidden md:flex items-center gap-10">
             <li>
               <Link
                 href="/explorar"
@@ -30,14 +30,14 @@ export default function LandingPage() {
             <li>
               <Link
                 href="/auth/registro"
-                className="text-body font-semibold text-primary hover:text-primary/80 min-h-[44px] inline-flex items-center"
+                className="text-body text-neutral-600 hover:text-primary min-h-[44px] inline-flex items-center"
               >
                 Registrarse
               </Link>
             </li>
           </ul>
-          {/* Mobile: only show key actions */}
-          <div className="flex md:hidden items-center gap-2">
+          {/* Mobile: compact actions */}
+          <div className="flex md:hidden items-center gap-4">
             <Link
               href="/auth/login"
               className="text-caption text-neutral-600 hover:text-primary min-h-[44px] min-w-[44px] inline-flex items-center justify-center"
@@ -46,7 +46,7 @@ export default function LandingPage() {
             </Link>
             <Link
               href="/auth/registro"
-              className="bg-[#1d4ed8] text-white rounded-[6px] min-h-[44px] px-3 inline-flex items-center justify-center font-semibold text-caption"
+              className="text-caption text-neutral-600 hover:text-primary min-h-[44px] min-w-[44px] inline-flex items-center justify-center"
             >
               Registrarse
             </Link>
