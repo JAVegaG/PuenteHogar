@@ -288,6 +288,12 @@ export const AdditionalFeatureScalarFieldEnum = {
   id: 'id',
   name: 'name',
   description: 'description',
+  type: 'type',
+  element: 'element',
+  active: 'active',
+  main: 'main',
+  required: 'required',
+  error_message: 'error_message',
   deleted_at: 'deleted_at'
 } as const
 

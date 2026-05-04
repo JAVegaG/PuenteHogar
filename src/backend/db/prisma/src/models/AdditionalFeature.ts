@@ -28,6 +28,12 @@ export type AdditionalFeatureMinAggregateOutputType = {
   id: string | null
   name: string | null
   description: string | null
+  type: string | null
+  element: string | null
+  active: boolean | null
+  main: boolean | null
+  required: boolean | null
+  error_message: string | null
   deleted_at: Date | null
 }
 
@@ -35,6 +41,12 @@ export type AdditionalFeatureMaxAggregateOutputType = {
   id: string | null
   name: string | null
   description: string | null
+  type: string | null
+  element: string | null
+  active: boolean | null
+  main: boolean | null
+  required: boolean | null
+  error_message: string | null
   deleted_at: Date | null
 }
 
@@ -42,6 +54,12 @@ export type AdditionalFeatureCountAggregateOutputType = {
   id: number
   name: number
   description: number
+  type: number
+  element: number
+  active: number
+  main: number
+  required: number
+  error_message: number
   deleted_at: number
   _all: number
 }
@@ -51,6 +69,12 @@ export type AdditionalFeatureMinAggregateInputType = {
   id?: true
   name?: true
   description?: true
+  type?: true
+  element?: true
+  active?: true
+  main?: true
+  required?: true
+  error_message?: true
   deleted_at?: true
 }
 
@@ -58,6 +82,12 @@ export type AdditionalFeatureMaxAggregateInputType = {
   id?: true
   name?: true
   description?: true
+  type?: true
+  element?: true
+  active?: true
+  main?: true
+  required?: true
+  error_message?: true
   deleted_at?: true
 }
 
@@ -65,6 +95,12 @@ export type AdditionalFeatureCountAggregateInputType = {
   id?: true
   name?: true
   description?: true
+  type?: true
+  element?: true
+  active?: true
+  main?: true
+  required?: true
+  error_message?: true
   deleted_at?: true
   _all?: true
 }
@@ -145,6 +181,12 @@ export type AdditionalFeatureGroupByOutputType = {
   id: string
   name: string
   description: string | null
+  type: string
+  element: string
+  active: boolean
+  main: boolean
+  required: boolean
+  error_message: string | null
   deleted_at: Date | null
   _count: AdditionalFeatureCountAggregateOutputType | null
   _min: AdditionalFeatureMinAggregateOutputType | null
@@ -173,6 +215,12 @@ export type AdditionalFeatureWhereInput = {
   id?: Prisma.StringFilter<"AdditionalFeature"> | string
   name?: Prisma.StringFilter<"AdditionalFeature"> | string
   description?: Prisma.StringNullableFilter<"AdditionalFeature"> | string | null
+  type?: Prisma.StringFilter<"AdditionalFeature"> | string
+  element?: Prisma.StringFilter<"AdditionalFeature"> | string
+  active?: Prisma.BoolFilter<"AdditionalFeature"> | boolean
+  main?: Prisma.BoolFilter<"AdditionalFeature"> | boolean
+  required?: Prisma.BoolFilter<"AdditionalFeature"> | boolean
+  error_message?: Prisma.StringNullableFilter<"AdditionalFeature"> | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"AdditionalFeature"> | Date | string | null
   properties?: Prisma.PropertyAdditionalFeatureListRelationFilter
 }
@@ -181,6 +229,12 @@ export type AdditionalFeatureOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  type?: Prisma.SortOrder
+  element?: Prisma.SortOrder
+  active?: Prisma.SortOrder
+  main?: Prisma.SortOrder
+  required?: Prisma.SortOrder
+  error_message?: Prisma.SortOrderInput | Prisma.SortOrder
   deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   properties?: Prisma.PropertyAdditionalFeatureOrderByRelationAggregateInput
 }
@@ -192,6 +246,12 @@ export type AdditionalFeatureWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.AdditionalFeatureWhereInput | Prisma.AdditionalFeatureWhereInput[]
   name?: Prisma.StringFilter<"AdditionalFeature"> | string
   description?: Prisma.StringNullableFilter<"AdditionalFeature"> | string | null
+  type?: Prisma.StringFilter<"AdditionalFeature"> | string
+  element?: Prisma.StringFilter<"AdditionalFeature"> | string
+  active?: Prisma.BoolFilter<"AdditionalFeature"> | boolean
+  main?: Prisma.BoolFilter<"AdditionalFeature"> | boolean
+  required?: Prisma.BoolFilter<"AdditionalFeature"> | boolean
+  error_message?: Prisma.StringNullableFilter<"AdditionalFeature"> | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"AdditionalFeature"> | Date | string | null
   properties?: Prisma.PropertyAdditionalFeatureListRelationFilter
 }, "id">
@@ -200,6 +260,12 @@ export type AdditionalFeatureOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  type?: Prisma.SortOrder
+  element?: Prisma.SortOrder
+  active?: Prisma.SortOrder
+  main?: Prisma.SortOrder
+  required?: Prisma.SortOrder
+  error_message?: Prisma.SortOrderInput | Prisma.SortOrder
   deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.AdditionalFeatureCountOrderByAggregateInput
   _max?: Prisma.AdditionalFeatureMaxOrderByAggregateInput
@@ -213,6 +279,12 @@ export type AdditionalFeatureScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"AdditionalFeature"> | string
   name?: Prisma.StringWithAggregatesFilter<"AdditionalFeature"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"AdditionalFeature"> | string | null
+  type?: Prisma.StringWithAggregatesFilter<"AdditionalFeature"> | string
+  element?: Prisma.StringWithAggregatesFilter<"AdditionalFeature"> | string
+  active?: Prisma.BoolWithAggregatesFilter<"AdditionalFeature"> | boolean
+  main?: Prisma.BoolWithAggregatesFilter<"AdditionalFeature"> | boolean
+  required?: Prisma.BoolWithAggregatesFilter<"AdditionalFeature"> | boolean
+  error_message?: Prisma.StringNullableWithAggregatesFilter<"AdditionalFeature"> | string | null
   deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"AdditionalFeature"> | Date | string | null
 }
 
@@ -220,6 +292,12 @@ export type AdditionalFeatureCreateInput = {
   id?: string
   name: string
   description?: string | null
+  type?: string
+  element?: string
+  active?: boolean
+  main?: boolean
+  required?: boolean
+  error_message?: string | null
   deleted_at?: Date | string | null
   properties?: Prisma.PropertyAdditionalFeatureCreateNestedManyWithoutFeatureInput
 }
@@ -228,6 +306,12 @@ export type AdditionalFeatureUncheckedCreateInput = {
   id?: string
   name: string
   description?: string | null
+  type?: string
+  element?: string
+  active?: boolean
+  main?: boolean
+  required?: boolean
+  error_message?: string | null
   deleted_at?: Date | string | null
   properties?: Prisma.PropertyAdditionalFeatureUncheckedCreateNestedManyWithoutFeatureInput
 }
@@ -236,6 +320,12 @@ export type AdditionalFeatureUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  element?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  main?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  required?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  error_message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   properties?: Prisma.PropertyAdditionalFeatureUpdateManyWithoutFeatureNestedInput
 }
@@ -244,6 +334,12 @@ export type AdditionalFeatureUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  element?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  main?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  required?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  error_message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   properties?: Prisma.PropertyAdditionalFeatureUncheckedUpdateManyWithoutFeatureNestedInput
 }
@@ -252,6 +348,12 @@ export type AdditionalFeatureCreateManyInput = {
   id?: string
   name: string
   description?: string | null
+  type?: string
+  element?: string
+  active?: boolean
+  main?: boolean
+  required?: boolean
+  error_message?: string | null
   deleted_at?: Date | string | null
 }
 
@@ -259,6 +361,12 @@ export type AdditionalFeatureUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  element?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  main?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  required?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  error_message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
@@ -266,6 +374,12 @@ export type AdditionalFeatureUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  element?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  main?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  required?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  error_message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
@@ -273,6 +387,12 @@ export type AdditionalFeatureCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  type?: Prisma.SortOrder
+  element?: Prisma.SortOrder
+  active?: Prisma.SortOrder
+  main?: Prisma.SortOrder
+  required?: Prisma.SortOrder
+  error_message?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
 }
 
@@ -280,6 +400,12 @@ export type AdditionalFeatureMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  type?: Prisma.SortOrder
+  element?: Prisma.SortOrder
+  active?: Prisma.SortOrder
+  main?: Prisma.SortOrder
+  required?: Prisma.SortOrder
+  error_message?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
 }
 
@@ -287,6 +413,12 @@ export type AdditionalFeatureMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  type?: Prisma.SortOrder
+  element?: Prisma.SortOrder
+  active?: Prisma.SortOrder
+  main?: Prisma.SortOrder
+  required?: Prisma.SortOrder
+  error_message?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
 }
 
@@ -313,6 +445,12 @@ export type AdditionalFeatureCreateWithoutPropertiesInput = {
   id?: string
   name: string
   description?: string | null
+  type?: string
+  element?: string
+  active?: boolean
+  main?: boolean
+  required?: boolean
+  error_message?: string | null
   deleted_at?: Date | string | null
 }
 
@@ -320,6 +458,12 @@ export type AdditionalFeatureUncheckedCreateWithoutPropertiesInput = {
   id?: string
   name: string
   description?: string | null
+  type?: string
+  element?: string
+  active?: boolean
+  main?: boolean
+  required?: boolean
+  error_message?: string | null
   deleted_at?: Date | string | null
 }
 
@@ -343,6 +487,12 @@ export type AdditionalFeatureUpdateWithoutPropertiesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  element?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  main?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  required?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  error_message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
@@ -350,6 +500,12 @@ export type AdditionalFeatureUncheckedUpdateWithoutPropertiesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  element?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  main?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  required?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  error_message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
@@ -388,6 +544,12 @@ export type AdditionalFeatureSelect<ExtArgs extends runtime.Types.Extensions.Int
   id?: boolean
   name?: boolean
   description?: boolean
+  type?: boolean
+  element?: boolean
+  active?: boolean
+  main?: boolean
+  required?: boolean
+  error_message?: boolean
   deleted_at?: boolean
   properties?: boolean | Prisma.AdditionalFeature$propertiesArgs<ExtArgs>
   _count?: boolean | Prisma.AdditionalFeatureCountOutputTypeDefaultArgs<ExtArgs>
@@ -397,6 +559,12 @@ export type AdditionalFeatureSelectCreateManyAndReturn<ExtArgs extends runtime.T
   id?: boolean
   name?: boolean
   description?: boolean
+  type?: boolean
+  element?: boolean
+  active?: boolean
+  main?: boolean
+  required?: boolean
+  error_message?: boolean
   deleted_at?: boolean
 }, ExtArgs["result"]["additionalFeature"]>
 
@@ -404,6 +572,12 @@ export type AdditionalFeatureSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   id?: boolean
   name?: boolean
   description?: boolean
+  type?: boolean
+  element?: boolean
+  active?: boolean
+  main?: boolean
+  required?: boolean
+  error_message?: boolean
   deleted_at?: boolean
 }, ExtArgs["result"]["additionalFeature"]>
 
@@ -411,10 +585,16 @@ export type AdditionalFeatureSelectScalar = {
   id?: boolean
   name?: boolean
   description?: boolean
+  type?: boolean
+  element?: boolean
+  active?: boolean
+  main?: boolean
+  required?: boolean
+  error_message?: boolean
   deleted_at?: boolean
 }
 
-export type AdditionalFeatureOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "deleted_at", ExtArgs["result"]["additionalFeature"]>
+export type AdditionalFeatureOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "type" | "element" | "active" | "main" | "required" | "error_message" | "deleted_at", ExtArgs["result"]["additionalFeature"]>
 export type AdditionalFeatureInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   properties?: boolean | Prisma.AdditionalFeature$propertiesArgs<ExtArgs>
   _count?: boolean | Prisma.AdditionalFeatureCountOutputTypeDefaultArgs<ExtArgs>
@@ -431,6 +611,12 @@ export type $AdditionalFeaturePayload<ExtArgs extends runtime.Types.Extensions.I
     id: string
     name: string
     description: string | null
+    type: string
+    element: string
+    active: boolean
+    main: boolean
+    required: boolean
+    error_message: string | null
     deleted_at: Date | null
   }, ExtArgs["result"]["additionalFeature"]>
   composites: {}
@@ -859,6 +1045,12 @@ export interface AdditionalFeatureFieldRefs {
   readonly id: Prisma.FieldRef<"AdditionalFeature", 'String'>
   readonly name: Prisma.FieldRef<"AdditionalFeature", 'String'>
   readonly description: Prisma.FieldRef<"AdditionalFeature", 'String'>
+  readonly type: Prisma.FieldRef<"AdditionalFeature", 'String'>
+  readonly element: Prisma.FieldRef<"AdditionalFeature", 'String'>
+  readonly active: Prisma.FieldRef<"AdditionalFeature", 'Boolean'>
+  readonly main: Prisma.FieldRef<"AdditionalFeature", 'Boolean'>
+  readonly required: Prisma.FieldRef<"AdditionalFeature", 'Boolean'>
+  readonly error_message: Prisma.FieldRef<"AdditionalFeature", 'String'>
   readonly deleted_at: Prisma.FieldRef<"AdditionalFeature", 'DateTime'>
 }
     
