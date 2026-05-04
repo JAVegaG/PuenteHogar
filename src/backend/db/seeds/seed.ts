@@ -299,8 +299,11 @@ async function main() {
   const notificationTypes = [
     { name: 'NEW_INTEREST', description: 'Nuevo arrendatario interesado en un inmueble' },
     { name: 'CONTRACT_SIGNED', description: 'Contrato firmado por todas las partes' },
+    { name: 'CONTRACT_UPLOADED', description: 'Contrato cargado por el arrendador' },
     { name: 'PAYMENT_RECEIVED', description: 'Pago del canon recibido exitosamente' },
     { name: 'PAYMENT_DUE', description: 'Recordatorio de pago próximo a vencer' },
+    { name: 'LEASE_CREATED', description: 'Arriendo creado para un arrendatario' },
+    { name: 'LEASE_CANCELLED', description: 'Arriendo cancelado por el arrendador' },
   ];
 
   for (const nt of notificationTypes) {
