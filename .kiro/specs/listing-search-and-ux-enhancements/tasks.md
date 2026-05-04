@@ -186,13 +186,13 @@ This plan implements ten interconnected improvements across backend schema, API 
     - Ensure consistent input field styling matching the platform patterns
     - _Requirements: 9.3, 9.5_
 
-- [ ] 14. Frontend: Fix "Invalid Date" bug
-  - [ ] 14.1 Fix formatDate function in ContractDetailView
+- [x] 14. Frontend: Fix "Invalid Date" bug
+  - [x] 14.1 Fix formatDate function in ContractDetailView
     - In `src/frontend/modules/landlord-contracts/components/ContractDetailView.tsx`, update the `formatDate` function to handle empty, null, or invalid date strings by returning "—" instead of "Invalid Date"
     - Add guard: `if (!dateStr) return '—'; const date = new Date(dateStr); if (isNaN(date.getTime())) return '—';`
     - _Requirements: 10.1, 10.4_
 
-  - [ ] 14.2 Add frontend date validation in contract wizard step 2
+  - [x] 14.2 Add frontend date validation in contract wizard step 2
     - In `src/frontend/modules/landlord-contracts/validation.ts`, update `validateContractStep2` to check for invalid date strings: if `data.startDate` is truthy but `isNaN(new Date(data.startDate).getTime())`, set error "La fecha de inicio es obligatoria"
     - This prevents the form from submitting with a value that would produce "Invalid Date"
     - _Requirements: 10.3_
