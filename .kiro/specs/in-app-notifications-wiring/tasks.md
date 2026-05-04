@@ -237,8 +237,8 @@ _These tasks address UX issues discovered during manual testing after the initia
   - Ensure `npm run test` passes for backend
   - Verify notifications display human-readable messages, Spanish labels, delete works, and badge appears on hamburger icon
 
-- [ ] 13. Move "Gestionar preferencias" to top of notifications page
-  - [~] 13.1 Relocate preferences link in `NotificationsListView`
+- [x] 13. Move "Gestionar preferencias" to top of notifications page
+  - [x] 13.1 Relocate preferences link in `NotificationsListView`
     - Open `src/frontend/modules/notifications/components/NotificationsListView.tsx`
     - Move the "Gestionar preferencias" link from the bottom of the list to the top action bar, alongside "Marcar todas como leídas"
     - Remove the bottom "Gestionar preferencias" link
