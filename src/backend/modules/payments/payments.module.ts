@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { NotificationsModule } from '@modules/notifications';
 import { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
 import { CircuitBreakerFactory } from '@src/shared/circuit-breaker/circuit-breaker.factory';
 import { PrismaService } from '@src/shared/prisma/prisma.service';
@@ -12,6 +13,7 @@ import {
   PAYMENT_REPOSITORY,
 } from './application/use-cases/initiate-payment.use-case';
 import { PaymentGatewayAdapter } from './infrastructure/adapters/payment-gateway.adapter';
+import { PaymentNotificationAdapter } from './infrastructure/adapters/payment-notification.adapter';
 import { PaymentsEtlService } from './infrastructure/etl/payments-etl.service';
 import { PrismaPaymentRepository } from './infrastructure/repositories/prisma-payment.repository';
 import { PaymentsCrossModuleQueryService } from './infrastructure/repositories/payments-cross-module-query.service';
@@ -19,7 +21,7 @@ import { PAYMENTS_CROSS_MODULE_QUERY } from './domain/ports/cross-module-query.p
 import { PaymentsController } from './payments.controller';
 
 @Module({
-  imports: [ConfigModule],
+  imports: [ConfigModule, NotificationsModule],
   controllers: [PaymentsController],
   providers: [
     PrismaService,
@@ -40,11 +42,7 @@ import { PaymentsController } from './payments.controller';
     },
     {
       provide: PAYMENT_NOTIFICATION_PORT,
-      useValue: {
-        notifyPaymentReceived: async () => {
-          // stub — notifications module will handle this
-        },
-      },
+      useClass: PaymentNotificationAdapter,
     },
     {
       provide: PAYMENTS_CROSS_MODULE_QUERY,
