@@ -155,7 +155,7 @@ This plan implements ten interconnected improvements across backend schema, API 
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 12. Frontend: Lease detail page redesign with cards
-  - [ ] 12.1 Redesign LeaseDetailPage with card-based layout
+  - [x] 12.1 Redesign LeaseDetailPage with card-based layout
     - Update the lease detail page component to organize information into three card sections: "Inmueble" (property type, rooms, bathrooms, area, address), "Arrendatario" (full name, document, email, phone), and "Acuerdo" (monthly amount, start date, end date, contract link, contract status)
     - Each card section uses visible border/background consistent with platform card styling (`border border-neutral-200 rounded-card bg-white p-4`)
     - Display lease status using `StatusBadge` with `lease` variant at the top
