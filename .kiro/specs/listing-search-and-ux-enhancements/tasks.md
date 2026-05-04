@@ -14,7 +14,7 @@ This plan implements ten interconnected improvements across backend schema, API 
     - _Requirements: 3.1_
 
 - [ ] 2. Backend: Additional features endpoint and listing filter extensions
-  - [~] 2.1 Create GetAdditionalFeaturesUseCase and AdditionalFeatureResponseDto
+  - [x] 2.1 Create GetAdditionalFeaturesUseCase and AdditionalFeatureResponseDto
     - Create `src/backend/modules/property-listings/application/dtos/additional-feature-response.dto.ts` with fields: `id`, `name`, `description`, `type`, `element`, `active`, `main`, `required`, `errorMessage` — all decorated with `@ApiProperty`/`@ApiPropertyOptional`
     - Create `src/backend/modules/property-listings/application/use-cases/get-additional-features.use-case.ts` that queries `AdditionalFeature` where `active: true` and `deleted_at: null`, with optional `main` boolean filter
     - _Requirements: 3.2_
