@@ -133,7 +133,7 @@ export class PrismaNotificationRepository implements INotificationRepository {
 
   async findInAppNotificationsByUserId(userId: string): Promise<InAppNotificationEntity[]> {
     const records = await this.prisma.inAppNotification.findMany({
-      where: { user_id: userId },
+      where: { user_id: userId, ...softDeleteFilter },
       orderBy: { created_at: 'desc' },
     });
 
@@ -155,13 +155,13 @@ export class PrismaNotificationRepository implements INotificationRepository {
 
   async countUnreadByUserId(userId: string): Promise<number> {
     return this.prisma.inAppNotification.count({
-      where: { user_id: userId, read: false },
+      where: { user_id: userId, read: false, ...softDeleteFilter },
     });
   }
 
   async markAsRead(id: string, userId: string): Promise<InAppNotificationEntity | null> {
     const existing = await this.prisma.inAppNotification.findFirst({
-      where: { id, user_id: userId },
+      where: { id, user_id: userId, ...softDeleteFilter },
     });
 
     if (!existing) return null;
@@ -186,7 +186,7 @@ export class PrismaNotificationRepository implements INotificationRepository {
 
   async markAllAsRead(userId: string): Promise<number> {
     const result = await this.prisma.inAppNotification.updateMany({
-      where: { user_id: userId, read: false },
+      where: { user_id: userId, read: false, ...softDeleteFilter },
       data: { read: true },
     });
 
