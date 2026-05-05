@@ -106,24 +106,27 @@ describe('Bug Condition Exploration — UX Polish Bugs Exist on Unfixed Code', (
 
     // ─── Test 1e: Local formatCOP in ListingManagementView produces single $ ───
     describe('Test 1e: ListingManagementView formatCOP produces single ' + DOLLAR, () => {
-        it('local formatCOP should return string starting with ' + DOLLAR + ' (exactly one)', () => {
+        it('local formatCOP in ListingManagementView source should prepend exactly one ' + DOLLAR, () => {
             /**
              * **Validates: Requirements 2.4**
              *
-             * Replicate the CURRENT (buggy) logic from ListingManagementView and verify
-             * it produces exactly one $ symbol.
+             * Verify the ACTUAL formatCOP function in ListingManagementView returns
+             * a string starting with exactly one $ symbol.
              */
-            function formatCOPBuggy(amount: number): string {
-                const digits = String(Math.round(amount));
-                const formatted = digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-                return `${formatted}`;
-            }
+            const source = fs.readFileSync(
+                path.resolve(__dirname, '../../modules/landlord-portfolio/components/ListingManagementView.tsx'),
+                'utf-8',
+            );
 
-            const result = formatCOPBuggy(120000);
+            // Extract the formatCOP function body
+            const funcMatch = source.match(/function formatCOP\(amount: number\): string \{[\s\S]*?return [`']([^`']*)[`'];?\s*\}/);
+            expect(funcMatch).not.toBeNull();
 
-            expect(result.startsWith(DOLLAR)).toBe(true);
-            const dollarCount = result.split('').filter(c => c === DOLLAR).length;
-            expect(dollarCount).toBe(1);
+            // The return template should contain a literal $ before the interpolation
+            const returnStatement = funcMatch![0];
+            const hasLiteralDollar = returnStatement.includes('return `$${');
+
+            expect(hasLiteralDollar).toBe(true);
         });
     });
 

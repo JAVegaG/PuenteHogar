@@ -44,6 +44,7 @@ describe('Bug Condition Exploration — Test 1g: HandleSigningWebhookUseCase sch
                 { userId: 'landlord-1', roleInContract: 'LANDLORD' },
                 { userId: 'tenant-1', roleInContract: 'TENANT' },
             ]),
+            getLeaseMonthlyAmount: jest.fn().mockResolvedValue({ amount: 1200000, currency: 'COP' }),
         };
 
         // Mock notification port
@@ -61,14 +62,12 @@ describe('Bug Condition Exploration — Test 1g: HandleSigningWebhookUseCase sch
             scheduleInitialPayment: jest.fn().mockResolvedValue(undefined),
         };
 
-        // The use case constructor should accept a payment scheduling port
-        // On unfixed code, this will fail because the constructor doesn't accept it
+        // The use case constructor accepts: repository, notificationPort, paymentSchedulingPort, auditLogger
         const useCase = new HandleSigningWebhookUseCase(
             mockRepository as IContractRepository,
             mockNotificationPort as INotificationPort,
+            mockPaymentSchedulingPort as any,
             mockAuditLogger,
-            // @ts-expect-error — On unfixed code, this parameter doesn't exist
-            mockPaymentSchedulingPort,
         );
 
         const dto: SigningWebhookDto = {
