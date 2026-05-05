@@ -275,7 +275,7 @@
     - _Preservation: existing lease state transitions with leaseId still work_
     - _Requirements: 2.10, 3.11_
 
-- [ ] 15. Final verification — Run tests for bugs 8-10
+- [x] 15. Final verification — Run tests for bugs 8-10
   - Run frontend tests to verify startDate pre-fill works
   - Run backend tests to verify area is returned and lease resolution works
   - Verify no regressions in existing tests
