@@ -2,6 +2,10 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
 import type { IContractRepository } from '@modules/contracts/domain/ports/contract-repository.port';
 import type { INotificationPort } from '@modules/contracts/domain/ports/notification.port';
+import {
+  PAYMENT_SCHEDULING_PORT,
+  type IPaymentSchedulingPort,
+} from '@modules/contracts/domain/ports/payment-scheduling.port';
 import { SigningWebhookDto } from '@modules/contracts/application/dtos/signing-webhook.dto';
 import {
   CONTRACT_NOTIFICATION_PORT,
@@ -15,6 +19,8 @@ export class HandleSigningWebhookUseCase {
     private readonly repository: IContractRepository,
     @Inject(CONTRACT_NOTIFICATION_PORT)
     private readonly notificationPort: INotificationPort,
+    @Inject(PAYMENT_SCHEDULING_PORT)
+    private readonly paymentSchedulingPort: IPaymentSchedulingPort,
     private readonly auditLogger: AuditLoggerService,
   ) { }
 
@@ -51,6 +57,14 @@ export class HandleSigningWebhookUseCase {
         timestamp: new Date(),
         metadata: { externalSigningId: dto.externalSigningId },
       });
+
+      // fire-and-forget: schedule initial payment
+      const leaseInfo = await this.repository.getLeaseMonthlyAmount(contract.leaseId);
+      if (leaseInfo) {
+        this.paymentSchedulingPort
+          .scheduleInitialPayment(contract.leaseId, leaseInfo.amount, 'COP', contract.startDate)
+          .catch(() => undefined);
+      }
     } else {
       // FAILED — keep SIGNATURE_PENDING for retry
       await this.repository.updateStatus(contract.id, 'SIGNATURE_PENDING');
