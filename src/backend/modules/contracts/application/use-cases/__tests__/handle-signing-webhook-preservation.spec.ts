@@ -14,6 +14,7 @@ import { HandleSigningWebhookUseCase } from '../handle-signing-webhook.use-case'
 import { ContractEntity } from '@modules/contracts/domain/entities/contract.entity';
 import type { IContractRepository } from '@modules/contracts/domain/ports/contract-repository.port';
 import type { INotificationPort } from '@modules/contracts/domain/ports/notification.port';
+import type { IPaymentSchedulingPort } from '@modules/contracts/domain/ports/payment-scheduling.port';
 import type { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
 import type { SigningWebhookDto } from '../dtos/signing-webhook.dto';
 
@@ -38,6 +39,7 @@ describe('Preservation Property Tests — HandleSigningWebhookUseCase', () => {
                 { userId: 'landlord-1', roleInContract: 'LANDLORD' },
                 { userId: 'tenant-1', roleInContract: 'TENANT' },
             ]),
+            getLeaseMonthlyAmount: jest.fn().mockResolvedValue({ amount: 1200000, currency: 'COP' }),
         };
 
         const mockNotificationPort: jest.Mocked<Partial<INotificationPort>> = {
@@ -45,11 +47,15 @@ describe('Preservation Property Tests — HandleSigningWebhookUseCase', () => {
             notifySigningFailed: jest.fn().mockResolvedValue(undefined),
         };
 
+        const mockPaymentSchedulingPort = {
+            scheduleInitialPayment: jest.fn().mockResolvedValue(undefined),
+        };
+
         const mockAuditLogger = {
             log: jest.fn(),
         } as unknown as jest.Mocked<AuditLoggerService>;
 
-        return { mockContract, mockRepository, mockNotificationPort, mockAuditLogger };
+        return { mockContract, mockRepository, mockNotificationPort, mockPaymentSchedulingPort, mockAuditLogger };
     }
 
     // ─── Property: For all COMPLETED webhooks, notifications are sent and audit is logged ───
@@ -62,11 +68,12 @@ describe('Preservation Property Tests — HandleSigningWebhookUseCase', () => {
              * notifyContractSigned(landlordUserId, tenantUserId, contractId, signedAt)
              * as fire-and-forget when status is COMPLETED.
              */
-            const { mockRepository, mockNotificationPort, mockAuditLogger } = createMocks();
+            const { mockRepository, mockNotificationPort, mockPaymentSchedulingPort, mockAuditLogger } = createMocks();
 
             const useCase = new HandleSigningWebhookUseCase(
                 mockRepository as unknown as IContractRepository,
                 mockNotificationPort as unknown as INotificationPort,
+                mockPaymentSchedulingPort as unknown as IPaymentSchedulingPort,
                 mockAuditLogger,
             );
 
@@ -95,11 +102,12 @@ describe('Preservation Property Tests — HandleSigningWebhookUseCase', () => {
              * Observation: On unfixed code, HandleSigningWebhookUseCase logs an audit
              * entry with action 'CONTRACT_SIGNED' when status is COMPLETED.
              */
-            const { mockRepository, mockNotificationPort, mockAuditLogger } = createMocks();
+            const { mockRepository, mockNotificationPort, mockPaymentSchedulingPort, mockAuditLogger } = createMocks();
 
             const useCase = new HandleSigningWebhookUseCase(
                 mockRepository as unknown as IContractRepository,
                 mockNotificationPort as unknown as INotificationPort,
+                mockPaymentSchedulingPort as unknown as IPaymentSchedulingPort,
                 mockAuditLogger,
             );
 
@@ -138,11 +146,12 @@ describe('Preservation Property Tests — HandleSigningWebhookUseCase', () => {
                         }),
                     }),
                     async ({ externalSigningId, completedAt }) => {
-                        const { mockRepository, mockNotificationPort, mockAuditLogger } = createMocks();
+                        const { mockRepository, mockNotificationPort, mockPaymentSchedulingPort, mockAuditLogger } = createMocks();
 
                         const useCase = new HandleSigningWebhookUseCase(
                             mockRepository as unknown as IContractRepository,
                             mockNotificationPort as unknown as INotificationPort,
+                            mockPaymentSchedulingPort as unknown as IPaymentSchedulingPort,
                             mockAuditLogger,
                         );
 
@@ -191,11 +200,12 @@ describe('Preservation Property Tests — HandleSigningWebhookUseCase', () => {
              * After the fix adds payment scheduling, FAILED webhooks must still NOT
              * trigger any payment creation.
              */
-            const { mockRepository, mockNotificationPort, mockAuditLogger } = createMocks();
+            const { mockRepository, mockNotificationPort, mockPaymentSchedulingPort, mockAuditLogger } = createMocks();
 
             const useCase = new HandleSigningWebhookUseCase(
                 mockRepository as unknown as IContractRepository,
                 mockNotificationPort as unknown as INotificationPort,
+                mockPaymentSchedulingPort as unknown as IPaymentSchedulingPort,
                 mockAuditLogger,
             );
 
@@ -229,6 +239,9 @@ describe('Preservation Property Tests — HandleSigningWebhookUseCase', () => {
 
             // No contract signed notification
             expect(mockNotificationPort.notifyContractSigned).not.toHaveBeenCalled();
+
+            // No payment scheduling for FAILED webhooks
+            expect(mockPaymentSchedulingPort.scheduleInitialPayment).not.toHaveBeenCalled();
         });
 
         it('property: for all FAILED webhooks with various signing IDs, no payment scheduling occurs and correct failure handling happens', async () => {
@@ -246,11 +259,12 @@ describe('Preservation Property Tests — HandleSigningWebhookUseCase', () => {
                 fc.asyncProperty(
                     fc.string({ minLength: 1, maxLength: 50 }), // externalSigningId
                     async (externalSigningId) => {
-                        const { mockRepository, mockNotificationPort, mockAuditLogger } = createMocks();
+                        const { mockRepository, mockNotificationPort, mockPaymentSchedulingPort, mockAuditLogger } = createMocks();
 
                         const useCase = new HandleSigningWebhookUseCase(
                             mockRepository as unknown as IContractRepository,
                             mockNotificationPort as unknown as INotificationPort,
+                            mockPaymentSchedulingPort as unknown as IPaymentSchedulingPort,
                             mockAuditLogger,
                         );
 
@@ -307,11 +321,12 @@ describe('Preservation Property Tests — HandleSigningWebhookUseCase', () => {
                         }),
                     }),
                     async ({ externalSigningId, completedAt }) => {
-                        const { mockRepository, mockNotificationPort, mockAuditLogger } = createMocks();
+                        const { mockRepository, mockNotificationPort, mockPaymentSchedulingPort, mockAuditLogger } = createMocks();
 
                         const useCase = new HandleSigningWebhookUseCase(
                             mockRepository as unknown as IContractRepository,
                             mockNotificationPort as unknown as INotificationPort,
+                            mockPaymentSchedulingPort as unknown as IPaymentSchedulingPort,
                             mockAuditLogger,
                         );
 

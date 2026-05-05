@@ -49,8 +49,9 @@ describe('Preservation Property Tests — Existing Behavior Unchanged', () => {
             /**
              * **Validates: Requirements 3.1, 3.6**
              *
-             * Since the current code has no variant prop, the red styling is always applied.
-             * We verify this by checking the source contains the hardcoded red class.
+             * The default variant ('destructive') uses bg-red-600.
+             * We verify the source contains bg-red-600 in the confirm button's
+             * variant-aware className (destructive branch).
              */
             fc.assert(
                 fc.property(
@@ -60,13 +61,14 @@ describe('Preservation Property Tests — Existing Behavior Unchanged', () => {
                         confirmLabel: fc.string({ minLength: 1, maxLength: 30 }),
                     }),
                     () => {
-                        // Regardless of props, the source always has bg-red-600 on the confirm button
+                        // The source must contain bg-red-600 for the destructive variant (default)
                         const source = readSource('../../shared/components/ConfirmationDialog.tsx');
-                        const confirmButtonMatch = source.match(
-                            /onClick=\{onConfirm\}[\s\S]*?className="([^"]+)"/
-                        );
-                        expect(confirmButtonMatch).not.toBeNull();
-                        expect(confirmButtonMatch![1]).toContain('bg-red-600');
+                        // Confirm button uses onClick={onConfirm} and its className contains bg-red-600
+                        // for the destructive (default) variant
+                        expect(source).toContain('onClick={onConfirm}');
+                        expect(source).toContain("variant = 'destructive'");
+                        // The destructive branch of the className includes bg-red-600
+                        expect(source).toMatch(/bg-red-600.*hover:bg-red-700/);
                         return true;
                     },
                 ),
