@@ -239,6 +239,18 @@ _For any_ `CONTRACT_SIGNED` or `PAYMENT_RECEIVED` state transition, the `Trackin
 
 **Validates: Requirements 3.12**
 
+Property 16: Bug Condition — Tenant Contact Info Visible in NEW_INTEREST Notification
+
+_For any_ `NEW_INTEREST` notification displayed to a landlord in `/mis-notificaciones`, the notification message SHALL include the tenant's name (using bold markdown), and the notification card SHALL render the tenant's email and phone number from the `data` field so the landlord can immediately follow up.
+
+**Validates: Requirements 2.15**
+
+Property 17: Preservation — Other Notification Types Render Unchanged
+
+_For any_ notification type other than `NEW_INTEREST`, the notification card SHALL continue to render only title, message, and timestamp without additional contact info fields.
+
+**Validates: Requirements 3.13**
+
 ## Fix Implementation
 
 ### Changes Required
@@ -454,6 +466,22 @@ Assuming our root cause analysis is correct:
 **Changes**:
 1. **Inject `IPIIEncryptor`**: For decrypting tenant phone number
 2. **Implement `getTenantContactInfo`**: Cross-schema lookup: User → NaturalPersonDetail/LegalPersonDetail for name, User.mail for email, decrypt User.phone_number for phone
+
+---
+
+**File**: `src/backend/modules/notifications/application/use-cases/send-notification.use-case.ts`
+
+**Changes**:
+1. **Update `buildNotificationContent` for `NEW_INTEREST`**: Include tenant name in the message using bold markdown: `**{tenantName}** ha mostrado interés en tu inmueble **{propertyTitle}**.` (falls back to current generic message if tenantName is not in data)
+
+---
+
+**File**: `src/frontend/modules/notifications/components/NotificationsListView.tsx`
+
+**Changes**:
+1. **Render tenant contact info for `NEW_INTEREST` notifications**: When `notification.notificationType === 'NEW_INTEREST'` and `notification.data.tenantEmail` or `notification.data.tenantPhone` exist, render them below the message in a compact contact info section
+2. **Contact info styling**: Use `text-caption text-neutral-600` with email and phone icons, displayed as clickable `mailto:` and `tel:` links for easy follow-up
+3. **Conditional rendering**: Only show contact info section for `NEW_INTEREST` type — other notification types remain unchanged
 
 ## Testing Strategy
 

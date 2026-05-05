@@ -30,6 +30,8 @@ This document covers multiple UI/UX polish bugs reported by a tenant user during
 
 1.11 WHEN a tenant successfully initiates contact with a landlord (CONTACT_INITIATED state transition) THEN the rental-tracking module's notification port is a no-op stub that does nothing — no in-app notification is created, no external notification is sent — so the landlord is never informed that a tenant is interested in their property, despite the `NEW_INTEREST` notification type existing in the database and the `SendNotificationUseCase` being fully functional in other modules
 
+1.12 WHEN a landlord receives a "Nuevo interesado" notification in `/mis-notificaciones` THEN the notification card only shows the title ("Nuevo interesado") and a generic message ("Un arrendatario ha mostrado interés en tu inmueble **{propertyTitle}**.") — the tenant's contact information (name, email, phone) is stored in the notification's `data` JSON field but is NOT displayed anywhere in the UI — the landlord has no way to see who the interested tenant is or how to contact them, making the notification effectively useless for follow-up
+
 ### Expected Behavior (Correct)
 
 2.1 WHEN a tenant clicks "Contactar arrendador" on a listing detail page THEN the ConfirmationDialog SHALL display the "Confirmar" button with the primary blue style (`bg-[#1d4ed8]`) to indicate a safe, non-destructive action — the ConfirmationDialog component SHALL support a `variant` prop (`"destructive"` | `"primary"`) defaulting to `"destructive"` for backward compatibility
@@ -60,6 +62,8 @@ This document covers multiple UI/UX polish bugs reported by a tenant user during
 
 2.14 WHEN a tenant successfully initiates contact with a landlord (CONTACT_INITIATED state transition) THEN the rental-tracking module SHALL send a real notification to the landlord using the `NEW_INTEREST` notification type via `SendNotificationUseCase` — the notification SHALL include the property title and the tenant's contact information (name, email, phone) so the landlord can follow up — the notification port stub SHALL be replaced with a real `TrackingNotificationAdapter` that imports `NotificationsModule`
 
+2.15 WHEN a landlord views a "Nuevo interesado" notification in `/mis-notificaciones` THEN the notification card SHALL display the tenant's contact information (name, email, phone number) extracted from the notification's `data` field — the notification message SHALL include the tenant's name (e.g., "**Juan Pérez** ha mostrado interés en tu inmueble **Hermosa casa en el limonar**.") and the card SHALL render the email and phone below the message so the landlord can immediately follow up without needing a separate screen or flow
+
 ### Unchanged Behavior (Regression Prevention)
 
 3.1 WHEN the ConfirmationDialog is used for destructive actions (e.g., delete portfolio, delete unit, unpublish listing) THEN the system SHALL CONTINUE TO display the confirm button with the red destructive style (`bg-red-600`)
@@ -85,3 +89,5 @@ This document covers multiple UI/UX polish bugs reported by a tenant user during
 3.11 WHEN a tenant successfully contacts a landlord via the existing flow (where a valid lease ID is provided) THEN the system SHALL CONTINUE TO transition the lease state correctly and send notifications
 
 3.12 WHEN the `CONTACT_INITIATED` notification is sent to the landlord THEN the existing `CONTRACT_SIGNED` and `PAYMENT_RECEIVED` notification flows in other modules (contracts, payments) SHALL CONTINUE TO work independently — the rental-tracking notification adapter SHALL only handle `CONTACT_INITIATED` and delegate other states to their respective module adapters
+
+3.13 WHEN other notification types (CONTRACT_SIGNED, PAYMENT_RECEIVED, LEASE_CREATED, LEASE_CANCELLED, CONTRACT_UPLOADED) are displayed in `/mis-notificaciones` THEN they SHALL CONTINUE TO render as before (title + message only) — the tenant contact info display is specific to `NEW_INTEREST` notifications only
