@@ -58,4 +58,5 @@ export interface IContractRepository {
   updateFileUrl(contractId: string, newFileUrl: string): Promise<ContractEntity>;
   deleteContract(contractId: string): Promise<void>;
   findSigningsByContractId(contractId: string): Promise<SigningInfo[]>;
+  getLeaseMonthlyAmount(leaseId: string): Promise<{ amount: number; currency: string } | null>;
 }

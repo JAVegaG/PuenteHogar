@@ -298,6 +298,25 @@ export class PrismaContractRepository implements IContractRepository {
     });
   }
 
+  async getLeaseMonthlyAmount(leaseId: string): Promise<{ amount: number; currency: string } | null> {
+    const lease = await this.prisma.lease.findFirst({
+      where: { id: leaseId },
+      select: { portfolio_unit_id: true },
+    });
+    if (!lease) return null;
+
+    const unit = await this.prisma.portfolioUnit.findFirst({
+      where: { id: lease.portfolio_unit_id },
+      select: { lease_base_amount: true, lease_base_currency: true },
+    });
+    if (!unit) return null;
+
+    return {
+      amount: Number(unit.lease_base_amount),
+      currency: unit.lease_base_currency ?? 'COP',
+    };
+  }
+
   async findSigningsByContractId(contractId: string): Promise<SigningInfo[]> {
     const parties = await this.prisma.contractParty.findMany({
       where: { contract_id: contractId },
