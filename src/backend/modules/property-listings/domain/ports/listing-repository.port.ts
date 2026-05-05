@@ -34,6 +34,7 @@ export interface ListingDetail {
   numberOfRooms: number | null;
   numberOfBathrooms: number | null;
   propertyType: string | null;
+  area: number | null;
   address: {
     state: string;
     city: string;

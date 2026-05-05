@@ -55,6 +55,9 @@ export class ListingDetailResponseDto {
   @ApiPropertyOptional({ type: () => ListingAddressDto, nullable: true })
   address!: ListingAddressDto | null;
 
+  @ApiPropertyOptional({ nullable: true })
+  area!: number | null;
+
   @ApiPropertyOptional({ nullable: true, description: 'ID del arrendador para contacto' })
   landlordUserId!: string | null;
 }

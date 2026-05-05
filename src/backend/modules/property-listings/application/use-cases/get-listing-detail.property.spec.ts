@@ -97,6 +97,7 @@ function buildListingDetail(data: {
     numberOfRooms: data.numberOfRooms,
     numberOfBathrooms: data.numberOfBathrooms,
     propertyType: data.propertyType,
+    area: null,
     address: data.address,
     landlordUserId: data.landlordUserId,
   };
@@ -238,6 +239,7 @@ describe('GetListingDetailUseCase — Property 20: Detalle de inmueble contiene 
       numberOfRooms: 2,
       numberOfBathrooms: 1,
       propertyType: 'APARTMENT',
+      area: null,
       address: { state: 'Valle', city: 'Cali', neighborhood: 'Centro', address: 'Calle 1 #2-3' },
       landlordUserId: uuidv4(),
     };

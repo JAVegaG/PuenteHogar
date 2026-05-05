@@ -263,6 +263,7 @@ export class PrismaListingRepository implements IListingRepository {
     let numberOfRooms: number | null = null;
     let numberOfBathrooms: number | null = null;
     let propertyType: string | null = null;
+    let area: number | null = null;
     let address: ListingDetail['address'] = null;
     let landlordUserId: string | null = null;
 
@@ -276,6 +277,9 @@ export class PrismaListingRepository implements IListingRepository {
         numberOfRooms = property.number_of_rooms;
         numberOfBathrooms = property.number_of_bathrooms;
         propertyType = property.property_type;
+        if (property.length !== null && property.width !== null) {
+          area = Number(property.length) * Number(property.width);
+        }
         if (property.address) {
           address = {
             state: property.address.state,
@@ -298,6 +302,7 @@ export class PrismaListingRepository implements IListingRepository {
       numberOfRooms,
       numberOfBathrooms,
       propertyType,
+      area,
       address,
       landlordUserId,
     };

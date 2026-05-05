@@ -28,6 +28,7 @@ export interface ListingAddress {
 }
 
 export interface ListingDetail extends Listing {
+  area: number | null;
   address: ListingAddress | null;
   landlordUserId: string | null;
 }

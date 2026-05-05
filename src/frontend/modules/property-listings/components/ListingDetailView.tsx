@@ -29,7 +29,7 @@ export default function ListingDetailView({ listing }: ListingDetailViewProps) {
         <PropertyInfoGrid
           rooms={listing.numberOfRooms}
           bathrooms={listing.numberOfBathrooms}
-          area={null}
+          area={listing.area}
         />
       </section>
 

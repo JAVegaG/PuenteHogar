@@ -8,7 +8,7 @@ export class GetListingDetailUseCase {
   constructor(
     @Inject(LISTING_REPOSITORY)
     private readonly repository: IListingRepository,
-  ) {}
+  ) { }
 
   async execute(listingId: string): Promise<ListingDetailResponseDto> {
     const detail = await this.repository.findDetailById(listingId);
@@ -34,6 +34,7 @@ export class GetListingDetailUseCase {
     dto.numberOfRooms = detail.numberOfRooms;
     dto.numberOfBathrooms = detail.numberOfBathrooms;
     dto.propertyType = detail.propertyType;
+    dto.area = detail.area;
     dto.address = detail.address;
     dto.landlordUserId = detail.landlordUserId;
     return dto;
