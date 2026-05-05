@@ -287,7 +287,7 @@
     - File: `src/backend/modules/rental-tracking/application/use-cases/transition-lease-state.use-case.ts`
     - _Requirements: 2.11_
 
-  - [ ] 16.2 Enhance notification to include tenant contact info for CONTACT_INITIATED
+  - [x] 16.2 Enhance notification to include tenant contact info for CONTACT_INITIATED
     - When state is CONTACT_INITIATED, resolve tenant's name, email, phone (via cross-schema lookup) and include in the notification payload
     - The landlord should receive the tenant's contact info so they can follow up
     - Update the notification port interface if needed to support additional metadata
