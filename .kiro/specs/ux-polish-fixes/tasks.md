@@ -115,7 +115,7 @@
 
 - [ ] 7. Fix Bug #5 — Pagination chevron clipped
 
-  - [~] 7.1 Replace select styling with appearance-none + custom chevron
+  - [x] 7.1 Replace select styling with appearance-none + custom chevron
     - Change the `<select>` element's className from `px-2 py-1` to use:
       - `appearance-none`
       - `pl-3 pr-8` for adequate chevron space
@@ -130,42 +130,42 @@
 
 - [ ] 8. Fix Bug #6 — Missing scheduled payment on contract signing
 
-  - [~] 8.1 Create `IPaymentSchedulingPort` interface
+  - [x] 8.1 Create `IPaymentSchedulingPort` interface
     - Define port interface with method: `scheduleInitialPayment(leaseId: string, amount: number, currency: string, dueDate: Date): Promise<void>`
     - Export DI token: `export const PAYMENT_SCHEDULING_PORT = 'PAYMENT_SCHEDULING_PORT'`
     - File (NEW): `src/backend/modules/contracts/domain/ports/payment-scheduling.port.ts`
     - _Requirements: 2.6_
 
-  - [~] 8.2 Create `PaymentSchedulingAdapter` implementation
+  - [x] 8.2 Create `PaymentSchedulingAdapter` implementation
     - Implement `IPaymentSchedulingPort` as `@Injectable()` class
     - Inject `PrismaService`
     - Create `ScheduledPayment` record: `prisma.scheduledPayment.create({ data: { lease_id, amount, currency, due_date } })`
     - File (NEW): `src/backend/modules/payments/infrastructure/adapters/payment-scheduling.adapter.ts`
     - _Requirements: 2.6_
 
-  - [~] 8.3 Export adapter from PaymentsModule
+  - [x] 8.3 Export adapter from PaymentsModule
     - Register `PaymentSchedulingAdapter` as provider in `payments.module.ts`
     - Export `PaymentSchedulingAdapter` so the contracts module can inject it
     - File: `src/backend/modules/payments/payments.module.ts`
     - _Requirements: 2.6_
 
-  - [~] 8.4 Import PaymentsModule in ContractsModule and register port
+  - [x] 8.4 Import PaymentsModule in ContractsModule and register port
     - Add `PaymentsModule` to the `imports` array
     - Add `{ provide: PAYMENT_SCHEDULING_PORT, useExisting: PaymentSchedulingAdapter }` to providers
     - File: `src/backend/modules/contracts/contracts.module.ts`
     - _Requirements: 2.6_
 
-  - [~] 8.5 Add `getLeaseMonthlyAmount` to contract repository port
+  - [x] 8.5 Add `getLeaseMonthlyAmount` to contract repository port
     - Add method signature: `getLeaseMonthlyAmount(leaseId: string): Promise<{ amount: number; currency: string } | null>`
     - File: `src/backend/modules/contracts/domain/ports/contract-repository.port.ts`
     - _Requirements: 2.6_
 
-  - [~] 8.6 Implement `getLeaseMonthlyAmount` in Prisma repository
+  - [x] 8.6 Implement `getLeaseMonthlyAmount` in Prisma repository
     - Multi-step query: find Lease by ID → get associated PortfolioUnit → return `{ amount: portfolioUnit.lease_base_amount, currency: portfolioUnit.lease_base_currency ?? 'COP' }`
     - File: `src/backend/modules/contracts/infrastructure/repositories/prisma-contract.repository.ts`
     - _Requirements: 2.6_
 
-  - [~] 8.7 Inject port and call fire-and-forget in HandleSigningWebhookUseCase
+  - [x] 8.7 Inject port and call fire-and-forget in HandleSigningWebhookUseCase
     - Add `@Inject(PAYMENT_SCHEDULING_PORT) private readonly paymentSchedulingPort: IPaymentSchedulingPort` to constructor
     - After notifications block (when status is COMPLETED): look up lease amount via `this.repository.getLeaseMonthlyAmount(contract.leaseId)`
     - Call `this.paymentSchedulingPort.scheduleInitialPayment(contract.leaseId, leaseAmount, 'COP', contract.startDate).catch(() => undefined)` — fire-and-forget pattern
@@ -178,7 +178,7 @@
 
 - [ ] 9. Fix Bug #7 — MVP stub testing documentation
 
-  - [~] 9.1 Create `documentation/MVP-STUB-TESTING-GUIDE.md`
+  - [x] 9.1 Create `documentation/MVP-STUB-TESTING-GUIDE.md`
     - **Overview**: Explain MVP stubs for external integrations and what manual steps are needed
     - **Stubs Reference**: Table of all stubs (ESignatureProviderAdapter, PaymentGatewayAdapter, MessagingChannelAdapter) with behavior and manual intervention requirements
     - **E-Signature Flow**: Step-by-step guide with curl command for `POST /contracts/webhook/signing`
