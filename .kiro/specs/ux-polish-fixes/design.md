@@ -227,6 +227,18 @@ _For any_ developer or tester following the MVP Stub Testing Guide (`documentati
 
 **Validates: Requirements 2.7, 3.9**
 
+Property 14: Bug Condition — Landlord Receives Real Notification on CONTACT_INITIATED
+
+_For any_ `CONTACT_INITIATED` state transition triggered by a tenant, the `TrackingNotificationAdapter` SHALL send a real in-app notification to the landlord using the `NEW_INTEREST` notification type via `SendNotificationUseCase`. The notification data SHALL include the property title and the tenant's contact information (fullName, email, phoneNumber). The adapter SHALL NOT be a no-op stub.
+
+**Validates: Requirements 2.11, 2.14**
+
+Property 15: Preservation — Other Module Notifications Unaffected
+
+_For any_ `CONTRACT_SIGNED` or `PAYMENT_RECEIVED` state transition, the `TrackingNotificationAdapter` SHALL be a no-op (those notifications are handled by the contracts and payments module adapters respectively). The rental-tracking adapter SHALL NOT duplicate notifications already sent by other modules.
+
+**Validates: Requirements 3.12**
+
 ## Fix Implementation
 
 ### Changes Required
@@ -400,6 +412,48 @@ Assuming our root cause analysis is correct:
    - **Messaging**: Note that the messaging stub (`MessagingChannelAdapter`) just logs notifications to the NestJS console — no manual intervention needed, notifications can be verified by checking server logs
 
 **No new Property-Based Tests needed** — this is a documentation-only task. Correctness is validated by manual review: the guide must contain accurate endpoint URLs, valid JSON payloads matching the DTO schemas (`SigningWebhookDto`, `PaymentWebhookDto`), and correct state transition descriptions.
+
+---
+
+**File**: `src/backend/modules/rental-tracking/infrastructure/adapters/tracking-notification.adapter.ts` (NEW)
+
+**Changes**:
+1. **Create `TrackingNotificationAdapter`**: Implements `ITrackingNotificationPort` using `SendNotificationUseCase`
+2. **Handle `CONTACT_INITIATED`**: Sends a `NEW_INTEREST` notification to the landlord with property title and tenant contact info (name, email, phone)
+3. **Resolve property title**: Cross-schema lookup via Lease → PortfolioUnit → Listing.title (with fallback to PortfolioUnit.name)
+4. **Delegate other states**: `CONTRACT_SIGNED` and `PAYMENT_RECEIVED` are handled by their respective module adapters — the tracking adapter is a no-op for those
+
+---
+
+**File**: `src/backend/modules/rental-tracking/rental-tracking.module.ts`
+
+**Changes**:
+1. **Import `NotificationsModule`**: Required for `SendNotificationUseCase` injection into the adapter
+2. **Replace stub with real adapter**: Change `provide: TRACKING_NOTIFICATION_PORT` from `useValue` (no-op stub) to `useClass: TrackingNotificationAdapter`
+
+---
+
+**File**: `src/backend/modules/rental-tracking/domain/ports/notification.port.ts`
+
+**Changes**:
+1. **Add `TenantContactInfo` interface**: `{ fullName: string; email: string; phoneNumber: string }`
+2. **Add `LeaseStateNotificationMetadata` interface**: `{ tenantContact?: TenantContactInfo }`
+3. **Extend `notifyLeaseStateChanged` signature**: Add optional `metadata?: LeaseStateNotificationMetadata` parameter
+
+---
+
+**File**: `src/backend/modules/rental-tracking/domain/ports/tracking-repository.port.ts`
+
+**Changes**:
+1. **Add `getTenantContactInfo` method**: `getTenantContactInfo(tenantUserId: string): Promise<TenantContactInfo | null>` — resolves tenant name, email, and decrypted phone via cross-schema lookup
+
+---
+
+**File**: `src/backend/modules/rental-tracking/infrastructure/repositories/prisma-tracking.repository.ts`
+
+**Changes**:
+1. **Inject `IPIIEncryptor`**: For decrypting tenant phone number
+2. **Implement `getTenantContactInfo`**: Cross-schema lookup: User → NaturalPersonDetail/LegalPersonDetail for name, User.mail for email, decrypt User.phone_number for phone
 
 ## Testing Strategy
 

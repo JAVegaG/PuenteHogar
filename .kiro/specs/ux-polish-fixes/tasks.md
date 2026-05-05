@@ -294,6 +294,17 @@
     - Files: `src/backend/modules/rental-tracking/domain/ports/notification.port.ts`, `src/backend/modules/rental-tracking/application/use-cases/transition-lease-state.use-case.ts`
     - _Requirements: 2.11_
 
+  - [x] 16.3 Wire real TrackingNotificationAdapter replacing the no-op stub
+    - The rental-tracking module's notification port was a stub (`useValue: { notifyLeaseStateChanged: async () => {} }`) that never sent notifications
+    - Create `TrackingNotificationAdapter` implementing `ITrackingNotificationPort` using `SendNotificationUseCase`
+    - Use `NEW_INTEREST` notification type (already seeded in DB) for `CONTACT_INITIATED` state
+    - Include tenant contact info (name, email, phone) and property title in notification data
+    - Resolve property title from lease via cross-schema lookup (Lease → PortfolioUnit → Listing.title)
+    - Import `NotificationsModule` in `RentalTrackingModule` and register adapter with `useClass`
+    - File (NEW): `src/backend/modules/rental-tracking/infrastructure/adapters/tracking-notification.adapter.ts`
+    - File: `src/backend/modules/rental-tracking/rental-tracking.module.ts`
+    - _Requirements: 2.11, 2.14, 3.12_
+
 - [ ] 17. Fix Bug #12 — Contact button and message too wide on desktop
 
   - [x] 17.1 Constrain ContactLandlordButton width on desktop

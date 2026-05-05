@@ -28,6 +28,8 @@ This document covers multiple UI/UX polish bugs reported by a tenant user during
 
 1.10 WHEN a tenant clicks "Contactar arrendador" on a published listing THEN the system returns "No se encontró un arriendo asociado a este inmueble" because the frontend passes the `listingId` to `transitionLeaseState` but the backend expects a `leaseId` — the system has no mechanism to resolve a listing ID to its associated lease ID
 
+1.11 WHEN a tenant successfully initiates contact with a landlord (CONTACT_INITIATED state transition) THEN the rental-tracking module's notification port is a no-op stub that does nothing — no in-app notification is created, no external notification is sent — so the landlord is never informed that a tenant is interested in their property, despite the `NEW_INTEREST` notification type existing in the database and the `SendNotificationUseCase` being fully functional in other modules
+
 ### Expected Behavior (Correct)
 
 2.1 WHEN a tenant clicks "Contactar arrendador" on a listing detail page THEN the ConfirmationDialog SHALL display the "Confirmar" button with the primary blue style (`bg-[#1d4ed8]`) to indicate a safe, non-destructive action — the ConfirmationDialog component SHALL support a `variant` prop (`"destructive"` | `"primary"`) defaulting to `"destructive"` for backward compatibility
@@ -56,6 +58,8 @@ This document covers multiple UI/UX polish bugs reported by a tenant user during
 
 2.13 WHEN the area value is `null` or `undefined` (property has no length/width data) THEN the PropertyInfoGrid SHALL display "-" for the Área field — it SHALL NOT display "undefined m²" or "null m²"
 
+2.14 WHEN a tenant successfully initiates contact with a landlord (CONTACT_INITIATED state transition) THEN the rental-tracking module SHALL send a real notification to the landlord using the `NEW_INTEREST` notification type via `SendNotificationUseCase` — the notification SHALL include the property title and the tenant's contact information (name, email, phone) so the landlord can follow up — the notification port stub SHALL be replaced with a real `TrackingNotificationAdapter` that imports `NotificationsModule`
+
 ### Unchanged Behavior (Regression Prevention)
 
 3.1 WHEN the ConfirmationDialog is used for destructive actions (e.g., delete portfolio, delete unit, unpublish listing) THEN the system SHALL CONTINUE TO display the confirm button with the red destructive style (`bg-red-600`)
@@ -79,3 +83,5 @@ This document covers multiple UI/UX polish bugs reported by a tenant user during
 3.10 WHEN the listing detail page displays rooms and bathrooms THEN the system SHALL CONTINUE TO display those values correctly — the area fix must not affect existing property info rendering
 
 3.11 WHEN a tenant successfully contacts a landlord via the existing flow (where a valid lease ID is provided) THEN the system SHALL CONTINUE TO transition the lease state correctly and send notifications
+
+3.12 WHEN the `CONTACT_INITIATED` notification is sent to the landlord THEN the existing `CONTRACT_SIGNED` and `PAYMENT_RECEIVED` notification flows in other modules (contracts, payments) SHALL CONTINUE TO work independently — the rental-tracking notification adapter SHALL only handle `CONTACT_INITIATED` and delegate other states to their respective module adapters
