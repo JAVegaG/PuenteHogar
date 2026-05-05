@@ -268,6 +268,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             updateFileUrl: jest.fn(),
             deleteContract: jest.fn(),
             findSigningsByContractId: jest.fn(),
+            getLeaseMonthlyAmount: jest.fn(),
           };
           const mockObjectStorage: IObjectStorage = {
             uploadFile: jest.fn(),
@@ -346,6 +347,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
               updateFileUrl: jest.fn(),
               deleteContract: jest.fn(),
               findSigningsByContractId: jest.fn().mockResolvedValue([]),
+              getLeaseMonthlyAmount: jest.fn(),
             };
 
             const mockObjectStorage: IObjectStorage = {
@@ -410,6 +412,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
               updateFileUrl: jest.fn(),
               deleteContract: jest.fn(),
               findSigningsByContractId: jest.fn().mockResolvedValue([]),
+              getLeaseMonthlyAmount: jest.fn(),
             };
 
             const mockObjectStorage2: IObjectStorage = {

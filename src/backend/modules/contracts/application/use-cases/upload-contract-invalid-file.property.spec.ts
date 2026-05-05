@@ -87,6 +87,7 @@ function makeRepositoryStub(): { stub: IContractRepository; createCallCount: num
     async updateFileUrl(): Promise<ContractEntity> { throw new Error('Not expected'); },
     async deleteContract(): Promise<void> { throw new Error('Not expected'); },
     async findSigningsByContractId(): Promise<any[]> { return []; },
+    async getLeaseMonthlyAmount(): Promise<{ amount: number; currency: string } | null> { return null; },
   };
 
   return { stub, createCallCount };

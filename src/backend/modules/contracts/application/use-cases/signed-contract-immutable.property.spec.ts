@@ -152,6 +152,7 @@ function makeStubs(input: {
     async findSigningsByContractId(): Promise<any[]> {
       return [];
     },
+    async getLeaseMonthlyAmount(): Promise<{ amount: number; currency: string } | null> { return null; },
   };
 
   const eSignatureProvider: IESignatureProvider = {
