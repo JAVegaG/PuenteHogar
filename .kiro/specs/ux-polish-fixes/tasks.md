@@ -217,3 +217,65 @@
   - Ensure no other existing tests are broken
   - Check TSC, linting and formatting, solve all issues
   - Ask the user if questions arise
+
+- [ ] 12. Fix Bug #8 — startDate ISO format not compatible with date input
+
+  - [x] 12.1 Convert ISO startDate to YYYY-MM-DD format in ContractWizard
+    - The lease API returns `startDate` as ISO string (e.g., `"2026-05-03T00:00:00.000Z"`)
+    - HTML `<input type="date">` requires `YYYY-MM-DD` format (e.g., `"2026-05-03"`)
+    - Change `startDate: lease.startDate || ''` to `startDate: lease.startDate ? lease.startDate.split('T')[0] : ''`
+    - File: `src/frontend/modules/landlord-contracts/components/ContractWizard.tsx`
+    - _Bug_Condition: lease.startDate is ISO format AND date input shows empty_
+    - _Expected_Behavior: date input displays the date correctly in YYYY-MM-DD format_
+    - _Preservation: monthlyRent pre-fill unchanged, other fields unchanged_
+    - _Requirements: 2.8, 3.3_
+
+- [ ] 13. Fix Bug #9 — Area not displayed in listing detail
+
+  - [x] 13.1 Add `area` field to ListingDetailResponseDto
+    - Add `@ApiPropertyOptional({ nullable: true }) area!: number | null;` to the DTO
+    - File: `src/backend/modules/property-listings/application/dtos/listing-detail-response.dto.ts`
+    - _Requirements: 2.9_
+
+  - [x] 13.2 Fetch area from Property in listing repository
+    - In `findDetailById`, add `area` to the `property` select/include
+    - Return `area: property.area ?? null` in the listing detail result
+    - File: `src/backend/modules/property-listings/infrastructure/repositories/prisma-listing.repository.ts`
+    - _Requirements: 2.9_
+
+  - [x] 13.3 Add `area` to frontend ListingDetail type
+    - Add `area: number | null` to the `ListingDetail` type definition
+    - File: `src/frontend/modules/property-listings/types.ts` (or wherever the type is defined)
+    - _Requirements: 2.9_
+
+  - [x] 13.4 Pass area to PropertyInfoGrid in ListingDetailView
+    - Change `area={null}` to `area={listing.area}` in ListingDetailView
+    - File: `src/frontend/modules/property-listings/components/ListingDetailView.tsx`
+    - _Preservation: rooms and bathrooms display unchanged_
+    - _Requirements: 2.9, 3.10_
+
+- [ ] 14. Fix Bug #10 — Contact landlord fails because listingId passed instead of leaseId
+
+  - [x] 14.1 Add endpoint to resolve listing ID to lease ID
+    - Create a new endpoint or modify the existing `transitionLeaseState` to accept a `listingId` parameter
+    - The resolution path: listing → portfolio_unit_id → lease (where portfolio_unit_id matches and lease is active)
+    - Add method to rental-tracking repository: `findLeaseIdByListingId(listingId: string): Promise<string | null>`
+    - File: `src/backend/modules/rental-tracking/infrastructure/repositories/prisma-tracking.repository.ts`
+    - _Requirements: 2.10_
+
+  - [x] 14.2 Update TransitionLeaseStateDto to accept listingId
+    - Add optional `listingId?: string` field to the DTO (alternative to `leaseId`)
+    - In the use case, if `listingId` is provided instead of `leaseId`, resolve it first
+    - Files: `src/backend/modules/rental-tracking/application/dtos/transition-lease-state.dto.ts`, `src/backend/modules/rental-tracking/application/use-cases/transition-lease-state.use-case.ts`
+    - _Requirements: 2.10_
+
+  - [x] 14.3 Update frontend to pass listingId correctly
+    - Ensure `tenantService.transitionLeaseState` passes `listingId` in the correct field
+    - File: `src/frontend/shared/services/tenant.ts`
+    - _Preservation: existing lease state transitions with leaseId still work_
+    - _Requirements: 2.10, 3.11_
+
+- [ ] 15. Final verification — Run tests for bugs 8-10
+  - Run frontend tests to verify startDate pre-fill works
+  - Run backend tests to verify area is returned and lease resolution works
+  - Verify no regressions in existing tests

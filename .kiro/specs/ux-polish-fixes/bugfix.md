@@ -22,6 +22,12 @@ This document covers multiple UI/UX polish bugs reported by a tenant user during
 
 1.7 WHEN a developer or tester needs to test flows that depend on external service stubs (e-signature provider, payment gateway) THEN there is no documentation explaining that manual webhook calls are required to complete the signing and payment flows, or what the correct endpoint URLs and payloads are — developers must inspect source code to understand the manual steps needed to advance the rental lifecycle past stub boundaries
 
+1.8 WHEN a landlord opens the contract creation wizard at step 2 "Términos del contrato" and the lease has a `startDate` value (ISO format like `"2026-05-03T00:00:00.000Z"`) THEN the startDate field appears empty because the HTML `<input type="date">` element requires `YYYY-MM-DD` format but receives the full ISO string — the previous fix (`startDate: lease.startDate || ''`) passes the raw ISO string which the date input cannot display
+
+1.9 WHEN a tenant views the listing detail page ("Detalle del inmueble") THEN the "Área" field shows "-" (dash) even though the backend has the property's `area` value (e.g., `80`) — the frontend passes `area={null}` hardcoded to `PropertyInfoGrid` and the `ListingDetailResponseDto` does not include an `area` field
+
+1.10 WHEN a tenant clicks "Contactar arrendador" on a published listing THEN the system returns "No se encontró un arriendo asociado a este inmueble" because the frontend passes the `listingId` to `transitionLeaseState` but the backend expects a `leaseId` — the system has no mechanism to resolve a listing ID to its associated lease ID
+
 ### Expected Behavior (Correct)
 
 2.1 WHEN a tenant clicks "Contactar arrendador" on a listing detail page THEN the ConfirmationDialog SHALL display the "Confirmar" button with the primary blue style (`bg-[#1d4ed8]`) to indicate a safe, non-destructive action — the ConfirmationDialog component SHALL support a `variant` prop (`"destructive"` | `"primary"`) defaulting to `"destructive"` for backward compatibility
@@ -37,6 +43,12 @@ This document covers multiple UI/UX polish bugs reported by a tenant user during
 2.6 WHEN a contract reaches SIGNED status (signing webhook with `status: "COMPLETED"`) THEN the system SHALL automatically create at least one `ScheduledPayment` record for the associated lease by looking up the lease's monthly amount and currency (COP), setting the due date to the contract's start date or the first day of the next month, and using a cross-module port interface (per project conventions the contracts module SHALL NOT directly write to the payments schema) so that the tenant can immediately see and pay their first scheduled payment in `/mis-pagos`
 
 2.7 WHEN a developer or tester needs to test the full rental lifecycle (listing → contact → contract → signing → payment) THEN a documentation file `documentation/MVP-STUB-TESTING-GUIDE.md` SHALL exist that documents all MVP stubs, their behavior, the manual steps required to test each flow end-to-end, and exact curl commands with example payloads for each webhook endpoint — the guide SHALL cover: (a) the e-signature signing flow (initiate signing → manual webhook call to complete), (b) the payment flow (initiate payment → manual webhook call to confirm), and (c) the full rental lifecycle from listing to payment
+
+2.8 WHEN a landlord opens the contract creation wizard at step 2 "Términos del contrato" and the lease has a `startDate` value in ISO format THEN the startDate field SHALL be pre-filled with the date portion only (`YYYY-MM-DD`) extracted from the ISO string, so the HTML date input can display it correctly
+
+2.9 WHEN a tenant views the listing detail page THEN the "Área" field SHALL display the property's area value (in m²) fetched from the backend — the backend SHALL include the `area` field in the `ListingDetailResponseDto` by reading it from the `Property` table
+
+2.10 WHEN a tenant clicks "Contactar arrendador" on a published listing THEN the system SHALL resolve the listing ID to its associated lease ID (via listing → portfolio_unit → lease lookup) and successfully initiate the contact flow without errors — a published listing with an active lease SHALL always allow contact initiation
 
 ### Unchanged Behavior (Regression Prevention)
 
@@ -57,3 +69,7 @@ This document covers multiple UI/UX polish bugs reported by a tenant user during
 3.8 WHEN `ScheduledPayment` records are created via the `PaymentsRaw` ETL pipeline (`PaymentsEtlService.processPaymentsRaw()`) THEN the system SHALL CONTINUE TO process those raw records and create scheduled payments as before — the new on-signing creation path must not duplicate or conflict with ETL-created records
 
 3.9 WHEN the existing `src/backend/README.md` and files in the `documentation/` directory exist THEN the system SHALL CONTINUE TO leave them unchanged — the new `documentation/MVP-STUB-TESTING-GUIDE.md` is an additive file, not a modification of existing documentation
+
+3.10 WHEN the listing detail page displays rooms and bathrooms THEN the system SHALL CONTINUE TO display those values correctly — the area fix must not affect existing property info rendering
+
+3.11 WHEN a tenant successfully contacts a landlord via the existing flow (where a valid lease ID is provided) THEN the system SHALL CONTINUE TO transition the lease state correctly and send notifications
