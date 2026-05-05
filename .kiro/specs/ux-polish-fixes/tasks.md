@@ -193,7 +193,7 @@
 
 - [ ] 10. Verify fixes pass exploration and preservation tests
 
-  - [~] 10.1 Verify bug condition exploration tests now pass
+  - [x] 10.1 Verify bug condition exploration tests now pass
     - **Property 1: Expected Behavior** - All Seven Bugs Are Fixed
     - **IMPORTANT**: Re-run the SAME tests from task 1 — do NOT write new tests
     - The tests from task 1 encode the expected behavior
@@ -202,7 +202,7 @@
     - **EXPECTED OUTCOME**: Tests PASS (confirms all bugs are fixed)
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7_
 
-  - [~] 10.2 Verify preservation tests still pass
+  - [x] 10.2 Verify preservation tests still pass
     - **Property 2: Preservation** - Existing Behavior Still Unchanged
     - **IMPORTANT**: Re-run the SAME tests from task 2 — do NOT write new tests
     - Run preservation property tests from step 2
@@ -210,9 +210,10 @@
     - Confirm all preservation tests still pass after fixes (no regressions introduced)
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9_
 
-- [~] 11. Checkpoint — Ensure all tests pass
+- [x] 11. Checkpoint — Ensure all tests pass
   - Run full test suite (frontend + backend)
   - Ensure all exploration tests (task 1) pass on fixed code
   - Ensure all preservation tests (task 2) pass on fixed code
   - Ensure no other existing tests are broken
+  - Check TSC, linting and formatting, solve all issues
   - Ask the user if questions arise
