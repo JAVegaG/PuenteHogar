@@ -56,9 +56,13 @@ export function buildNotificationContent(
     case 'NEW_INTEREST':
       return {
         title: 'Nuevo interesado',
-        message: data.propertyTitle
-          ? `Un arrendatario ha mostrado interés en tu inmueble **${String(data.propertyTitle)}**.`
-          : 'Un arrendatario ha mostrado interés en uno de tus inmuebles.',
+        message: data.tenantName && data.propertyTitle
+          ? `**${String(data.tenantName)}** ha mostrado interés en tu inmueble **${String(data.propertyTitle)}**.`
+          : data.tenantName
+            ? `**${String(data.tenantName)}** ha mostrado interés en uno de tus inmuebles.`
+            : data.propertyTitle
+              ? `Un arrendatario ha mostrado interés en tu inmueble **${String(data.propertyTitle)}**.`
+              : 'Un arrendatario ha mostrado interés en uno de tus inmuebles.',
       };
     case 'LEASE_CREATED':
       return {

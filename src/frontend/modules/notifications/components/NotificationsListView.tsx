@@ -245,6 +245,36 @@ export default function NotificationsListView({
                             <p className="text-caption text-neutral-600 mt-1">
                                 {renderMessageWithBold(notification.message)}
                             </p>
+                            {notification.notificationType === 'NEW_INTEREST' &&
+                                (notification.data?.tenantEmail || notification.data?.tenantPhone) && (
+                                    <div className="flex flex-col gap-1 mt-2 text-caption text-neutral-600">
+                                        {notification.data.tenantEmail && (
+                                            <a
+                                                href={`mailto:${String(notification.data.tenantEmail)}`}
+                                                onClick={(e) => e.stopPropagation()}
+                                                className="inline-flex items-center gap-1.5 hover:text-primary transition-colors"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                                                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                                                </svg>
+                                                {String(notification.data.tenantEmail)}
+                                            </a>
+                                        )}
+                                        {notification.data.tenantPhone && (
+                                            <a
+                                                href={`tel:${String(notification.data.tenantPhone)}`}
+                                                onClick={(e) => e.stopPropagation()}
+                                                className="inline-flex items-center gap-1.5 hover:text-primary transition-colors"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                                                </svg>
+                                                {String(notification.data.tenantPhone)}
+                                            </a>
+                                        )}
+                                    </div>
+                                )}
                             <p className="text-small text-neutral-600 mt-2">
                                 {formatRelativeDate(notification.createdAt)}
                             </p>
