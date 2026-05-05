@@ -279,3 +279,32 @@
   - Run frontend tests to verify startDate pre-fill works
   - Run backend tests to verify area is returned and lease resolution works
   - Verify no regressions in existing tests
+
+- [ ] 16. Fix Bug #11 — Notify landlord with tenant contact info on CONTACT_INITIATED
+
+  - [ ] 16.1 Add CONTACT_INITIATED to NOTIFY_ON_STATES in TransitionLeaseStateUseCase
+    - Add `'CONTACT_INITIATED'` to the `NOTIFY_ON_STATES` set so the notification port is called
+    - File: `src/backend/modules/rental-tracking/application/use-cases/transition-lease-state.use-case.ts`
+    - _Requirements: 2.11_
+
+  - [ ] 16.2 Enhance notification to include tenant contact info for CONTACT_INITIATED
+    - When state is CONTACT_INITIATED, resolve tenant's name, email, phone (via cross-schema lookup) and include in the notification payload
+    - The landlord should receive the tenant's contact info so they can follow up
+    - Update the notification port interface if needed to support additional metadata
+    - Files: `src/backend/modules/rental-tracking/domain/ports/notification.port.ts`, `src/backend/modules/rental-tracking/application/use-cases/transition-lease-state.use-case.ts`
+    - _Requirements: 2.11_
+
+- [ ] 17. Fix Bug #12 — Contact button and message too wide on desktop
+
+  - [ ] 17.1 Constrain ContactLandlordButton width on desktop
+    - The button and message currently stretch full-width on desktop
+    - Add `max-w-[560px] mx-auto` to the container div to match the listing detail content area
+    - File: `src/frontend/modules/tenant/components/ContactLandlordButton.tsx`
+    - _Requirements: 2.12_
+
+- [ ] 18. Fix Bug #13 — "undefined m²" displayed when area is null/undefined
+
+  - [ ] 18.1 Fix PropertyInfoGrid area null check
+    - Change `area !== null` to `area != null` (loose equality) to handle both `null` and `undefined`
+    - File: `src/frontend/modules/property-listings/components/PropertyInfoGrid.tsx`
+    - _Requirements: 2.13_

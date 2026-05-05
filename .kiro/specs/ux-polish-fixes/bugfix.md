@@ -50,6 +50,12 @@ This document covers multiple UI/UX polish bugs reported by a tenant user during
 
 2.10 WHEN a tenant clicks "Contactar arrendador" on a published listing THEN the system SHALL resolve the listing ID to its associated lease ID (via listing → portfolio_unit → lease lookup) and successfully initiate the contact flow without errors — a published listing with an active lease SHALL always allow contact initiation
 
+2.11 WHEN a tenant successfully initiates contact with a landlord THEN the landlord SHALL receive a notification (in-app or via the notification port) containing the interested tenant's contact information (name, email, phone) so the landlord can follow up — the `CONTACT_INITIATED` state SHALL trigger a notification to the landlord
+
+2.12 WHEN the "Contactar arrendador" button and success/error messages are displayed on desktop viewports THEN they SHALL be constrained to a reasonable max-width (matching the listing detail content area, e.g., `max-w-[560px]`) so they don't stretch full-width across the entire screen
+
+2.13 WHEN the area value is `null` or `undefined` (property has no length/width data) THEN the PropertyInfoGrid SHALL display "-" for the Área field — it SHALL NOT display "undefined m²" or "null m²"
+
 ### Unchanged Behavior (Regression Prevention)
 
 3.1 WHEN the ConfirmationDialog is used for destructive actions (e.g., delete portfolio, delete unit, unpublish listing) THEN the system SHALL CONTINUE TO display the confirm button with the red destructive style (`bg-red-600`)
