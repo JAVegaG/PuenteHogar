@@ -16,7 +16,7 @@ import type { IContractRepository } from '@modules/contracts/domain/ports/contra
 import type { INotificationPort } from '@modules/contracts/domain/ports/notification.port';
 import type { IPaymentSchedulingPort } from '@modules/contracts/domain/ports/payment-scheduling.port';
 import type { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
-import type { SigningWebhookDto } from '../dtos/signing-webhook.dto';
+import type { SigningWebhookDto } from '../../dtos/signing-webhook.dto';
 
 describe('Preservation Property Tests — HandleSigningWebhookUseCase', () => {
     // ─── Shared test setup ───

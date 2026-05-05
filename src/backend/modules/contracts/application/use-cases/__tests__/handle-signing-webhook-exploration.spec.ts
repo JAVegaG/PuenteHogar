@@ -12,7 +12,7 @@ import { ContractEntity } from '@modules/contracts/domain/entities/contract.enti
 import type { IContractRepository } from '@modules/contracts/domain/ports/contract-repository.port';
 import type { INotificationPort } from '@modules/contracts/domain/ports/notification.port';
 import type { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
-import type { SigningWebhookDto } from '../dtos/signing-webhook.dto';
+import type { SigningWebhookDto } from '../../dtos/signing-webhook.dto';
 
 describe('Bug Condition Exploration — Test 1g: HandleSigningWebhookUseCase schedules payment on COMPLETED', () => {
     it('should call IPaymentSchedulingPort.scheduleInitialPayment when webhook status is COMPLETED', async () => {
