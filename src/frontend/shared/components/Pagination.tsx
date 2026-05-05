@@ -37,7 +37,7 @@ export function Pagination({
           id="page-size-select"
           value={pageSize}
           onChange={(e) => onPageSizeChange(Number(e.target.value))}
-          className="text-caption text-neutral-900 bg-neutral-50 border border-neutral-300 rounded-card px-2 py-1 min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className="appearance-none text-caption text-neutral-900 bg-neutral-50 border border-neutral-300 rounded-card pl-3 pr-8 py-1 min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%3E%3Cpath%20d%3D%22M5%208l5%205%205-5%22%20stroke%3D%22%234B5563%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')] bg-[length:20px_20px] bg-[right_8px_center] bg-no-repeat"
         >
           <option value={9}>9</option>
           <option value={18}>18</option>
@@ -73,11 +73,10 @@ export function Pagination({
                 onClick={() => onPageChange(item as number)}
                 aria-label={`Página ${item}`}
                 aria-current={item === page ? 'page' : undefined}
-                className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-card text-caption focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-                  item === page
+                className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-card text-caption focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${item === page
                     ? 'bg-primary text-white'
                     : 'border border-neutral-300 text-neutral-600'
-                }`}
+                  }`}
               >
                 {item}
               </button>
