@@ -6,7 +6,7 @@ import type { TransitionLeaseStateDto } from '../dtos/lease-status.dto';
 export const TRACKING_REPOSITORY = 'TRACKING_REPOSITORY';
 export const TRACKING_NOTIFICATION_PORT = 'TRACKING_NOTIFICATION_PORT';
 
-const NOTIFY_ON_STATES = new Set(['CONTRACT_SIGNED', 'PAYMENT_RECEIVED']);
+const NOTIFY_ON_STATES = new Set(['CONTACT_INITIATED', 'CONTRACT_SIGNED', 'PAYMENT_RECEIVED']);
 
 @Injectable()
 export class TransitionLeaseStateUseCase {
