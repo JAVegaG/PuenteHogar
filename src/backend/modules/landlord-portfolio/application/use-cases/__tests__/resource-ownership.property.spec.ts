@@ -542,6 +542,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
               getStatusHistory: jest.fn(),
               recordTransition: jest.fn(),
               getActiveLeasesForUser: jest.fn(),
+              findLeaseIdByListingId: jest.fn(),
             };
 
             const useCase = new GetLeaseStatusUseCase(mockRepo);
@@ -580,6 +581,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
               getStatusHistory: jest.fn().mockResolvedValue([]),
               recordTransition: jest.fn(),
               getActiveLeasesForUser: jest.fn(),
+              findLeaseIdByListingId: jest.fn(),
             };
 
             const useCase = new GetLeaseStatusUseCase(mockRepo);
@@ -619,6 +621,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
               getStatusHistory: jest.fn().mockResolvedValue([]),
               recordTransition: jest.fn(),
               getActiveLeasesForUser: jest.fn(),
+              findLeaseIdByListingId: jest.fn(),
             };
 
             const useCase = new GetLeaseStatusUseCase(mockRepo);
@@ -651,6 +654,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             getStatusHistory: jest.fn(),
             recordTransition: jest.fn(),
             getActiveLeasesForUser: jest.fn(),
+            findLeaseIdByListingId: jest.fn(),
           };
 
           const useCase = new GetLeaseStatusUseCase(mockRepo);

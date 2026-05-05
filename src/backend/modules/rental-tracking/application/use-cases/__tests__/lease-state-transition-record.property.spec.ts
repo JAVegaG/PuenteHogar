@@ -46,6 +46,7 @@ function makeMockRepo(overrides?: Partial<jest.Mocked<ITrackingRepository>>): je
     getActiveLeasesForUser: jest.fn().mockResolvedValue([]),
     getLandlordUserId: jest.fn().mockResolvedValue(null),
     getTenantUserId: jest.fn().mockResolvedValue(null),
+    findLeaseIdByListingId: jest.fn().mockResolvedValue(null),
     ...overrides,
   };
 }

@@ -39,6 +39,7 @@ function makeMockRepo(landlordId: string, tenantId: string): jest.Mocked<ITracki
     getActiveLeasesForUser: jest.fn().mockResolvedValue([]),
     getLandlordUserId: jest.fn().mockResolvedValue(landlordId),
     getTenantUserId: jest.fn().mockResolvedValue(tenantId),
+    findLeaseIdByListingId: jest.fn().mockResolvedValue(null),
   };
 }
 
