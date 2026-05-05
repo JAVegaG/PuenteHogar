@@ -14,6 +14,7 @@ import {
 } from './application/use-cases/initiate-payment.use-case';
 import { PaymentGatewayAdapter } from './infrastructure/adapters/payment-gateway.adapter';
 import { PaymentNotificationAdapter } from './infrastructure/adapters/payment-notification.adapter';
+import { PaymentSchedulingAdapter } from './infrastructure/adapters/payment-scheduling.adapter';
 import { PaymentsEtlService } from './infrastructure/etl/payments-etl.service';
 import { PrismaPaymentRepository } from './infrastructure/repositories/prisma-payment.repository';
 import { PaymentsCrossModuleQueryService } from './infrastructure/repositories/payments-cross-module-query.service';
@@ -32,6 +33,7 @@ import { PaymentsController } from './payments.controller';
     GetPaymentHistoryUseCase,
     HandlePaymentWebhookUseCase,
     PaymentsCrossModuleQueryService,
+    PaymentSchedulingAdapter,
     {
       provide: PAYMENT_REPOSITORY,
       useClass: PrismaPaymentRepository,
@@ -54,6 +56,7 @@ import { PaymentsController } from './payments.controller';
     GetPaymentHistoryUseCase,
     HandlePaymentWebhookUseCase,
     PaymentsCrossModuleQueryService,
+    PaymentSchedulingAdapter,
     PAYMENTS_CROSS_MODULE_QUERY,
   ],
 })
