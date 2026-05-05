@@ -141,7 +141,7 @@ export const tenantService = {
         return res.json();
     },
 
-    async transitionLeaseState(leaseId: string, newState: string, token: string): Promise<void> {
+    async transitionLeaseState(listingId: string, newState: string, token: string): Promise<void> {
         let res: Response;
         try {
             res = await fetch(`${API_URL}/tracking/leases/transition`, {
@@ -150,7 +150,7 @@ export const tenantService = {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ leaseId, newState }),
+                body: JSON.stringify({ listingId, newState }),
             });
         } catch {
             throw new Error('No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo.');

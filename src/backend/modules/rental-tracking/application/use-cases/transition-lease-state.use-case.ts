@@ -15,24 +15,39 @@ export class TransitionLeaseStateUseCase {
     private readonly repository: ITrackingRepository,
     @Inject(TRACKING_NOTIFICATION_PORT)
     private readonly notificationPort: ITrackingNotificationPort,
-  ) {}
+  ) { }
 
   async execute(dto: TransitionLeaseStateDto, requestingUserId: string): Promise<void> {
-    const landlordId = await this.repository.getLandlordUserId(dto.leaseId);
+    let leaseId = dto.leaseId;
+
+    // Resolve listingId to leaseId if leaseId is not provided
+    if (!leaseId && dto.listingId) {
+      const resolved = await this.repository.findLeaseIdByListingId(dto.listingId);
+      if (!resolved) {
+        throw new NotFoundException('No se encontró un arriendo asociado a este inmueble');
+      }
+      leaseId = resolved;
+    }
+
+    if (!leaseId) {
+      throw new NotFoundException('Lease no encontrado');
+    }
+
+    const landlordId = await this.repository.getLandlordUserId(leaseId);
     if (!landlordId) throw new NotFoundException('Lease no encontrado');
 
-    const tenantId = await this.repository.getTenantUserId(dto.leaseId);
+    const tenantId = await this.repository.getTenantUserId(leaseId);
     if (!tenantId) throw new NotFoundException('Lease no encontrado');
 
     const isParty = requestingUserId === landlordId || requestingUserId === tenantId;
     if (!isParty) throw new ForbiddenException('No tienes acceso a este lease');
 
-    await this.repository.recordTransition(dto.leaseId, dto.newState);
+    await this.repository.recordTransition(leaseId, dto.newState);
 
     if (NOTIFY_ON_STATES.has(dto.newState)) {
       // fire-and-forget — no await, no throw
       void this.notificationPort
-        .notifyLeaseStateChanged(landlordId, tenantId, dto.leaseId, dto.newState)
+        .notifyLeaseStateChanged(landlordId, tenantId, leaseId, dto.newState)
         .catch(() => undefined);
     }
   }

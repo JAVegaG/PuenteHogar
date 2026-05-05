@@ -22,6 +22,9 @@ export interface ITrackingRepository {
 
   /** Resolves the tenant user_id for a given lease */
   getTenantUserId(leaseId: string): Promise<string | null>;
+
+  /** Resolves a listing ID to its associated lease ID via portfolio_unit_id */
+  findLeaseIdByListingId(listingId: string): Promise<string | null>;
 }
 
 export interface ActiveLeaseSummary {

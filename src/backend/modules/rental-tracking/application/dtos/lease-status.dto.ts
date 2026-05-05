@@ -1,12 +1,18 @@
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsEnum, IsNotEmpty, IsOptional, IsString, ValidateIf } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import type { LeaseState } from '@modules/rental-tracking/domain/entities/lease-status.entity';
 
 export class TransitionLeaseStateDto {
-  @ApiProperty({ description: 'ID del lease a transicionar' })
+  @ApiPropertyOptional({ description: 'ID del lease a transicionar (opcional si se provee listingId)' })
+  @ValidateIf((o) => !o.listingId)
   @IsString()
   @IsNotEmpty()
-  leaseId!: string;
+  leaseId?: string;
+
+  @ApiPropertyOptional({ description: 'ID del listing (se resuelve al lease asociado)' })
+  @IsOptional()
+  @IsString()
+  listingId?: string;
 
   @ApiProperty({
     enum: ['PUBLISHED', 'CONTACT_INITIATED', 'CONTRACT_UPLOADED', 'CONTRACT_SIGNED', 'PAYMENT_RECEIVED'],

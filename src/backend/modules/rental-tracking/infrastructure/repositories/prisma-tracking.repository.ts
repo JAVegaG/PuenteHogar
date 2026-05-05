@@ -164,4 +164,19 @@ export class PrismaTrackingRepository implements ITrackingRepository {
     });
     return lease?.user_id ?? null;
   }
+
+  async findLeaseIdByListingId(listingId: string): Promise<string | null> {
+    const listing = await this.prisma.listing.findFirst({
+      where: { id: listingId, deleted_at: null },
+      select: { portfolio_unit_id: true },
+    });
+    if (!listing) return null;
+
+    const lease = await this.prisma.lease.findFirst({
+      where: { portfolio_unit_id: listing.portfolio_unit_id, deleted_at: null },
+      orderBy: { created_at: 'desc' },
+      select: { id: true },
+    });
+    return lease?.id ?? null;
+  }
 }
