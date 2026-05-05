@@ -10,8 +10,8 @@ import { TransitionLeaseStateUseCase } from '../transition-lease-state.use-case'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const NOTIFY_STATES: LeaseState[] = ['CONTRACT_SIGNED', 'PAYMENT_RECEIVED'];
-const NON_NOTIFY_STATES: LeaseState[] = ['PUBLISHED', 'CONTACT_INITIATED', 'CONTRACT_UPLOADED'];
+const NOTIFY_STATES: LeaseState[] = ['CONTACT_INITIATED', 'CONTRACT_SIGNED', 'PAYMENT_RECEIVED'];
+const NON_NOTIFY_STATES: LeaseState[] = ['PUBLISHED', 'CONTRACT_UPLOADED'];
 
 // ─── Generators ───────────────────────────────────────────────────────────────
 
@@ -40,6 +40,7 @@ function makeMockRepo(landlordId: string, tenantId: string): jest.Mocked<ITracki
     getLandlordUserId: jest.fn().mockResolvedValue(landlordId),
     getTenantUserId: jest.fn().mockResolvedValue(tenantId),
     findLeaseIdByListingId: jest.fn().mockResolvedValue(null),
+    getTenantContactInfo: jest.fn().mockResolvedValue({ fullName: 'Juan Pérez', email: 'tenant@test.com', phoneNumber: '3001234567' }),
   };
 }
 
@@ -71,6 +72,7 @@ describe('Property 42: Transición a CONTRACT_SIGNED o PAYMENT_RECEIVED dispara 
               tenantId,
               leaseId,
               newState,
+              expect.anything(),
             );
 
             return true;
@@ -82,7 +84,7 @@ describe('Property 42: Transición a CONTRACT_SIGNED o PAYMENT_RECEIVED dispara 
   });
 
   describe('no notification dispatched for non-notify states', () => {
-    it('does NOT notify when transitioning to PUBLISHED, CONTACT_INITIATED, or CONTRACT_UPLOADED', async () => {
+    it('does NOT notify when transitioning to PUBLISHED or CONTRACT_UPLOADED', async () => {
       await fc.assert(
         fc.asyncProperty(
           fc.uuid(),
@@ -131,6 +133,7 @@ describe('Property 42: Transición a CONTRACT_SIGNED o PAYMENT_RECEIVED dispara 
               tenantId,
               leaseId,
               newState,
+              expect.anything(),
             );
 
             return true;
