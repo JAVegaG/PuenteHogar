@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { PrismaService } from '@src/shared/prisma/prisma.service';
 import { PII_ENCRYPTOR } from '@modules/users/application/use-cases/register-user.use-case';
 import { AES256PIIEncryptor } from '@modules/users/infrastructure/adapters/aes256-pii-encryptor.adapter';
+import { NotificationsModule } from '@modules/notifications';
 import { GetActiveLeasesSummaryUseCase } from './application/use-cases/get-active-leases-summary.use-case';
 import { GetLeaseStatusUseCase } from './application/use-cases/get-lease-status.use-case';
 import {
@@ -11,9 +12,11 @@ import {
 } from './application/use-cases/transition-lease-state.use-case';
 import { RentalTrackingEtlService } from './infrastructure/etl/rental-tracking-etl.service';
 import { PrismaTrackingRepository } from './infrastructure/repositories/prisma-tracking.repository';
+import { TrackingNotificationAdapter } from './infrastructure/adapters/tracking-notification.adapter';
 import { RentalTrackingController } from './rental-tracking.controller';
 
 @Module({
+  imports: [NotificationsModule],
   controllers: [RentalTrackingController],
   providers: [
     PrismaService,
@@ -27,11 +30,7 @@ import { RentalTrackingController } from './rental-tracking.controller';
     },
     {
       provide: TRACKING_NOTIFICATION_PORT,
-      useValue: {
-        notifyLeaseStateChanged: async () => {
-          // stub — notifications module will handle this
-        },
-      },
+      useClass: TrackingNotificationAdapter,
     },
     {
       provide: PII_ENCRYPTOR,
