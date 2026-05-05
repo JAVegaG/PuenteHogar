@@ -50,8 +50,8 @@ src/backend/
     ├── users/                  # Registro, login, RBAC
     ├── property-listings/      # Publicaciones, búsqueda con filtros extendidos (departamento, ciudad, barrio, características adicionales), fotos, gestión de publicaciones (editar, despublicar, consulta por unidad), catálogo de características adicionales activas (con metadata: type, element, active, main, required, error_message), notificaciones in-app (NEW_INTEREST) via ListingNotificationAdapter
     ├── landlord-portfolio/     # Portafolios (CRUD completo: crear, listar, actualizar, eliminar), unidades enriquecidas (cross-schema Property+Address+PortfolioUnit, con unitStatus/hasActiveListing/tenantName/monthlyRent computados; crear, actualizar, eliminar con validación de arriendos activos), leases (listado por unidad, detalle con info de arrendatario descifrada via IPIIEncryptor, cancelación con cascada de contrato y transición de estado a Finalizado), catálogo geográfico (departamentos/ciudades DANE), notificaciones in-app (LEASE_CREATED, LEASE_CANCELLED) via PortfolioNotificationAdapter
-    ├── contracts/              # Contratos (CRUD: crear con upload S3 real, consultar con presigned URL, reemplazar PDF en PENDING, eliminar con guardas de estado), firma electrónica, almacenamiento de documentos en S3 (presigned URLs, 15 min TTL), listado de contratos por arrendador (cross-schema: Contract→Lease→PortfolioUnit→LandlordPortfolio), listado de contratos por arrendatario (cross-schema: ContractParty→Contract→Lease→PortfolioUnit, con resolución de nombre de unidad y arrendador via PII decryption), signing details por parte, notificaciones in-app (CONTRACT_SIGNED, CONTRACT_UPLOADED, signing_failed) via ContractNotificationAdapter
-    ├── payments/               # Pagos, pasarela, idempotencia (dominio, aplicación, infraestructura, controlador), notificaciones in-app (PAYMENT_RECEIVED) via PaymentNotificationAdapter
+    ├── contracts/              # Contratos (CRUD: crear con upload S3 real, consultar con presigned URL, reemplazar PDF en PENDING, eliminar con guardas de estado), firma electrónica, almacenamiento de documentos en S3 (presigned URLs, 15 min TTL), listado de contratos por arrendador (cross-schema: Contract→Lease→PortfolioUnit→LandlordPortfolio), listado de contratos por arrendatario (cross-schema: ContractParty→Contract→Lease→PortfolioUnit, con resolución de nombre de unidad y arrendador via PII decryption), signing details por parte, notificaciones in-app (CONTRACT_SIGNED, CONTRACT_UPLOADED, signing_failed) via ContractNotificationAdapter, programación de pago inicial al completar firma (fire-and-forget via IPaymentSchedulingPort → PaymentSchedulingAdapter en payments)
+    ├── payments/               # Pagos, pasarela, idempotencia (dominio, aplicación, infraestructura, controlador), notificaciones in-app (PAYMENT_RECEIVED) via PaymentNotificationAdapter, PaymentSchedulingAdapter (implementa IPaymentSchedulingPort del módulo contracts — crea ScheduledPayment en DB)
     ├── accounting/             # Reportes financieros (dominio, aplicación, infraestructura: PrismaAccountingRepository + RedisReportCache)
     ├── rental-tracking/        # Máquina de estados del arriendo (dominio, aplicación, infraestructura, controlador)
     ├── notifications/          # Notificaciones multicanal (dominio, aplicación, infraestructura, controlador). Exporta `SendNotificationUseCase` para inyección cross-module — los módulos consumidores importan `NotificationsModule` y registran adaptadores locales que delegan a este use case
@@ -104,6 +104,14 @@ Cada módulo que dispara notificaciones define un token DI local y un adaptador 
 | `PAYMENT_NOTIFICATION_PORT` | `payments` | `PaymentNotificationAdapter` | `PAYMENT_RECEIVED` |
 | `PORTFOLIO_NOTIFICATION_PORT` | `landlord-portfolio` | `PortfolioNotificationAdapter` | `LEASE_CREATED`, `LEASE_CANCELLED` |
 | `NOTIFICATION_PORT` | `property-listings` | `ListingNotificationAdapter` | `NEW_INTEREST` |
+
+### Cross-Module Service Ports
+
+Ports donde un módulo define la interfaz y otro módulo provee la implementación:
+
+| Token | Módulo que define | Módulo que implementa | Adaptador | Descripción |
+|-------|-------------------|----------------------|-----------|-------------|
+| `PAYMENT_SCHEDULING_PORT` | `contracts` | `payments` | `PaymentSchedulingAdapter` | Crea `ScheduledPayment` al completarse la firma de un contrato (fire-and-forget) |
 
 ### Cross-Module Query Ports
 
