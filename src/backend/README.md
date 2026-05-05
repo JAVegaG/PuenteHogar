@@ -53,7 +53,7 @@ src/backend/
     ├── contracts/              # Contratos (CRUD: crear con upload S3 real, consultar con presigned URL, reemplazar PDF en PENDING, eliminar con guardas de estado), firma electrónica, almacenamiento de documentos en S3 (presigned URLs, 15 min TTL), listado de contratos por arrendador (cross-schema: Contract→Lease→PortfolioUnit→LandlordPortfolio), listado de contratos por arrendatario (cross-schema: ContractParty→Contract→Lease→PortfolioUnit, con resolución de nombre de unidad y arrendador via PII decryption), signing details por parte, notificaciones in-app (CONTRACT_SIGNED, CONTRACT_UPLOADED, signing_failed) via ContractNotificationAdapter, programación de pago inicial al completar firma (fire-and-forget via IPaymentSchedulingPort → PaymentSchedulingAdapter en payments)
     ├── payments/               # Pagos, pasarela, idempotencia (dominio, aplicación, infraestructura, controlador), notificaciones in-app (PAYMENT_RECEIVED) via PaymentNotificationAdapter, PaymentSchedulingAdapter (implementa IPaymentSchedulingPort del módulo contracts — crea ScheduledPayment en DB)
     ├── accounting/             # Reportes financieros (dominio, aplicación, infraestructura: PrismaAccountingRepository + RedisReportCache)
-    ├── rental-tracking/        # Máquina de estados del arriendo (dominio, aplicación, infraestructura, controlador), resolución listing→lease para transiciones desde el frontend, autorización relajada para CONTACT_INITIATED (cualquier tenant autenticado), notificaciones in-app (CONTACT_INITIATED, CONTRACT_SIGNED, PAYMENT_RECEIVED) via TrackingNotificationAdapter
+    ├── rental-tracking/        # Máquina de estados del arriendo (dominio, aplicación, infraestructura, controlador), resolución listing→lease para transiciones desde el frontend, autorización relajada para CONTACT_INITIATED (cualquier tenant autenticado), notificaciones in-app (CONTACT_INITIATED con metadata de contacto del arrendatario, CONTRACT_SIGNED, PAYMENT_RECEIVED) via TrackingNotificationAdapter
     ├── notifications/          # Notificaciones multicanal (dominio, aplicación, infraestructura, controlador). Exporta `SendNotificationUseCase` para inyección cross-module — los módulos consumidores importan `NotificationsModule` y registran adaptadores locales que delegan a este use case
     └── shared/                 # Helpers compartidos entre módulos de dominio
 ```
@@ -104,7 +104,7 @@ Cada módulo que dispara notificaciones define un token DI local y un adaptador 
 | `PAYMENT_NOTIFICATION_PORT` | `payments` | `PaymentNotificationAdapter` | `PAYMENT_RECEIVED` |
 | `PORTFOLIO_NOTIFICATION_PORT` | `landlord-portfolio` | `PortfolioNotificationAdapter` | `LEASE_CREATED`, `LEASE_CANCELLED` |
 | `NOTIFICATION_PORT` | `property-listings` | `ListingNotificationAdapter` | `NEW_INTEREST` |
-| `TRACKING_NOTIFICATION_PORT` | `rental-tracking` | `TrackingNotificationAdapter` | `CONTACT_INITIATED`, `CONTRACT_SIGNED`, `PAYMENT_RECEIVED` |
+| `TRACKING_NOTIFICATION_PORT` | `rental-tracking` | `TrackingNotificationAdapter` | `CONTACT_INITIATED` (con metadata de contacto del tenant), `CONTRACT_SIGNED`, `PAYMENT_RECEIVED` |
 
 ### Cross-Module Service Ports
 

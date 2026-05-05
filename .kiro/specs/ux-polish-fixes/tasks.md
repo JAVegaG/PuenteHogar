@@ -305,9 +305,9 @@
     - File: `src/backend/modules/rental-tracking/rental-tracking.module.ts`
     - _Requirements: 2.11, 2.14, 3.12_
 
-- [ ] 19. Fix Bug #15 — Tenant contact info not visible in NEW_INTEREST notification
+- [-] 19. Fix Bug #15 — Tenant contact info not visible in NEW_INTEREST notification
 
-  - [ ] 19.1 Update `buildNotificationContent` to include tenant name in NEW_INTEREST message
+  - [x] 19.1 Update `buildNotificationContent` to include tenant name in NEW_INTEREST message
     - Change the `NEW_INTEREST` case to include tenant name when available in data:
       - If `data.tenantName` AND `data.propertyTitle`: `"**{tenantName}** ha mostrado interés en tu inmueble **{propertyTitle}**."`
       - If only `data.tenantName`: `"**{tenantName}** ha mostrado interés en uno de tus inmuebles."`
@@ -315,7 +315,7 @@
     - File: `src/backend/modules/notifications/application/use-cases/send-notification.use-case.ts`
     - _Requirements: 2.15_
 
-  - [ ] 19.2 Render tenant contact info in NotificationsListView for NEW_INTEREST
+  - [-] 19.2 Render tenant contact info in NotificationsListView for NEW_INTEREST
     - When `notification.notificationType === 'NEW_INTEREST'` and `notification.data` contains `tenantEmail` or `tenantPhone`, render a contact info section below the message
     - Display tenant email as a `mailto:` link with an envelope icon
     - Display tenant phone as a `tel:` link with a phone icon
