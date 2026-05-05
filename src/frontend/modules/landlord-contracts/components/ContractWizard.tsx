@@ -39,7 +39,7 @@ export function ContractWizard({ lease, onSuccess }: ContractWizardProps) {
         documentNumber: lease.tenant.documentNumber,
         email: lease.tenant.email,
         phoneNumber: lease.tenant.phoneNumber,
-        startDate: lease.startDate || '',
+        startDate: lease.startDate ? lease.startDate.split('T')[0] : '',
         endDate: '',
         monthlyRent: String(lease.monthlyAmount || ''),
         file: null,
