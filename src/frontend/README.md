@@ -314,7 +314,7 @@ Gestión de arriendos: historial de arriendos por unidad con tarjetas de estado 
 
 ### landlord-contracts
 
-Creación y gestión de contratos: wizard de 3 pasos (arrendatario, términos, documento PDF) con indicador de progreso, validación por paso (incluye validación de fecha para prevenir "Invalid Date"), pre-población desde datos del arriendo, carga de archivo PDF, y envío al backend. Listado de contratos del arrendador con badges de estado en formato tarjeta, vista de detalle con secciones en tarjetas (Términos, Partes, Documento) y acciones contextuales (iniciar firma, ver estado), y página de creación con wrapper del wizard. Componentes: ContractsListView, ContractDetailView, ContractCreationView, ContractWizard, WizardProgress, StepTenant, StepTerms, StepDocument.
+Creación y gestión de contratos: wizard de 3 pasos (arrendatario, términos, documento PDF) con indicador de progreso, validación por paso (incluye validación de fecha para prevenir "Invalid Date"), pre-población desde datos del arriendo (startDate convertido de ISO a YYYY-MM-DD para compatibilidad con `<input type="date">`), carga de archivo PDF, y envío al backend. Listado de contratos del arrendador con badges de estado en formato tarjeta, vista de detalle con secciones en tarjetas (Términos, Partes, Documento) y acciones contextuales (iniciar firma, ver estado), y página de creación con wrapper del wizard. Componentes: ContractsListView, ContractDetailView, ContractCreationView, ContractWizard, WizardProgress, StepTenant, StepTerms, StepDocument.
 
 ### landlord-publish
 
@@ -334,7 +334,7 @@ Publicación de unidades: formulario para publicar una unidad del portafolio com
 | `Pagination` | Paginación con selector de items/página |
 | `SideMenu` | Menú lateral (drawer 320px, auth-aware, enlace "Mis notificaciones" con badge de no leídas) |
 | `Skeleton` | Skeleton loader genérico |
-| `ConfirmationDialog` | Diálogo modal de confirmación para acciones destructivas (native `<dialog>`, focus trap, Escape to close) |
+| `ConfirmationDialog` | Diálogo modal de confirmación con variante visual (`variant?: 'destructive' | 'primary'`, default `'destructive'`). Native `<dialog>`, focus trap, Escape to close |
 | `StatusBadge` | Badge de estado con variantes: lease (Vigente/Acordado/Finalizado), unit (Ocupado/Disponible/Mantenimiento), payment (Al día/Pendiente), listing (Publicada/Sin publicar), contract (Pendiente/Firma pendiente/Firmado), notification (Enviada/Fallida/Pendiente), tracking, paymentStatus |
 | `Toast` | Notificación temporal auto-hide (`role="status"`, `aria-live="polite"`) |
 | `WizardProgress` | Indicador visual de progreso multi-paso (pasos numerados con check en completados, conector entre pasos, `aria-current="step"`) |
