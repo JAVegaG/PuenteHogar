@@ -89,7 +89,7 @@ export default function PropertyInfoGrid({
             />
           </svg>
         }
-        value={area !== null ? `${area} m²` : "-"}
+        value={area != null ? `${area} m²` : "-"}
         label="Área"
       />
     </div>
