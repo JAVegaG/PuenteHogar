@@ -75,7 +75,7 @@ export function ContactLandlordButton({ listingId }: ContactLandlordButtonProps)
     };
 
     return (
-        <div className="px-mobile-margin md:px-desktop-margin">
+        <div className="px-mobile-margin md:px-desktop-margin max-w-[560px] mx-auto">
             {message && (
                 <div
                     role="alert"
