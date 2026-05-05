@@ -39,8 +39,12 @@ export class TransitionLeaseStateUseCase {
     const tenantId = await this.repository.getTenantUserId(leaseId);
     if (!tenantId) throw new NotFoundException('Lease no encontrado');
 
-    const isParty = requestingUserId === landlordId || requestingUserId === tenantId;
-    if (!isParty) throw new ForbiddenException('No tienes acceso a este lease');
+    // CONTACT_INITIATED can be triggered by any authenticated tenant (prospective tenant)
+    // Other transitions require the user to be a party to the lease
+    if (dto.newState !== 'CONTACT_INITIATED') {
+      const isParty = requestingUserId === landlordId || requestingUserId === tenantId;
+      if (!isParty) throw new ForbiddenException('No tienes acceso a este lease');
+    }
 
     await this.repository.recordTransition(leaseId, dto.newState);
 
