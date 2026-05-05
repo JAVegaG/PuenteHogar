@@ -8,6 +8,7 @@ import type { IContractRepository, CreateContractData } from '@modules/contracts
 import { ContractEntity, ContractStatus } from '@modules/contracts/domain/entities/contract.entity';
 import { ContractPartyEntity } from '@modules/contracts/domain/entities/contract-party.entity';
 import type { INotificationPort } from '@modules/contracts/domain/ports/notification.port';
+import type { IPaymentSchedulingPort } from '@modules/contracts/domain/ports/payment-scheduling.port';
 import { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
 
 function uuidv4(): string {
@@ -39,6 +40,7 @@ const arbitrarySigningWebhookInput = fc.record({
 interface StubResult {
   repository: IContractRepository;
   notificationPort: INotificationPort;
+  paymentSchedulingPort: IPaymentSchedulingPort;
   auditLogger: AuditLoggerService;
   storedContracts: Map<string, ContractEntity>;
   notificationCalls: Array<{
@@ -151,6 +153,10 @@ function makeStubs(input: {
     async notifyContractUploaded() { },
   };
 
+  const paymentSchedulingPort: IPaymentSchedulingPort = {
+    async scheduleInitialPayment() { },
+  };
+
   const auditLogger = new AuditLoggerService();
   // Spy on the log method to capture entries
   const originalLog = auditLogger.log.bind(auditLogger);
@@ -159,7 +165,7 @@ function makeStubs(input: {
     originalLog(entry);
   };
 
-  return { repository, notificationPort, auditLogger, storedContracts, notificationCalls, auditEntries };
+  return { repository, notificationPort, paymentSchedulingPort, auditLogger, storedContracts, notificationCalls, auditEntries };
 }
 
 // ─── Tests ───────────────────────────────────────────────────────────────────
@@ -190,6 +196,7 @@ describe('HandleSigningWebhookUseCase — Property 28: Firma exitosa actualiza e
           const useCase = new HandleSigningWebhookUseCase(
             stubs.repository as any,
             stubs.notificationPort as any,
+            stubs.paymentSchedulingPort as any,
             stubs.auditLogger,
           );
 
@@ -238,6 +245,7 @@ describe('HandleSigningWebhookUseCase — Property 28: Firma exitosa actualiza e
           const useCase = new HandleSigningWebhookUseCase(
             stubs.repository as any,
             stubs.notificationPort as any,
+            stubs.paymentSchedulingPort as any,
             stubs.auditLogger,
           );
 
@@ -280,6 +288,7 @@ describe('HandleSigningWebhookUseCase — Property 28: Firma exitosa actualiza e
           const useCase = new HandleSigningWebhookUseCase(
             stubs.repository as any,
             stubs.notificationPort as any,
+            stubs.paymentSchedulingPort as any,
             stubs.auditLogger,
           );
 

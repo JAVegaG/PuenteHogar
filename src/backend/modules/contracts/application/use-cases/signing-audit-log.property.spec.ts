@@ -10,6 +10,7 @@ import { ContractEntity, ContractStatus } from '@modules/contracts/domain/entiti
 import { ContractPartyEntity } from '@modules/contracts/domain/entities/contract-party.entity';
 import type { IESignatureProvider } from '@modules/contracts/domain/ports/e-signature-provider.port';
 import type { INotificationPort } from '@modules/contracts/domain/ports/notification.port';
+import type { IPaymentSchedulingPort } from '@modules/contracts/domain/ports/payment-scheduling.port';
 import { AuditLoggerService, AuditEntry } from '@src/shared/audit/audit-logger.service';
 import { CircuitBreakerFactory } from '@src/shared/circuit-breaker/circuit-breaker.factory';
 
@@ -44,6 +45,7 @@ interface StubResult {
   repository: IContractRepository;
   eSignatureProvider: IESignatureProvider;
   notificationPort: INotificationPort;
+  paymentSchedulingPort: IPaymentSchedulingPort;
   circuitBreakerFactory: CircuitBreakerFactory;
   auditLogger: AuditLoggerService;
   auditEntries: AuditEntry[];
@@ -158,6 +160,10 @@ function makeStubs(input: {
     async notifyContractUploaded() { },
   };
 
+  const paymentSchedulingPort: IPaymentSchedulingPort = {
+    async scheduleInitialPayment() { },
+  };
+
   const auditLogger = new AuditLoggerService();
   const originalLog = auditLogger.log.bind(auditLogger);
   auditLogger.log = (entry: AuditEntry) => {
@@ -171,6 +177,7 @@ function makeStubs(input: {
     repository,
     eSignatureProvider,
     notificationPort,
+    paymentSchedulingPort,
     circuitBreakerFactory,
     auditLogger,
     auditEntries,
@@ -257,6 +264,7 @@ describe('Property 30: Eventos de firma registrados en log de auditoría', () =>
           const useCase = new HandleSigningWebhookUseCase(
             stubs.repository as any,
             stubs.notificationPort as any,
+            stubs.paymentSchedulingPort as any,
             stubs.auditLogger,
           );
 
@@ -306,6 +314,7 @@ describe('Property 30: Eventos de firma registrados en log de auditoría', () =>
           const useCase = new HandleSigningWebhookUseCase(
             stubs.repository as any,
             stubs.notificationPort as any,
+            stubs.paymentSchedulingPort as any,
             stubs.auditLogger,
           );
 

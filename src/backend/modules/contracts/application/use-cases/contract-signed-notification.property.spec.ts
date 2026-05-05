@@ -14,6 +14,7 @@ import {
 } from '@modules/contracts/domain/entities/contract.entity';
 import { ContractPartyEntity } from '@modules/contracts/domain/entities/contract-party.entity';
 import type { INotificationPort } from '@modules/contracts/domain/ports/notification.port';
+import type { IPaymentSchedulingPort } from '@modules/contracts/domain/ports/payment-scheduling.port';
 import { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
 
 function uuidv4(): string {
@@ -52,6 +53,7 @@ interface NotificationCall {
 interface StubResult {
   repository: IContractRepository;
   notificationPort: INotificationPort;
+  paymentSchedulingPort: IPaymentSchedulingPort;
   auditLogger: AuditLoggerService;
   notificationCalls: NotificationCall[];
 }
@@ -155,9 +157,13 @@ function makeStubs(input: {
     async notifyContractUploaded() { },
   };
 
+  const paymentSchedulingPort: IPaymentSchedulingPort = {
+    async scheduleInitialPayment() { },
+  };
+
   const auditLogger = new AuditLoggerService();
 
-  return { repository, notificationPort, auditLogger, notificationCalls };
+  return { repository, notificationPort, paymentSchedulingPort, auditLogger, notificationCalls };
 }
 
 // ─── Tests ───────────────────────────────────────────────────────────────────
@@ -185,6 +191,7 @@ describe('HandleSigningWebhookUseCase — Property 29: Contrato SIGNED dispara n
         const useCase = new HandleSigningWebhookUseCase(
           stubs.repository as any,
           stubs.notificationPort as any,
+          stubs.paymentSchedulingPort as any,
           stubs.auditLogger,
         );
 
@@ -234,6 +241,7 @@ describe('HandleSigningWebhookUseCase — Property 29: Contrato SIGNED dispara n
         const useCase = new HandleSigningWebhookUseCase(
           stubs.repository as any,
           stubs.notificationPort as any,
+          stubs.paymentSchedulingPort as any,
           stubs.auditLogger,
         );
 
@@ -270,6 +278,7 @@ describe('HandleSigningWebhookUseCase — Property 29: Contrato SIGNED dispara n
         const useCase = new HandleSigningWebhookUseCase(
           stubs.repository as any,
           stubs.notificationPort as any,
+          stubs.paymentSchedulingPort as any,
           stubs.auditLogger,
         );
 
