@@ -3,6 +3,7 @@ import type {
   LeaseState,
   LeaseStatusHistoryEntity,
 } from '../entities/lease-status.entity';
+import type { TenantContactInfo } from './notification.port';
 
 export interface ITrackingRepository {
   /** Returns the current state of a lease, or null if not found */
@@ -25,6 +26,9 @@ export interface ITrackingRepository {
 
   /** Resolves a listing ID to its associated lease ID via portfolio_unit_id */
   findLeaseIdByListingId(listingId: string): Promise<string | null>;
+
+  /** Resolves tenant contact info (name, email, phone) for notification purposes */
+  getTenantContactInfo(tenantUserId: string): Promise<TenantContactInfo | null>;
 }
 
 export interface ActiveLeaseSummary {

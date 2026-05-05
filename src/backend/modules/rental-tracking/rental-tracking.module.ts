@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { PrismaService } from '@src/shared/prisma/prisma.service';
+import { PII_ENCRYPTOR } from '@modules/users/application/use-cases/register-user.use-case';
+import { AES256PIIEncryptor } from '@modules/users/infrastructure/adapters/aes256-pii-encryptor.adapter';
 import { GetActiveLeasesSummaryUseCase } from './application/use-cases/get-active-leases-summary.use-case';
 import { GetLeaseStatusUseCase } from './application/use-cases/get-lease-status.use-case';
 import {
@@ -31,7 +33,11 @@ import { RentalTrackingController } from './rental-tracking.controller';
         },
       },
     },
+    {
+      provide: PII_ENCRYPTOR,
+      useClass: AES256PIIEncryptor,
+    },
   ],
   exports: [TransitionLeaseStateUseCase, GetLeaseStatusUseCase, GetActiveLeasesSummaryUseCase],
 })
-export class RentalTrackingModule {}
+export class RentalTrackingModule { }

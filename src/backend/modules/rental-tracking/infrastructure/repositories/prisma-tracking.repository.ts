@@ -1,5 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from '@src/shared/prisma/prisma.service';
+import type { IPIIEncryptor } from '@modules/users/domain/ports/pii-encryptor.port';
+import { PII_ENCRYPTOR } from '@modules/users/application/use-cases/register-user.use-case';
 import {
   LeaseCurrentStatusEntity,
   LeaseState,
@@ -9,10 +11,14 @@ import {
   ActiveLeaseSummary,
   ITrackingRepository,
 } from '@modules/rental-tracking/domain/ports/tracking-repository.port';
+import type { TenantContactInfo } from '@modules/rental-tracking/domain/ports/notification.port';
 
 @Injectable()
 export class PrismaTrackingRepository implements ITrackingRepository {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(PII_ENCRYPTOR) private readonly piiEncryptor: IPIIEncryptor,
+  ) { }
 
   async getCurrentStatus(leaseId: string): Promise<LeaseCurrentStatusEntity | null> {
     const current = await this.prisma.leaseCurrentStatus.findUnique({
@@ -178,5 +184,34 @@ export class PrismaTrackingRepository implements ITrackingRepository {
       select: { id: true },
     });
     return lease?.id ?? null;
+  }
+
+  async getTenantContactInfo(tenantUserId: string): Promise<TenantContactInfo | null> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: tenantUserId },
+    });
+    if (!user) return null;
+
+    // Resolve name from NaturalPersonDetail or LegalPersonDetail
+    let fullName = 'Desconocido';
+    const natural = await this.prisma.naturalPersonDetail.findUnique({
+      where: { user_id: tenantUserId },
+    });
+    if (natural) {
+      fullName = `${natural.first_name} ${natural.last_name}`;
+    } else {
+      const legal = await this.prisma.legalPersonDetail.findUnique({
+        where: { user_id: tenantUserId },
+      });
+      if (legal) {
+        fullName = legal.business_name;
+      }
+    }
+
+    // Decrypt PII fields
+    const email = user.mail ?? '';
+    const phoneNumber = user.phone_number ? this.piiEncryptor.decrypt(user.phone_number) : '';
+
+    return { fullName, email, phoneNumber };
   }
 }

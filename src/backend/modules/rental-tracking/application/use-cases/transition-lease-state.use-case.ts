@@ -1,6 +1,6 @@
 import { ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { ITrackingRepository } from '@modules/rental-tracking/domain/ports/tracking-repository.port';
-import type { ITrackingNotificationPort } from '@modules/rental-tracking/domain/ports/notification.port';
+import type { ITrackingNotificationPort, LeaseStateNotificationMetadata } from '@modules/rental-tracking/domain/ports/notification.port';
 import type { TransitionLeaseStateDto } from '../dtos/lease-status.dto';
 
 export const TRACKING_REPOSITORY = 'TRACKING_REPOSITORY';
@@ -49,9 +49,19 @@ export class TransitionLeaseStateUseCase {
     await this.repository.recordTransition(leaseId, dto.newState);
 
     if (NOTIFY_ON_STATES.has(dto.newState)) {
+      let metadata: LeaseStateNotificationMetadata | undefined;
+
+      // For CONTACT_INITIATED, resolve tenant contact info so landlord can follow up
+      if (dto.newState === 'CONTACT_INITIATED') {
+        const tenantContact = await this.repository.getTenantContactInfo(requestingUserId);
+        if (tenantContact) {
+          metadata = { tenantContact };
+        }
+      }
+
       // fire-and-forget — no await, no throw
       void this.notificationPort
-        .notifyLeaseStateChanged(landlordId, tenantId, leaseId, dto.newState)
+        .notifyLeaseStateChanged(landlordId, tenantId, leaseId, dto.newState, metadata)
         .catch(() => undefined);
     }
   }
