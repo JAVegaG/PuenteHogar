@@ -37,7 +37,9 @@ export function LeaseCard({ lease, portfolioId, unitId }: LeaseCardProps) {
                 <p className="text-body font-semibold" style={{ color: '#111827' }}>
                     {lease.tenantName}
                 </p>
-                <StatusBadge status={lease.status} variant="lease" />
+                <StatusBadge status={lease.status} variant={
+                    ['Vigente', 'Acordado', 'Finalizado'].includes(lease.status) ? 'lease' : 'tracking'
+                } />
             </div>
 
             <p className="text-caption mt-[4px]" style={{ color: '#4b5563' }}>

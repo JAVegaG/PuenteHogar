@@ -4,7 +4,7 @@ export interface LeaseListItem {
     startDate: string;
     endDate: string | null;
     monthlyAmount: number;
-    status: 'Vigente' | 'Acordado' | 'Finalizado';
+    status: string;
     contractId: string | null;
     contractStatus: 'PENDING' | 'SIGNATURE_PENDING' | 'SIGNED' | null;
 }
