@@ -146,7 +146,9 @@ function LeaseDetailContent() {
         </Link>
     );
 
-    const canCancel = lease?.status === 'Acordado';
+    const TRACKING_STATUSES = ['CONTACT_INITIATED', 'CONTRACT_UPLOADED', 'CONTRACT_SIGNED', 'PAYMENT_RECEIVED'];
+    const badgeVariant = TRACKING_STATUSES.includes(lease?.status ?? '') ? 'tracking' : 'lease';
+    const canCancel = lease?.contractStatus !== 'SIGNED';
 
     return (
         <>
@@ -182,7 +184,7 @@ function LeaseDetailContent() {
                         ) : lease ? (
                             <>
                                 <div className="mb-[16px]">
-                                    <StatusBadge status={lease.status} variant="lease" />
+                                    <StatusBadge status={lease.status} variant={badgeVariant} />
                                 </div>
                                 <LeaseDetailView
                                     lease={lease}
@@ -190,7 +192,7 @@ function LeaseDetailContent() {
                                     unitId={unitId}
                                 />
 
-                                {/* Cancel lease button - only for "Acordado" status */}
+                                {/* Cancel lease button - visible when contract is not signed */}
                                 {canCancel && (
                                     <div className="mt-[24px]">
                                         {cancelError && (

@@ -15,7 +15,7 @@ export interface LeaseDetail {
     userId: string;
     startDate: string;
     endDate: string | null;
-    status: 'Vigente' | 'Acordado' | 'Finalizado';
+    status: string;
     monthlyAmount: number;
     contractId: string | null;
     contractStatus: string | null;
