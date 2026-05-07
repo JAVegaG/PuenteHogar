@@ -143,6 +143,8 @@ export class PrismaPortfolioRepository implements IPortfolioRepository {
 
     const now = new Date();
 
+    const SIGNED_STATUSES = ['CONTRACT_SIGNED', 'PAYMENT_RECEIVED'];
+
     const portfolioStats: PortfolioWithStats[] = await Promise.all(
       portfolios.map(async (portfolio) => {
         const totalUnits = portfolio.units.length;
@@ -154,8 +156,21 @@ export class PrismaPortfolioRepository implements IPortfolioRepository {
           const unitActiveLeases = unit.leases.filter(
             (lease) => lease.deleted_at === null && (lease.end_date === null || lease.end_date > now),
           );
-          activeLeases += unitActiveLeases.length;
-          if (unitActiveLeases.length > 0) {
+
+          // Only count leases with signed tracking status as truly active
+          let signedLeaseCount = 0;
+          for (const lease of unitActiveLeases) {
+            const currentStatus = await this.prisma.leaseCurrentStatus.findUnique({
+              where: { lease_id: lease.id },
+              include: { status: true },
+            });
+            if (currentStatus?.status?.name && SIGNED_STATUSES.includes(currentStatus.status.name)) {
+              signedLeaseCount++;
+            }
+          }
+
+          activeLeases += signedLeaseCount;
+          if (signedLeaseCount > 0) {
             unitsWithActiveLease++;
           }
         }
@@ -179,8 +194,6 @@ export class PrismaPortfolioRepository implements IPortfolioRepository {
   }
 
   async getGlobalStats(userId: string): Promise<{ totalUnits: number; activeLeases: number }> {
-    const now = new Date();
-
     const totalUnits = await this.prisma.portfolioUnit.count({
       where: {
         portfolio: {
@@ -189,7 +202,12 @@ export class PrismaPortfolioRepository implements IPortfolioRepository {
       },
     });
 
-    const activeLeases = await this.prisma.lease.count({
+    // Only count leases with signed tracking status (CONTRACT_SIGNED or PAYMENT_RECEIVED)
+    const SIGNED_STATUSES = ['CONTRACT_SIGNED', 'PAYMENT_RECEIVED'];
+    const now = new Date();
+
+    // Step 1: Find all active leases for this user's portfolios
+    const activeLeaseRecords = await this.prisma.lease.findMany({
       where: {
         deleted_at: null,
         portfolio_unit: {
@@ -199,7 +217,20 @@ export class PrismaPortfolioRepository implements IPortfolioRepository {
         },
         OR: [{ end_date: null }, { end_date: { gt: now } }],
       },
+      select: { id: true },
     });
+
+    // Step 2: Check tracking status for each lease (cross-schema lookup)
+    let activeLeases = 0;
+    for (const lease of activeLeaseRecords) {
+      const currentStatus = await this.prisma.leaseCurrentStatus.findUnique({
+        where: { lease_id: lease.id },
+        include: { status: true },
+      });
+      if (currentStatus?.status?.name && SIGNED_STATUSES.includes(currentStatus.status.name)) {
+        activeLeases++;
+      }
+    }
 
     return { totalUnits, activeLeases };
   }
