@@ -164,7 +164,7 @@
 
 - [ ] 6. Fix "Ver contrato archivado" button link and styling
 
-  - [~] 6.1 Fix contract link in LeaseDetailView
+  - [x] 6.1 Fix contract link in LeaseDetailView
     - In `src/frontend/modules/landlord-leases/components/LeaseDetailView.tsx`
     - When `contractStatus === 'SIGNED'`, change `href` from `basePath` (lease detail page) to `/mis-contratos/${lease.contractId}`
     - Apply active blue link styling (Primary_Button_Style or equivalent active link style) instead of gray/disabled styling
