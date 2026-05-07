@@ -61,6 +61,7 @@ export class GetPortfolioUseCase {
       });
 
       const trackingStatusName = currentStatus?.status?.name;
+      dto.trackingStatus = trackingStatusName ?? undefined;
       const isSignedOrBeyond = trackingStatusName != null && SIGNED_STATUSES.includes(trackingStatusName);
 
       if (isSignedOrBeyond) {

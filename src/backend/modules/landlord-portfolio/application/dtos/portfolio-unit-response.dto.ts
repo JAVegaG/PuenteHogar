@@ -54,4 +54,7 @@ export class PortfolioUnitResponseDto {
 
   @ApiPropertyOptional({ description: 'Canon mensual del arriendo activo (si ocupado)', nullable: true })
   monthlyRent?: number | null;
+
+  @ApiPropertyOptional({ description: 'Current lease tracking status name', example: 'CONTRACT_SIGNED' })
+  trackingStatus?: string;
 }
