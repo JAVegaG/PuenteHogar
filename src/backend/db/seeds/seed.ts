@@ -239,6 +239,7 @@ async function main() {
     { name: 'PROCESSING', description: 'Pago en proceso, esperando confirmación de la pasarela' },
     { name: 'PAID', description: 'Pago confirmado exitosamente' },
     { name: 'REJECTED', description: 'Pago rechazado por la pasarela' },
+    { name: 'APPROVED', description: 'Pago aprobado por la pasarela' },
   ];
 
   for (const status of paymentStatuses) {
