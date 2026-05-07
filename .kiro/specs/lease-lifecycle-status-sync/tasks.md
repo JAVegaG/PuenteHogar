@@ -96,7 +96,7 @@
 
 - [ ] 4. Fix unit occupancy derivation and portfolio summary metrics
 
-  - [~] 4.1 Update GetPortfolioUseCase to require CONTRACT_SIGNED or PAYMENT_RECEIVED for "Ocupado"
+  - [x] 4.1 Update GetPortfolioUseCase to require CONTRACT_SIGNED or PAYMENT_RECEIVED for "Ocupado"
     - In `src/backend/modules/landlord-portfolio/application/use-cases/get-portfolio.use-case.ts`
     - After finding an active lease (end_date=null, deleted_at=null), query `LeaseCurrentStatus` for that lease
     - Check if `status.name IN ('CONTRACT_SIGNED', 'PAYMENT_RECEIVED')`
