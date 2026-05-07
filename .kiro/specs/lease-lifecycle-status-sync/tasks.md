@@ -114,14 +114,14 @@
     - This enables the frontend income report page to derive badges from tracking status directly
     - _Requirements: 2.9a_
 
-  - [~] 4.3 Verify bug condition exploration test now passes for unit status derivation
+  - [x] 4.3 Verify bug condition exploration test now passes for unit status derivation
     - **Property 1: Expected Behavior** - Unit Occupancy Requires Signed Contract
     - **IMPORTANT**: Re-run the SAME test from task 1 (unit status assertions only) - do NOT write a new test
     - Run bug condition exploration test from step 1 (unit status portion)
     - **EXPECTED OUTCOME**: Test PASSES (confirms unit status derivation is fixed)
     - _Requirements: 2.4, 2.4a_
 
-  - [~] 4.4 Verify preservation tests still pass for signed lease occupancy
+  - [x] 4.4 Verify preservation tests still pass for signed lease occupancy
     - **Property 2: Preservation** - Signed Leases Remain Occupied
     - **IMPORTANT**: Re-run the SAME tests from task 2 (signed lease occupancy assertions) - do NOT write new tests
     - Run preservation property tests from step 2 (signed lease occupancy portion)
