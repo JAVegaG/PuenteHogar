@@ -53,26 +53,43 @@ export class GetPortfolioUseCase {
     });
 
     if (activeLease) {
-      dto.unitStatus = 'Ocupado';
-      dto.monthlyRent = entity.leaseBaseAmount;
-
-      // Resolve tenant name cross-schema
-      const tenant = await this.prisma.user.findUnique({
-        where: { id: activeLease.user_id },
-        select: { id: true },
+      // Check tracking status — only CONTRACT_SIGNED or PAYMENT_RECEIVED means "Ocupado"
+      const SIGNED_STATUSES = ['CONTRACT_SIGNED', 'PAYMENT_RECEIVED'];
+      const currentStatus = await this.prisma.leaseCurrentStatus.findUnique({
+        where: { lease_id: activeLease.id },
+        include: { status: true },
       });
-      if (tenant) {
-        const natural = await this.prisma.naturalPersonDetail.findFirst({
-          where: { user_id: tenant.id },
+
+      const trackingStatusName = currentStatus?.status?.name;
+      const isSignedOrBeyond = trackingStatusName != null && SIGNED_STATUSES.includes(trackingStatusName);
+
+      if (isSignedOrBeyond) {
+        dto.unitStatus = 'Ocupado';
+        dto.monthlyRent = entity.leaseBaseAmount;
+
+        // Resolve tenant name cross-schema
+        const tenant = await this.prisma.user.findUnique({
+          where: { id: activeLease.user_id },
+          select: { id: true },
         });
-        if (natural) {
-          dto.tenantName = `${natural.first_name} ${natural.last_name}`;
-        } else {
-          const legal = await this.prisma.legalPersonDetail.findFirst({
+        if (tenant) {
+          const natural = await this.prisma.naturalPersonDetail.findFirst({
             where: { user_id: tenant.id },
           });
-          dto.tenantName = legal?.business_name ?? null;
+          if (natural) {
+            dto.tenantName = `${natural.first_name} ${natural.last_name}`;
+          } else {
+            const legal = await this.prisma.legalPersonDetail.findFirst({
+              where: { user_id: tenant.id },
+            });
+            dto.tenantName = legal?.business_name ?? null;
+          }
         }
+      } else {
+        // Lease exists but tracking status is pre-signing — treat as "Disponible"
+        dto.unitStatus = 'Disponible';
+        dto.tenantName = null;
+        dto.monthlyRent = null;
       }
     } else {
       dto.unitStatus = 'Disponible';
