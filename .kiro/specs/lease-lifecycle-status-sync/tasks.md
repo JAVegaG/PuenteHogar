@@ -187,7 +187,7 @@
 
 - [ ] 8. Fix income report page (badges + income totals)
 
-  - [~] 8.1 Fix getLeaseStatus() and income derivation on Reporte de portafolio page
+  - [x] 8.1 Fix getLeaseStatus() and income derivation on Reporte de portafolio page
     - In `src/frontend/app/mis-ingresos/portafolio/[portfolioId]/page.tsx`
     - Replace `getLeaseStatus()` derivation from `unitStatus` with direct use of `trackingStatus` from the portfolio unit response DTO (added in task 4.2)
     - Only show "Vigente" badge for units whose `trackingStatus ∈ {CONTRACT_SIGNED, PAYMENT_RECEIVED}`
