@@ -261,11 +261,16 @@ describe('Property 30: Eventos de firma registrados en log de auditoría', () =>
             externalSigningId: input.externalSigningId,
           });
 
+          const mockListingDeactivationPort = { deactivateByLeaseId: async () => { } };
+          const mockTransitionLeaseState = { execute: async () => { } };
+
           const useCase = new HandleSigningWebhookUseCase(
             stubs.repository as any,
             stubs.notificationPort as any,
             stubs.paymentSchedulingPort as any,
+            mockListingDeactivationPort as any,
             stubs.auditLogger,
+            mockTransitionLeaseState as any,
           );
 
           await useCase.execute({
@@ -311,11 +316,16 @@ describe('Property 30: Eventos de firma registrados en log de auditoría', () =>
             externalSigningId: input.externalSigningId,
           });
 
+          const mockListingDeactivationPort = { deactivateByLeaseId: async () => { } };
+          const mockTransitionLeaseState = { execute: async () => { } };
+
           const useCase = new HandleSigningWebhookUseCase(
             stubs.repository as any,
             stubs.notificationPort as any,
             stubs.paymentSchedulingPort as any,
+            mockListingDeactivationPort as any,
             stubs.auditLogger,
+            mockTransitionLeaseState as any,
           );
 
           await useCase.execute({

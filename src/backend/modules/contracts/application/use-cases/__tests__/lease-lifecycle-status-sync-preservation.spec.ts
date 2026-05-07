@@ -84,11 +84,21 @@ describe('Preservation Property Tests — Signed Leases Remain Occupied, Non-Can
                             scheduleInitialPayment: jest.fn().mockResolvedValue(undefined),
                         };
 
+                        const mockListingDeactivationPort = {
+                            deactivateByLeaseId: jest.fn().mockResolvedValue(undefined),
+                        };
+
+                        const mockTransitionLeaseState = {
+                            execute: jest.fn().mockResolvedValue(undefined),
+                        };
+
                         const useCase = new HandleSigningWebhookUseCase(
                             mockRepository as IContractRepository,
                             mockNotificationPort as INotificationPort,
                             mockPaymentSchedulingPort as any,
+                            mockListingDeactivationPort as any,
                             mockAuditLogger,
+                            mockTransitionLeaseState as any,
                         );
 
                         const dto: SigningWebhookDto = {
@@ -104,14 +114,8 @@ describe('Preservation Property Tests — Signed Leases Remain Occupied, Non-Can
                         expect(statusUpdates[0].newStatus).toBe('SIGNATURE_PENDING');
 
                         // PRESERVATION: No tracking status transition should have been called
-                        // On unfixed code, there's no transitionLeaseState dependency at all
-                        // This confirms the behavior we want to preserve: failed webhooks don't touch tracking
-                        if ('transitionLeaseState' in useCase) {
-                            const transitionMock = (useCase as any).transitionLeaseState;
-                            if (transitionMock?.execute) {
-                                expect(transitionMock.execute).not.toHaveBeenCalled();
-                            }
-                        }
+                        // Failed webhooks don't touch tracking
+                        expect(mockTransitionLeaseState.execute).not.toHaveBeenCalled();
                     },
                 ),
                 { numRuns: 10 },

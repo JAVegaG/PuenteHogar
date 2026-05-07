@@ -188,11 +188,16 @@ describe('HandleSigningWebhookUseCase — Property 29: Contrato SIGNED dispara n
           fileUrl: input.fileUrl,
         });
 
+        const mockListingDeactivationPort = { deactivateByLeaseId: async () => { } };
+        const mockTransitionLeaseState = { execute: async () => { } };
+
         const useCase = new HandleSigningWebhookUseCase(
           stubs.repository as any,
           stubs.notificationPort as any,
           stubs.paymentSchedulingPort as any,
+          mockListingDeactivationPort as any,
           stubs.auditLogger,
+          mockTransitionLeaseState as any,
         );
 
         await useCase.execute({
@@ -238,11 +243,16 @@ describe('HandleSigningWebhookUseCase — Property 29: Contrato SIGNED dispara n
           fileUrl: input.fileUrl,
         });
 
+        const mockListingDeactivationPort2 = { deactivateByLeaseId: async () => { } };
+        const mockTransitionLeaseState2 = { execute: async () => { } };
+
         const useCase = new HandleSigningWebhookUseCase(
           stubs.repository as any,
           stubs.notificationPort as any,
           stubs.paymentSchedulingPort as any,
+          mockListingDeactivationPort2 as any,
           stubs.auditLogger,
+          mockTransitionLeaseState2 as any,
         );
 
         await useCase.execute({
@@ -275,11 +285,16 @@ describe('HandleSigningWebhookUseCase — Property 29: Contrato SIGNED dispara n
           throw new Error('Messaging channel unavailable');
         };
 
+        const mockListingDeactivationPort3 = { deactivateByLeaseId: async () => { } };
+        const mockTransitionLeaseState3 = { execute: async () => { } };
+
         const useCase = new HandleSigningWebhookUseCase(
           stubs.repository as any,
           stubs.notificationPort as any,
           stubs.paymentSchedulingPort as any,
+          mockListingDeactivationPort3 as any,
           stubs.auditLogger,
+          mockTransitionLeaseState3 as any,
         );
 
         // Must not throw even when notification fails

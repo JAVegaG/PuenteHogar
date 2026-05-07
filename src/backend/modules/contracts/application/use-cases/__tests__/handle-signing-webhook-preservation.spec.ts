@@ -51,11 +51,19 @@ describe('Preservation Property Tests — HandleSigningWebhookUseCase', () => {
             scheduleInitialPayment: jest.fn().mockResolvedValue(undefined),
         };
 
+        const mockListingDeactivationPort = {
+            deactivateByLeaseId: jest.fn().mockResolvedValue(undefined),
+        };
+
+        const mockTransitionLeaseState = {
+            execute: jest.fn().mockResolvedValue(undefined),
+        };
+
         const mockAuditLogger = {
             log: jest.fn(),
         } as unknown as jest.Mocked<AuditLoggerService>;
 
-        return { mockContract, mockRepository, mockNotificationPort, mockPaymentSchedulingPort, mockAuditLogger };
+        return { mockContract, mockRepository, mockNotificationPort, mockPaymentSchedulingPort, mockListingDeactivationPort, mockTransitionLeaseState, mockAuditLogger };
     }
 
     // ─── Property: For all COMPLETED webhooks, notifications are sent and audit is logged ───
@@ -68,13 +76,15 @@ describe('Preservation Property Tests — HandleSigningWebhookUseCase', () => {
              * notifyContractSigned(landlordUserId, tenantUserId, contractId, signedAt)
              * as fire-and-forget when status is COMPLETED.
              */
-            const { mockRepository, mockNotificationPort, mockPaymentSchedulingPort, mockAuditLogger } = createMocks();
+            const { mockRepository, mockNotificationPort, mockPaymentSchedulingPort, mockListingDeactivationPort, mockTransitionLeaseState, mockAuditLogger } = createMocks();
 
             const useCase = new HandleSigningWebhookUseCase(
                 mockRepository as unknown as IContractRepository,
                 mockNotificationPort as unknown as INotificationPort,
                 mockPaymentSchedulingPort as unknown as IPaymentSchedulingPort,
+                mockListingDeactivationPort as any,
                 mockAuditLogger,
+                mockTransitionLeaseState as any,
             );
 
             const dto: SigningWebhookDto = {
@@ -102,13 +112,15 @@ describe('Preservation Property Tests — HandleSigningWebhookUseCase', () => {
              * Observation: On unfixed code, HandleSigningWebhookUseCase logs an audit
              * entry with action 'CONTRACT_SIGNED' when status is COMPLETED.
              */
-            const { mockRepository, mockNotificationPort, mockPaymentSchedulingPort, mockAuditLogger } = createMocks();
+            const { mockRepository, mockNotificationPort, mockPaymentSchedulingPort, mockListingDeactivationPort, mockTransitionLeaseState, mockAuditLogger } = createMocks();
 
             const useCase = new HandleSigningWebhookUseCase(
                 mockRepository as unknown as IContractRepository,
                 mockNotificationPort as unknown as INotificationPort,
                 mockPaymentSchedulingPort as unknown as IPaymentSchedulingPort,
+                mockListingDeactivationPort as any,
                 mockAuditLogger,
+                mockTransitionLeaseState as any,
             );
 
             const dto: SigningWebhookDto = {
@@ -146,14 +158,16 @@ describe('Preservation Property Tests — HandleSigningWebhookUseCase', () => {
                         }),
                     }),
                     async ({ externalSigningId, completedAt }) => {
-                        const { mockRepository, mockNotificationPort, mockPaymentSchedulingPort, mockAuditLogger } = createMocks();
+                        const { mockRepository, mockNotificationPort, mockPaymentSchedulingPort, mockListingDeactivationPort, mockTransitionLeaseState, mockAuditLogger } = createMocks();
 
                         const useCase = new HandleSigningWebhookUseCase(
-                            mockRepository as unknown as IContractRepository,
-                            mockNotificationPort as unknown as INotificationPort,
-                            mockPaymentSchedulingPort as unknown as IPaymentSchedulingPort,
-                            mockAuditLogger,
-                        );
+                mockRepository as unknown as IContractRepository,
+                mockNotificationPort as unknown as INotificationPort,
+                mockPaymentSchedulingPort as unknown as IPaymentSchedulingPort,
+                mockListingDeactivationPort as any,
+                mockAuditLogger,
+                mockTransitionLeaseState as any,
+            );
 
                         const dto: SigningWebhookDto = {
                             contractId: 'contract-1',
@@ -200,13 +214,15 @@ describe('Preservation Property Tests — HandleSigningWebhookUseCase', () => {
              * After the fix adds payment scheduling, FAILED webhooks must still NOT
              * trigger any payment creation.
              */
-            const { mockRepository, mockNotificationPort, mockPaymentSchedulingPort, mockAuditLogger } = createMocks();
+            const { mockRepository, mockNotificationPort, mockPaymentSchedulingPort, mockListingDeactivationPort, mockTransitionLeaseState, mockAuditLogger } = createMocks();
 
             const useCase = new HandleSigningWebhookUseCase(
                 mockRepository as unknown as IContractRepository,
                 mockNotificationPort as unknown as INotificationPort,
                 mockPaymentSchedulingPort as unknown as IPaymentSchedulingPort,
+                mockListingDeactivationPort as any,
                 mockAuditLogger,
+                mockTransitionLeaseState as any,
             );
 
             const dto: SigningWebhookDto = {
@@ -259,14 +275,16 @@ describe('Preservation Property Tests — HandleSigningWebhookUseCase', () => {
                 fc.asyncProperty(
                     fc.string({ minLength: 1, maxLength: 50 }), // externalSigningId
                     async (externalSigningId) => {
-                        const { mockRepository, mockNotificationPort, mockPaymentSchedulingPort, mockAuditLogger } = createMocks();
+                        const { mockRepository, mockNotificationPort, mockPaymentSchedulingPort, mockListingDeactivationPort, mockTransitionLeaseState, mockAuditLogger } = createMocks();
 
                         const useCase = new HandleSigningWebhookUseCase(
-                            mockRepository as unknown as IContractRepository,
-                            mockNotificationPort as unknown as INotificationPort,
-                            mockPaymentSchedulingPort as unknown as IPaymentSchedulingPort,
-                            mockAuditLogger,
-                        );
+                mockRepository as unknown as IContractRepository,
+                mockNotificationPort as unknown as INotificationPort,
+                mockPaymentSchedulingPort as unknown as IPaymentSchedulingPort,
+                mockListingDeactivationPort as any,
+                mockAuditLogger,
+                mockTransitionLeaseState as any,
+            );
 
                         const dto: SigningWebhookDto = {
                             contractId: 'contract-1',
@@ -321,14 +339,16 @@ describe('Preservation Property Tests — HandleSigningWebhookUseCase', () => {
                         }),
                     }),
                     async ({ externalSigningId, completedAt }) => {
-                        const { mockRepository, mockNotificationPort, mockPaymentSchedulingPort, mockAuditLogger } = createMocks();
+                        const { mockRepository, mockNotificationPort, mockPaymentSchedulingPort, mockListingDeactivationPort, mockTransitionLeaseState, mockAuditLogger } = createMocks();
 
                         const useCase = new HandleSigningWebhookUseCase(
-                            mockRepository as unknown as IContractRepository,
-                            mockNotificationPort as unknown as INotificationPort,
-                            mockPaymentSchedulingPort as unknown as IPaymentSchedulingPort,
-                            mockAuditLogger,
-                        );
+                mockRepository as unknown as IContractRepository,
+                mockNotificationPort as unknown as INotificationPort,
+                mockPaymentSchedulingPort as unknown as IPaymentSchedulingPort,
+                mockListingDeactivationPort as any,
+                mockAuditLogger,
+                mockTransitionLeaseState as any,
+            );
 
                         const dto: SigningWebhookDto = {
                             contractId: 'contract-1',

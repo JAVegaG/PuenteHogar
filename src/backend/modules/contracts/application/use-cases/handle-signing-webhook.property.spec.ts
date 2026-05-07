@@ -193,11 +193,16 @@ describe('HandleSigningWebhookUseCase — Property 28: Firma exitosa actualiza e
             fileUrl: input.fileUrl,
           });
 
+          const mockListingDeactivationPort = { deactivateByLeaseId: async () => { } };
+          const mockTransitionLeaseState = { execute: async () => { } };
+
           const useCase = new HandleSigningWebhookUseCase(
             stubs.repository as any,
             stubs.notificationPort as any,
             stubs.paymentSchedulingPort as any,
+            mockListingDeactivationPort as any,
             stubs.auditLogger,
+            mockTransitionLeaseState as any,
           );
 
           await useCase.execute({
@@ -242,11 +247,16 @@ describe('HandleSigningWebhookUseCase — Property 28: Firma exitosa actualiza e
             fileUrl: input.fileUrl,
           });
 
+          const mockListingDeactivationPort = { deactivateByLeaseId: async () => { } };
+          const mockTransitionLeaseState = { execute: async () => { } };
+
           const useCase = new HandleSigningWebhookUseCase(
             stubs.repository as any,
             stubs.notificationPort as any,
             stubs.paymentSchedulingPort as any,
+            mockListingDeactivationPort as any,
             stubs.auditLogger,
+            mockTransitionLeaseState as any,
           );
 
           await useCase.execute({
@@ -285,11 +295,16 @@ describe('HandleSigningWebhookUseCase — Property 28: Firma exitosa actualiza e
             fileUrl: input.fileUrl,
           });
 
+          const mockListingDeactivationPort = { deactivateByLeaseId: async () => { } };
+          const mockTransitionLeaseState = { execute: async () => { } };
+
           const useCase = new HandleSigningWebhookUseCase(
             stubs.repository as any,
             stubs.notificationPort as any,
             stubs.paymentSchedulingPort as any,
+            mockListingDeactivationPort as any,
             stubs.auditLogger,
+            mockTransitionLeaseState as any,
           );
 
           await useCase.execute({

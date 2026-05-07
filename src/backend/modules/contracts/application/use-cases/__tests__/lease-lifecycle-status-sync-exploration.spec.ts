@@ -163,14 +163,11 @@ describe('Bug Condition Exploration — Lease Lifecycle Status Never Advances Be
                 scheduleInitialPayment: jest.fn().mockResolvedValue(undefined),
             };
 
-            const useCase = new HandleSigningWebhookUseCase(
-                mockRepository as IContractRepository,
-                mockNotificationPort as INotificationPort,
-                mockPaymentSchedulingPort as any,
-                mockAuditLogger,
-            );
+            const mockListingDeactivationPort = {
+                deactivateByLeaseId: jest.fn().mockResolvedValue(undefined),
+            };
 
-            // Mock TransitionLeaseStateUseCase if it exists on the use case
+            // Mock TransitionLeaseStateUseCase
             const mockTransitionLeaseState = {
                 execute: jest.fn().mockImplementation((dto) => {
                     transitionCalls.push({ leaseId: dto.leaseId, newState: dto.newState });
@@ -178,9 +175,14 @@ describe('Bug Condition Exploration — Lease Lifecycle Status Never Advances Be
                 }),
             };
 
-            if ('transitionLeaseState' in useCase) {
-                (useCase as any).transitionLeaseState = mockTransitionLeaseState;
-            }
+            const useCase = new HandleSigningWebhookUseCase(
+                mockRepository as IContractRepository,
+                mockNotificationPort as INotificationPort,
+                mockPaymentSchedulingPort as any,
+                mockListingDeactivationPort as any,
+                mockAuditLogger,
+                mockTransitionLeaseState as any,
+            );
 
             const dto: SigningWebhookDto = {
                 contractId: 'contract-1',

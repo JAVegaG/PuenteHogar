@@ -62,12 +62,24 @@ describe('Bug Condition Exploration — Test 1g: HandleSigningWebhookUseCase sch
             scheduleInitialPayment: jest.fn().mockResolvedValue(undefined),
         };
 
-        // The use case constructor accepts: repository, notificationPort, paymentSchedulingPort, auditLogger
+        // Mock listing deactivation port
+        const mockListingDeactivationPort = {
+            deactivateByLeaseId: jest.fn().mockResolvedValue(undefined),
+        };
+
+        // Mock transition lease state use case
+        const mockTransitionLeaseState = {
+            execute: jest.fn().mockResolvedValue(undefined),
+        };
+
+        // The use case constructor accepts: repository, notificationPort, paymentSchedulingPort, listingDeactivationPort, auditLogger, transitionLeaseState
         const useCase = new HandleSigningWebhookUseCase(
             mockRepository as IContractRepository,
             mockNotificationPort as INotificationPort,
             mockPaymentSchedulingPort as any,
+            mockListingDeactivationPort as any,
             mockAuditLogger,
+            mockTransitionLeaseState as any,
         );
 
         const dto: SigningWebhookDto = {
