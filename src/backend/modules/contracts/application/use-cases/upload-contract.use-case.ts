@@ -20,6 +20,7 @@ import type { IObjectStorage } from '@modules/contracts/domain/ports/object-stor
 import type { INotificationPort } from '@modules/contracts/domain/ports/notification.port';
 import { ContractSummaryDto } from '@modules/contracts/application/dtos/contract-summary.dto';
 import { CreateContractDto } from '@modules/contracts/application/dtos/create-contract.dto';
+import { TransitionLeaseStateUseCase } from '@modules/rental-tracking/application/use-cases/transition-lease-state.use-case';
 
 export const CONTRACT_REPOSITORY = 'CONTRACT_REPOSITORY';
 export const E_SIGNATURE_PROVIDER = 'E_SIGNATURE_PROVIDER';
@@ -38,6 +39,7 @@ export class UploadContractUseCase {
     @Inject(CONTRACT_NOTIFICATION_PORT)
     private readonly notificationPort: INotificationPort,
     private readonly auditLogger: AuditLoggerService,
+    private readonly transitionLeaseState: TransitionLeaseStateUseCase,
   ) { }
 
   async execute(
@@ -135,6 +137,8 @@ export class UploadContractUseCase {
     if (tenantUserId) {
       this.notificationPort.notifyContractUploaded(tenantUserId, contract.id, dto.leaseId).catch(() => undefined);
     }
+
+    this.transitionLeaseState.execute({ leaseId: dto.leaseId, newState: 'CONTRACT_UPLOADED' }, userId).catch(() => undefined);
 
     return this.toSummaryDto(contract, [
       { userId, role: 'LANDLORD' },
