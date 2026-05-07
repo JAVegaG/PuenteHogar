@@ -40,8 +40,9 @@ export class TransitionLeaseStateUseCase {
     if (!tenantId) throw new NotFoundException('Lease no encontrado');
 
     // CONTACT_INITIATED can be triggered by any authenticated tenant (prospective tenant)
+    // 'system' is used for automated transitions (e.g., webhook-triggered)
     // Other transitions require the user to be a party to the lease
-    if (dto.newState !== 'CONTACT_INITIATED') {
+    if (dto.newState !== 'CONTACT_INITIATED' && requestingUserId !== 'system') {
       const isParty = requestingUserId === landlordId || requestingUserId === tenantId;
       if (!isParty) throw new ForbiddenException('No tienes acceso a este lease');
     }
