@@ -81,9 +81,9 @@ export function LeaseCard({ lease, portfolioId, unitId }: LeaseCardProps) {
 
                 {showArchivedContract && (
                     <Link
-                        href={basePath}
+                        href={`/mis-contratos/${lease.contractId}`}
                         className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] px-[16px] py-[8px] text-caption font-medium rounded-[6px] transition-colors"
-                        style={{ color: '#4b5563', border: '1px solid #d1d5db' }}
+                        style={{ color: '#1d4ed8', border: '1px solid #1d4ed8' }}
                     >
                         Ver contrato archivado
                     </Link>
