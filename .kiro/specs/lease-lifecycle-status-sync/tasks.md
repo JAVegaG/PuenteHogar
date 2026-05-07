@@ -212,7 +212,7 @@
     - Run preservation property tests from step 2 (signed lease income portion)
     - **EXPECTED OUTCOME**: Tests PASS (confirms signed leases still show "Vigente" and contribute to income)
 
-- [~] 9. Checkpoint - Ensure all tests pass
+- [x] 9. Checkpoint - Ensure all tests pass
   - Run full backend test suite: `npm run test` from `src/backend/`
   - Run frontend build: `npm run build` from `src/frontend/`
   - Run backend build: `npm run build` from `src/backend/`
