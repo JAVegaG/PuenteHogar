@@ -139,7 +139,7 @@
     - _Preservation: Leases with contractStatus = 'SIGNED' remain non-cancellable (requirement 3.10)_
     - _Requirements: 2.9, 3.9, 3.10_
 
-  - [~] 5.2 Fix canCancel logic and StatusBadge variant on lease detail page
+  - [x] 5.2 Fix canCancel logic and StatusBadge variant on lease detail page
     - In `src/frontend/app/mi-portafolio/[id]/unidades/[unitId]/arriendos/[leaseId]/page.tsx`
     - Change `canCancel` from `lease?.status === 'Acordado'` to `lease?.contractStatus !== 'SIGNED'`
     - Change StatusBadge from `variant="lease"` to `variant="tracking"` when the status is a tracking enum value (CONTACT_INITIATED, CONTRACT_UPLOADED, CONTRACT_SIGNED, PAYMENT_RECEIVED)
