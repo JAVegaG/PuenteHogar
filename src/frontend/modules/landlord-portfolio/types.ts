@@ -19,6 +19,7 @@ export interface PortfolioUnit {
   hasActiveListing?: boolean;
   tenantName?: string | null;
   monthlyRent?: number | null;
+  trackingStatus?: string;
 }
 
 export interface CreatePortfolioUnitRequest {

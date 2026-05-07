@@ -46,11 +46,25 @@ function ReportSkeleton() {
     );
 }
 
-/** Resolves the lease status label for a unit based on its unitStatus */
-function getLeaseStatus(unit: PortfolioUnit): string {
-    if (unit.unitStatus === 'Ocupado') return 'Vigente';
-    if (unit.unitStatus === 'Mantenimiento') return 'Finalizado';
-    return 'Acordado';
+/** Set of tracking statuses that represent a signed/active lease */
+const SIGNED_STATUSES = new Set(['CONTRACT_SIGNED', 'PAYMENT_RECEIVED']);
+
+/** Returns true if the unit has a signed lease (CONTRACT_SIGNED or PAYMENT_RECEIVED) */
+function isSignedLease(unit: PortfolioUnit): boolean {
+    return !!unit.trackingStatus && SIGNED_STATUSES.has(unit.trackingStatus);
+}
+
+/** Resolves the badge status and variant for a unit based on its trackingStatus */
+function getLeaseStatusInfo(unit: PortfolioUnit): { status: string; variant: 'lease' | 'tracking' } {
+    if (isSignedLease(unit)) {
+        return { status: 'Vigente', variant: 'lease' };
+    }
+    // For pre-signing states, use the tracking variant for proper Spanish translation
+    if (unit.trackingStatus) {
+        return { status: unit.trackingStatus, variant: 'tracking' };
+    }
+    // Fallback for units without tracking status
+    return { status: 'Acordado', variant: 'lease' };
 }
 
 function PortfolioReportContent() {
@@ -108,6 +122,11 @@ function PortfolioReportContent() {
         fetchData(period);
     };
 
+    // Only include income from units with signed leases (CONTRACT_SIGNED or PAYMENT_RECEIVED)
+    const signedUnits = units.filter(isSignedLease);
+    const totalReceivedIncome = report?.totalAmount ?? 0;
+    const totalExpectedIncome = signedUnits.reduce((sum, unit) => sum + (unit.monthlyRent ?? 0), 0);
+
     const backButton = (
         <Link
             href="/mis-ingresos"
@@ -131,8 +150,8 @@ function PortfolioReportContent() {
         </Link>
     );
 
-    const totalAmountFormatted = formatPrice(report?.totalAmount ?? 0);
-    const expectedAmountFormatted = formatPrice(report?.expectedAmount ?? 0);
+    const totalAmountFormatted = formatPrice(totalReceivedIncome);
+    const expectedAmountFormatted = formatPrice(totalExpectedIncome);
 
     return (
         <>
@@ -199,8 +218,8 @@ function PortfolioReportContent() {
                                                     </thead>
                                                     <tbody>
                                                         {units.map((unit) => {
-                                                            const income = unit.monthlyRent ?? 0;
-                                                            const leaseStatus = getLeaseStatus(unit);
+                                                            const income = isSignedLease(unit) ? (unit.monthlyRent ?? 0) : 0;
+                                                            const { status: leaseStatus, variant: badgeVariant } = getLeaseStatusInfo(unit);
                                                             return (
                                                                 <tr
                                                                     key={unit.id}
@@ -211,7 +230,7 @@ function PortfolioReportContent() {
                                                                         {unit.name}
                                                                     </td>
                                                                     <td className="py-[12px] pr-[12px]">
-                                                                        <StatusBadge status={leaseStatus} variant="lease" />
+                                                                        <StatusBadge status={leaseStatus} variant={badgeVariant} />
                                                                     </td>
                                                                     <td
                                                                         className="py-[12px] text-body font-semibold text-right"
@@ -229,8 +248,8 @@ function PortfolioReportContent() {
                                             {/* Mobile stacked cards */}
                                             <div className="flex flex-col gap-[12px] md:hidden">
                                                 {units.map((unit) => {
-                                                    const income = unit.monthlyRent ?? 0;
-                                                    const leaseStatus = getLeaseStatus(unit);
+                                                    const income = isSignedLease(unit) ? (unit.monthlyRent ?? 0) : 0;
+                                                    const { status: leaseStatus, variant: badgeVariant } = getLeaseStatusInfo(unit);
                                                     return (
                                                         <div
                                                             key={unit.id}
@@ -241,7 +260,7 @@ function PortfolioReportContent() {
                                                                 <p className="text-body font-semibold" style={{ color: '#111827' }}>
                                                                     {unit.name}
                                                                 </p>
-                                                                <StatusBadge status={leaseStatus} variant="lease" />
+                                                                <StatusBadge status={leaseStatus} variant={badgeVariant} />
                                                             </div>
                                                             <p
                                                                 className="text-body font-semibold mt-[8px]"
