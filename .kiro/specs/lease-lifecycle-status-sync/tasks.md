@@ -149,14 +149,14 @@
     - _Preservation: Cancel button hidden when contractStatus = 'SIGNED'; lease variant statuses (Vigente, Acordado, Finalizado) still display correctly_
     - _Requirements: 2.5, 2.9, 3.4, 3.10_
 
-  - [~] 5.3 Verify bug condition exploration test now passes for cancel gate
+  - [x] 5.3 Verify bug condition exploration test now passes for cancel gate
     - **Property 1: Expected Behavior** - Cancel Gate Allows Pre-Signing Cancellation
     - **IMPORTANT**: Re-run the SAME test from task 1 (cancel gate assertions only) - do NOT write a new test
     - Run bug condition exploration test from step 1 (cancel gate portion)
     - **EXPECTED OUTCOME**: Test PASSES (confirms cancel gate is fixed)
     - _Requirements: 2.9_
 
-  - [~] 5.4 Verify preservation tests still pass for signed lease non-cancellability
+  - [x] 5.4 Verify preservation tests still pass for signed lease non-cancellability
     - **Property 2: Preservation** - Signed Leases Remain Non-Cancellable
     - **IMPORTANT**: Re-run the SAME tests from task 2 (signed lease cancellation assertions) - do NOT write new tests
     - Run preservation property tests from step 2 (signed lease non-cancellable portion)
