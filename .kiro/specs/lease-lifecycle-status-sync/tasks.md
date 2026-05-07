@@ -107,7 +107,7 @@
     - _Preservation: Units with CONTRACT_SIGNED/PAYMENT_RECEIVED leases continue to show "Ocupado"_
     - _Requirements: 2.4, 2.4a, 3.2, 3.3_
 
-  - [~] 4.2 Add trackingStatus field to portfolio unit response DTO
+  - [x] 4.2 Add trackingStatus field to portfolio unit response DTO
     - In `src/backend/modules/landlord-portfolio/application/dtos/portfolio-unit-response.dto.ts`
     - Add `trackingStatus?: string` field with `@ApiPropertyOptional()` decorator
     - Populate from the lease's current tracking status name in `GetPortfolioUseCase.toResponseDto()`
