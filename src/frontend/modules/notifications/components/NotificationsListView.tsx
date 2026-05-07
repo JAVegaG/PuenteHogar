@@ -246,9 +246,9 @@ export default function NotificationsListView({
                                 {renderMessageWithBold(notification.message)}
                             </p>
                             {notification.notificationType === 'NEW_INTEREST' &&
-                                (notification.data?.tenantEmail || notification.data?.tenantPhone) && (
+                                Boolean(notification.data?.tenantEmail || notification.data?.tenantPhone) && (
                                     <div className="flex flex-col gap-1 mt-2 text-caption text-neutral-600">
-                                        {notification.data.tenantEmail && (
+                                        {Boolean(notification.data.tenantEmail) && (
                                             <a
                                                 href={`mailto:${String(notification.data.tenantEmail)}`}
                                                 onClick={(e) => e.stopPropagation()}
@@ -261,7 +261,7 @@ export default function NotificationsListView({
                                                 {String(notification.data.tenantEmail)}
                                             </a>
                                         )}
-                                        {notification.data.tenantPhone && (
+                                        {Boolean(notification.data.tenantPhone) && (
                                             <a
                                                 href={`tel:${String(notification.data.tenantPhone)}`}
                                                 onClick={(e) => e.stopPropagation()}

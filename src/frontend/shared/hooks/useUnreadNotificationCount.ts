@@ -6,12 +6,11 @@ import { notificationService } from '@shared/services/notification';
 
 export function useUnreadNotificationCount(refreshKey?: number): { unreadCount: number | undefined } {
     const { user, logout } = useAuth();
+    const token = user?.accessToken;
     const [unreadCount, setUnreadCount] = useState<number | undefined>(undefined);
 
     useEffect(() => {
-        const token = user?.accessToken;
         if (!token) {
-            setUnreadCount(undefined);
             return;
         }
 
@@ -40,7 +39,10 @@ export function useUnreadNotificationCount(refreshKey?: number): { unreadCount: 
         return () => {
             cancelled = true;
         };
-    }, [user?.accessToken, logout, refreshKey]);
+    }, [token, logout, refreshKey]);
 
-    return { unreadCount };
+    // Reset count when user logs out (token becomes undefined)
+    const resolvedCount = token ? unreadCount : undefined;
+
+    return { unreadCount: resolvedCount };
 }
