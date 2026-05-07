@@ -121,7 +121,7 @@ function LeaseDetailContent() {
         }
     }, [portfolioId, unitId, leaseId, user?.accessToken, logout, router]);
 
-    const unitDetailPath = `/mi-portafolio/${portfolioId}/unidades/${unitId}`;
+    const unitDetailPath = `/mi-portafolio/${portfolioId}/unidades/${unitId}/arriendos`;
 
     const backButton = (
         <Link

@@ -109,7 +109,7 @@ src/frontend/
 │   │   └── validation.ts               # Validación por paso: step1, step2, step3
 │   ├── landlord-leases/
 │   │   ├── components/
-│   │   │   ├── LeaseCard.tsx            # Tarjeta de arriendo con estado y acciones contextuales
+│   │   │   ├── LeaseCard.tsx            # Tarjeta de arriendo con estado y acciones contextuales (StatusBadge dinámico: lease o tracking según estado)
 │   │   │   ├── LeaseCreateForm.tsx      # Formulario de creación de arriendo
 │   │   │   ├── LeaseDetailView.tsx      # Vista de detalle de arriendo (solo lectura)
 │   │   │   └── UnitInfoHeader.tsx       # Encabezado con info de la unidad
@@ -203,7 +203,7 @@ src/frontend/
 │   │   ├── Pagination.tsx         # Paginación con selector de items/página
 │   │   ├── SideMenu.tsx           # Menú lateral (drawer 320px, auth-aware)
 │   │   ├── Skeleton.tsx           # Skeleton loader genérico
-│   │   ├── StatusBadge.tsx        # Badge de estado reutilizable (variantes: lease, unit, payment, listing, contract)
+│   │   ├── StatusBadge.tsx        # Badge de estado reutilizable (variantes: lease, unit, payment, listing, contract, tracking, paymentStatus, notification)
 │   │   ├── Toast.tsx              # Notificación temporal (auto-hide, role="status")
 │   │   └── WizardProgress.tsx     # Indicador visual de progreso multi-paso (pasos numerados, checks, conectores)
 │   ├── hooks/
@@ -310,7 +310,7 @@ Contabilidad del arrendador: dashboard de ingresos con resumen mensual (ingresos
 
 ### landlord-leases
 
-Gestión de arriendos: historial de arriendos por unidad con tarjetas de estado y acciones contextuales (ver detalle, generar/ver contrato), vista de detalle de arriendo rediseñada con tarjetas (Inmueble, Arrendatario, Acuerdo), cancelación de arriendo con diálogo de confirmación y cascada de contrato, creación de arriendo (email del arrendatario, fechas), encabezado de info de unidad. Componentes: LeaseCard, LeaseDetailView, LeaseCreateForm, UnitInfoHeader.
+Gestión de arriendos: historial de arriendos por unidad con tarjetas de estado y acciones contextuales (ver detalle, generar/ver contrato), vista de detalle de arriendo rediseñada con tarjetas (Inmueble, Arrendatario, Acuerdo), cancelación de arriendo con diálogo de confirmación y cascada de contrato, creación de arriendo (email del arrendatario, fechas), encabezado de info de unidad. LeaseCard usa StatusBadge con variante dinámica (`lease` para estados estándar Vigente/Acordado/Finalizado, `tracking` para estados del ciclo de arriendo como PUBLISHED/CONTACT_INITIATED/etc.). Componentes: LeaseCard, LeaseDetailView, LeaseCreateForm, UnitInfoHeader.
 
 ### landlord-contracts
 
