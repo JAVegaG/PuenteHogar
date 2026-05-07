@@ -6,6 +6,11 @@ import {
   PAYMENT_SCHEDULING_PORT,
   type IPaymentSchedulingPort,
 } from '@modules/contracts/domain/ports/payment-scheduling.port';
+import {
+  LISTING_DEACTIVATION_PORT,
+  type IListingDeactivationPort,
+} from '@modules/contracts/domain/ports/listing-deactivation.port';
+import { TransitionLeaseStateUseCase } from '@modules/rental-tracking/application/use-cases/transition-lease-state.use-case';
 import { SigningWebhookDto } from '@modules/contracts/application/dtos/signing-webhook.dto';
 import {
   CONTRACT_NOTIFICATION_PORT,
@@ -21,7 +26,10 @@ export class HandleSigningWebhookUseCase {
     private readonly notificationPort: INotificationPort,
     @Inject(PAYMENT_SCHEDULING_PORT)
     private readonly paymentSchedulingPort: IPaymentSchedulingPort,
+    @Inject(LISTING_DEACTIVATION_PORT)
+    private readonly listingDeactivationPort: IListingDeactivationPort,
     private readonly auditLogger: AuditLoggerService,
+    private readonly transitionLeaseState: TransitionLeaseStateUseCase,
   ) { }
 
   async execute(dto: SigningWebhookDto): Promise<void> {
@@ -65,6 +73,16 @@ export class HandleSigningWebhookUseCase {
           .scheduleInitialPayment(contract.leaseId, leaseInfo.amount, 'COP', contract.startDate)
           .catch(() => undefined);
       }
+
+      // fire-and-forget: transition lease tracking status to CONTRACT_SIGNED
+      this.transitionLeaseState
+        .execute({ leaseId: contract.leaseId, newState: 'CONTRACT_SIGNED' }, 'system')
+        .catch(() => undefined);
+
+      // fire-and-forget: deactivate listing for the signed lease's unit
+      this.listingDeactivationPort
+        .deactivateByLeaseId(contract.leaseId)
+        .catch(() => undefined);
     } else {
       // FAILED — keep SIGNATURE_PENDING for retry
       await this.repository.updateStatus(contract.id, 'SIGNATURE_PENDING');
