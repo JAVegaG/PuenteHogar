@@ -70,7 +70,7 @@
     - _Preservation: Contract creation logic and audit logging remain unchanged_
     - _Requirements: 2.1_
 
-  - [~] 3.3 Add tracking status transition and listing deactivation to HandleSigningWebhookUseCase
+  - [x] 3.3 Add tracking status transition and listing deactivation to HandleSigningWebhookUseCase
     - Inject `TransitionLeaseStateUseCase` and `IListingDeactivationPort` (via `LISTING_DEACTIVATION_PORT` token) in `src/backend/modules/contracts/application/use-cases/handle-signing-webhook.use-case.ts`
     - After updating contract status to SIGNED (when webhook status = COMPLETED), call `transitionLeaseState.execute({ leaseId: contract.leaseId, newState: 'CONTRACT_SIGNED' }, 'system')`
     - Call `listingDeactivationPort.deactivateByLeaseId(contract.leaseId).catch(() => undefined)` — fire-and-forget
