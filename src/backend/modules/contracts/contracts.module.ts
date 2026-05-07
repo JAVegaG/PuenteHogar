@@ -9,8 +9,10 @@ import { AES256PIIEncryptor } from '@modules/users/infrastructure/adapters/aes25
 import { UsersModule } from '@modules/users/users.module';
 import { NotificationsModule } from '@modules/notifications';
 import { PaymentsModule } from '@modules/payments';
+import { RentalTrackingModule } from '@modules/rental-tracking';
 import { PaymentSchedulingAdapter } from '@modules/payments/infrastructure/adapters/payment-scheduling.adapter';
 import { ContractNotificationAdapter } from './infrastructure/adapters/contract-notification.adapter';
+import { ListingDeactivationAdapter } from './infrastructure/adapters/listing-deactivation.adapter';
 import { GetContractSummaryUseCase } from './application/use-cases/get-contract-summary.use-case';
 import { GetLandlordContractsUseCase } from './application/use-cases/get-landlord-contracts.use-case';
 import { GetTenantContractsUseCase } from './application/use-cases/get-tenant-contracts.use-case';
@@ -32,10 +34,11 @@ import { ContractsEtlService } from './infrastructure/etl/contracts-etl.service'
 import { PrismaContractRepository } from './infrastructure/repositories/prisma-contract.repository';
 import { ContractsCrossModuleQueryService } from './infrastructure/repositories/contracts-cross-module-query.service';
 import { CONTRACTS_CROSS_MODULE_QUERY } from './domain/ports/cross-module-query.port';
+import { LISTING_DEACTIVATION_PORT } from './domain/ports/listing-deactivation.port';
 import { PAYMENT_SCHEDULING_PORT } from './domain/ports/payment-scheduling.port';
 
 @Module({
-  imports: [ConfigModule, forwardRef(() => UsersModule), NotificationsModule, PaymentsModule],
+  imports: [ConfigModule, forwardRef(() => UsersModule), NotificationsModule, PaymentsModule, RentalTrackingModule],
   controllers: [ContractsController],
   providers: [
     PrismaService,
@@ -79,6 +82,10 @@ import { PAYMENT_SCHEDULING_PORT } from './domain/ports/payment-scheduling.port'
     {
       provide: PAYMENT_SCHEDULING_PORT,
       useExisting: PaymentSchedulingAdapter,
+    },
+    {
+      provide: LISTING_DEACTIVATION_PORT,
+      useClass: ListingDeactivationAdapter,
     },
   ],
   exports: [
