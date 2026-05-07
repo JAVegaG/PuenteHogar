@@ -79,16 +79,7 @@ describe('Bug Condition Exploration — Lease Lifecycle Status Never Advances Be
                 log: jest.fn(),
             } as unknown as AuditLoggerService;
 
-            // Create the use case — on unfixed code, it does NOT accept a TransitionLeaseStateUseCase
-            const useCase = new UploadContractUseCase(
-                mockRepository as IContractRepository,
-                mockObjectStorage as any,
-                mockNotificationPort as INotificationPort,
-                mockAuditLogger,
-            );
-
-            // If the use case had a transitionLeaseState dependency, we'd mock it here
-            // On unfixed code, there's no such dependency, so we check if it's called
+            // Create the use case with TransitionLeaseStateUseCase injected
             const mockTransitionLeaseState = {
                 execute: jest.fn().mockImplementation((dto) => {
                     transitionCalls.push({ leaseId: dto.leaseId, newState: dto.newState });
@@ -96,10 +87,13 @@ describe('Bug Condition Exploration — Lease Lifecycle Status Never Advances Be
                 }),
             };
 
-            // Monkey-patch if the property exists (it won't on unfixed code)
-            if ('transitionLeaseState' in useCase) {
-                (useCase as any).transitionLeaseState = mockTransitionLeaseState;
-            }
+            const useCase = new UploadContractUseCase(
+                mockRepository as IContractRepository,
+                mockObjectStorage as any,
+                mockNotificationPort as INotificationPort,
+                mockAuditLogger,
+                mockTransitionLeaseState as any,
+            );
 
             const file = {
                 buffer: Buffer.from('fake-pdf-content'),

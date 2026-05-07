@@ -11,6 +11,7 @@ import { ContractEntity, ContractStatus } from '@modules/contracts/domain/entiti
 import type { ContractPartyEntity } from '@modules/contracts/domain/entities/contract-party.entity';
 import { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
 import type { INotificationPort } from '@modules/contracts/domain/ports/notification.port';
+import { TransitionLeaseStateUseCase } from '@modules/rental-tracking/application/use-cases/transition-lease-state.use-case';
 
 function uuidv4(): string {
   return crypto.randomUUID();
@@ -105,6 +106,10 @@ function makeNotificationPortStub(): INotificationPort {
   };
 }
 
+function makeTransitionLeaseStateStub(): TransitionLeaseStateUseCase {
+  return { execute: jest.fn().mockResolvedValue(undefined) } as unknown as TransitionLeaseStateUseCase;
+}
+
 // ─── Tests ───────────────────────────────────────────────────────────────────
 
 describe('UploadContractUseCase — Property 26: Archivo inválido (no PDF o > 10MB) es rechazado con 422', () => {
@@ -116,7 +121,7 @@ describe('UploadContractUseCase — Property 26: Archivo inválido (no PDF o > 1
         async (mimeType, fileSizeBytes) => {
           const { stub, createCallCount } = makeRepositoryStub();
           const objectStorage = makeObjectStorageStub();
-          const useCase = new UploadContractUseCase(stub, objectStorage, makeNotificationPortStub(), makeAuditLoggerStub());
+          const useCase = new UploadContractUseCase(stub, objectStorage, makeNotificationPortStub(), makeAuditLoggerStub(), makeTransitionLeaseStateStub());
 
           const file = {
             buffer: Buffer.from('fake-content'),
@@ -147,7 +152,7 @@ describe('UploadContractUseCase — Property 26: Archivo inválido (no PDF o > 1
         async (fileSizeBytes) => {
           const { stub, createCallCount } = makeRepositoryStub();
           const objectStorage = makeObjectStorageStub();
-          const useCase = new UploadContractUseCase(stub, objectStorage, makeNotificationPortStub(), makeAuditLoggerStub());
+          const useCase = new UploadContractUseCase(stub, objectStorage, makeNotificationPortStub(), makeAuditLoggerStub(), makeTransitionLeaseStateStub());
 
           const file = {
             buffer: Buffer.from('fake-content'),
@@ -179,7 +184,7 @@ describe('UploadContractUseCase — Property 26: Archivo inválido (no PDF o > 1
         async (mimeType, fileSizeBytes) => {
           const { stub, createCallCount } = makeRepositoryStub();
           const objectStorage = makeObjectStorageStub();
-          const useCase = new UploadContractUseCase(stub, objectStorage, makeNotificationPortStub(), makeAuditLoggerStub());
+          const useCase = new UploadContractUseCase(stub, objectStorage, makeNotificationPortStub(), makeAuditLoggerStub(), makeTransitionLeaseStateStub());
 
           const file = {
             buffer: Buffer.from('fake-content'),
@@ -206,7 +211,7 @@ describe('UploadContractUseCase — Property 26: Archivo inválido (no PDF o > 1
   it('Property 26d — PDF at exactly 10 MB boundary is accepted', async () => {
     const { stub } = makeRepositoryStub();
     const objectStorage = makeObjectStorageStub();
-    const useCase = new UploadContractUseCase(stub, objectStorage, makeNotificationPortStub(), makeAuditLoggerStub());
+    const useCase = new UploadContractUseCase(stub, objectStorage, makeNotificationPortStub(), makeAuditLoggerStub(), makeTransitionLeaseStateStub());
 
     const file = {
       buffer: Buffer.from('fake-content'),

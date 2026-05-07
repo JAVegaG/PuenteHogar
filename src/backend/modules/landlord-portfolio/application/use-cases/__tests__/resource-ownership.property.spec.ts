@@ -19,6 +19,7 @@ import { UploadContractUseCase } from '@modules/contracts/application/use-cases/
 import { CreateContractDto } from '@modules/contracts/application/dtos/create-contract.dto';
 import { GetPaymentHistoryUseCase } from '@modules/payments/application/use-cases/get-payment-history.use-case';
 import { GetLeaseStatusUseCase } from '@modules/rental-tracking/application/use-cases/get-lease-status.use-case';
+import { TransitionLeaseStateUseCase } from '@modules/rental-tracking/application/use-cases/transition-lease-state.use-case';
 
 import type { IPortfolioRepository } from '@modules/landlord-portfolio/domain/ports/portfolio-repository.port';
 import type { IListingRepository } from '@modules/property-listings/domain/ports/listing-repository.port';
@@ -280,7 +281,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             notifyContractSigned: jest.fn(),
             notifySigningFailed: jest.fn(),
             notifyContractUploaded: jest.fn(),
-          } as INotificationPort, auditLogger);
+          } as INotificationPort, auditLogger, { execute: jest.fn().mockResolvedValue(undefined) } as unknown as TransitionLeaseStateUseCase);
 
           let threw = false;
           try {
@@ -658,7 +659,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             recordTransition: jest.fn(),
             getActiveLeasesForUser: jest.fn(),
             findLeaseIdByListingId: jest.fn(),
-              getTenantContactInfo: jest.fn().mockResolvedValue(null),
+            getTenantContactInfo: jest.fn().mockResolvedValue(null),
           };
 
           const useCase = new GetLeaseStatusUseCase(mockRepo);
