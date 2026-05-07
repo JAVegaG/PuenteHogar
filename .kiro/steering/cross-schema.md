@@ -1,6 +1,7 @@
 ---
 inclusion: fileMatch
 fileMatchPattern: "src/backend/modules/**"
+description: Cross-schema communication patterns including user name resolution, PII decryption, and cross-module port interfaces.
 ---
 
 # Cross-Schema Patterns

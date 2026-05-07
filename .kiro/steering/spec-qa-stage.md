@@ -1,5 +1,5 @@
 ---
-inclusion: auto
+description: Ensures every spec task list includes a final QA stage for manual testing, and documents how post-implementation findings are added to spec files.
 ---
 
 # Spec QA Stage

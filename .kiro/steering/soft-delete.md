@@ -1,5 +1,7 @@
 ---
-inclusion: auto
+inclusion: fileMatch
+fileMatchPattern: "src/backend/**"
+description: Enforces soft-delete query patterns. Every read query must filter by deleted_at null using shared utilities.
 ---
 
 # Soft Delete Rules

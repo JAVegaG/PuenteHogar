@@ -1,6 +1,7 @@
 ---
 inclusion: fileMatch
 fileMatchPattern: "src/frontend/**"
+description: Frontend component patterns including typography tokens, layout conventions, and shared component usage.
 ---
 
 # Frontend Component Patterns
