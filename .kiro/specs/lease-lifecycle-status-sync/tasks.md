@@ -27,7 +27,7 @@
   - Mark task complete when test is written, run, and failure is documented
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.4a, 1.9, 1.9a, 1.9b, 1.9c_
 
-- [~] 2. Write preservation property tests (BEFORE implementing fix)
+- [x] 2. Write preservation property tests (BEFORE implementing fix)
   - **Property 2: Preservation** - Signed Leases Remain Occupied, Non-Cancellable, and Income-Contributing
   - **IMPORTANT**: Follow observation-first methodology
   - Observe behavior on UNFIXED code for non-buggy inputs (cases where isBugCondition returns false):
