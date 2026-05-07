@@ -176,7 +176,7 @@
 
 - [ ] 7. Add APPROVED to PaymentStatus seed
 
-  - [~] 7.1 Add APPROVED entry to payment statuses seed array
+  - [x] 7.1 Add APPROVED entry to payment statuses seed array
     - In `src/backend/db/seeds/seed.ts`
     - Add `{ name: 'APPROVED', description: 'Pago aprobado por la pasarela' }` to the `paymentStatuses` array
     - Ensure existing statuses (PENDING, PROCESSING, PAID, REJECTED) remain unchanged
