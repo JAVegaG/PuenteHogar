@@ -50,7 +50,7 @@
 
 - [ ] 3. Wire cross-module calls from contracts → rental-tracking
 
-  - [~] 3.1 Import RentalTrackingModule in ContractsModule and register listing deactivation port
+  - [x] 3.1 Import RentalTrackingModule in ContractsModule and register listing deactivation port
     - Add `RentalTrackingModule` to imports array in `src/backend/modules/contracts/contracts.module.ts`
     - Define `IListingDeactivationPort` interface with method `deactivateByLeaseId(leaseId: string): Promise<void>` in contracts domain ports
     - Define DI token `LISTING_DEACTIVATION_PORT`
@@ -61,7 +61,7 @@
     - _Preservation: Failed webhooks and existing contract operations remain unchanged_
     - _Requirements: 2.1, 2.3, 2.6_
 
-  - [~] 3.2 Add tracking status transition call to UploadContractUseCase
+  - [-] 3.2 Add tracking status transition call to UploadContractUseCase
     - Inject `TransitionLeaseStateUseCase` via `@Inject()` in `src/backend/modules/contracts/application/use-cases/upload-contract.use-case.ts`
     - After successful contract creation and audit log, call `transitionLeaseState.execute({ leaseId: dto.leaseId, newState: 'CONTRACT_UPLOADED' }, userId)`
     - Use fire-and-forget pattern: `.catch(() => undefined)` to avoid blocking contract upload on tracking failures
