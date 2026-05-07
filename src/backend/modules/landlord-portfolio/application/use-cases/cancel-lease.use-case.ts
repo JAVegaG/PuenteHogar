@@ -53,30 +53,23 @@ export class CancelLeaseUseCase {
             throw new NotFoundException('Arriendo no encontrado');
         }
 
-        // 4. Check lease status is "Acordado"
-        const currentStatus = await this.prisma.leaseCurrentStatus.findUnique({
-            where: { lease_id: leaseId },
-            include: { status: true },
-        });
-        const leaseStatusName = currentStatus?.status?.name ?? 'Acordado';
-        if (leaseStatusName !== 'Acordado') {
-            throw new ConflictException('Solo se pueden cancelar arriendos en estado Acordado');
-        }
-
-        // 5. Check associated contract status
+        // 4. Check associated contract status — cancellation is allowed if no signed contract exists
         const contract = await this.prisma.contract.findFirst({
             where: { lease_id: leaseId, deleted_at: null },
             include: { status: true },
             orderBy: { created_at: 'desc' },
         });
 
-        if (contract) {
-            const contractStatusName = contract.status.name;
-            if (contractStatusName === 'SIGNED') {
-                throw new ConflictException('No se puede cancelar un arriendo con contrato firmado');
-            }
-            // PENDING or SIGNATURE_PENDING → soft-delete contract in transaction
+        if (contract && contract.status.name === 'SIGNED') {
+            throw new ConflictException('No se puede cancelar un arriendo con contrato firmado');
         }
+        // No contract, or contract is PENDING/SIGNATURE_PENDING → allow cancellation
+
+        // 5. Fetch current status for the transaction update
+        const currentStatus = await this.prisma.leaseCurrentStatus.findUnique({
+            where: { lease_id: leaseId },
+            include: { status: true },
+        });
 
         // 6. Execute all mutations in a transaction
         await this.prisma.$transaction(async (tx) => {
