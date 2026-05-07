@@ -80,7 +80,7 @@
     - _Preservation: Failed webhooks (status ≠ COMPLETED) keep contract at SIGNATURE_PENDING, no tracking change_
     - _Requirements: 2.3, 2.6, 3.1_
 
-  - [~] 3.4 Verify bug condition exploration test now passes for lifecycle gap
+  - [x] 3.4 Verify bug condition exploration test now passes for lifecycle gap
     - **Property 1: Expected Behavior** - Contract Upload and Signing Propagate Tracking Status
     - **IMPORTANT**: Re-run the SAME test from task 1 (lifecycle gap assertions only) - do NOT write a new test
     - The test from task 1 encodes the expected behavior for contract upload → CONTRACT_UPLOADED and signing → CONTRACT_SIGNED
@@ -88,7 +88,7 @@
     - **EXPECTED OUTCOME**: Test PASSES (confirms lifecycle gap is fixed)
     - _Requirements: 2.1, 2.3, 2.6_
 
-  - [~] 3.5 Verify preservation tests still pass for webhook handling
+  - [x] 3.5 Verify preservation tests still pass for webhook handling
     - **Property 2: Preservation** - Failed Webhooks Don't Change Tracking Status
     - **IMPORTANT**: Re-run the SAME tests from task 2 (webhook preservation assertions) - do NOT write new tests
     - Run preservation property tests from step 2 (failed webhook portion)
