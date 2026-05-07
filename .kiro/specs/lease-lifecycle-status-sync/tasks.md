@@ -199,14 +199,14 @@
     - _Preservation: Units with CONTRACT_SIGNED/PAYMENT_RECEIVED continue to show "Vigente" and include rent in totals (requirement 3.11)_
     - _Requirements: 2.9a, 2.9c, 3.11_
 
-  - [~] 8.2 Verify bug condition exploration test now passes for income report
+  - [x] 8.2 Verify bug condition exploration test now passes for income report
     - **Property 1: Expected Behavior** - Income Report Excludes Pre-Signing Leases
     - **IMPORTANT**: Re-run the SAME test from task 1 (income report assertions only) - do NOT write a new test
     - Run bug condition exploration test from step 1 (income report portion)
     - **EXPECTED OUTCOME**: Test PASSES (confirms income report is fixed)
     - _Requirements: 2.9a, 2.9c_
 
-  - [~] 8.3 Verify preservation tests still pass for signed lease income reporting
+  - [x] 8.3 Verify preservation tests still pass for signed lease income reporting
     - **Property 2: Preservation** - Signed Leases Continue Contributing to Income
     - **IMPORTANT**: Re-run the SAME tests from task 2 (income report preservation assertions) - do NOT write new tests
     - Run preservation property tests from step 2 (signed lease income portion)
