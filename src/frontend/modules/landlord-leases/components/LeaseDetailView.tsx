@@ -116,11 +116,17 @@ export function LeaseDetailView({ lease, portfolioId, unitId }: LeaseDetailViewP
                                     Contrato
                                 </span>
                                 <Link
-                                    href={basePath}
+                                    href={
+                                        lease.contractStatus === 'SIGNED'
+                                            ? `/mis-contratos/${lease.contractId}`
+                                            : basePath
+                                    }
                                     className="text-body font-medium"
                                     style={{ color: '#1d4ed8' }}
                                 >
-                                    Ver contrato
+                                    {lease.contractStatus === 'SIGNED'
+                                        ? 'Ver contrato archivado'
+                                        : 'Ver contrato'}
                                 </Link>
                             </div>
                             {lease.contractStatus && (
