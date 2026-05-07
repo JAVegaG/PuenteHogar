@@ -129,7 +129,7 @@
 
 - [ ] 5. Broaden cancel gate in CancelLeaseUseCase (backend) and lease detail page (frontend)
 
-  - [~] 5.1 Replace status name check with contract status check in CancelLeaseUseCase
+  - [x] 5.1 Replace status name check with contract status check in CancelLeaseUseCase
     - In `src/backend/modules/landlord-portfolio/application/use-cases/cancel-lease.use-case.ts`
     - Remove step 4's `leaseStatusName !== 'Acordado'` guard
     - Replace with semantic check: cancellation is allowed if and only if `contractStatus ∉ {'SIGNED'}` (i.e., contractStatus is null, PENDING, or SIGNATURE_PENDING)
