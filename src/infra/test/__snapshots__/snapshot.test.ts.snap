@@ -1,0 +1,2399 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Snapshot Tests CdnStack matches snapshot 1`] = `
+{
+  "Parameters": {
+    "BootstrapVersion": {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+  },
+  "Resources": {
+    "AssetsBucket5CB76180": {
+      "DeletionPolicy": "Retain",
+      "Type": "AWS::S3::Bucket",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "WebAcl": {
+      "Properties": {
+        "DefaultAction": {
+          "Allow": {},
+        },
+        "Rules": [],
+        "Scope": "CLOUDFRONT",
+        "VisibilityConfig": {
+          "CloudWatchMetricsEnabled": true,
+          "MetricName": "test",
+          "SampledRequestsEnabled": true,
+        },
+      },
+      "Type": "AWS::WAFv2::WebACL",
+    },
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`Snapshot Tests CiStack matches snapshot 1`] = `
+{
+  "Outputs": {
+    "BackendRepoUri": {
+      "Description": "Backend ECR repository URI",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            {
+              "Fn::Select": [
+                4,
+                {
+                  "Fn::Split": [
+                    ":",
+                    {
+                      "Fn::GetAtt": [
+                        "BackendRepo7FFBAD06",
+                        "Arn",
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            ".dkr.ecr.",
+            {
+              "Fn::Select": [
+                3,
+                {
+                  "Fn::Split": [
+                    ":",
+                    {
+                      "Fn::GetAtt": [
+                        "BackendRepo7FFBAD06",
+                        "Arn",
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            ".",
+            {
+              "Ref": "AWS::URLSuffix",
+            },
+            "/",
+            {
+              "Ref": "BackendRepo7FFBAD06",
+            },
+          ],
+        ],
+      },
+    },
+    "CiRoleArn": {
+      "Description": "GitHub Actions CI/CD IAM role ARN",
+      "Value": {
+        "Fn::GetAtt": [
+          "GitHubActionsCiRoleA4848CA3",
+          "Arn",
+        ],
+      },
+    },
+    "FrontendRepoUri": {
+      "Description": "Frontend ECR repository URI",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            {
+              "Fn::Select": [
+                4,
+                {
+                  "Fn::Split": [
+                    ":",
+                    {
+                      "Fn::GetAtt": [
+                        "FrontendRepoF80FCC01",
+                        "Arn",
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            ".dkr.ecr.",
+            {
+              "Fn::Select": [
+                3,
+                {
+                  "Fn::Split": [
+                    ":",
+                    {
+                      "Fn::GetAtt": [
+                        "FrontendRepoF80FCC01",
+                        "Arn",
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            ".",
+            {
+              "Ref": "AWS::URLSuffix",
+            },
+            "/",
+            {
+              "Ref": "FrontendRepoF80FCC01",
+            },
+          ],
+        ],
+      },
+    },
+  },
+  "Parameters": {
+    "BootstrapVersion": {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+  },
+  "Resources": {
+    "BackendRepo7FFBAD06": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "ImageScanningConfiguration": {
+          "ScanOnPush": true,
+        },
+        "LifecyclePolicy": {
+          "LifecyclePolicyText": "{"rules":[{"rulePriority":1,"description":"Retain only the last 10 images","selection":{"tagStatus":"any","countType":"imageCountMoreThan","countNumber":10},"action":{"type":"expire"}}]}",
+        },
+        "RepositoryName": "snapshotci-backend",
+      },
+      "Type": "AWS::ECR::Repository",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "CustomAWSCDKOpenIdConnectProviderCustomResourceProviderHandlerF2C543E0": {
+      "DependsOn": [
+        "CustomAWSCDKOpenIdConnectProviderCustomResourceProviderRole517FED65",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "d75c48c9f82cde63e9bf414df335e84e8ac24f11eb34889be255b702aec71e50.zip",
+        },
+        "Handler": "__entrypoint__.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "CustomAWSCDKOpenIdConnectProviderCustomResourceProviderRole517FED65",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs22.x",
+        "Timeout": 900,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "CustomAWSCDKOpenIdConnectProviderCustomResourceProviderRole517FED65": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Sub": "arn:\${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          },
+        ],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "iam:CreateOpenIDConnectProvider",
+                    "iam:DeleteOpenIDConnectProvider",
+                    "iam:UpdateOpenIDConnectProviderThumbprint",
+                    "iam:AddClientIDToOpenIDConnectProvider",
+                    "iam:RemoveClientIDFromOpenIDConnectProvider",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*",
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "Inline",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "FrontendRepoF80FCC01": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "ImageScanningConfiguration": {
+          "ScanOnPush": true,
+        },
+        "LifecyclePolicy": {
+          "LifecyclePolicyText": "{"rules":[{"rulePriority":1,"description":"Retain only the last 10 images","selection":{"tagStatus":"any","countType":"imageCountMoreThan","countNumber":10},"action":{"type":"expire"}}]}",
+        },
+        "RepositoryName": "snapshotci-frontend",
+      },
+      "Type": "AWS::ECR::Repository",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "GitHubActionsCiRoleA4848CA3": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
+                },
+                "StringLike": {
+                  "token.actions.githubusercontent.com:sub": "repo:*",
+                },
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": {
+                  "Ref": "GitHubOidcProvider7EBF861F",
+                },
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "Description": "IAM role for GitHub Actions CI/CD pipeline",
+        "RoleName": "SnapshotCi-github-actions-ci",
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "GitHubActionsCiRoleDefaultPolicyC5F94A69": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "ecr:PutImage",
+                "ecr:InitiateLayerUpload",
+                "ecr:CompleteLayerUpload",
+                "ecr:UploadLayerPart",
+                "ecr:BatchCheckLayerAvailability",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "BackendRepo7FFBAD06",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::GetAtt": [
+                    "FrontendRepoF80FCC01",
+                    "Arn",
+                  ],
+                },
+              ],
+              "Sid": "EcrPushToRepos",
+            },
+            {
+              "Action": "ecr:GetAuthorizationToken",
+              "Effect": "Allow",
+              "Resource": "*",
+              "Sid": "EcrGetAuthToken",
+            },
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:iam::",
+                    {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":role/cdk-*",
+                  ],
+                ],
+              },
+              "Sid": "CdkDeployAssumeRole",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "GitHubActionsCiRoleDefaultPolicyC5F94A69",
+        "Roles": [
+          {
+            "Ref": "GitHubActionsCiRoleA4848CA3",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "GitHubOidcProvider7EBF861F": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "ClientIDList": [
+          "sts.amazonaws.com",
+        ],
+        "CodeHash": "d75c48c9f82cde63e9bf414df335e84e8ac24f11eb34889be255b702aec71e50",
+        "RejectUnauthorized": false,
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "CustomAWSCDKOpenIdConnectProviderCustomResourceProviderHandlerF2C543E0",
+            "Arn",
+          ],
+        },
+        "ThumbprintList": [
+          "6938fd4d98bab03faadb97b34396831e3780aea1",
+        ],
+        "Url": "https://token.actions.githubusercontent.com",
+      },
+      "Type": "Custom::AWSCDKOpenIdConnectProvider",
+      "UpdateReplacePolicy": "Delete",
+    },
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`Snapshot Tests ComputeStack matches snapshot 1`] = `
+{
+  "Outputs": {
+    "BackendServiceArn": {
+      "Description": "Backend App Runner service ARN",
+      "Value": {
+        "Fn::GetAtt": [
+          "BackendService",
+          "ServiceArn",
+        ],
+      },
+    },
+    "BackendServiceUrl": {
+      "Description": "Backend App Runner service URL",
+      "Value": {
+        "Fn::GetAtt": [
+          "BackendService",
+          "ServiceUrl",
+        ],
+      },
+    },
+    "FrontendServiceArn": {
+      "Description": "Frontend App Runner service ARN",
+      "Value": {
+        "Fn::GetAtt": [
+          "FrontendService",
+          "ServiceArn",
+        ],
+      },
+    },
+    "FrontendServiceUrl": {
+      "Description": "Frontend App Runner service URL",
+      "Value": {
+        "Fn::GetAtt": [
+          "FrontendService",
+          "ServiceUrl",
+        ],
+      },
+    },
+  },
+  "Parameters": {
+    "BootstrapVersion": {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+  },
+  "Resources": {
+    "BackendAutoScaling": {
+      "Properties": {
+        "AutoScalingConfigurationName": "snapshotcompute-backend-scaling",
+        "MaxConcurrency": 50,
+        "MaxSize": 2,
+        "MinSize": 1,
+      },
+      "Type": "AWS::AppRunner::AutoScalingConfiguration",
+    },
+    "BackendInstanceRole9660A9CF": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "tasks.apprunner.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "Description": "Instance role for backend App Runner service",
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "BackendInstanceRoleDefaultPolicy5C2C7813": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "secretsmanager:GetSecretValue",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::ImportValue": "VpcStack:ExportsOutputRefDbSecret685A0FA57881E1C6",
+                },
+                {
+                  "Fn::ImportValue": "VpcStack:ExportsOutputRefJwtSecretB8834B392B9A9162",
+                },
+                {
+                  "Fn::ImportValue": "VpcStack:ExportsOutputRefPiiKeySecretFBA32A500EDB1DA9",
+                },
+              ],
+              "Sid": "SecretsManagerRead",
+            },
+            {
+              "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:DeleteObject",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    {
+                      "Fn::ImportValue": "VpcStack:ExportsOutputFnGetAttAssetsBucket5CB76180ArnBF60D959",
+                    },
+                    "/*",
+                  ],
+                ],
+              },
+              "Sid": "S3ReadWrite",
+            },
+            {
+              "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+              "Sid": "CloudWatchLogs",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "BackendInstanceRoleDefaultPolicy5C2C7813",
+        "Roles": [
+          {
+            "Ref": "BackendInstanceRole9660A9CF",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "BackendService": {
+      "DependsOn": [
+        "VpcConnector",
+      ],
+      "Properties": {
+        "AutoScalingConfigurationArn": {
+          "Fn::GetAtt": [
+            "BackendAutoScaling",
+            "AutoScalingConfigurationArn",
+          ],
+        },
+        "HealthCheckConfiguration": {
+          "HealthyThreshold": 1,
+          "Interval": 10,
+          "Path": "/api/health",
+          "Protocol": "HTTP",
+          "Timeout": 5,
+          "UnhealthyThreshold": 3,
+        },
+        "InstanceConfiguration": {
+          "Cpu": "512",
+          "InstanceRoleArn": {
+            "Fn::GetAtt": [
+              "BackendInstanceRole9660A9CF",
+              "Arn",
+            ],
+          },
+          "Memory": "1024",
+        },
+        "NetworkConfiguration": {
+          "EgressConfiguration": {
+            "EgressType": "VPC",
+            "VpcConnectorArn": {
+              "Fn::GetAtt": [
+                "VpcConnector",
+                "VpcConnectorArn",
+              ],
+            },
+          },
+        },
+        "ServiceName": "snapshotcompute-backend",
+        "SourceConfiguration": {
+          "AuthenticationConfiguration": {
+            "AccessRoleArn": {
+              "Fn::GetAtt": [
+                "EcrAccessRoleF36C0DBD",
+                "Arn",
+              ],
+            },
+          },
+          "AutoDeploymentsEnabled": true,
+          "ImageRepository": {
+            "ImageConfiguration": {
+              "Port": "3000",
+              "RuntimeEnvironmentSecrets": [
+                {
+                  "Name": "DB_SECRET",
+                  "Value": {
+                    "Fn::ImportValue": "VpcStack:ExportsOutputRefDbSecret685A0FA57881E1C6",
+                  },
+                },
+                {
+                  "Name": "JWT_SECRET",
+                  "Value": {
+                    "Fn::ImportValue": "VpcStack:ExportsOutputRefJwtSecretB8834B392B9A9162",
+                  },
+                },
+                {
+                  "Name": "PII_ENCRYPTION_KEY",
+                  "Value": {
+                    "Fn::ImportValue": "VpcStack:ExportsOutputRefPiiKeySecretFBA32A500EDB1DA9",
+                  },
+                },
+              ],
+              "RuntimeEnvironmentVariables": [
+                {
+                  "Name": "DB_HOST",
+                  "Value": "test-db.cluster-abc123.us-east-1.rds.amazonaws.com",
+                },
+                {
+                  "Name": "DB_PORT",
+                  "Value": "5432",
+                },
+                {
+                  "Name": "DB_NAME",
+                  "Value": "rental_platform",
+                },
+                {
+                  "Name": "REDIS_HOST",
+                  "Value": "test-redis.abc123.0001.use1.cache.amazonaws.com",
+                },
+                {
+                  "Name": "REDIS_PORT",
+                  "Value": "6379",
+                },
+                {
+                  "Name": "S3_BUCKET_NAME",
+                  "Value": {
+                    "Fn::ImportValue": "VpcStack:ExportsOutputRefAssetsBucket5CB761808BF2E271",
+                  },
+                },
+                {
+                  "Name": "S3_REGION",
+                  "Value": {
+                    "Ref": "AWS::Region",
+                  },
+                },
+                {
+                  "Name": "NODE_ENV",
+                  "Value": "development",
+                },
+                {
+                  "Name": "PORT",
+                  "Value": "3000",
+                },
+              ],
+            },
+            "ImageIdentifier": "123456789012.dkr.ecr.us-east-1.amazonaws.com/backend:latest",
+            "ImageRepositoryType": "ECR",
+          },
+        },
+      },
+      "Type": "AWS::AppRunner::Service",
+    },
+    "EcrAccessRoleDefaultPolicyDD196393": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                "arn:aws:ecr:us-east-1:123456789012:repository/backend",
+                "arn:aws:ecr:us-east-1:123456789012:repository/frontend",
+              ],
+              "Sid": "EcrPullFromRepos",
+            },
+            {
+              "Action": "ecr:GetAuthorizationToken",
+              "Effect": "Allow",
+              "Resource": "*",
+              "Sid": "EcrGetAuthToken",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "EcrAccessRoleDefaultPolicyDD196393",
+        "Roles": [
+          {
+            "Ref": "EcrAccessRoleF36C0DBD",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "EcrAccessRoleF36C0DBD": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "build.apprunner.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "Description": "ECR access role for App Runner to pull images",
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "FrontendAutoScaling": {
+      "Properties": {
+        "AutoScalingConfigurationName": "snapshotcompute-frontend-scaling",
+        "MaxConcurrency": 80,
+        "MaxSize": 2,
+        "MinSize": 1,
+      },
+      "Type": "AWS::AppRunner::AutoScalingConfiguration",
+    },
+    "FrontendInstanceRole4E5ED434": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "tasks.apprunner.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "Description": "Instance role for frontend App Runner service",
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "FrontendInstanceRoleDefaultPolicyD7EF68F9": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+              "Sid": "CloudWatchLogs",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "FrontendInstanceRoleDefaultPolicyD7EF68F9",
+        "Roles": [
+          {
+            "Ref": "FrontendInstanceRole4E5ED434",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "FrontendService": {
+      "Properties": {
+        "AutoScalingConfigurationArn": {
+          "Fn::GetAtt": [
+            "FrontendAutoScaling",
+            "AutoScalingConfigurationArn",
+          ],
+        },
+        "HealthCheckConfiguration": {
+          "HealthyThreshold": 1,
+          "Interval": 10,
+          "Path": "/",
+          "Protocol": "HTTP",
+          "Timeout": 5,
+          "UnhealthyThreshold": 3,
+        },
+        "InstanceConfiguration": {
+          "Cpu": "256",
+          "InstanceRoleArn": {
+            "Fn::GetAtt": [
+              "FrontendInstanceRole4E5ED434",
+              "Arn",
+            ],
+          },
+          "Memory": "512",
+        },
+        "NetworkConfiguration": {
+          "EgressConfiguration": {
+            "EgressType": "DEFAULT",
+          },
+        },
+        "ServiceName": "snapshotcompute-frontend",
+        "SourceConfiguration": {
+          "AuthenticationConfiguration": {
+            "AccessRoleArn": {
+              "Fn::GetAtt": [
+                "EcrAccessRoleF36C0DBD",
+                "Arn",
+              ],
+            },
+          },
+          "AutoDeploymentsEnabled": true,
+          "ImageRepository": {
+            "ImageConfiguration": {
+              "Port": "3000",
+              "RuntimeEnvironmentVariables": [
+                {
+                  "Name": "NEXT_PUBLIC_API_URL",
+                  "Value": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "https://",
+                        {
+                          "Fn::GetAtt": [
+                            "BackendService",
+                            "ServiceUrl",
+                          ],
+                        },
+                      ],
+                    ],
+                  },
+                },
+                {
+                  "Name": "NODE_ENV",
+                  "Value": "development",
+                },
+                {
+                  "Name": "PORT",
+                  "Value": "3000",
+                },
+              ],
+            },
+            "ImageIdentifier": "123456789012.dkr.ecr.us-east-1.amazonaws.com/frontend:latest",
+            "ImageRepositoryType": "ECR",
+          },
+        },
+      },
+      "Type": "AWS::AppRunner::Service",
+    },
+    "VpcConnector": {
+      "Properties": {
+        "SecurityGroups": [
+          {
+            "Fn::ImportValue": "VpcStack:ExportsOutputFnGetAttVpcConnectorSg66AC3654GroupId9458E942",
+          },
+        ],
+        "Subnets": [
+          {
+            "Fn::ImportValue": "VpcStack:ExportsOutputRefVpcPrivateSubnet1Subnet536B997AFD4CC940",
+          },
+          {
+            "Fn::ImportValue": "VpcStack:ExportsOutputRefVpcPrivateSubnet2Subnet3788AAA1380949A3",
+          },
+        ],
+        "VpcConnectorName": "snapshotcompute-connector",
+      },
+      "Type": "AWS::AppRunner::VpcConnector",
+    },
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`Snapshot Tests DataStack matches snapshot 1`] = `
+{
+  "Parameters": {
+    "BootstrapVersion": {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+  },
+  "Resources": {
+    "AssetsBucket5CB76180": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256",
+              },
+            },
+          ],
+        },
+        "CorsConfiguration": {
+          "CorsRules": [
+            {
+              "AllowedHeaders": [
+                "*",
+              ],
+              "AllowedMethods": [
+                "GET",
+                "PUT",
+                "POST",
+                "DELETE",
+              ],
+              "AllowedOrigins": [
+                "*",
+              ],
+              "MaxAge": 3600,
+            },
+          ],
+        },
+        "LifecycleConfiguration": {
+          "Rules": [
+            {
+              "Id": "IntelligentTiering",
+              "Status": "Enabled",
+              "Transitions": [
+                {
+                  "StorageClass": "INTELLIGENT_TIERING",
+                  "TransitionInDays": 30,
+                },
+              ],
+            },
+          ],
+        },
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "BlockPublicPolicy": true,
+          "IgnorePublicAcls": true,
+          "RestrictPublicBuckets": true,
+        },
+        "Tags": [
+          {
+            "Key": "aws-cdk:auto-delete-objects",
+            "Value": "true",
+          },
+        ],
+        "VersioningConfiguration": {
+          "Status": "Enabled",
+        },
+      },
+      "Type": "AWS::S3::Bucket",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "AssetsBucketAutoDeleteObjectsCustomResource51BA1286": {
+      "DeletionPolicy": "Delete",
+      "DependsOn": [
+        "AssetsBucketPolicyFFACF6C4",
+      ],
+      "Properties": {
+        "BucketName": {
+          "Ref": "AssetsBucket5CB76180",
+        },
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "Custom::S3AutoDeleteObjects",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "AssetsBucketPolicyFFACF6C4": {
+      "Properties": {
+        "Bucket": {
+          "Ref": "AssetsBucket5CB76180",
+        },
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "s3:PutBucketPolicy",
+                "s3:GetBucket*",
+                "s3:List*",
+                "s3:DeleteObject*",
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::GetAtt": [
+                    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+                    "Arn",
+                  ],
+                },
+              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "AssetsBucket5CB76180",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "AssetsBucket5CB76180",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::S3::BucketPolicy",
+    },
+    "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F": {
+      "DependsOn": [
+        "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip",
+        },
+        "Description": {
+          "Fn::Join": [
+            "",
+            [
+              "Lambda function for auto-deleting objects in ",
+              {
+                "Ref": "AssetsBucket5CB76180",
+              },
+              " S3 bucket.",
+            ],
+          ],
+        },
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs22.x",
+        "Timeout": 900,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Sub": "arn:\${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "DatabaseB269D8BB": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "AllocatedStorage": "20",
+        "BackupRetentionPeriod": 7,
+        "CopyTagsToSnapshot": true,
+        "DBInstanceClass": "db.t3.micro",
+        "DBName": "rental_platform",
+        "DBSubnetGroupName": {
+          "Ref": "DbSubnetGroup",
+        },
+        "DeletionProtection": false,
+        "Engine": "postgres",
+        "EngineVersion": "16",
+        "MasterUserPassword": {
+          "Fn::Join": [
+            "",
+            [
+              "{{resolve:secretsmanager:",
+              {
+                "Ref": "DbSecret685A0FA5",
+              },
+              ":SecretString:password::}}",
+            ],
+          ],
+        },
+        "MasterUsername": {
+          "Fn::Join": [
+            "",
+            [
+              "{{resolve:secretsmanager:",
+              {
+                "Ref": "DbSecret685A0FA5",
+              },
+              ":SecretString:username::}}",
+            ],
+          ],
+        },
+        "MaxAllocatedStorage": 40,
+        "MultiAZ": false,
+        "StorageEncrypted": true,
+        "StorageType": "gp2",
+        "VPCSecurityGroups": [
+          {
+            "Fn::ImportValue": "SnapshotNetwork:ExportsOutputFnGetAttDataSecurityGroup80B4589AGroupIdD7A181B0",
+          },
+        ],
+      },
+      "Type": "AWS::RDS::DBInstance",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "DbSecret685A0FA5": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "Description": "Database credentials for RDS PostgreSQL",
+        "GenerateSecretString": {
+          "ExcludePunctuation": true,
+          "GenerateStringKey": "password",
+          "PasswordLength": 32,
+          "SecretStringTemplate": "{"username":"app_user"}",
+        },
+      },
+      "Type": "AWS::SecretsManager::Secret",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "DbSecretAttachment0609CE05": {
+      "Properties": {
+        "SecretId": {
+          "Ref": "DbSecret685A0FA5",
+        },
+        "TargetId": {
+          "Ref": "DatabaseB269D8BB",
+        },
+        "TargetType": "AWS::RDS::DBInstance",
+      },
+      "Type": "AWS::SecretsManager::SecretTargetAttachment",
+    },
+    "DbSubnetGroup": {
+      "Properties": {
+        "DBSubnetGroupDescription": "Subnet group for RDS instance in isolated subnets",
+        "SubnetIds": [
+          {
+            "Fn::ImportValue": "SnapshotNetwork:ExportsOutputRefVpcDataSubnet1Subnet8E3CA4EDBB6D2B2E",
+          },
+          {
+            "Fn::ImportValue": "SnapshotNetwork:ExportsOutputRefVpcDataSubnet2Subnet25D1B0F65BC21239",
+          },
+        ],
+      },
+      "Type": "AWS::RDS::DBSubnetGroup",
+    },
+    "JwtSecretB8834B39": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "Description": "JWT signing secret for authentication",
+        "GenerateSecretString": {
+          "ExcludePunctuation": true,
+          "PasswordLength": 64,
+        },
+      },
+      "Type": "AWS::SecretsManager::Secret",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "PiiEncryptionKey5C1DDEBC": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "Description": "AES-256-CBC key for PII field encryption",
+        "GenerateSecretString": {
+          "ExcludePunctuation": true,
+          "PasswordLength": 32,
+        },
+      },
+      "Type": "AWS::SecretsManager::Secret",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "RedisCluster": {
+      "DependsOn": [
+        "RedisSubnetGroup",
+      ],
+      "Properties": {
+        "AtRestEncryptionEnabled": true,
+        "AutomaticFailoverEnabled": false,
+        "CacheNodeType": "cache.t3.micro",
+        "CacheSubnetGroupName": "snapshotdata-redis-subnets",
+        "Engine": "redis",
+        "EngineVersion": "7.1",
+        "NumCacheClusters": 1,
+        "Port": 6379,
+        "ReplicationGroupDescription": "ElastiCache Redis 7 cluster for application caching",
+        "SecurityGroupIds": [
+          {
+            "Fn::ImportValue": "SnapshotNetwork:ExportsOutputFnGetAttDataSecurityGroup80B4589AGroupIdD7A181B0",
+          },
+        ],
+        "TransitEncryptionEnabled": true,
+      },
+      "Type": "AWS::ElastiCache::ReplicationGroup",
+    },
+    "RedisSubnetGroup": {
+      "Properties": {
+        "CacheSubnetGroupName": "snapshotdata-redis-subnets",
+        "Description": "Subnet group for ElastiCache Redis in data subnets",
+        "SubnetIds": [
+          {
+            "Fn::ImportValue": "SnapshotNetwork:ExportsOutputRefVpcDataSubnet1Subnet8E3CA4EDBB6D2B2E",
+          },
+          {
+            "Fn::ImportValue": "SnapshotNetwork:ExportsOutputRefVpcDataSubnet2Subnet25D1B0F65BC21239",
+          },
+        ],
+      },
+      "Type": "AWS::ElastiCache::SubnetGroup",
+    },
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`Snapshot Tests MonitoringStack matches snapshot 1`] = `
+{
+  "Conditions": {
+    "HasAlarmEmail": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "AlarmEmail",
+            },
+            "",
+          ],
+        },
+      ],
+    },
+  },
+  "Outputs": {
+    "AlarmTopicArn": {
+      "Description": "SNS topic ARN for alarm notifications",
+      "Value": {
+        "Ref": "AlarmNotificationTopic58BFACC9",
+      },
+    },
+    "DashboardUrl": {
+      "Description": "CloudWatch dashboard URL",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Ref": "AWS::Region",
+            },
+            ".console.aws.amazon.com/cloudwatch/home?region=",
+            {
+              "Ref": "AWS::Region",
+            },
+            "#dashboards:name=SnapshotMonitoring-dashboard",
+          ],
+        ],
+      },
+    },
+  },
+  "Parameters": {
+    "AlarmEmail": {
+      "Default": "",
+      "Description": "Email address to receive alarm notifications. Leave empty to skip subscription.",
+      "Type": "String",
+    },
+    "BootstrapVersion": {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+  },
+  "Resources": {
+    "AlarmEmailSubscription": {
+      "Condition": "HasAlarmEmail",
+      "Properties": {
+        "Endpoint": {
+          "Ref": "AlarmEmail",
+        },
+        "Protocol": "email",
+        "TopicArn": {
+          "Ref": "AlarmNotificationTopic58BFACC9",
+        },
+      },
+      "Type": "AWS::SNS::Subscription",
+    },
+    "AlarmNotificationTopic58BFACC9": {
+      "Properties": {
+        "DisplayName": "staging Infrastructure Alarms",
+        "TopicName": "SnapshotMonitoring-alarm-notifications",
+      },
+      "Type": "AWS::SNS::Topic",
+    },
+    "ApiLatencyAlarm453002C0": {
+      "Properties": {
+        "AlarmActions": [
+          {
+            "Ref": "AlarmNotificationTopic58BFACC9",
+          },
+        ],
+        "AlarmDescription": "API response latency (p95) exceeds 800ms threshold",
+        "AlarmName": "SnapshotMonitoring-api-latency-p95",
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": [
+          {
+            "Name": "ServiceName",
+            "Value": "service",
+          },
+        ],
+        "EvaluationPeriods": 3,
+        "ExtendedStatistic": "p95",
+        "MetricName": "RequestLatency",
+        "Namespace": "AWS/AppRunner",
+        "Period": 300,
+        "Threshold": 800,
+        "TreatMissingData": "notBreaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "BackendLogGroupDA10F1B2": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "LogGroupName": "/apprunner/staging/backend",
+        "RetentionInDays": 30,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "ErrorRateAlarm1E0D8C38": {
+      "Properties": {
+        "AlarmActions": [
+          {
+            "Ref": "AlarmNotificationTopic58BFACC9",
+          },
+        ],
+        "AlarmDescription": "5xx error rate exceeds 1% threshold",
+        "AlarmName": "SnapshotMonitoring-5xx-error-rate",
+        "ComparisonOperator": "GreaterThanThreshold",
+        "EvaluationPeriods": 3,
+        "Metrics": [
+          {
+            "Expression": "(errors / requests) * 100",
+            "Id": "expr_1",
+            "ReturnData": true,
+          },
+          {
+            "Id": "errors",
+            "MetricStat": {
+              "Metric": {
+                "Dimensions": [
+                  {
+                    "Name": "ServiceName",
+                    "Value": "service",
+                  },
+                ],
+                "MetricName": "5xxStatusResponses",
+                "Namespace": "AWS/AppRunner",
+              },
+              "Period": 300,
+              "Stat": "Sum",
+            },
+            "ReturnData": false,
+          },
+          {
+            "Id": "requests",
+            "MetricStat": {
+              "Metric": {
+                "Dimensions": [
+                  {
+                    "Name": "ServiceName",
+                    "Value": "service",
+                  },
+                ],
+                "MetricName": "RequestCount",
+                "Namespace": "AWS/AppRunner",
+              },
+              "Period": 300,
+              "Stat": "Sum",
+            },
+            "ReturnData": false,
+          },
+        ],
+        "Threshold": 1,
+        "TreatMissingData": "notBreaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "FrontendLogGroupCE4F14E0": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "LogGroupName": "/apprunner/staging/frontend",
+        "RetentionInDays": 30,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "MonitoringDashboard96464763": {
+      "Properties": {
+        "DashboardBody": {
+          "Fn::Join": [
+            "",
+            [
+              "{"widgets":[{"type":"metric","width":12,"height":6,"x":0,"y":0,"properties":{"view":"timeSeries","title":"Request Count","region":"",
+              {
+                "Ref": "AWS::Region",
+              },
+              "","metrics":[["AWS/AppRunner","RequestCount","ServiceName","service",{"label":"Backend Requests","period":60,"stat":"Sum"}]],"yAxis":{}}},{"type":"metric","width":12,"height":6,"x":12,"y":0,"properties":{"view":"timeSeries","title":"Error Rates","region":"",
+              {
+                "Ref": "AWS::Region",
+              },
+              "","metrics":[["AWS/AppRunner","4xxStatusResponses","ServiceName","service",{"label":"4xx Errors","period":60,"stat":"Sum"}],["AWS/AppRunner","5xxStatusResponses","ServiceName","service",{"label":"5xx Errors","period":60,"stat":"Sum"}]],"yAxis":{}}},{"type":"metric","width":12,"height":6,"x":0,"y":6,"properties":{"view":"timeSeries","title":"Latency Percentiles","region":"",
+              {
+                "Ref": "AWS::Region",
+              },
+              "","metrics":[["AWS/AppRunner","RequestLatency","ServiceName","service",{"label":"p50","period":60,"stat":"p50"}],["AWS/AppRunner","RequestLatency","ServiceName","service",{"label":"p95","period":60,"stat":"p95"}],["AWS/AppRunner","RequestLatency","ServiceName","service",{"label":"p99","period":60,"stat":"p99"}]],"yAxis":{}}},{"type":"metric","width":12,"height":6,"x":12,"y":6,"properties":{"view":"timeSeries","title":"DB CPU Utilization","region":"",
+              {
+                "Ref": "AWS::Region",
+              },
+              "","metrics":[["AWS/RDS","CPUUtilization","DBInstanceIdentifier","",
+              {
+                "Fn::ImportValue": "DepStack:ExportsOutputRefDatabaseB269D8BB88F4B1C4",
+              },
+              "",{"label":"CPU %","period":60}]],"yAxis":{}}},{"type":"metric","width":12,"height":6,"x":0,"y":12,"properties":{"view":"timeSeries","title":"DB Connections","region":"",
+              {
+                "Ref": "AWS::Region",
+              },
+              "","metrics":[["AWS/RDS","DatabaseConnections","DBInstanceIdentifier","",
+              {
+                "Fn::ImportValue": "DepStack:ExportsOutputRefDatabaseB269D8BB88F4B1C4",
+              },
+              "",{"label":"Active Connections","period":60}]],"yAxis":{}}},{"type":"metric","width":12,"height":6,"x":12,"y":12,"properties":{"view":"timeSeries","title":"DB Free Storage Space","region":"",
+              {
+                "Ref": "AWS::Region",
+              },
+              "","metrics":[["AWS/RDS","FreeStorageSpace","DBInstanceIdentifier","",
+              {
+                "Fn::ImportValue": "DepStack:ExportsOutputRefDatabaseB269D8BB88F4B1C4",
+              },
+              "",{"label":"Free Storage (bytes)"}]],"yAxis":{}}}]}",
+            ],
+          ],
+        },
+        "DashboardName": "SnapshotMonitoring-dashboard",
+      },
+      "Type": "AWS::CloudWatch::Dashboard",
+    },
+    "RdsCpuAlarm29EF1690": {
+      "Properties": {
+        "AlarmActions": [
+          {
+            "Ref": "AlarmNotificationTopic58BFACC9",
+          },
+        ],
+        "AlarmDescription": "RDS CPU utilization exceeds 80% threshold",
+        "AlarmName": "SnapshotMonitoring-rds-cpu-utilization",
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": [
+          {
+            "Name": "DBInstanceIdentifier",
+            "Value": {
+              "Fn::ImportValue": "DepStack:ExportsOutputRefDatabaseB269D8BB88F4B1C4",
+            },
+          },
+        ],
+        "EvaluationPeriods": 3,
+        "MetricName": "CPUUtilization",
+        "Namespace": "AWS/RDS",
+        "Period": 300,
+        "Statistic": "Average",
+        "Threshold": 80,
+        "TreatMissingData": "missing",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "RdsFreeStorageAlarm0E00E3B8": {
+      "Properties": {
+        "AlarmActions": [
+          {
+            "Ref": "AlarmNotificationTopic58BFACC9",
+          },
+        ],
+        "AlarmDescription": "RDS free storage space is below 20% of allocated storage",
+        "AlarmName": "SnapshotMonitoring-rds-free-storage",
+        "ComparisonOperator": "LessThanThreshold",
+        "Dimensions": [
+          {
+            "Name": "DBInstanceIdentifier",
+            "Value": {
+              "Fn::ImportValue": "DepStack:ExportsOutputRefDatabaseB269D8BB88F4B1C4",
+            },
+          },
+        ],
+        "EvaluationPeriods": 3,
+        "MetricName": "FreeStorageSpace",
+        "Namespace": "AWS/RDS",
+        "Period": 300,
+        "Statistic": "Average",
+        "Threshold": 4294967296,
+        "TreatMissingData": "missing",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`Snapshot Tests NetworkStack matches snapshot 1`] = `
+{
+  "Parameters": {
+    "BootstrapVersion": {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+  },
+  "Resources": {
+    "DataSecurityGroup80B4589A": {
+      "Properties": {
+        "GroupDescription": "Security group for data stores (RDS, Redis)",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "255.255.255.255/32",
+            "Description": "Disallow all traffic",
+            "FromPort": 252,
+            "IpProtocol": "icmp",
+            "ToPort": 86,
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "DataSecurityGroupfromSnapshotNetworkEicEndpointSecurityGroup6228D49F5432DD7C4965": {
+      "Properties": {
+        "Description": "Allow inbound from EIC Endpoint SG on PostgreSQL port",
+        "FromPort": 5432,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "DataSecurityGroup80B4589A",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "EicEndpointSecurityGroup16D4F7FE",
+            "GroupId",
+          ],
+        },
+        "ToPort": 5432,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "DataSecurityGroupfromSnapshotNetworkVpcConnectorSecurityGroup343418175432FCF4DB8D": {
+      "Properties": {
+        "Description": "Allow inbound from VPC Connector SG on PostgreSQL port",
+        "FromPort": 5432,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "DataSecurityGroup80B4589A",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "VpcConnectorSecurityGroup11DFF030",
+            "GroupId",
+          ],
+        },
+        "ToPort": 5432,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "DataSecurityGroupfromSnapshotNetworkVpcConnectorSecurityGroup34341817637923679FE9": {
+      "Properties": {
+        "Description": "Allow inbound from VPC Connector SG on Redis port",
+        "FromPort": 6379,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "DataSecurityGroup80B4589A",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "VpcConnectorSecurityGroup11DFF030",
+            "GroupId",
+          ],
+        },
+        "ToPort": 6379,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "EicEndpoint": {
+      "Properties": {
+        "PreserveClientIp": false,
+        "SecurityGroupIds": [
+          {
+            "Fn::GetAtt": [
+              "EicEndpointSecurityGroup16D4F7FE",
+              "GroupId",
+            ],
+          },
+        ],
+        "SubnetId": {
+          "Ref": "VpcPrivateSubnet1Subnet536B997A",
+        },
+      },
+      "Type": "AWS::EC2::InstanceConnectEndpoint",
+    },
+    "EicEndpointSecurityGroup16D4F7FE": {
+      "Properties": {
+        "GroupDescription": "Security group for EC2 Instance Connect Endpoint",
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "EicEndpointSecurityGrouptoSnapshotNetworkDataSecurityGroup2CFD1042543275D45B8B": {
+      "Properties": {
+        "Description": "Allow outbound to data SG on PostgreSQL port",
+        "DestinationSecurityGroupId": {
+          "Fn::GetAtt": [
+            "DataSecurityGroup80B4589A",
+            "GroupId",
+          ],
+        },
+        "FromPort": 5432,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "EicEndpointSecurityGroup16D4F7FE",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "ToPort": 5432,
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress",
+    },
+    "Vpc8378EB38": {
+      "Properties": {
+        "CidrBlock": "10.0.0.0/16",
+        "EnableDnsHostnames": true,
+        "EnableDnsSupport": true,
+        "InstanceTenancy": "default",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "SnapshotNetwork/Vpc",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::VPC",
+    },
+    "VpcConnectorSecurityGroup11DFF030": {
+      "Properties": {
+        "GroupDescription": "Security group for App Runner VPC Connector",
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "VpcConnectorSecurityGrouptoSnapshotNetworkDataSecurityGroup2CFD10425432A4C0C68A": {
+      "Properties": {
+        "Description": "Allow outbound to data SG on PostgreSQL port",
+        "DestinationSecurityGroupId": {
+          "Fn::GetAtt": [
+            "DataSecurityGroup80B4589A",
+            "GroupId",
+          ],
+        },
+        "FromPort": 5432,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "VpcConnectorSecurityGroup11DFF030",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "ToPort": 5432,
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress",
+    },
+    "VpcConnectorSecurityGrouptoSnapshotNetworkDataSecurityGroup2CFD10426379F69E5FC2": {
+      "Properties": {
+        "Description": "Allow outbound to data SG on Redis port",
+        "DestinationSecurityGroupId": {
+          "Fn::GetAtt": [
+            "DataSecurityGroup80B4589A",
+            "GroupId",
+          ],
+        },
+        "FromPort": 6379,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "VpcConnectorSecurityGroup11DFF030",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "ToPort": 6379,
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress",
+    },
+    "VpcDataSubnet1RouteTable8A39B5EF": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "SnapshotNetwork/Vpc/DataSubnet1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "VpcDataSubnet1RouteTableAssociationCD7515ED": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VpcDataSubnet1RouteTable8A39B5EF",
+        },
+        "SubnetId": {
+          "Ref": "VpcDataSubnet1Subnet8E3CA4ED",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "VpcDataSubnet1Subnet8E3CA4ED": {
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "CidrBlock": "10.0.4.0/24",
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Data",
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Isolated",
+          },
+          {
+            "Key": "Name",
+            "Value": "SnapshotNetwork/Vpc/DataSubnet1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "VpcDataSubnet2RouteTableAssociationF6BF0EC9": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VpcDataSubnet2RouteTableB4F85DDC",
+        },
+        "SubnetId": {
+          "Ref": "VpcDataSubnet2Subnet25D1B0F6",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "VpcDataSubnet2RouteTableB4F85DDC": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "SnapshotNetwork/Vpc/DataSubnet2",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "VpcDataSubnet2Subnet25D1B0F6": {
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "CidrBlock": "10.0.5.0/24",
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Data",
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Isolated",
+          },
+          {
+            "Key": "Name",
+            "Value": "SnapshotNetwork/Vpc/DataSubnet2",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "VpcFlowLog8FF33A73": {
+      "Properties": {
+        "DeliverLogsPermissionArn": {
+          "Fn::GetAtt": [
+            "VpcFlowLogIAMRole6A475D41",
+            "Arn",
+          ],
+        },
+        "LogDestinationType": "cloud-watch-logs",
+        "LogGroupName": {
+          "Ref": "VpcFlowLogGroup86559C69",
+        },
+        "ResourceId": {
+          "Ref": "Vpc8378EB38",
+        },
+        "ResourceType": "VPC",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "SnapshotNetwork/Vpc/FlowLog",
+          },
+        ],
+        "TrafficType": "ALL",
+      },
+      "Type": "AWS::EC2::FlowLog",
+    },
+    "VpcFlowLogGroup86559C69": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "RetentionInDays": 30,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "VpcFlowLogIAMRole6A475D41": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "vpc-flow-logs.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "SnapshotNetwork/Vpc/FlowLog",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "VpcFlowLogIAMRoleDefaultPolicy406FB995": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "logs:DescribeLogStreams",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "VpcFlowLogGroup86559C69",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "VpcFlowLogIAMRoleDefaultPolicy406FB995",
+        "Roles": [
+          {
+            "Ref": "VpcFlowLogIAMRole6A475D41",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "VpcIGWD7BA715C": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "SnapshotNetwork/Vpc",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::InternetGateway",
+    },
+    "VpcPrivateSubnet1DefaultRouteBE02A9ED": {
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+          "Ref": "VpcPublicSubnet1NATGateway4D7517AA",
+        },
+        "RouteTableId": {
+          "Ref": "VpcPrivateSubnet1RouteTableB2C5B500",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "VpcPrivateSubnet1RouteTableAssociation70C59FA6": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VpcPrivateSubnet1RouteTableB2C5B500",
+        },
+        "SubnetId": {
+          "Ref": "VpcPrivateSubnet1Subnet536B997A",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "VpcPrivateSubnet1RouteTableB2C5B500": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "SnapshotNetwork/Vpc/PrivateSubnet1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "VpcPrivateSubnet1Subnet536B997A": {
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "CidrBlock": "10.0.2.0/24",
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Private",
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private",
+          },
+          {
+            "Key": "Name",
+            "Value": "SnapshotNetwork/Vpc/PrivateSubnet1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "VpcPrivateSubnet2DefaultRoute060D2087": {
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+          "Ref": "VpcPublicSubnet1NATGateway4D7517AA",
+        },
+        "RouteTableId": {
+          "Ref": "VpcPrivateSubnet2RouteTableA678073B",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "VpcPrivateSubnet2RouteTableA678073B": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "SnapshotNetwork/Vpc/PrivateSubnet2",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "VpcPrivateSubnet2RouteTableAssociationA89CAD56": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VpcPrivateSubnet2RouteTableA678073B",
+        },
+        "SubnetId": {
+          "Ref": "VpcPrivateSubnet2Subnet3788AAA1",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "VpcPrivateSubnet2Subnet3788AAA1": {
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "CidrBlock": "10.0.3.0/24",
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Private",
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private",
+          },
+          {
+            "Key": "Name",
+            "Value": "SnapshotNetwork/Vpc/PrivateSubnet2",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "VpcPublicSubnet1DefaultRoute3DA9E72A": {
+      "DependsOn": [
+        "VpcVPCGWBF912B6E",
+      ],
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "VpcIGWD7BA715C",
+        },
+        "RouteTableId": {
+          "Ref": "VpcPublicSubnet1RouteTable6C95E38E",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "VpcPublicSubnet1EIPD7E02669": {
+      "Properties": {
+        "Domain": "vpc",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "SnapshotNetwork/Vpc/PublicSubnet1",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::EIP",
+    },
+    "VpcPublicSubnet1NATGateway4D7517AA": {
+      "DependsOn": [
+        "VpcPublicSubnet1DefaultRoute3DA9E72A",
+        "VpcPublicSubnet1RouteTableAssociation97140677",
+      ],
+      "Properties": {
+        "AllocationId": {
+          "Fn::GetAtt": [
+            "VpcPublicSubnet1EIPD7E02669",
+            "AllocationId",
+          ],
+        },
+        "SubnetId": {
+          "Ref": "VpcPublicSubnet1Subnet5C2D37C4",
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "SnapshotNetwork/Vpc/PublicSubnet1",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::NatGateway",
+    },
+    "VpcPublicSubnet1RouteTable6C95E38E": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "SnapshotNetwork/Vpc/PublicSubnet1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "VpcPublicSubnet1RouteTableAssociation97140677": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VpcPublicSubnet1RouteTable6C95E38E",
+        },
+        "SubnetId": {
+          "Ref": "VpcPublicSubnet1Subnet5C2D37C4",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "VpcPublicSubnet1Subnet5C2D37C4": {
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "CidrBlock": "10.0.0.0/24",
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Public",
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public",
+          },
+          {
+            "Key": "Name",
+            "Value": "SnapshotNetwork/Vpc/PublicSubnet1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "VpcPublicSubnet2DefaultRoute97F91067": {
+      "DependsOn": [
+        "VpcVPCGWBF912B6E",
+      ],
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "VpcIGWD7BA715C",
+        },
+        "RouteTableId": {
+          "Ref": "VpcPublicSubnet2RouteTable94F7E489",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "VpcPublicSubnet2RouteTable94F7E489": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "SnapshotNetwork/Vpc/PublicSubnet2",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "VpcPublicSubnet2RouteTableAssociationDD5762D8": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VpcPublicSubnet2RouteTable94F7E489",
+        },
+        "SubnetId": {
+          "Ref": "VpcPublicSubnet2Subnet691E08A3",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "VpcPublicSubnet2Subnet691E08A3": {
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "CidrBlock": "10.0.1.0/24",
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Public",
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public",
+          },
+          {
+            "Key": "Name",
+            "Value": "SnapshotNetwork/Vpc/PublicSubnet2",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "VpcVPCGWBF912B6E": {
+      "Properties": {
+        "InternetGatewayId": {
+          "Ref": "VpcIGWD7BA715C",
+        },
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+    },
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
+    },
+  },
+}
+`;
