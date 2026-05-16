@@ -19,12 +19,17 @@ export class NetworkStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props: NetworkStackProps) {
         super(scope, id, props);
 
-        // 2.1 — VPC with CIDR 10.0.0.0/16, 2 AZs, private + isolated subnets, NAT Gateway
+        // 2.1 — VPC with CIDR 10.0.0.0/16, 2 AZs, public + private + isolated subnets, NAT Gateway
         const vpc = new ec2.Vpc(this, 'Vpc', {
             ipAddresses: ec2.IpAddresses.cidr('10.0.0.0/16'),
             maxAzs: props.maxAzs,
             natGateways: props.natGateways,
             subnetConfiguration: [
+                {
+                    name: 'Public',
+                    subnetType: ec2.SubnetType.PUBLIC,
+                    cidrMask: 24,
+                },
                 {
                     name: 'Private',
                     subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
