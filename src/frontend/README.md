@@ -4,7 +4,7 @@ Aplicación Next.js (App Router) con Tailwind CSS y TypeScript para la plataform
 
 ## Stack
 
-- Next.js 16 (App Router)
+- Next.js 16 (App Router, `output: 'standalone'` para despliegue containerizado)
 - TypeScript
 - Tailwind CSS
 - Vitest (testing)

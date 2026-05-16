@@ -1,0 +1,18 @@
+{
+  "enabled": true,
+  "name": "Update Infra README",
+  "description": "When any file inside src/infra/ is edited, asks the agent to review and update src/infra/README.md to reflect the current state of the infrastructure.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "src/infra/**/*.ts",
+      "src/infra/**/*.json",
+      "src/infra/docker/*"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A file in src/infra/ was just edited. Review the current state of the CDK infrastructure codebase and update src/infra/README.md if needed to accurately reflect: the stacks that exist, their dependencies, environment configuration differences (staging vs production), deploy commands, environment variable injection, Dockerfile details, and the project structure. Only update sections that are outdated or incomplete. Do not rewrite sections that are still accurate."
+  }
+}
