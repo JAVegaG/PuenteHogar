@@ -56,11 +56,17 @@ const compute = new ComputeStack(app, `${env}-Compute`, {
     privateSubnets: network.privateSubnets,
     vpcConnectorSecurityGroup: network.vpcConnectorSecurityGroup,
     dbSecret: data.dbSecret,
+    jwtSecret: data.jwtSecret,
+    piiKeySecret: data.piiKeySecret,
+    dbEndpointAddress: data.dbInstance.dbInstanceEndpointAddress,
+    dbEndpointPort: data.dbInstance.dbInstanceEndpointPort,
     redisEndpoint: data.redisEndpoint,
     assetsBucket: data.assetsBucket,
     environment: config.environment,
     backendImageUri: `${ci.backendRepo.repositoryUri}:latest`,
     frontendImageUri: `${ci.frontendRepo.repositoryUri}:latest`,
+    backendRepoArn: ci.backendRepo.repositoryArn,
+    frontendRepoArn: ci.frontendRepo.repositoryArn,
 });
 compute.addDependency(network);
 compute.addDependency(data);
