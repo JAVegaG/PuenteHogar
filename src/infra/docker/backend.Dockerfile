@@ -26,6 +26,9 @@ COPY --from=deps /app/package-lock.json ./package-lock.json
 # Copy source code
 COPY . .
 
+# Provide a dummy DATABASE_URL for Prisma generate (only needed for client generation, not connection)
+ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+
 # Generate Prisma client
 RUN npx prisma generate --schema=db/prisma/schema.prisma
 

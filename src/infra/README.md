@@ -233,9 +233,9 @@ src/infra/
 
 | Setting | Staging | Production |
 |---------|---------|------------|
-| Backend min instances | 0 (scale to zero) | 1 (warm) |
+| Backend min instances | 1 | 1 |
 | Backend max instances | 2 | 6 |
-| Frontend min instances | 0 | 1 |
+| Frontend min instances | 1 | 1 |
 | Frontend max instances | 2 | 4 |
 | RDS instance | db.t3.micro | db.t3.medium |
 | RDS Multi-AZ | No | Yes |
@@ -248,6 +248,10 @@ src/infra/
 ### `cdk synth` fails with "Cannot find module"
 
 Run `npm install` and `npm run build` first.
+
+### Backend Docker build fails with "Cannot resolve environment variable: DATABASE_URL"
+
+The backend Dockerfile sets a dummy `DATABASE_URL` during build for Prisma client generation. If you see this error, ensure you're using the latest Dockerfile from `src/infra/docker/backend.Dockerfile`.
 
 ### Stack deployment fails with "Resource limit exceeded"
 
