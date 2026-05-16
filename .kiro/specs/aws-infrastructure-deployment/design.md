@@ -173,7 +173,7 @@ interface InfraStackMap {
 
 ### Component 1: NetworkStack
 
-**Purpose**: Provisions the VPC with private and isolated subnets for data resources and VPC Connector egress. App Runner services live outside the VPC but connect via VPC Connector.
+**Purpose**: Provisions the VPC with public, private, and isolated subnets for data resources and VPC Connector egress. App Runner services live outside the VPC but connect via VPC Connector.
 
 ```typescript
 interface NetworkStackProps extends cdk.StackProps {
@@ -192,8 +192,8 @@ interface NetworkStackOutputs {
 ```
 
 **Responsibilities**:
-- Create VPC with 2-tier subnet architecture (private for VPC Connector, isolated for data)
-- No public subnets needed (App Runner handles public ingress natively)
+- Create VPC with 3-tier subnet architecture (public for NAT Gateway, private for VPC Connector, isolated for data)
+- Public subnets host the NAT Gateway (required by CDK for PRIVATE_WITH_EGRESS subnets)
 - Configure NAT Gateway for private subnet internet access (VPC Connector egress)
 - Define security groups: VPC Connector SG → Data SG (ports 5432, 6379)
 - Output references for dependent stacks
@@ -269,7 +269,8 @@ interface ComputeStackOutputs {
 interface CdnStackProps extends cdk.StackProps {
   readonly backendServiceUrl: string;
   readonly frontendServiceUrl: string;
-  readonly assetsBucket: s3.IBucket;
+  readonly assetsBucketArn: string;
+  readonly assetsBucketName: string;
   readonly domainName?: string;
   readonly environment: 'staging' | 'production';
 }
@@ -281,7 +282,8 @@ interface CdnStackOutputs {
 ```
 
 **Responsibilities**:
-- Create CloudFront distribution with App Runner origins (backend + frontend) and S3 origin
+- Create CloudFront distribution with App Runner origins (backend + frontend) and S3 origin (via Origin Access Control)
+- Import S3 bucket by ARN/name to avoid cross-stack circular dependency (OAC pattern)
 - Configure cache behaviors: `/api/*` → backend (no cache), `/assets/*` → S3 (long cache), `/*` → frontend
 - Attach WAF with rate limiting and common attack protection
 - Provision ACM certificate for custom domain (if provided)
@@ -1046,7 +1048,7 @@ When traffic grows and cold starts become unacceptable or fine-grained control i
 - S3 bucket encryption (SSE-S3)
 - ElastiCache encryption at rest and in transit
 - Secrets Manager for all credentials (DB password, PII_ENCRYPTION_KEY, JWT_SECRET)
-- S3 bucket policy blocks public access (CloudFront OAI for reads)
+- S3 bucket policy blocks public access (CloudFront OAC for reads)
 
 ### Application Security
 - WAF attached to CloudFront with rules:

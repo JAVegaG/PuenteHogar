@@ -58,11 +58,11 @@
 ## 6. CdnStack (CloudFront + WAF)
 - [x] 6.1 Create `lib/stacks/cdn-stack.ts` accepting Compute and Data stack outputs as props
 - [x] 6.2 Create WAF Web ACL with: rate limiting (2000 req/5min/IP), AWS Common Rule Set, Known Bad Inputs, SQLi protection, XSS protection
-- [x] 6.3 Create CloudFront distribution with three origins: backend App Runner URL, frontend App Runner URL, S3 bucket (OAI)
+- [x] 6.3 Create CloudFront distribution with three origins: backend App Runner URL, frontend App Runner URL, S3 bucket (OAC)
 - [x] 6.4 Configure cache behaviors: `/api/*` → backend (no cache), `/assets/*` → S3 (1-year cache), default → frontend
 - [x] 6.5 Enable compression (gzip + Brotli), set minimum TLS 1.2, enable HTTP/2
 - [x] 6.6 Conditionally create ACM certificate and attach to distribution if `domainName` is provided in config
-- [x] 6.7 Update S3 bucket policy to allow access only from CloudFront OAI and backend instance role
+- [x] 6.7 Update S3 bucket policy to allow access only from CloudFront OAC and backend instance role
 
 **Checkpoint**: Run `npx cdk synth` and verify CdnStack template contains CloudFront distribution, WAF ACL, and correct cache behaviors.
 

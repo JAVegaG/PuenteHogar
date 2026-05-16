@@ -16,7 +16,7 @@
 
 2.1. The stack MUST create a VPC with CIDR `10.0.0.0/16` spanning 2 availability zones.
 
-2.2. The VPC MUST have private subnets (for VPC Connector egress) and isolated subnets (for data stores — no internet access).
+2.2. The VPC MUST have public subnets (for NAT Gateway placement), private subnets (for VPC Connector egress), and isolated subnets (for data stores — no internet access).
 
 2.3. At least one NAT Gateway MUST be provisioned in a public subnet for VPC Connector outbound internet access.
 
@@ -143,7 +143,7 @@
 
 8.7. All security groups MUST deny all traffic by default (AWS default) and explicitly allow only required ports from required sources. No `0.0.0.0/0` inbound rules on any security group.
 
-8.8. The S3 bucket MUST have a bucket policy that denies all public access and allows access only from the backend App Runner instance role and CloudFront OAI.
+8.8. The S3 bucket MUST have a bucket policy that denies all public access and allows access only from the backend App Runner instance role and CloudFront Origin Access Control (OAC).
 
 ## 9. Monitoring (MonitoringStack)
 
