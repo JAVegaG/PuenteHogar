@@ -221,7 +221,7 @@
   - Ensure no lint errors
   - Ask the user if questions arise
 
-- [~] 10. Manual QA and post-implementation review
+- [x] 10. Manual QA and post-implementation review
   - Deploy or run the feature locally and test all user-facing flows end-to-end
   - Test contract lifecycle flow: upload contract → initiate signing → webhook COMPLETED → verify tracking status progression on lease detail page
   - Verify unit status shows "Disponible" for leases in pre-signing states and "Ocupado" only for CONTRACT_SIGNED/PAYMENT_RECEIVED

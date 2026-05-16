@@ -1,0 +1,24 @@
+info:
+  name: payment webhook
+  type: http
+
+http:
+  method: POST
+  url: http://localhost:3001/payments/webhook
+  body:
+    type: json
+    data: |-
+      {
+        "scheduledPaymentId": "<SCHEDULED_PAYMENT_ID>",
+        "externalTransactionId": "mock-txn-123",
+        "status": "APPROVED",
+        "amount": 1250000,
+        "currency": "COP"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

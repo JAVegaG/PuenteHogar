@@ -1,0 +1,23 @@
+info:
+  name: signing webhook
+  type: http
+
+http:
+  method: POST
+  url: http://localhost:3001/contracts/webhook/signing
+  body:
+    type: json
+    data: |-
+      {
+        "contractId": "<CONTRACT_ID>",
+        "externalSigningId": "mock-signing-id",
+        "status": "COMPLETED",
+        "completedAt": "2026-01-15T10:00:00.000Z"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
