@@ -4,13 +4,13 @@ import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as wafv2 from 'aws-cdk-lib/aws-wafv2';
-import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 
 export interface CdnStackProps extends cdk.StackProps {
     readonly backendServiceUrl: string;
     readonly frontendServiceUrl: string;
-    readonly assetsBucket: s3.IBucket;
+    readonly assetsBucketArn: string;
+    readonly assetsBucketName: string;
     readonly domainName?: string;
     readonly environment: 'staging' | 'production';
 }
@@ -133,14 +133,16 @@ export class CdnStack extends cdk.Stack {
             protocolPolicy: cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
         });
 
-        // Origin 3: S3 bucket with OAI
-        const originAccessIdentity = new cloudfront.OriginAccessIdentity(this, 'OAI', {
-            comment: `OAI for ${id} CloudFront distribution`,
+        // Origin 3: S3 bucket with Origin Access Control (OAC)
+        // Import the bucket from attributes to avoid cross-stack circular dependency.
+        // When CDK manages the bucket policy automatically via OAC, it needs to modify
+        // the bucket's stack — but since the bucket is in DataStack and the distribution
+        // is in CdnStack, this creates a cycle. Importing by attributes breaks the link.
+        const importedBucket = s3.Bucket.fromBucketAttributes(this, 'ImportedAssetsBucket', {
+            bucketArn: props.assetsBucketArn,
+            bucketName: props.assetsBucketName,
         });
-
-        const s3Origin = new origins.S3Origin(props.assetsBucket as s3.Bucket, {
-            originAccessIdentity,
-        });
+        const s3Origin = origins.S3BucketOrigin.withOriginAccessControl(importedBucket);
 
         // ─────────────────────────────────────────────────────────────────────
         // 6.4 + 6.5 — CloudFront Distribution with cache behaviors, compression, TLS
@@ -202,16 +204,11 @@ export class CdnStack extends cdk.Stack {
         });
 
         // ─────────────────────────────────────────────────────────────────────
-        // 6.7 — Update S3 bucket policy to allow access only from CloudFront OAI
+        // 6.7 — S3 bucket access from CloudFront
         // ─────────────────────────────────────────────────────────────────────
-        // Grant read access to CloudFront OAI on the assets bucket
-        (props.assetsBucket as s3.Bucket).addToResourcePolicy(new iam.PolicyStatement({
-            sid: 'AllowCloudFrontOAIRead',
-            effect: iam.Effect.ALLOW,
-            principals: [originAccessIdentity.grantPrincipal],
-            actions: ['s3:GetObject'],
-            resources: [`${props.assetsBucket.bucketArn}/*`],
-        }));
+        // With S3BucketOrigin.withOriginAccessControl() on an imported bucket, CDK
+        // automatically creates the OAC and adds the necessary bucket policy to allow
+        // CloudFront to read from the bucket — all within this stack.
 
         // Export outputs
         this.distribution = distribution;

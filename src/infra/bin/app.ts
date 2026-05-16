@@ -77,7 +77,8 @@ const cdn = new CdnStack(app, `${env}-Cdn`, {
     env: cdkEnv,
     backendServiceUrl: compute.backendServiceUrl,
     frontendServiceUrl: compute.frontendServiceUrl,
-    assetsBucket: data.assetsBucket,
+    assetsBucketArn: data.assetsBucket.bucketArn,
+    assetsBucketName: data.assetsBucket.bucketName,
     domainName: config.domainName,
     environment: config.environment,
 });

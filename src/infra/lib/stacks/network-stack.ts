@@ -16,6 +16,12 @@ export class NetworkStack extends cdk.Stack {
     public readonly vpcConnectorSecurityGroup: ec2.ISecurityGroup;
     public readonly dataSecurityGroup: ec2.ISecurityGroup;
 
+    // Override availabilityZones to avoid AWS API calls during synthesis
+    get availabilityZones(): string[] {
+        const region = this.region;
+        return [`${region}a`, `${region}b`];
+    }
+
     constructor(scope: Construct, id: string, props: NetworkStackProps) {
         super(scope, id, props);
 

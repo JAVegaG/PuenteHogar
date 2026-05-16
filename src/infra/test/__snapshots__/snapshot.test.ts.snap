@@ -1854,11 +1854,14 @@ exports[`Snapshot Tests NetworkStack matches snapshot 1`] = `
     "VpcDataSubnet1Subnet8E3CA4ED": {
       "Properties": {
         "AvailabilityZone": {
-          "Fn::Select": [
-            0,
-            {
-              "Fn::GetAZs": "",
-            },
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "AWS::Region",
+              },
+              "a",
+            ],
           ],
         },
         "CidrBlock": "10.0.4.0/24",
@@ -1911,11 +1914,14 @@ exports[`Snapshot Tests NetworkStack matches snapshot 1`] = `
     "VpcDataSubnet2Subnet25D1B0F6": {
       "Properties": {
         "AvailabilityZone": {
-          "Fn::Select": [
-            1,
-            {
-              "Fn::GetAZs": "",
-            },
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "AWS::Region",
+              },
+              "b",
+            ],
           ],
         },
         "CidrBlock": "10.0.5.0/24",
@@ -2078,11 +2084,14 @@ exports[`Snapshot Tests NetworkStack matches snapshot 1`] = `
     "VpcPrivateSubnet1Subnet536B997A": {
       "Properties": {
         "AvailabilityZone": {
-          "Fn::Select": [
-            0,
-            {
-              "Fn::GetAZs": "",
-            },
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "AWS::Region",
+              },
+              "a",
+            ],
           ],
         },
         "CidrBlock": "10.0.2.0/24",
@@ -2147,11 +2156,14 @@ exports[`Snapshot Tests NetworkStack matches snapshot 1`] = `
     "VpcPrivateSubnet2Subnet3788AAA1": {
       "Properties": {
         "AvailabilityZone": {
-          "Fn::Select": [
-            1,
-            {
-              "Fn::GetAZs": "",
-            },
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "AWS::Region",
+              },
+              "b",
+            ],
           ],
         },
         "CidrBlock": "10.0.3.0/24",
@@ -2255,11 +2267,14 @@ exports[`Snapshot Tests NetworkStack matches snapshot 1`] = `
     "VpcPublicSubnet1Subnet5C2D37C4": {
       "Properties": {
         "AvailabilityZone": {
-          "Fn::Select": [
-            0,
-            {
-              "Fn::GetAZs": "",
-            },
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "AWS::Region",
+              },
+              "a",
+            ],
           ],
         },
         "CidrBlock": "10.0.0.0/24",
@@ -2327,11 +2342,14 @@ exports[`Snapshot Tests NetworkStack matches snapshot 1`] = `
     "VpcPublicSubnet2Subnet691E08A3": {
       "Properties": {
         "AvailabilityZone": {
-          "Fn::Select": [
-            1,
-            {
-              "Fn::GetAZs": "",
-            },
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "AWS::Region",
+              },
+              "b",
+            ],
           ],
         },
         "CidrBlock": "10.0.1.0/24",
