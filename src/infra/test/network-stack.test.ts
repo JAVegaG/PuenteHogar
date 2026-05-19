@@ -1,5 +1,5 @@
 import * as cdk from 'aws-cdk-lib';
-import { Template } from 'aws-cdk-lib/assertions';
+import { Template, Match } from 'aws-cdk-lib/assertions';
 import { NetworkStack } from '../lib/stacks/network-stack';
 
 describe('NetworkStack', () => {
@@ -27,16 +27,16 @@ describe('NetworkStack', () => {
         });
     });
 
-    test('creates at least 4 subnets (2 private + 2 isolated across 2 AZs)', () => {
+    test('creates at least 6 subnets (2 public + 2 private + 2 isolated across 2 AZs)', () => {
         const subnets = template.findResources('AWS::EC2::Subnet');
-        expect(Object.keys(subnets).length).toBeGreaterThanOrEqual(4);
+        expect(Object.keys(subnets).length).toBeGreaterThanOrEqual(6);
     });
 
     test('creates a NAT Gateway', () => {
         template.resourceCountIs('AWS::EC2::NatGateway', 1);
     });
 
-    test('creates VPC Connector security group with outbound to data SG on port 5432', () => {
+    test('creates ECS service security group with outbound to data SG on port 5432', () => {
         template.hasResourceProperties('AWS::EC2::SecurityGroupEgress', {
             IpProtocol: 'tcp',
             FromPort: 5432,
@@ -44,7 +44,7 @@ describe('NetworkStack', () => {
         });
     });
 
-    test('creates VPC Connector security group with outbound to data SG on port 6379', () => {
+    test('creates ECS service security group with outbound to data SG on port 6379', () => {
         template.hasResourceProperties('AWS::EC2::SecurityGroupEgress', {
             IpProtocol: 'tcp',
             FromPort: 6379,
@@ -52,7 +52,64 @@ describe('NetworkStack', () => {
         });
     });
 
-    test('creates data security group with inbound from VPC Connector SG on port 5432', () => {
+    test('creates ECS service security group with outbound HTTPS for ECR pulls', () => {
+        // CDK puts CIDR-based egress rules inline in the SecurityGroup resource
+        template.hasResourceProperties('AWS::EC2::SecurityGroup', {
+            SecurityGroupEgress: Match.arrayWith([
+                Match.objectLike({
+                    IpProtocol: 'tcp',
+                    FromPort: 443,
+                    ToPort: 443,
+                    CidrIp: '0.0.0.0/0',
+                }),
+            ]),
+        });
+    });
+
+    test('creates ALB security group with inbound HTTP from internet', () => {
+        // CDK puts CIDR-based ingress rules inline in the SecurityGroup resource
+        template.hasResourceProperties('AWS::EC2::SecurityGroup', {
+            SecurityGroupIngress: Match.arrayWith([
+                Match.objectLike({
+                    IpProtocol: 'tcp',
+                    FromPort: 80,
+                    ToPort: 80,
+                    CidrIp: '0.0.0.0/0',
+                }),
+            ]),
+        });
+    });
+
+    test('creates ALB security group with inbound HTTPS from internet', () => {
+        template.hasResourceProperties('AWS::EC2::SecurityGroup', {
+            SecurityGroupIngress: Match.arrayWith([
+                Match.objectLike({
+                    IpProtocol: 'tcp',
+                    FromPort: 443,
+                    ToPort: 443,
+                    CidrIp: '0.0.0.0/0',
+                }),
+            ]),
+        });
+    });
+
+    test('creates ALB security group with outbound to ECS service SG on port 3000', () => {
+        template.hasResourceProperties('AWS::EC2::SecurityGroupEgress', {
+            IpProtocol: 'tcp',
+            FromPort: 3000,
+            ToPort: 3000,
+        });
+    });
+
+    test('creates ECS service SG with inbound from ALB on port 3000', () => {
+        template.hasResourceProperties('AWS::EC2::SecurityGroupIngress', {
+            IpProtocol: 'tcp',
+            FromPort: 3000,
+            ToPort: 3000,
+        });
+    });
+
+    test('creates data security group with inbound from ECS service SG on port 5432', () => {
         template.hasResourceProperties('AWS::EC2::SecurityGroupIngress', {
             IpProtocol: 'tcp',
             FromPort: 5432,
@@ -60,7 +117,7 @@ describe('NetworkStack', () => {
         });
     });
 
-    test('creates data security group with inbound from VPC Connector SG on port 6379', () => {
+    test('creates data security group with inbound from ECS service SG on port 6379', () => {
         template.hasResourceProperties('AWS::EC2::SecurityGroupIngress', {
             IpProtocol: 'tcp',
             FromPort: 6379,
@@ -75,7 +132,6 @@ describe('NetworkStack', () => {
     });
 
     test('creates EIC security group with outbound to data SG on port 5432 only', () => {
-        // EIC SG should have an egress rule to port 5432
         const egressRules = template.findResources('AWS::EC2::SecurityGroupEgress', {
             Properties: {
                 IpProtocol: 'tcp',
@@ -92,12 +148,7 @@ describe('NetworkStack', () => {
         });
     });
 
-    test('creates security groups with no 0.0.0.0/0 inbound rules', () => {
-        const ingressRules = template.findResources('AWS::EC2::SecurityGroupIngress');
-        for (const [, rule] of Object.entries(ingressRules)) {
-            const props = (rule as any).Properties;
-            expect(props.CidrIp).not.toBe('0.0.0.0/0');
-            expect(props.CidrIpv6).not.toBe('::/0');
-        }
+    test('creates 4 security groups (ECS service, ALB, Data, EIC)', () => {
+        template.resourceCountIs('AWS::EC2::SecurityGroup', 4);
     });
 });

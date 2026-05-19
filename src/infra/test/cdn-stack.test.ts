@@ -8,18 +8,17 @@ import { Construct } from 'constructs';
 
 /**
  * For testing, we recreate the CDN stack logic with the S3 bucket in the same stack
- * to avoid the cross-stack cyclic dependency that OAI + bucket policy creates.
+ * to avoid the cross-stack cyclic dependency that OAC + bucket policy creates.
  * This tests the same resource configuration as the real CdnStack.
  */
 class TestCdnStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props: cdk.StackProps & {
-        backendServiceUrl: string;
-        frontendServiceUrl: string;
+        albDnsName: string;
         environment: 'staging' | 'production';
     }) {
         super(scope, id, props);
 
-        // Create bucket in the same stack to avoid cross-stack OAI cycle
+        // Create bucket in the same stack to avoid cross-stack OAC cycle
         const assetsBucket = new s3.Bucket(this, 'AssetsBucket');
 
         // WAF Web ACL
@@ -66,20 +65,18 @@ class TestCdnStack extends cdk.Stack {
             ],
         });
 
-        const backendOrigin = new origins.HttpOrigin(props.backendServiceUrl, {
-            protocolPolicy: cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
+        // ALB origin (HTTP only — CloudFront handles TLS)
+        const albOrigin = new origins.HttpOrigin(props.albDnsName, {
+            protocolPolicy: cloudfront.OriginProtocolPolicy.HTTP_ONLY,
+            httpPort: 80,
         });
 
-        const frontendOrigin = new origins.HttpOrigin(props.frontendServiceUrl, {
-            protocolPolicy: cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
-        });
-
-        const oai = new cloudfront.OriginAccessIdentity(this, 'OAI');
-        const s3Origin = new origins.S3Origin(assetsBucket, { originAccessIdentity: oai });
+        // S3 origin with OAC
+        const s3Origin = origins.S3BucketOrigin.withOriginAccessControl(assetsBucket);
 
         new cloudfront.Distribution(this, 'Distribution', {
             defaultBehavior: {
-                origin: frontendOrigin,
+                origin: albOrigin,
                 viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
                 cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
                 allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
@@ -87,7 +84,7 @@ class TestCdnStack extends cdk.Stack {
             },
             additionalBehaviors: {
                 '/api/*': {
-                    origin: backendOrigin,
+                    origin: albOrigin,
                     viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
                     cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
                     allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
@@ -113,8 +110,7 @@ describe('CdnStack', () => {
     beforeAll(() => {
         const app = new cdk.App();
         const stack = new TestCdnStack(app, 'TestCdn', {
-            backendServiceUrl: 'abc123.us-east-1.awsapprunner.com',
-            frontendServiceUrl: 'def456.us-east-1.awsapprunner.com',
+            albDnsName: 'test-alb-123456.us-east-1.elb.amazonaws.com',
             environment: 'staging',
         });
         template = Template.fromStack(stack);
@@ -124,29 +120,15 @@ describe('CdnStack', () => {
         template.resourceCountIs('AWS::CloudFront::Distribution', 1);
     });
 
-    test('CloudFront distribution has backend origin (HTTPS only)', () => {
+    test('CloudFront distribution has ALB origin (HTTP only)', () => {
         template.hasResourceProperties('AWS::CloudFront::Distribution', {
             DistributionConfig: {
                 Origins: Match.arrayWith([
                     Match.objectLike({
-                        DomainName: 'abc123.us-east-1.awsapprunner.com',
+                        DomainName: 'test-alb-123456.us-east-1.elb.amazonaws.com',
                         CustomOriginConfig: Match.objectLike({
-                            OriginProtocolPolicy: 'https-only',
-                        }),
-                    }),
-                ]),
-            },
-        });
-    });
-
-    test('CloudFront distribution has frontend origin (HTTPS only)', () => {
-        template.hasResourceProperties('AWS::CloudFront::Distribution', {
-            DistributionConfig: {
-                Origins: Match.arrayWith([
-                    Match.objectLike({
-                        DomainName: 'def456.us-east-1.awsapprunner.com',
-                        CustomOriginConfig: Match.objectLike({
-                            OriginProtocolPolicy: 'https-only',
+                            OriginProtocolPolicy: 'http-only',
+                            HTTPPort: 80,
                         }),
                     }),
                 ]),
@@ -200,10 +182,7 @@ describe('CdnStack', () => {
         });
     });
 
-    test('CloudFront uses TLS 1.2 minimum (enforced via HttpVersion http2)', () => {
-        // When no custom domain/certificate is provided, CloudFront uses its default
-        // certificate which enforces TLS 1.2. The minimumProtocolVersion only appears
-        // in the template when a custom certificate is attached.
+    test('CloudFront uses HTTP/2', () => {
         template.hasResourceProperties('AWS::CloudFront::Distribution', {
             DistributionConfig: {
                 HttpVersion: 'http2',

@@ -428,40 +428,31 @@ exports[`Snapshot Tests CiStack matches snapshot 1`] = `
 exports[`Snapshot Tests ComputeStack matches snapshot 1`] = `
 {
   "Outputs": {
-    "BackendServiceArn": {
-      "Description": "Backend App Runner service ARN",
+    "AlbArn": {
+      "Description": "ALB ARN",
+      "Value": {
+        "Ref": "Alb16C2F182",
+      },
+    },
+    "AlbDnsName": {
+      "Description": "ALB DNS name",
       "Value": {
         "Fn::GetAtt": [
-          "BackendService",
-          "ServiceArn",
+          "Alb16C2F182",
+          "DNSName",
         ],
       },
     },
-    "BackendServiceUrl": {
-      "Description": "Backend App Runner service URL",
+    "BackendServiceArn": {
+      "Description": "Backend ECS service ARN",
       "Value": {
-        "Fn::GetAtt": [
-          "BackendService",
-          "ServiceUrl",
-        ],
+        "Ref": "BackendService7A4224EE",
       },
     },
     "FrontendServiceArn": {
-      "Description": "Frontend App Runner service ARN",
+      "Description": "Frontend ECS service ARN",
       "Value": {
-        "Fn::GetAtt": [
-          "FrontendService",
-          "ServiceArn",
-        ],
-      },
-    },
-    "FrontendServiceUrl": {
-      "Description": "Frontend App Runner service URL",
-      "Value": {
-        "Fn::GetAtt": [
-          "FrontendService",
-          "ServiceUrl",
-        ],
+        "Ref": "FrontendServiceBC94BA93",
       },
     },
   },
@@ -473,16 +464,364 @@ exports[`Snapshot Tests ComputeStack matches snapshot 1`] = `
     },
   },
   "Resources": {
-    "BackendAutoScaling": {
+    "Alb16C2F182": {
       "Properties": {
-        "AutoScalingConfigurationName": "snapshotcompute-backend-scaling",
-        "MaxConcurrency": 50,
-        "MaxSize": 2,
-        "MinSize": 1,
+        "LoadBalancerAttributes": [
+          {
+            "Key": "deletion_protection.enabled",
+            "Value": "false",
+          },
+        ],
+        "Scheme": "internet-facing",
+        "SecurityGroups": [
+          {
+            "Fn::ImportValue": "VpcStack:ExportsOutputFnGetAttAlbSg1155C1BEGroupIdF2A72E65",
+          },
+        ],
+        "Subnets": [
+          {
+            "Fn::ImportValue": "VpcStack:ExportsOutputRefVpcPublicSubnet1Subnet5C2D37C4FFA2B456",
+          },
+          {
+            "Fn::ImportValue": "VpcStack:ExportsOutputRefVpcPublicSubnet2Subnet691E08A351552740",
+          },
+        ],
+        "Type": "application",
       },
-      "Type": "AWS::AppRunner::AutoScalingConfiguration",
+      "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
     },
-    "BackendInstanceRole9660A9CF": {
+    "AlbHttpListener00C8B33E": {
+      "Properties": {
+        "DefaultActions": [
+          {
+            "TargetGroupArn": {
+              "Ref": "FrontendTargetGroupED7B3E5D",
+            },
+            "Type": "forward",
+          },
+        ],
+        "LoadBalancerArn": {
+          "Ref": "Alb16C2F182",
+        },
+        "Port": 80,
+        "Protocol": "HTTP",
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+    },
+    "AlbHttpListenerApiRouteRule19DA7546": {
+      "Properties": {
+        "Actions": [
+          {
+            "TargetGroupArn": {
+              "Ref": "BackendTargetGroupECF98930",
+            },
+            "Type": "forward",
+          },
+        ],
+        "Conditions": [
+          {
+            "Field": "path-pattern",
+            "PathPatternConfig": {
+              "Values": [
+                "/api/*",
+              ],
+            },
+          },
+        ],
+        "ListenerArn": {
+          "Ref": "AlbHttpListener00C8B33E",
+        },
+        "Priority": 10,
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+    },
+    "BackendLogGroupDA10F1B2": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "LogGroupName": "/ecs/staging/backend",
+        "RetentionInDays": 30,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "BackendService7A4224EE": {
+      "DependsOn": [
+        "AlbHttpListenerApiRouteRule19DA7546",
+        "BackendTaskRoleDefaultPolicyD82ED08E",
+        "BackendTaskRole65DD5890",
+      ],
+      "Properties": {
+        "Cluster": {
+          "Ref": "EcsCluster97242B84",
+        },
+        "DeploymentConfiguration": {
+          "Alarms": {
+            "AlarmNames": [],
+            "Enable": false,
+            "Rollback": false,
+          },
+          "DeploymentCircuitBreaker": {
+            "Enable": true,
+            "Rollback": true,
+          },
+          "MaximumPercent": 200,
+          "MinimumHealthyPercent": 100,
+        },
+        "DeploymentController": {
+          "Type": "ECS",
+        },
+        "DesiredCount": 1,
+        "EnableECSManagedTags": false,
+        "HealthCheckGracePeriodSeconds": 60,
+        "LaunchType": "FARGATE",
+        "LoadBalancers": [
+          {
+            "ContainerName": "backend",
+            "ContainerPort": 3000,
+            "TargetGroupArn": {
+              "Ref": "BackendTargetGroupECF98930",
+            },
+          },
+        ],
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "AssignPublicIp": "DISABLED",
+            "SecurityGroups": [
+              {
+                "Fn::ImportValue": "VpcStack:ExportsOutputFnGetAttEcsServiceSgBB9C5630GroupId8A244605",
+              },
+            ],
+            "Subnets": [
+              {
+                "Fn::ImportValue": "VpcStack:ExportsOutputRefVpcPrivateSubnet1Subnet536B997AFD4CC940",
+              },
+              {
+                "Fn::ImportValue": "VpcStack:ExportsOutputRefVpcPrivateSubnet2Subnet3788AAA1380949A3",
+              },
+            ],
+          },
+        },
+        "ServiceName": "snapshotcompute-backend-svc",
+        "TaskDefinition": {
+          "Ref": "BackendTaskDef6ECE986E",
+        },
+      },
+      "Type": "AWS::ECS::Service",
+    },
+    "BackendServiceTaskCountTarget0CA57D80": {
+      "DependsOn": [
+        "BackendTaskRoleDefaultPolicyD82ED08E",
+        "BackendTaskRole65DD5890",
+      ],
+      "Properties": {
+        "MaxCapacity": 2,
+        "MinCapacity": 1,
+        "ResourceId": {
+          "Fn::Join": [
+            "",
+            [
+              "service/",
+              {
+                "Ref": "EcsCluster97242B84",
+              },
+              "/",
+              {
+                "Fn::GetAtt": [
+                  "BackendService7A4224EE",
+                  "Name",
+                ],
+              },
+            ],
+          ],
+        },
+        "RoleARN": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":iam::",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService",
+            ],
+          ],
+        },
+        "ScalableDimension": "ecs:service:DesiredCount",
+        "ServiceNamespace": "ecs",
+      },
+      "Type": "AWS::ApplicationAutoScaling::ScalableTarget",
+    },
+    "BackendServiceTaskCountTargetBackendCpuScaling3DD11755": {
+      "DependsOn": [
+        "BackendTaskRoleDefaultPolicyD82ED08E",
+        "BackendTaskRole65DD5890",
+      ],
+      "Properties": {
+        "PolicyName": "SnapshotComputeBackendServiceTaskCountTargetBackendCpuScalingDA040013",
+        "PolicyType": "TargetTrackingScaling",
+        "ScalingTargetId": {
+          "Ref": "BackendServiceTaskCountTarget0CA57D80",
+        },
+        "TargetTrackingScalingPolicyConfiguration": {
+          "PredefinedMetricSpecification": {
+            "PredefinedMetricType": "ECSServiceAverageCPUUtilization",
+          },
+          "ScaleInCooldown": 60,
+          "ScaleOutCooldown": 60,
+          "TargetValue": 70,
+        },
+      },
+      "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
+    },
+    "BackendTargetGroupECF98930": {
+      "Properties": {
+        "HealthCheckIntervalSeconds": 30,
+        "HealthCheckPath": "/api/health",
+        "HealthCheckTimeoutSeconds": 5,
+        "HealthyThresholdCount": 2,
+        "Matcher": {
+          "HttpCode": "200",
+        },
+        "Port": 3000,
+        "Protocol": "HTTP",
+        "TargetGroupAttributes": [
+          {
+            "Key": "deregistration_delay.timeout_seconds",
+            "Value": "30",
+          },
+          {
+            "Key": "stickiness.enabled",
+            "Value": "false",
+          },
+        ],
+        "TargetType": "ip",
+        "UnhealthyThresholdCount": 3,
+        "VpcId": {
+          "Fn::ImportValue": "VpcStack:ExportsOutputRefVpc8378EB38272D6E3A",
+        },
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+    },
+    "BackendTaskDef6ECE986E": {
+      "Properties": {
+        "ContainerDefinitions": [
+          {
+            "Environment": [
+              {
+                "Name": "DB_HOST",
+                "Value": "test-db.cluster-abc123.us-east-1.rds.amazonaws.com",
+              },
+              {
+                "Name": "DB_PORT",
+                "Value": "5432",
+              },
+              {
+                "Name": "DB_NAME",
+                "Value": "rental_platform",
+              },
+              {
+                "Name": "REDIS_HOST",
+                "Value": "test-redis.abc123.0001.use1.cache.amazonaws.com",
+              },
+              {
+                "Name": "REDIS_PORT",
+                "Value": "6379",
+              },
+              {
+                "Name": "S3_BUCKET_NAME",
+                "Value": {
+                  "Fn::ImportValue": "VpcStack:ExportsOutputRefAssetsBucket5CB761808BF2E271",
+                },
+              },
+              {
+                "Name": "S3_REGION",
+                "Value": {
+                  "Ref": "AWS::Region",
+                },
+              },
+              {
+                "Name": "NODE_ENV",
+                "Value": "development",
+              },
+              {
+                "Name": "PORT",
+                "Value": "3000",
+              },
+            ],
+            "Essential": true,
+            "Image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/backend:latest",
+            "LogConfiguration": {
+              "LogDriver": "awslogs",
+              "Options": {
+                "awslogs-group": {
+                  "Ref": "BackendLogGroupDA10F1B2",
+                },
+                "awslogs-region": {
+                  "Ref": "AWS::Region",
+                },
+                "awslogs-stream-prefix": "backend",
+              },
+            },
+            "Name": "backend",
+            "PortMappings": [
+              {
+                "ContainerPort": 3000,
+                "Protocol": "tcp",
+              },
+            ],
+            "Secrets": [
+              {
+                "Name": "DB_SECRET",
+                "ValueFrom": {
+                  "Fn::ImportValue": "VpcStack:ExportsOutputRefDbSecret685A0FA57881E1C6",
+                },
+              },
+              {
+                "Name": "JWT_SECRET",
+                "ValueFrom": {
+                  "Fn::ImportValue": "VpcStack:ExportsOutputRefJwtSecretB8834B392B9A9162",
+                },
+              },
+              {
+                "Name": "PII_ENCRYPTION_KEY",
+                "ValueFrom": {
+                  "Fn::ImportValue": "VpcStack:ExportsOutputRefPiiKeySecretFBA32A500EDB1DA9",
+                },
+              },
+            ],
+          },
+        ],
+        "Cpu": "512",
+        "ExecutionRoleArn": {
+          "Fn::GetAtt": [
+            "TaskExecutionRole250D2532",
+            "Arn",
+          ],
+        },
+        "Family": "SnapshotComputeBackendTaskDef0BF91DCD",
+        "Memory": "1024",
+        "NetworkMode": "awsvpc",
+        "RequiresCompatibilities": [
+          "FARGATE",
+        ],
+        "RuntimePlatform": {
+          "CpuArchitecture": "X86_64",
+          "OperatingSystemFamily": "LINUX",
+        },
+        "TaskRoleArn": {
+          "Fn::GetAtt": [
+            "BackendTaskRole65DD5890",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::ECS::TaskDefinition",
+    },
+    "BackendTaskRole65DD5890": {
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -490,17 +829,17 @@ exports[`Snapshot Tests ComputeStack matches snapshot 1`] = `
               "Action": "sts:AssumeRole",
               "Effect": "Allow",
               "Principal": {
-                "Service": "tasks.apprunner.amazonaws.com",
+                "Service": "ecs-tasks.amazonaws.com",
               },
             },
           ],
           "Version": "2012-10-17",
         },
-        "Description": "Instance role for backend App Runner service",
+        "Description": "Task role for backend ECS service",
       },
       "Type": "AWS::IAM::Role",
     },
-    "BackendInstanceRoleDefaultPolicy5C2C7813": {
+    "BackendTaskRoleDefaultPolicyD82ED08E": {
       "Properties": {
         "PolicyDocument": {
           "Statement": [
@@ -552,219 +891,280 @@ exports[`Snapshot Tests ComputeStack matches snapshot 1`] = `
           ],
           "Version": "2012-10-17",
         },
-        "PolicyName": "BackendInstanceRoleDefaultPolicy5C2C7813",
+        "PolicyName": "BackendTaskRoleDefaultPolicyD82ED08E",
         "Roles": [
           {
-            "Ref": "BackendInstanceRole9660A9CF",
+            "Ref": "BackendTaskRole65DD5890",
           },
         ],
       },
       "Type": "AWS::IAM::Policy",
     },
-    "BackendService": {
+    "EcsCluster97242B84": {
+      "Properties": {
+        "ClusterName": "snapshotcompute-cluster",
+        "ClusterSettings": [
+          {
+            "Name": "containerInsights",
+            "Value": "disabled",
+          },
+        ],
+      },
+      "Type": "AWS::ECS::Cluster",
+    },
+    "FrontendLogGroupCE4F14E0": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "LogGroupName": "/ecs/staging/frontend",
+        "RetentionInDays": 30,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "FrontendServiceBC94BA93": {
       "DependsOn": [
-        "VpcConnector",
+        "AlbHttpListenerApiRouteRule19DA7546",
+        "AlbHttpListener00C8B33E",
+        "FrontendTaskRoleDefaultPolicy6686BFF4",
+        "FrontendTaskRoleFDC53C6E",
       ],
       "Properties": {
-        "AutoScalingConfigurationArn": {
-          "Fn::GetAtt": [
-            "BackendAutoScaling",
-            "AutoScalingConfigurationArn",
-          ],
+        "Cluster": {
+          "Ref": "EcsCluster97242B84",
         },
-        "HealthCheckConfiguration": {
-          "HealthyThreshold": 1,
-          "Interval": 10,
-          "Path": "/api/health",
-          "Protocol": "HTTP",
-          "Timeout": 5,
-          "UnhealthyThreshold": 3,
-        },
-        "InstanceConfiguration": {
-          "Cpu": "512",
-          "InstanceRoleArn": {
-            "Fn::GetAtt": [
-              "BackendInstanceRole9660A9CF",
-              "Arn",
-            ],
+        "DeploymentConfiguration": {
+          "Alarms": {
+            "AlarmNames": [],
+            "Enable": false,
+            "Rollback": false,
           },
-          "Memory": "1024",
-        },
-        "NetworkConfiguration": {
-          "EgressConfiguration": {
-            "EgressType": "VPC",
-            "VpcConnectorArn": {
-              "Fn::GetAtt": [
-                "VpcConnector",
-                "VpcConnectorArn",
-              ],
-            },
+          "DeploymentCircuitBreaker": {
+            "Enable": true,
+            "Rollback": true,
           },
+          "MaximumPercent": 200,
+          "MinimumHealthyPercent": 100,
         },
-        "ServiceName": "snapshotcompute-backend",
-        "SourceConfiguration": {
-          "AuthenticationConfiguration": {
-            "AccessRoleArn": {
-              "Fn::GetAtt": [
-                "EcrAccessRoleF36C0DBD",
-                "Arn",
-              ],
-            },
-          },
-          "AutoDeploymentsEnabled": true,
-          "ImageRepository": {
-            "ImageConfiguration": {
-              "Port": "3000",
-              "RuntimeEnvironmentSecrets": [
-                {
-                  "Name": "DB_SECRET",
-                  "Value": {
-                    "Fn::ImportValue": "VpcStack:ExportsOutputRefDbSecret685A0FA57881E1C6",
-                  },
-                },
-                {
-                  "Name": "JWT_SECRET",
-                  "Value": {
-                    "Fn::ImportValue": "VpcStack:ExportsOutputRefJwtSecretB8834B392B9A9162",
-                  },
-                },
-                {
-                  "Name": "PII_ENCRYPTION_KEY",
-                  "Value": {
-                    "Fn::ImportValue": "VpcStack:ExportsOutputRefPiiKeySecretFBA32A500EDB1DA9",
-                  },
-                },
-              ],
-              "RuntimeEnvironmentVariables": [
-                {
-                  "Name": "DB_HOST",
-                  "Value": "test-db.cluster-abc123.us-east-1.rds.amazonaws.com",
-                },
-                {
-                  "Name": "DB_PORT",
-                  "Value": "5432",
-                },
-                {
-                  "Name": "DB_NAME",
-                  "Value": "rental_platform",
-                },
-                {
-                  "Name": "REDIS_HOST",
-                  "Value": "test-redis.abc123.0001.use1.cache.amazonaws.com",
-                },
-                {
-                  "Name": "REDIS_PORT",
-                  "Value": "6379",
-                },
-                {
-                  "Name": "S3_BUCKET_NAME",
-                  "Value": {
-                    "Fn::ImportValue": "VpcStack:ExportsOutputRefAssetsBucket5CB761808BF2E271",
-                  },
-                },
-                {
-                  "Name": "S3_REGION",
-                  "Value": {
-                    "Ref": "AWS::Region",
-                  },
-                },
-                {
-                  "Name": "NODE_ENV",
-                  "Value": "development",
-                },
-                {
-                  "Name": "PORT",
-                  "Value": "3000",
-                },
-              ],
-            },
-            "ImageIdentifier": "123456789012.dkr.ecr.us-east-1.amazonaws.com/backend:latest",
-            "ImageRepositoryType": "ECR",
-          },
+        "DeploymentController": {
+          "Type": "ECS",
         },
-      },
-      "Type": "AWS::AppRunner::Service",
-    },
-    "EcrAccessRoleDefaultPolicyDD196393": {
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "ecr:GetDownloadUrlForLayer",
-                "ecr:BatchGetImage",
-              ],
-              "Effect": "Allow",
-              "Resource": [
-                "arn:aws:ecr:us-east-1:123456789012:repository/backend",
-                "arn:aws:ecr:us-east-1:123456789012:repository/frontend",
-              ],
-              "Sid": "EcrPullFromRepos",
-            },
-            {
-              "Action": "ecr:GetAuthorizationToken",
-              "Effect": "Allow",
-              "Resource": "*",
-              "Sid": "EcrGetAuthToken",
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "EcrAccessRoleDefaultPolicyDD196393",
-        "Roles": [
+        "DesiredCount": 1,
+        "EnableECSManagedTags": false,
+        "HealthCheckGracePeriodSeconds": 60,
+        "LaunchType": "FARGATE",
+        "LoadBalancers": [
           {
-            "Ref": "EcrAccessRoleF36C0DBD",
+            "ContainerName": "frontend",
+            "ContainerPort": 3000,
+            "TargetGroupArn": {
+              "Ref": "FrontendTargetGroupED7B3E5D",
+            },
           },
         ],
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "AssignPublicIp": "DISABLED",
+            "SecurityGroups": [
+              {
+                "Fn::ImportValue": "VpcStack:ExportsOutputFnGetAttEcsServiceSgBB9C5630GroupId8A244605",
+              },
+            ],
+            "Subnets": [
+              {
+                "Fn::ImportValue": "VpcStack:ExportsOutputRefVpcPrivateSubnet1Subnet536B997AFD4CC940",
+              },
+              {
+                "Fn::ImportValue": "VpcStack:ExportsOutputRefVpcPrivateSubnet2Subnet3788AAA1380949A3",
+              },
+            ],
+          },
+        },
+        "ServiceName": "snapshotcompute-frontend-svc",
+        "TaskDefinition": {
+          "Ref": "FrontendTaskDef7D3FD156",
+        },
       },
-      "Type": "AWS::IAM::Policy",
+      "Type": "AWS::ECS::Service",
     },
-    "EcrAccessRoleF36C0DBD": {
+    "FrontendServiceTaskCountTarget125583E9": {
+      "DependsOn": [
+        "FrontendTaskRoleDefaultPolicy6686BFF4",
+        "FrontendTaskRoleFDC53C6E",
+      ],
       "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "build.apprunner.amazonaws.com",
+        "MaxCapacity": 2,
+        "MinCapacity": 1,
+        "ResourceId": {
+          "Fn::Join": [
+            "",
+            [
+              "service/",
+              {
+                "Ref": "EcsCluster97242B84",
+              },
+              "/",
+              {
+                "Fn::GetAtt": [
+                  "FrontendServiceBC94BA93",
+                  "Name",
+                ],
+              },
+            ],
+          ],
+        },
+        "RoleARN": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":iam::",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService",
+            ],
+          ],
+        },
+        "ScalableDimension": "ecs:service:DesiredCount",
+        "ServiceNamespace": "ecs",
+      },
+      "Type": "AWS::ApplicationAutoScaling::ScalableTarget",
+    },
+    "FrontendServiceTaskCountTargetFrontendCpuScalingC68B756E": {
+      "DependsOn": [
+        "FrontendTaskRoleDefaultPolicy6686BFF4",
+        "FrontendTaskRoleFDC53C6E",
+      ],
+      "Properties": {
+        "PolicyName": "SnapshotComputeFrontendServiceTaskCountTargetFrontendCpuScaling2BBE05BD",
+        "PolicyType": "TargetTrackingScaling",
+        "ScalingTargetId": {
+          "Ref": "FrontendServiceTaskCountTarget125583E9",
+        },
+        "TargetTrackingScalingPolicyConfiguration": {
+          "PredefinedMetricSpecification": {
+            "PredefinedMetricType": "ECSServiceAverageCPUUtilization",
+          },
+          "ScaleInCooldown": 60,
+          "ScaleOutCooldown": 60,
+          "TargetValue": 70,
+        },
+      },
+      "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
+    },
+    "FrontendTargetGroupED7B3E5D": {
+      "Properties": {
+        "HealthCheckIntervalSeconds": 30,
+        "HealthCheckPath": "/",
+        "HealthCheckTimeoutSeconds": 5,
+        "HealthyThresholdCount": 2,
+        "Matcher": {
+          "HttpCode": "200",
+        },
+        "Port": 3000,
+        "Protocol": "HTTP",
+        "TargetGroupAttributes": [
+          {
+            "Key": "deregistration_delay.timeout_seconds",
+            "Value": "30",
+          },
+          {
+            "Key": "stickiness.enabled",
+            "Value": "false",
+          },
+        ],
+        "TargetType": "ip",
+        "UnhealthyThresholdCount": 3,
+        "VpcId": {
+          "Fn::ImportValue": "VpcStack:ExportsOutputRefVpc8378EB38272D6E3A",
+        },
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+    },
+    "FrontendTaskDef7D3FD156": {
+      "Properties": {
+        "ContainerDefinitions": [
+          {
+            "Environment": [
+              {
+                "Name": "NEXT_PUBLIC_API_URL",
+                "Value": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "http://",
+                      {
+                        "Fn::GetAtt": [
+                          "Alb16C2F182",
+                          "DNSName",
+                        ],
+                      },
+                    ],
+                  ],
+                },
+              },
+              {
+                "Name": "NODE_ENV",
+                "Value": "development",
+              },
+              {
+                "Name": "PORT",
+                "Value": "3000",
+              },
+            ],
+            "Essential": true,
+            "Image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/frontend:latest",
+            "LogConfiguration": {
+              "LogDriver": "awslogs",
+              "Options": {
+                "awslogs-group": {
+                  "Ref": "FrontendLogGroupCE4F14E0",
+                },
+                "awslogs-region": {
+                  "Ref": "AWS::Region",
+                },
+                "awslogs-stream-prefix": "frontend",
               },
             },
-          ],
-          "Version": "2012-10-17",
-        },
-        "Description": "ECR access role for App Runner to pull images",
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "FrontendAutoScaling": {
-      "Properties": {
-        "AutoScalingConfigurationName": "snapshotcompute-frontend-scaling",
-        "MaxConcurrency": 80,
-        "MaxSize": 2,
-        "MinSize": 1,
-      },
-      "Type": "AWS::AppRunner::AutoScalingConfiguration",
-    },
-    "FrontendInstanceRole4E5ED434": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "tasks.apprunner.amazonaws.com",
+            "Name": "frontend",
+            "PortMappings": [
+              {
+                "ContainerPort": 3000,
+                "Protocol": "tcp",
               },
-            },
+            ],
+          },
+        ],
+        "Cpu": "256",
+        "ExecutionRoleArn": {
+          "Fn::GetAtt": [
+            "TaskExecutionRole250D2532",
+            "Arn",
           ],
-          "Version": "2012-10-17",
         },
-        "Description": "Instance role for frontend App Runner service",
+        "Family": "SnapshotComputeFrontendTaskDef7B264A29",
+        "Memory": "512",
+        "NetworkMode": "awsvpc",
+        "RequiresCompatibilities": [
+          "FARGATE",
+        ],
+        "RuntimePlatform": {
+          "CpuArchitecture": "X86_64",
+          "OperatingSystemFamily": "LINUX",
+        },
+        "TaskRoleArn": {
+          "Fn::GetAtt": [
+            "FrontendTaskRoleFDC53C6E",
+            "Arn",
+          ],
+        },
       },
-      "Type": "AWS::IAM::Role",
+      "Type": "AWS::ECS::TaskDefinition",
     },
-    "FrontendInstanceRoleDefaultPolicyD7EF68F9": {
+    "FrontendTaskRoleDefaultPolicy6686BFF4": {
       "Properties": {
         "PolicyDocument": {
           "Statement": [
@@ -780,113 +1180,158 @@ exports[`Snapshot Tests ComputeStack matches snapshot 1`] = `
           ],
           "Version": "2012-10-17",
         },
-        "PolicyName": "FrontendInstanceRoleDefaultPolicyD7EF68F9",
+        "PolicyName": "FrontendTaskRoleDefaultPolicy6686BFF4",
         "Roles": [
           {
-            "Ref": "FrontendInstanceRole4E5ED434",
+            "Ref": "FrontendTaskRoleFDC53C6E",
           },
         ],
       },
       "Type": "AWS::IAM::Policy",
     },
-    "FrontendService": {
+    "FrontendTaskRoleFDC53C6E": {
       "Properties": {
-        "AutoScalingConfigurationArn": {
-          "Fn::GetAtt": [
-            "FrontendAutoScaling",
-            "AutoScalingConfigurationArn",
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ecs-tasks.amazonaws.com",
+              },
+            },
           ],
+          "Version": "2012-10-17",
         },
-        "HealthCheckConfiguration": {
-          "HealthyThreshold": 1,
-          "Interval": 10,
-          "Path": "/",
-          "Protocol": "HTTP",
-          "Timeout": 5,
-          "UnhealthyThreshold": 3,
-        },
-        "InstanceConfiguration": {
-          "Cpu": "256",
-          "InstanceRoleArn": {
-            "Fn::GetAtt": [
-              "FrontendInstanceRole4E5ED434",
-              "Arn",
-            ],
-          },
-          "Memory": "512",
-        },
-        "NetworkConfiguration": {
-          "EgressConfiguration": {
-            "EgressType": "DEFAULT",
-          },
-        },
-        "ServiceName": "snapshotcompute-frontend",
-        "SourceConfiguration": {
-          "AuthenticationConfiguration": {
-            "AccessRoleArn": {
-              "Fn::GetAtt": [
-                "EcrAccessRoleF36C0DBD",
-                "Arn",
-              ],
-            },
-          },
-          "AutoDeploymentsEnabled": true,
-          "ImageRepository": {
-            "ImageConfiguration": {
-              "Port": "3000",
-              "RuntimeEnvironmentVariables": [
-                {
-                  "Name": "NEXT_PUBLIC_API_URL",
-                  "Value": {
-                    "Fn::Join": [
-                      "",
-                      [
-                        "https://",
-                        {
-                          "Fn::GetAtt": [
-                            "BackendService",
-                            "ServiceUrl",
-                          ],
-                        },
-                      ],
-                    ],
-                  },
-                },
-                {
-                  "Name": "NODE_ENV",
-                  "Value": "development",
-                },
-                {
-                  "Name": "PORT",
-                  "Value": "3000",
-                },
-              ],
-            },
-            "ImageIdentifier": "123456789012.dkr.ecr.us-east-1.amazonaws.com/frontend:latest",
-            "ImageRepositoryType": "ECR",
-          },
-        },
+        "Description": "Task role for frontend ECS service",
       },
-      "Type": "AWS::AppRunner::Service",
+      "Type": "AWS::IAM::Role",
     },
-    "VpcConnector": {
+    "TaskExecutionRole250D2532": {
       "Properties": {
-        "SecurityGroups": [
-          {
-            "Fn::ImportValue": "VpcStack:ExportsOutputFnGetAttVpcConnectorSg66AC3654GroupId9458E942",
-          },
-        ],
-        "Subnets": [
-          {
-            "Fn::ImportValue": "VpcStack:ExportsOutputRefVpcPrivateSubnet1Subnet536B997AFD4CC940",
-          },
-          {
-            "Fn::ImportValue": "VpcStack:ExportsOutputRefVpcPrivateSubnet2Subnet3788AAA1380949A3",
-          },
-        ],
-        "VpcConnectorName": "snapshotcompute-connector",
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ecs-tasks.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "Description": "ECS task execution role for pulling images and injecting secrets",
       },
-      "Type": "AWS::AppRunner::VpcConnector",
+      "Type": "AWS::IAM::Role",
+    },
+    "TaskExecutionRoleDefaultPolicyA84DD1B0": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+                "ecr:GetAuthorizationToken",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+              "Sid": "EcrPull",
+            },
+            {
+              "Action": "secretsmanager:GetSecretValue",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::ImportValue": "VpcStack:ExportsOutputRefDbSecret685A0FA57881E1C6",
+                },
+                {
+                  "Fn::ImportValue": "VpcStack:ExportsOutputRefJwtSecretB8834B392B9A9162",
+                },
+                {
+                  "Fn::ImportValue": "VpcStack:ExportsOutputRefPiiKeySecretFBA32A500EDB1DA9",
+                },
+              ],
+              "Sid": "SecretsManagerRead",
+            },
+            {
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+              "Sid": "CloudWatchLogs",
+            },
+            {
+              "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "BackendLogGroupDA10F1B2",
+                  "Arn",
+                ],
+              },
+            },
+            {
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::ImportValue": "VpcStack:ExportsOutputRefDbSecret685A0FA57881E1C6",
+              },
+            },
+            {
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::ImportValue": "VpcStack:ExportsOutputRefJwtSecretB8834B392B9A9162",
+              },
+            },
+            {
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::ImportValue": "VpcStack:ExportsOutputRefPiiKeySecretFBA32A500EDB1DA9",
+              },
+            },
+            {
+              "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "FrontendLogGroupCE4F14E0",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "TaskExecutionRoleDefaultPolicyA84DD1B0",
+        "Roles": [
+          {
+            "Ref": "TaskExecutionRole250D2532",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
     },
   },
   "Rules": {
@@ -1389,21 +1834,25 @@ exports[`Snapshot Tests MonitoringStack matches snapshot 1`] = `
             "Ref": "AlarmNotificationTopic58BFACC9",
           },
         ],
-        "AlarmDescription": "API response latency (p95) exceeds 800ms threshold",
+        "AlarmDescription": "ALB target response time (p95) exceeds 800ms threshold",
         "AlarmName": "SnapshotMonitoring-api-latency-p95",
         "ComparisonOperator": "GreaterThanThreshold",
         "Dimensions": [
           {
-            "Name": "ServiceName",
-            "Value": "service",
+            "Name": "LoadBalancer",
+            "Value": "app/test-alb/abc123",
+          },
+          {
+            "Name": "TargetGroup",
+            "Value": "targetgroup/backend-tg/def456",
           },
         ],
         "EvaluationPeriods": 3,
         "ExtendedStatistic": "p95",
-        "MetricName": "RequestLatency",
-        "Namespace": "AWS/AppRunner",
+        "MetricName": "TargetResponseTime",
+        "Namespace": "AWS/ApplicationELB",
         "Period": 300,
-        "Threshold": 800,
+        "Threshold": 0.8,
         "TreatMissingData": "notBreaching",
       },
       "Type": "AWS::CloudWatch::Alarm",
@@ -1411,7 +1860,7 @@ exports[`Snapshot Tests MonitoringStack matches snapshot 1`] = `
     "BackendLogGroupDA10F1B2": {
       "DeletionPolicy": "Delete",
       "Properties": {
-        "LogGroupName": "/apprunner/staging/backend",
+        "LogGroupName": "/ecs/staging/monitoring/backend",
         "RetentionInDays": 30,
       },
       "Type": "AWS::Logs::LogGroup",
@@ -1440,12 +1889,16 @@ exports[`Snapshot Tests MonitoringStack matches snapshot 1`] = `
               "Metric": {
                 "Dimensions": [
                   {
-                    "Name": "ServiceName",
-                    "Value": "service",
+                    "Name": "LoadBalancer",
+                    "Value": "app/test-alb/abc123",
+                  },
+                  {
+                    "Name": "TargetGroup",
+                    "Value": "targetgroup/backend-tg/def456",
                   },
                 ],
-                "MetricName": "5xxStatusResponses",
-                "Namespace": "AWS/AppRunner",
+                "MetricName": "HTTPCode_Target_5XX_Count",
+                "Namespace": "AWS/ApplicationELB",
               },
               "Period": 300,
               "Stat": "Sum",
@@ -1458,12 +1911,16 @@ exports[`Snapshot Tests MonitoringStack matches snapshot 1`] = `
               "Metric": {
                 "Dimensions": [
                   {
-                    "Name": "ServiceName",
-                    "Value": "service",
+                    "Name": "LoadBalancer",
+                    "Value": "app/test-alb/abc123",
+                  },
+                  {
+                    "Name": "TargetGroup",
+                    "Value": "targetgroup/backend-tg/def456",
                   },
                 ],
                 "MetricName": "RequestCount",
-                "Namespace": "AWS/AppRunner",
+                "Namespace": "AWS/ApplicationELB",
               },
               "Period": 300,
               "Stat": "Sum",
@@ -1479,7 +1936,7 @@ exports[`Snapshot Tests MonitoringStack matches snapshot 1`] = `
     "FrontendLogGroupCE4F14E0": {
       "DeletionPolicy": "Delete",
       "Properties": {
-        "LogGroupName": "/apprunner/staging/frontend",
+        "LogGroupName": "/ecs/staging/monitoring/frontend",
         "RetentionInDays": 30,
       },
       "Type": "AWS::Logs::LogGroup",
@@ -1491,27 +1948,27 @@ exports[`Snapshot Tests MonitoringStack matches snapshot 1`] = `
           "Fn::Join": [
             "",
             [
-              "{"widgets":[{"type":"metric","width":12,"height":6,"x":0,"y":0,"properties":{"view":"timeSeries","title":"Request Count","region":"",
+              "{"widgets":[{"type":"metric","width":12,"height":6,"x":0,"y":0,"properties":{"view":"timeSeries","title":"ALB Request Count","region":"",
               {
                 "Ref": "AWS::Region",
               },
-              "","metrics":[["AWS/AppRunner","RequestCount","ServiceName","service",{"label":"Backend Requests","period":60,"stat":"Sum"}]],"yAxis":{}}},{"type":"metric","width":12,"height":6,"x":12,"y":0,"properties":{"view":"timeSeries","title":"Error Rates","region":"",
+              "","metrics":[["AWS/ApplicationELB","RequestCount","LoadBalancer","app/test-alb/abc123",{"label":"Total Requests","period":60,"stat":"Sum"}]],"yAxis":{}}},{"type":"metric","width":12,"height":6,"x":12,"y":0,"properties":{"view":"timeSeries","title":"HTTP Error Codes","region":"",
               {
                 "Ref": "AWS::Region",
               },
-              "","metrics":[["AWS/AppRunner","4xxStatusResponses","ServiceName","service",{"label":"4xx Errors","period":60,"stat":"Sum"}],["AWS/AppRunner","5xxStatusResponses","ServiceName","service",{"label":"5xx Errors","period":60,"stat":"Sum"}]],"yAxis":{}}},{"type":"metric","width":12,"height":6,"x":0,"y":6,"properties":{"view":"timeSeries","title":"Latency Percentiles","region":"",
+              "","metrics":[["AWS/ApplicationELB","HTTPCode_Target_4XX_Count","LoadBalancer","app/test-alb/abc123",{"label":"4xx Errors","period":60,"stat":"Sum"}],["AWS/ApplicationELB","HTTPCode_Target_5XX_Count","LoadBalancer","app/test-alb/abc123",{"label":"5xx Errors","period":60,"stat":"Sum"}]],"yAxis":{}}},{"type":"metric","width":12,"height":6,"x":0,"y":6,"properties":{"view":"timeSeries","title":"Target Response Time","region":"",
               {
                 "Ref": "AWS::Region",
               },
-              "","metrics":[["AWS/AppRunner","RequestLatency","ServiceName","service",{"label":"p50","period":60,"stat":"p50"}],["AWS/AppRunner","RequestLatency","ServiceName","service",{"label":"p95","period":60,"stat":"p95"}],["AWS/AppRunner","RequestLatency","ServiceName","service",{"label":"p99","period":60,"stat":"p99"}]],"yAxis":{}}},{"type":"metric","width":12,"height":6,"x":12,"y":6,"properties":{"view":"timeSeries","title":"DB CPU Utilization","region":"",
+              "","metrics":[["AWS/ApplicationELB","TargetResponseTime","LoadBalancer","app/test-alb/abc123",{"label":"p50","period":60,"stat":"p50"}],["AWS/ApplicationELB","TargetResponseTime","LoadBalancer","app/test-alb/abc123",{"label":"p95","period":60,"stat":"p95"}],["AWS/ApplicationELB","TargetResponseTime","LoadBalancer","app/test-alb/abc123",{"label":"p99","period":60,"stat":"p99"}]],"yAxis":{}}},{"type":"metric","width":12,"height":6,"x":12,"y":6,"properties":{"view":"timeSeries","title":"ECS CPU Utilization","region":"",
               {
                 "Ref": "AWS::Region",
               },
-              "","metrics":[["AWS/RDS","CPUUtilization","DBInstanceIdentifier","",
+              "","metrics":[["AWS/ECS","CPUUtilization","ClusterName","test-cluster","ServiceName","test-backend-svc",{"label":"Backend CPU %","period":60}],["AWS/ECS","CPUUtilization","ClusterName","test-cluster","ServiceName","test-frontend-svc",{"label":"Frontend CPU %","period":60}]],"yAxis":{}}},{"type":"metric","width":12,"height":6,"x":0,"y":12,"properties":{"view":"timeSeries","title":"ECS Memory Utilization","region":"",
               {
-                "Fn::ImportValue": "DepStack:ExportsOutputRefDatabaseB269D8BB88F4B1C4",
+                "Ref": "AWS::Region",
               },
-              "",{"label":"CPU %","period":60}]],"yAxis":{}}},{"type":"metric","width":12,"height":6,"x":0,"y":12,"properties":{"view":"timeSeries","title":"DB Connections","region":"",
+              "","metrics":[["AWS/ECS","MemoryUtilization","ClusterName","test-cluster","ServiceName","test-backend-svc",{"label":"Backend Memory %","period":60}],["AWS/ECS","MemoryUtilization","ClusterName","test-cluster","ServiceName","test-frontend-svc",{"label":"Frontend Memory %","period":60}]],"yAxis":{}}},{"type":"metric","width":12,"height":6,"x":12,"y":12,"properties":{"view":"timeSeries","title":"DB Connections","region":"",
               {
                 "Ref": "AWS::Region",
               },
@@ -1519,15 +1976,7 @@ exports[`Snapshot Tests MonitoringStack matches snapshot 1`] = `
               {
                 "Fn::ImportValue": "DepStack:ExportsOutputRefDatabaseB269D8BB88F4B1C4",
               },
-              "",{"label":"Active Connections","period":60}]],"yAxis":{}}},{"type":"metric","width":12,"height":6,"x":12,"y":12,"properties":{"view":"timeSeries","title":"DB Free Storage Space","region":"",
-              {
-                "Ref": "AWS::Region",
-              },
-              "","metrics":[["AWS/RDS","FreeStorageSpace","DBInstanceIdentifier","",
-              {
-                "Fn::ImportValue": "DepStack:ExportsOutputRefDatabaseB269D8BB88F4B1C4",
-              },
-              "",{"label":"Free Storage (bytes)"}]],"yAxis":{}}}]}",
+              "",{"label":"Active Connections","period":60}]],"yAxis":{}}}]}",
             ],
           ],
         },
@@ -1632,6 +2081,52 @@ exports[`Snapshot Tests NetworkStack matches snapshot 1`] = `
     },
   },
   "Resources": {
+    "AlbSecurityGroup86A59E99": {
+      "Properties": {
+        "GroupDescription": "Security group for Application Load Balancer",
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow inbound HTTP from internet",
+            "FromPort": 80,
+            "IpProtocol": "tcp",
+            "ToPort": 80,
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow inbound HTTPS from internet",
+            "FromPort": 443,
+            "IpProtocol": "tcp",
+            "ToPort": 443,
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "AlbSecurityGrouptoSnapshotNetworkEcsServiceSecurityGroup27E56E793000D8118114": {
+      "Properties": {
+        "Description": "Allow outbound to ECS service SG on application port",
+        "DestinationSecurityGroupId": {
+          "Fn::GetAtt": [
+            "EcsServiceSecurityGroupCD98B82C",
+            "GroupId",
+          ],
+        },
+        "FromPort": 3000,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "AlbSecurityGroup86A59E99",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "ToPort": 3000,
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress",
+    },
     "DataSecurityGroup80B4589A": {
       "Properties": {
         "GroupDescription": "Security group for data stores (RDS, Redis)",
@@ -1649,6 +2144,48 @@ exports[`Snapshot Tests NetworkStack matches snapshot 1`] = `
         },
       },
       "Type": "AWS::EC2::SecurityGroup",
+    },
+    "DataSecurityGroupfromSnapshotNetworkEcsServiceSecurityGroup27E56E79543202C63BF2": {
+      "Properties": {
+        "Description": "Allow inbound from ECS Service SG on PostgreSQL port",
+        "FromPort": 5432,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "DataSecurityGroup80B4589A",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "EcsServiceSecurityGroupCD98B82C",
+            "GroupId",
+          ],
+        },
+        "ToPort": 5432,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "DataSecurityGroupfromSnapshotNetworkEcsServiceSecurityGroup27E56E796379E27232C2": {
+      "Properties": {
+        "Description": "Allow inbound from ECS Service SG on Redis port",
+        "FromPort": 6379,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "DataSecurityGroup80B4589A",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "EcsServiceSecurityGroupCD98B82C",
+            "GroupId",
+          ],
+        },
+        "ToPort": 6379,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
     },
     "DataSecurityGroupfromSnapshotNetworkEicEndpointSecurityGroup6228D49F5432DD7C4965": {
       "Properties": {
@@ -1671,47 +2208,86 @@ exports[`Snapshot Tests NetworkStack matches snapshot 1`] = `
       },
       "Type": "AWS::EC2::SecurityGroupIngress",
     },
-    "DataSecurityGroupfromSnapshotNetworkVpcConnectorSecurityGroup343418175432FCF4DB8D": {
+    "EcsServiceSecurityGroupCD98B82C": {
       "Properties": {
-        "Description": "Allow inbound from VPC Connector SG on PostgreSQL port",
-        "FromPort": 5432,
+        "GroupDescription": "Security group for ECS Fargate services",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow outbound HTTPS for ECR image pulls via NAT",
+            "FromPort": 443,
+            "IpProtocol": "tcp",
+            "ToPort": 443,
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "EcsServiceSecurityGroupfromSnapshotNetworkAlbSecurityGroup6F603702300021D3872C": {
+      "Properties": {
+        "Description": "Allow inbound from ALB on application port",
+        "FromPort": 3000,
         "GroupId": {
           "Fn::GetAtt": [
-            "DataSecurityGroup80B4589A",
+            "EcsServiceSecurityGroupCD98B82C",
             "GroupId",
           ],
         },
         "IpProtocol": "tcp",
         "SourceSecurityGroupId": {
           "Fn::GetAtt": [
-            "VpcConnectorSecurityGroup11DFF030",
+            "AlbSecurityGroup86A59E99",
             "GroupId",
           ],
         },
-        "ToPort": 5432,
+        "ToPort": 3000,
       },
       "Type": "AWS::EC2::SecurityGroupIngress",
     },
-    "DataSecurityGroupfromSnapshotNetworkVpcConnectorSecurityGroup34341817637923679FE9": {
+    "EcsServiceSecurityGrouptoSnapshotNetworkDataSecurityGroup2CFD1042543284E45757": {
       "Properties": {
-        "Description": "Allow inbound from VPC Connector SG on Redis port",
-        "FromPort": 6379,
-        "GroupId": {
+        "Description": "Allow outbound to data SG on PostgreSQL port",
+        "DestinationSecurityGroupId": {
           "Fn::GetAtt": [
             "DataSecurityGroup80B4589A",
             "GroupId",
           ],
         },
-        "IpProtocol": "tcp",
-        "SourceSecurityGroupId": {
+        "FromPort": 5432,
+        "GroupId": {
           "Fn::GetAtt": [
-            "VpcConnectorSecurityGroup11DFF030",
+            "EcsServiceSecurityGroupCD98B82C",
             "GroupId",
           ],
         },
+        "IpProtocol": "tcp",
+        "ToPort": 5432,
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress",
+    },
+    "EcsServiceSecurityGrouptoSnapshotNetworkDataSecurityGroup2CFD1042637972BA72B3": {
+      "Properties": {
+        "Description": "Allow outbound to data SG on Redis port",
+        "DestinationSecurityGroupId": {
+          "Fn::GetAtt": [
+            "DataSecurityGroup80B4589A",
+            "GroupId",
+          ],
+        },
+        "FromPort": 6379,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "EcsServiceSecurityGroupCD98B82C",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
         "ToPort": 6379,
       },
-      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Type": "AWS::EC2::SecurityGroupEgress",
     },
     "EicEndpoint": {
       "Properties": {
@@ -1774,57 +2350,6 @@ exports[`Snapshot Tests NetworkStack matches snapshot 1`] = `
         ],
       },
       "Type": "AWS::EC2::VPC",
-    },
-    "VpcConnectorSecurityGroup11DFF030": {
-      "Properties": {
-        "GroupDescription": "Security group for App Runner VPC Connector",
-        "VpcId": {
-          "Ref": "Vpc8378EB38",
-        },
-      },
-      "Type": "AWS::EC2::SecurityGroup",
-    },
-    "VpcConnectorSecurityGrouptoSnapshotNetworkDataSecurityGroup2CFD10425432A4C0C68A": {
-      "Properties": {
-        "Description": "Allow outbound to data SG on PostgreSQL port",
-        "DestinationSecurityGroupId": {
-          "Fn::GetAtt": [
-            "DataSecurityGroup80B4589A",
-            "GroupId",
-          ],
-        },
-        "FromPort": 5432,
-        "GroupId": {
-          "Fn::GetAtt": [
-            "VpcConnectorSecurityGroup11DFF030",
-            "GroupId",
-          ],
-        },
-        "IpProtocol": "tcp",
-        "ToPort": 5432,
-      },
-      "Type": "AWS::EC2::SecurityGroupEgress",
-    },
-    "VpcConnectorSecurityGrouptoSnapshotNetworkDataSecurityGroup2CFD10426379F69E5FC2": {
-      "Properties": {
-        "Description": "Allow outbound to data SG on Redis port",
-        "DestinationSecurityGroupId": {
-          "Fn::GetAtt": [
-            "DataSecurityGroup80B4589A",
-            "GroupId",
-          ],
-        },
-        "FromPort": 6379,
-        "GroupId": {
-          "Fn::GetAtt": [
-            "VpcConnectorSecurityGroup11DFF030",
-            "GroupId",
-          ],
-        },
-        "IpProtocol": "tcp",
-        "ToPort": 6379,
-      },
-      "Type": "AWS::EC2::SecurityGroupEgress",
     },
     "VpcDataSubnet1RouteTable8A39B5EF": {
       "Properties": {

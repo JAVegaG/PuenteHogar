@@ -54,7 +54,9 @@ const compute = new ComputeStack(app, `${env}-Compute`, {
     env: cdkEnv,
     vpc: network.vpc,
     privateSubnets: network.privateSubnets,
-    vpcConnectorSecurityGroup: network.vpcConnectorSecurityGroup,
+    publicSubnets: network.publicSubnets,
+    ecsServiceSecurityGroup: network.ecsServiceSecurityGroup,
+    albSecurityGroup: network.albSecurityGroup,
     dbSecret: data.dbSecret,
     jwtSecret: data.jwtSecret,
     piiKeySecret: data.piiKeySecret,
@@ -75,8 +77,7 @@ compute.addDependency(ci);
 // 5. CdnStack (depends on ComputeStack)
 const cdn = new CdnStack(app, `${env}-Cdn`, {
     env: cdkEnv,
-    backendServiceUrl: compute.backendServiceUrl,
-    frontendServiceUrl: compute.frontendServiceUrl,
+    albDnsName: compute.albDnsName,
     assetsBucketArn: data.assetsBucket.bucketArn,
     assetsBucketName: data.assetsBucket.bucketName,
     domainName: config.domainName,
@@ -87,8 +88,12 @@ cdn.addDependency(compute);
 // 6. MonitoringStack (depends on ComputeStack, DataStack)
 const monitoring = new MonitoringStack(app, `${env}-Monitoring`, {
     env: cdkEnv,
-    backendServiceArn: compute.backendServiceArn,
-    frontendServiceArn: compute.frontendServiceArn,
+    albArn: compute.albArn,
+    albFullName: compute.albFullName,
+    backendTargetGroupFullName: compute.backendTargetGroupFullName,
+    ecsClusterName: compute.ecsClusterName,
+    backendServiceName: compute.backendServiceName,
+    frontendServiceName: compute.frontendServiceName,
     dbInstance: data.dbInstance,
     environment: config.environment,
 });

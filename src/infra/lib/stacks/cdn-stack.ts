@@ -7,8 +7,7 @@ import * as wafv2 from 'aws-cdk-lib/aws-wafv2';
 import { Construct } from 'constructs';
 
 export interface CdnStackProps extends cdk.StackProps {
-    readonly backendServiceUrl: string;
-    readonly frontendServiceUrl: string;
+    readonly albDnsName: string;
     readonly assetsBucketArn: string;
     readonly assetsBucketName: string;
     readonly domainName?: string;
@@ -120,24 +119,16 @@ export class CdnStack extends cdk.Stack {
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // 6.3 — CloudFront Origins
+        // 6.3 — CloudFront Origins (ALB + S3)
         // ─────────────────────────────────────────────────────────────────────
 
-        // Origin 1: Backend App Runner URL
-        const backendOrigin = new origins.HttpOrigin(props.backendServiceUrl, {
-            protocolPolicy: cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
+        // Origin 1: ALB (HTTP only — CloudFront handles TLS termination)
+        const albOrigin = new origins.HttpOrigin(props.albDnsName, {
+            protocolPolicy: cloudfront.OriginProtocolPolicy.HTTP_ONLY,
+            httpPort: 80,
         });
 
-        // Origin 2: Frontend App Runner URL
-        const frontendOrigin = new origins.HttpOrigin(props.frontendServiceUrl, {
-            protocolPolicy: cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
-        });
-
-        // Origin 3: S3 bucket with Origin Access Control (OAC)
-        // Import the bucket from attributes to avoid cross-stack circular dependency.
-        // When CDK manages the bucket policy automatically via OAC, it needs to modify
-        // the bucket's stack — but since the bucket is in DataStack and the distribution
-        // is in CdnStack, this creates a cycle. Importing by attributes breaks the link.
+        // Origin 2: S3 bucket with Origin Access Control (OAC)
         const importedBucket = s3.Bucket.fromBucketAttributes(this, 'ImportedAssetsBucket', {
             bucketArn: props.assetsBucketArn,
             bucketName: props.assetsBucketName,
@@ -159,9 +150,9 @@ export class CdnStack extends cdk.Stack {
         });
 
         const distribution = new cloudfront.Distribution(this, 'Distribution', {
-            // Default behavior: frontend (SSR — no cache)
+            // Default behavior: frontend (SSR — no cache) via ALB
             defaultBehavior: {
-                origin: frontendOrigin,
+                origin: albOrigin,
                 viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
                 cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
                 allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
@@ -169,9 +160,9 @@ export class CdnStack extends cdk.Stack {
                 compress: true,
             },
             additionalBehaviors: {
-                // /api/* → backend origin (no cache, all methods)
+                // /api/* → ALB origin (no cache, all methods)
                 '/api/*': {
-                    origin: backendOrigin,
+                    origin: albOrigin,
                     viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
                     cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
                     allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
@@ -199,16 +190,8 @@ export class CdnStack extends cdk.Stack {
                     domainNames: [props.domainName, `*.${props.domainName}`],
                 }
                 : {}),
-            // Enable compression is handled per-behavior via `compress: true`
             comment: `${props.environment} CDN distribution`,
         });
-
-        // ─────────────────────────────────────────────────────────────────────
-        // 6.7 — S3 bucket access from CloudFront
-        // ─────────────────────────────────────────────────────────────────────
-        // With S3BucketOrigin.withOriginAccessControl() on an imported bucket, CDK
-        // automatically creates the OAC and adds the necessary bucket policy to allow
-        // CloudFront to read from the bucket — all within this stack.
 
         // Export outputs
         this.distribution = distribution;

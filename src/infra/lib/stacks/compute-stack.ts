@@ -1,15 +1,19 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as ecs from 'aws-cdk-lib/aws-ecs';
+import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as logs from 'aws-cdk-lib/aws-logs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
-import * as apprunner from 'aws-cdk-lib/aws-apprunner';
 import { Construct } from 'constructs';
 
 export interface ComputeStackProps extends cdk.StackProps {
     readonly vpc: ec2.IVpc;
     readonly privateSubnets: ec2.ISubnet[];
-    readonly vpcConnectorSecurityGroup: ec2.ISecurityGroup;
+    readonly publicSubnets: ec2.ISubnet[];
+    readonly ecsServiceSecurityGroup: ec2.ISecurityGroup;
+    readonly albSecurityGroup: ec2.ISecurityGroup;
     readonly dbSecret: secretsmanager.ISecret;
     readonly jwtSecret: secretsmanager.ISecret;
     readonly piiKeySecret: secretsmanager.ISecret;
@@ -25,31 +29,118 @@ export interface ComputeStackProps extends cdk.StackProps {
 }
 
 export class ComputeStack extends cdk.Stack {
-    public readonly backendServiceUrl: string;
-    public readonly frontendServiceUrl: string;
+    public readonly albDnsName: string;
+    public readonly albArn: string;
+    public readonly albFullName: string;
+    public readonly backendTargetGroupFullName: string;
     public readonly backendServiceArn: string;
     public readonly frontendServiceArn: string;
+    public readonly ecsClusterName: string;
+    public readonly backendServiceName: string;
+    public readonly frontendServiceName: string;
 
     constructor(scope: Construct, id: string, props: ComputeStackProps) {
         super(scope, id, props);
 
         const isProduction = props.environment === 'production';
 
-        // 5.2 — VPC Connector pointing to private subnets with VPC Connector security group
-        const vpcConnector = new apprunner.CfnVpcConnector(this, 'VpcConnector', {
-            subnets: props.privateSubnets.map(s => s.subnetId),
-            securityGroups: [props.vpcConnectorSecurityGroup.securityGroupId],
-            vpcConnectorName: `${id}-connector`.toLowerCase(),
+        // ─────────────────────────────────────────────────────────────────────
+        // 5.2 — ECS Cluster
+        // ─────────────────────────────────────────────────────────────────────
+        const cluster = new ecs.Cluster(this, 'EcsCluster', {
+            clusterName: `${id}-cluster`.toLowerCase(),
+            vpc: props.vpc,
+            containerInsightsV2: isProduction ? ecs.ContainerInsights.ENHANCED : ecs.ContainerInsights.DISABLED,
         });
 
-        // 5.3 — IAM instance role for backend
-        const backendInstanceRole = new iam.Role(this, 'BackendInstanceRole', {
-            assumedBy: new iam.ServicePrincipal('tasks.apprunner.amazonaws.com'),
-            description: 'Instance role for backend App Runner service',
+        // ─────────────────────────────────────────────────────────────────────
+        // 5.3 — Application Load Balancer
+        // ─────────────────────────────────────────────────────────────────────
+        const alb = new elbv2.ApplicationLoadBalancer(this, 'Alb', {
+            vpc: props.vpc,
+            internetFacing: true,
+            securityGroup: props.albSecurityGroup,
+            vpcSubnets: { subnets: props.publicSubnets },
         });
 
-        // Secrets Manager read on specific secret ARNs
-        backendInstanceRole.addToPolicy(new iam.PolicyStatement({
+        // HTTP listener on port 80 (CloudFront connects to ALB via HTTP)
+        const httpListener = alb.addListener('HttpListener', {
+            port: 80,
+            protocol: elbv2.ApplicationProtocol.HTTP,
+            open: false,
+        });
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 5.4 — Backend Target Group
+        // ─────────────────────────────────────────────────────────────────────
+        const backendTargetGroup = new elbv2.ApplicationTargetGroup(this, 'BackendTargetGroup', {
+            vpc: props.vpc,
+            port: 3000,
+            protocol: elbv2.ApplicationProtocol.HTTP,
+            targetType: elbv2.TargetType.IP,
+            healthCheck: {
+                path: '/api/health',
+                interval: cdk.Duration.seconds(30),
+                timeout: cdk.Duration.seconds(5),
+                healthyThresholdCount: 2,
+                unhealthyThresholdCount: 3,
+                healthyHttpCodes: '200',
+            },
+            deregistrationDelay: cdk.Duration.seconds(30),
+        });
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 5.5 — Frontend Target Group
+        // ─────────────────────────────────────────────────────────────────────
+        const frontendTargetGroup = new elbv2.ApplicationTargetGroup(this, 'FrontendTargetGroup', {
+            vpc: props.vpc,
+            port: 3000,
+            protocol: elbv2.ApplicationProtocol.HTTP,
+            targetType: elbv2.TargetType.IP,
+            healthCheck: {
+                path: '/',
+                interval: cdk.Duration.seconds(30),
+                timeout: cdk.Duration.seconds(5),
+                healthyThresholdCount: 2,
+                unhealthyThresholdCount: 3,
+                healthyHttpCodes: '200',
+            },
+            deregistrationDelay: cdk.Duration.seconds(30),
+        });
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 5.6 — Listener Rules: /api/* → backend, default → frontend
+        // ─────────────────────────────────────────────────────────────────────
+        httpListener.addAction('DefaultAction', {
+            action: elbv2.ListenerAction.forward([frontendTargetGroup]),
+        });
+
+        httpListener.addAction('ApiRoute', {
+            priority: 10,
+            conditions: [elbv2.ListenerCondition.pathPatterns(['/api/*'])],
+            action: elbv2.ListenerAction.forward([backendTargetGroup]),
+        });
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 5.7 — Task Execution Role (ECR pull + Secrets Manager read + CloudWatch logs)
+        // ─────────────────────────────────────────────────────────────────────
+        const taskExecutionRole = new iam.Role(this, 'TaskExecutionRole', {
+            assumedBy: new iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
+            description: 'ECS task execution role for pulling images and injecting secrets',
+        });
+
+        taskExecutionRole.addToPolicy(new iam.PolicyStatement({
+            sid: 'EcrPull',
+            effect: iam.Effect.ALLOW,
+            actions: [
+                'ecr:GetDownloadUrlForLayer',
+                'ecr:BatchGetImage',
+                'ecr:GetAuthorizationToken',
+            ],
+            resources: ['*'],
+        }));
+
+        taskExecutionRole.addToPolicy(new iam.PolicyStatement({
             sid: 'SecretsManagerRead',
             effect: iam.Effect.ALLOW,
             actions: ['secretsmanager:GetSecretValue'],
@@ -60,8 +151,37 @@ export class ComputeStack extends cdk.Stack {
             ],
         }));
 
-        // S3 read/write on assets bucket
-        backendInstanceRole.addToPolicy(new iam.PolicyStatement({
+        taskExecutionRole.addToPolicy(new iam.PolicyStatement({
+            sid: 'CloudWatchLogs',
+            effect: iam.Effect.ALLOW,
+            actions: [
+                'logs:CreateLogGroup',
+                'logs:CreateLogStream',
+                'logs:PutLogEvents',
+            ],
+            resources: ['*'],
+        }));
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 5.8 — Backend Task Role (Secrets Manager + S3 + CloudWatch)
+        // ─────────────────────────────────────────────────────────────────────
+        const backendTaskRole = new iam.Role(this, 'BackendTaskRole', {
+            assumedBy: new iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
+            description: 'Task role for backend ECS service',
+        });
+
+        backendTaskRole.addToPolicy(new iam.PolicyStatement({
+            sid: 'SecretsManagerRead',
+            effect: iam.Effect.ALLOW,
+            actions: ['secretsmanager:GetSecretValue'],
+            resources: [
+                props.dbSecret.secretArn,
+                props.jwtSecret.secretArn,
+                props.piiKeySecret.secretArn,
+            ],
+        }));
+
+        backendTaskRole.addToPolicy(new iam.PolicyStatement({
             sid: 'S3ReadWrite',
             effect: iam.Effect.ALLOW,
             actions: [
@@ -69,13 +189,10 @@ export class ComputeStack extends cdk.Stack {
                 's3:GetObject',
                 's3:DeleteObject',
             ],
-            resources: [
-                `${props.assetsBucket.bucketArn}/*`,
-            ],
+            resources: [`${props.assetsBucket.bucketArn}/*`],
         }));
 
-        // CloudWatch logs
-        backendInstanceRole.addToPolicy(new iam.PolicyStatement({
+        backendTaskRole.addToPolicy(new iam.PolicyStatement({
             sid: 'CloudWatchLogs',
             effect: iam.Effect.ALLOW,
             actions: [
@@ -85,13 +202,15 @@ export class ComputeStack extends cdk.Stack {
             resources: ['*'],
         }));
 
-        // 5.4 — IAM instance role for frontend (CloudWatch logs only)
-        const frontendInstanceRole = new iam.Role(this, 'FrontendInstanceRole', {
-            assumedBy: new iam.ServicePrincipal('tasks.apprunner.amazonaws.com'),
-            description: 'Instance role for frontend App Runner service',
+        // ─────────────────────────────────────────────────────────────────────
+        // 5.9 — Frontend Task Role (CloudWatch logs only)
+        // ─────────────────────────────────────────────────────────────────────
+        const frontendTaskRole = new iam.Role(this, 'FrontendTaskRole', {
+            assumedBy: new iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
+            description: 'Task role for frontend ECS service',
         });
 
-        frontendInstanceRole.addToPolicy(new iam.PolicyStatement({
+        frontendTaskRole.addToPolicy(new iam.PolicyStatement({
             sid: 'CloudWatchLogs',
             effect: iam.Effect.ALLOW,
             actions: [
@@ -101,183 +220,181 @@ export class ComputeStack extends cdk.Stack {
             resources: ['*'],
         }));
 
-        // 5.5 — IAM ECR access role (pull permissions on specific repos)
-        const ecrAccessRole = new iam.Role(this, 'EcrAccessRole', {
-            assumedBy: new iam.ServicePrincipal('build.apprunner.amazonaws.com'),
-            description: 'ECR access role for App Runner to pull images',
+        // ─────────────────────────────────────────────────────────────────────
+        // 5.10 — Backend Task Definition
+        // ─────────────────────────────────────────────────────────────────────
+        const backendLogGroup = new logs.LogGroup(this, 'BackendLogGroup', {
+            logGroupName: `/ecs/${props.environment}/backend`,
+            retention: isProduction ? logs.RetentionDays.THREE_MONTHS : logs.RetentionDays.ONE_MONTH,
+            removalPolicy: cdk.RemovalPolicy.DESTROY,
         });
 
-        ecrAccessRole.addToPolicy(new iam.PolicyStatement({
-            sid: 'EcrPullFromRepos',
-            effect: iam.Effect.ALLOW,
-            actions: [
-                'ecr:GetDownloadUrlForLayer',
-                'ecr:BatchGetImage',
-            ],
-            resources: [
-                props.backendRepoArn,
-                props.frontendRepoArn,
-            ],
-        }));
-
-        ecrAccessRole.addToPolicy(new iam.PolicyStatement({
-            sid: 'EcrGetAuthToken',
-            effect: iam.Effect.ALLOW,
-            actions: ['ecr:GetAuthorizationToken'],
-            resources: ['*'],
-        }));
-
-        // 5.6 — App Runner auto-scaling configuration per environment
-        const backendAutoScaling = new apprunner.CfnAutoScalingConfiguration(
-            this,
-            'BackendAutoScaling',
-            {
-                autoScalingConfigurationName: `${id}-backend-scaling`.toLowerCase(),
-                minSize: isProduction ? 1 : 1, // App Runner minimum is 1
-                maxSize: isProduction ? 6 : 2,
-                maxConcurrency: isProduction ? 80 : 50,
-            },
-        );
-
-        const frontendAutoScaling = new apprunner.CfnAutoScalingConfiguration(
-            this,
-            'FrontendAutoScaling',
-            {
-                autoScalingConfigurationName: `${id}-frontend-scaling`.toLowerCase(),
-                minSize: isProduction ? 1 : 1, // App Runner minimum is 1
-                maxSize: isProduction ? 4 : 2,
-                maxConcurrency: isProduction ? 100 : 80,
-            },
-        );
-
-        // 5.7 — Backend App Runner service
-        const backendService = new apprunner.CfnService(this, 'BackendService', {
-            serviceName: `${id}-backend`.toLowerCase(),
-            sourceConfiguration: {
-                imageRepository: {
-                    imageIdentifier: props.backendImageUri,
-                    imageRepositoryType: 'ECR',
-                    imageConfiguration: {
-                        port: '3000',
-                        runtimeEnvironmentVariables: [
-                            { name: 'DB_HOST', value: props.dbEndpointAddress },
-                            { name: 'DB_PORT', value: props.dbEndpointPort },
-                            { name: 'DB_NAME', value: 'rental_platform' },
-                            { name: 'REDIS_HOST', value: props.redisEndpoint },
-                            { name: 'REDIS_PORT', value: '6379' },
-                            { name: 'S3_BUCKET_NAME', value: props.assetsBucket.bucketName },
-                            { name: 'S3_REGION', value: cdk.Stack.of(this).region },
-                            { name: 'NODE_ENV', value: isProduction ? 'production' : 'development' },
-                            { name: 'PORT', value: '3000' },
-                        ],
-                        runtimeEnvironmentSecrets: [
-                            { name: 'DB_SECRET', value: props.dbSecret.secretArn },
-                            { name: 'JWT_SECRET', value: props.jwtSecret.secretArn },
-                            { name: 'PII_ENCRYPTION_KEY', value: props.piiKeySecret.secretArn },
-                        ],
-                    },
-                },
-                autoDeploymentsEnabled: true,
-                authenticationConfiguration: {
-                    accessRoleArn: ecrAccessRole.roleArn,
-                },
-            },
-            instanceConfiguration: {
-                instanceRoleArn: backendInstanceRole.roleArn,
-                cpu: String((isProduction ? 1 : 0.5) * 1024),
-                memory: String((isProduction ? 2 : 1) * 1024),
-            },
-            autoScalingConfigurationArn: backendAutoScaling.attrAutoScalingConfigurationArn,
-            healthCheckConfiguration: {
-                protocol: 'HTTP',
-                path: '/api/health',
-                interval: 10,
-                timeout: 5,
-                healthyThreshold: 1,
-                unhealthyThreshold: 3,
-            },
-            networkConfiguration: {
-                egressConfiguration: {
-                    egressType: 'VPC',
-                    vpcConnectorArn: vpcConnector.attrVpcConnectorArn,
-                },
+        const backendTaskDef = new ecs.FargateTaskDefinition(this, 'BackendTaskDef', {
+            cpu: isProduction ? 1024 : 512,
+            memoryLimitMiB: isProduction ? 2048 : 1024,
+            executionRole: taskExecutionRole,
+            taskRole: backendTaskRole,
+            runtimePlatform: {
+                cpuArchitecture: ecs.CpuArchitecture.X86_64,
+                operatingSystemFamily: ecs.OperatingSystemFamily.LINUX,
             },
         });
 
-        backendService.addDependency(vpcConnector);
+        backendTaskDef.addContainer('BackendContainer', {
+            image: ecs.ContainerImage.fromRegistry(props.backendImageUri),
+            containerName: 'backend',
+            portMappings: [{ containerPort: 3000, protocol: ecs.Protocol.TCP }],
+            environment: {
+                DB_HOST: props.dbEndpointAddress,
+                DB_PORT: props.dbEndpointPort,
+                DB_NAME: 'rental_platform',
+                REDIS_HOST: props.redisEndpoint,
+                REDIS_PORT: '6379',
+                S3_BUCKET_NAME: props.assetsBucket.bucketName,
+                S3_REGION: cdk.Stack.of(this).region,
+                NODE_ENV: isProduction ? 'production' : 'development',
+                PORT: '3000',
+            },
+            secrets: {
+                DB_SECRET: ecs.Secret.fromSecretsManager(props.dbSecret),
+                JWT_SECRET: ecs.Secret.fromSecretsManager(props.jwtSecret),
+                PII_ENCRYPTION_KEY: ecs.Secret.fromSecretsManager(props.piiKeySecret),
+            },
+            logging: ecs.LogDrivers.awsLogs({
+                logGroup: backendLogGroup,
+                streamPrefix: 'backend',
+            }),
+            essential: true,
+        });
 
-        // 5.8 — Frontend App Runner service
-        const frontendService = new apprunner.CfnService(this, 'FrontendService', {
-            serviceName: `${id}-frontend`.toLowerCase(),
-            sourceConfiguration: {
-                imageRepository: {
-                    imageIdentifier: props.frontendImageUri,
-                    imageRepositoryType: 'ECR',
-                    imageConfiguration: {
-                        port: '3000',
-                        runtimeEnvironmentVariables: [
-                            {
-                                name: 'NEXT_PUBLIC_API_URL',
-                                value: cdk.Fn.join('', [
-                                    'https://',
-                                    backendService.attrServiceUrl,
-                                ]),
-                            },
-                            { name: 'NODE_ENV', value: isProduction ? 'production' : 'development' },
-                            { name: 'PORT', value: '3000' },
-                        ],
-                    },
-                },
-                autoDeploymentsEnabled: true,
-                authenticationConfiguration: {
-                    accessRoleArn: ecrAccessRole.roleArn,
-                },
-            },
-            instanceConfiguration: {
-                instanceRoleArn: frontendInstanceRole.roleArn,
-                cpu: String((isProduction ? 0.5 : 0.25) * 1024),
-                memory: String((isProduction ? 1 : 0.5) * 1024),
-            },
-            autoScalingConfigurationArn: frontendAutoScaling.attrAutoScalingConfigurationArn,
-            healthCheckConfiguration: {
-                protocol: 'HTTP',
-                path: '/',
-                interval: 10,
-                timeout: 5,
-                healthyThreshold: 1,
-                unhealthyThreshold: 3,
-            },
-            networkConfiguration: {
-                egressConfiguration: {
-                    egressType: 'DEFAULT',
-                },
+        // ─────────────────────────────────────────────────────────────────────
+        // 5.11 — Frontend Task Definition
+        // ─────────────────────────────────────────────────────────────────────
+        const frontendLogGroup = new logs.LogGroup(this, 'FrontendLogGroup', {
+            logGroupName: `/ecs/${props.environment}/frontend`,
+            retention: isProduction ? logs.RetentionDays.THREE_MONTHS : logs.RetentionDays.ONE_MONTH,
+            removalPolicy: cdk.RemovalPolicy.DESTROY,
+        });
+
+        const frontendTaskDef = new ecs.FargateTaskDefinition(this, 'FrontendTaskDef', {
+            cpu: isProduction ? 512 : 256,
+            memoryLimitMiB: isProduction ? 1024 : 512,
+            executionRole: taskExecutionRole,
+            taskRole: frontendTaskRole,
+            runtimePlatform: {
+                cpuArchitecture: ecs.CpuArchitecture.X86_64,
+                operatingSystemFamily: ecs.OperatingSystemFamily.LINUX,
             },
         });
 
-        // 5.9 — Export service URLs and ARNs as stack outputs
-        this.backendServiceUrl = backendService.attrServiceUrl;
-        this.frontendServiceUrl = frontendService.attrServiceUrl;
-        this.backendServiceArn = backendService.attrServiceArn;
-        this.frontendServiceArn = frontendService.attrServiceArn;
-
-        new cdk.CfnOutput(this, 'BackendServiceUrl', {
-            value: backendService.attrServiceUrl,
-            description: 'Backend App Runner service URL',
+        frontendTaskDef.addContainer('FrontendContainer', {
+            image: ecs.ContainerImage.fromRegistry(props.frontendImageUri),
+            containerName: 'frontend',
+            portMappings: [{ containerPort: 3000, protocol: ecs.Protocol.TCP }],
+            environment: {
+                NEXT_PUBLIC_API_URL: `http://${alb.loadBalancerDnsName}`,
+                NODE_ENV: isProduction ? 'production' : 'development',
+                PORT: '3000',
+            },
+            logging: ecs.LogDrivers.awsLogs({
+                logGroup: frontendLogGroup,
+                streamPrefix: 'frontend',
+            }),
+            essential: true,
         });
 
-        new cdk.CfnOutput(this, 'FrontendServiceUrl', {
-            value: frontendService.attrServiceUrl,
-            description: 'Frontend App Runner service URL',
+        // ─────────────────────────────────────────────────────────────────────
+        // 5.12 — Backend Fargate Service
+        // ─────────────────────────────────────────────────────────────────────
+        const backendService = new ecs.FargateService(this, 'BackendService', {
+            cluster,
+            taskDefinition: backendTaskDef,
+            desiredCount: isProduction ? 2 : 1,
+            securityGroups: [props.ecsServiceSecurityGroup],
+            vpcSubnets: { subnets: props.privateSubnets },
+            assignPublicIp: false,
+            minHealthyPercent: 100,
+            maxHealthyPercent: 200,
+            serviceName: `${id}-backend-svc`.toLowerCase(),
+            circuitBreaker: { rollback: true },
+        });
+
+        backendService.attachToApplicationTargetGroup(backendTargetGroup);
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 5.13 — Frontend Fargate Service
+        // ─────────────────────────────────────────────────────────────────────
+        const frontendService = new ecs.FargateService(this, 'FrontendService', {
+            cluster,
+            taskDefinition: frontendTaskDef,
+            desiredCount: isProduction ? 2 : 1,
+            securityGroups: [props.ecsServiceSecurityGroup],
+            vpcSubnets: { subnets: props.privateSubnets },
+            assignPublicIp: false,
+            minHealthyPercent: 100,
+            maxHealthyPercent: 200,
+            serviceName: `${id}-frontend-svc`.toLowerCase(),
+            circuitBreaker: { rollback: true },
+        });
+
+        frontendService.attachToApplicationTargetGroup(frontendTargetGroup);
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 5.14 — Auto Scaling (target tracking on CPU 70%)
+        // ─────────────────────────────────────────────────────────────────────
+        const backendScaling = backendService.autoScaleTaskCount({
+            minCapacity: isProduction ? 2 : 1,
+            maxCapacity: isProduction ? 6 : 2,
+        });
+
+        backendScaling.scaleOnCpuUtilization('BackendCpuScaling', {
+            targetUtilizationPercent: 70,
+            scaleInCooldown: cdk.Duration.seconds(60),
+            scaleOutCooldown: cdk.Duration.seconds(60),
+        });
+
+        const frontendScaling = frontendService.autoScaleTaskCount({
+            minCapacity: isProduction ? 2 : 1,
+            maxCapacity: isProduction ? 4 : 2,
+        });
+
+        frontendScaling.scaleOnCpuUtilization('FrontendCpuScaling', {
+            targetUtilizationPercent: 70,
+            scaleInCooldown: cdk.Duration.seconds(60),
+            scaleOutCooldown: cdk.Duration.seconds(60),
+        });
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 5.15 — Export outputs
+        // ─────────────────────────────────────────────────────────────────────
+        this.albDnsName = alb.loadBalancerDnsName;
+        this.albArn = alb.loadBalancerArn;
+        this.albFullName = alb.loadBalancerFullName;
+        this.backendTargetGroupFullName = backendTargetGroup.targetGroupFullName;
+        this.backendServiceArn = backendService.serviceArn;
+        this.frontendServiceArn = frontendService.serviceArn;
+        this.ecsClusterName = cluster.clusterName;
+        this.backendServiceName = backendService.serviceName;
+        this.frontendServiceName = frontendService.serviceName;
+
+        new cdk.CfnOutput(this, 'AlbDnsName', {
+            value: alb.loadBalancerDnsName,
+            description: 'ALB DNS name',
+        });
+
+        new cdk.CfnOutput(this, 'AlbArn', {
+            value: alb.loadBalancerArn,
+            description: 'ALB ARN',
         });
 
         new cdk.CfnOutput(this, 'BackendServiceArn', {
-            value: backendService.attrServiceArn,
-            description: 'Backend App Runner service ARN',
+            value: backendService.serviceArn,
+            description: 'Backend ECS service ARN',
         });
 
         new cdk.CfnOutput(this, 'FrontendServiceArn', {
-            value: frontendService.attrServiceArn,
-            description: 'Frontend App Runner service ARN',
+            value: frontendService.serviceArn,
+            description: 'Frontend ECS service ARN',
         });
     }
 }

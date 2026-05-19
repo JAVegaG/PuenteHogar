@@ -21,7 +21,12 @@ function createComputeStack(environment: 'staging' | 'production'): Template {
         ],
     });
 
-    const vpcConnectorSg = new ec2.SecurityGroup(vpcStack, 'VpcConnectorSg', {
+    const ecsServiceSg = new ec2.SecurityGroup(vpcStack, 'EcsServiceSg', {
+        vpc,
+        allowAllOutbound: false,
+    });
+
+    const albSg = new ec2.SecurityGroup(vpcStack, 'AlbSg', {
         vpc,
         allowAllOutbound: false,
     });
@@ -34,7 +39,9 @@ function createComputeStack(environment: 'staging' | 'production'): Template {
     const stack = new ComputeStack(app, 'TestCompute', {
         vpc,
         privateSubnets: vpc.selectSubnets({ subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }).subnets,
-        vpcConnectorSecurityGroup: vpcConnectorSg,
+        publicSubnets: vpc.selectSubnets({ subnetType: ec2.SubnetType.PUBLIC }).subnets,
+        ecsServiceSecurityGroup: ecsServiceSg,
+        albSecurityGroup: albSg,
         dbSecret,
         jwtSecret,
         piiKeySecret,
@@ -59,67 +66,108 @@ describe('ComputeStack — Staging', () => {
         template = createComputeStack('staging');
     });
 
-    test('creates two App Runner services (backend and frontend)', () => {
-        template.resourceCountIs('AWS::AppRunner::Service', 2);
+    test('creates an ECS cluster', () => {
+        template.resourceCountIs('AWS::ECS::Cluster', 1);
     });
 
-    test('creates a VPC Connector', () => {
-        template.hasResourceProperties('AWS::AppRunner::VpcConnector', {
-            Subnets: Match.anyValue(),
-            SecurityGroups: Match.anyValue(),
+    test('creates an Application Load Balancer', () => {
+        template.hasResourceProperties('AWS::ElasticLoadBalancingV2::LoadBalancer', {
+            Scheme: 'internet-facing',
+            Type: 'application',
         });
     });
 
-    test('backend service has VPC egress configuration', () => {
-        template.hasResourceProperties('AWS::AppRunner::Service', {
-            NetworkConfiguration: {
-                EgressConfiguration: {
-                    EgressType: 'VPC',
-                    VpcConnectorArn: Match.anyValue(),
-                },
+    test('creates an HTTP listener on port 80', () => {
+        template.hasResourceProperties('AWS::ElasticLoadBalancingV2::Listener', {
+            Port: 80,
+            Protocol: 'HTTP',
+        });
+    });
+
+    test('creates backend target group with health check at /api/health', () => {
+        template.hasResourceProperties('AWS::ElasticLoadBalancingV2::TargetGroup', {
+            Port: 3000,
+            Protocol: 'HTTP',
+            TargetType: 'ip',
+            HealthCheckPath: '/api/health',
+        });
+    });
+
+    test('creates frontend target group with health check at /', () => {
+        template.hasResourceProperties('AWS::ElasticLoadBalancingV2::TargetGroup', {
+            Port: 3000,
+            Protocol: 'HTTP',
+            TargetType: 'ip',
+            HealthCheckPath: '/',
+        });
+    });
+
+    test('creates two target groups', () => {
+        template.resourceCountIs('AWS::ElasticLoadBalancingV2::TargetGroup', 2);
+    });
+
+    test('creates listener rule for /api/* path', () => {
+        template.hasResourceProperties('AWS::ElasticLoadBalancingV2::ListenerRule', {
+            Conditions: Match.arrayWith([
+                Match.objectLike({
+                    Field: 'path-pattern',
+                    PathPatternConfig: {
+                        Values: ['/api/*'],
+                    },
+                }),
+            ]),
+        });
+    });
+
+    test('creates two ECS Fargate services', () => {
+        template.resourceCountIs('AWS::ECS::Service', 2);
+    });
+
+    test('backend Fargate service has desiredCount 1 in staging', () => {
+        template.hasResourceProperties('AWS::ECS::Service', {
+            DesiredCount: 1,
+            LaunchType: 'FARGATE',
+        });
+    });
+
+    test('creates two Fargate task definitions', () => {
+        template.resourceCountIs('AWS::ECS::TaskDefinition', 2);
+    });
+
+    test('backend task definition has correct CPU/memory for staging', () => {
+        template.hasResourceProperties('AWS::ECS::TaskDefinition', {
+            Cpu: '512',
+            Memory: '1024',
+            RequiresCompatibilities: ['FARGATE'],
+        });
+    });
+
+    test('frontend task definition has correct CPU/memory for staging', () => {
+        template.hasResourceProperties('AWS::ECS::TaskDefinition', {
+            Cpu: '256',
+            Memory: '512',
+            RequiresCompatibilities: ['FARGATE'],
+        });
+    });
+
+    test('creates task execution role with ECR pull permissions', () => {
+        template.hasResourceProperties('AWS::IAM::Policy', {
+            PolicyDocument: {
+                Statement: Match.arrayWith([
+                    Match.objectLike({
+                        Action: Match.arrayWith([
+                            'ecr:GetDownloadUrlForLayer',
+                            'ecr:BatchGetImage',
+                            'ecr:GetAuthorizationToken',
+                        ]),
+                        Effect: 'Allow',
+                    }),
+                ]),
             },
         });
     });
 
-    test('frontend service has DEFAULT egress (no VPC Connector)', () => {
-        template.hasResourceProperties('AWS::AppRunner::Service', {
-            NetworkConfiguration: {
-                EgressConfiguration: {
-                    EgressType: 'DEFAULT',
-                },
-            },
-        });
-    });
-
-    test('backend service has health check at /api/health', () => {
-        template.hasResourceProperties('AWS::AppRunner::Service', {
-            HealthCheckConfiguration: {
-                Protocol: 'HTTP',
-                Path: '/api/health',
-            },
-        });
-    });
-
-    test('frontend service has health check at /', () => {
-        template.hasResourceProperties('AWS::AppRunner::Service', {
-            HealthCheckConfiguration: {
-                Protocol: 'HTTP',
-                Path: '/',
-            },
-        });
-    });
-
-    test('creates auto-scaling configurations', () => {
-        template.resourceCountIs('AWS::AppRunner::AutoScalingConfiguration', 2);
-    });
-
-    test('staging backend auto-scaling has maxSize 2', () => {
-        template.hasResourceProperties('AWS::AppRunner::AutoScalingConfiguration', {
-            MaxSize: 2,
-        });
-    });
-
-    test('creates IAM instance role for backend with Secrets Manager read', () => {
+    test('creates backend task role with Secrets Manager read', () => {
         template.hasResourceProperties('AWS::IAM::Policy', {
             PolicyDocument: {
                 Statement: Match.arrayWith([
@@ -132,7 +180,7 @@ describe('ComputeStack — Staging', () => {
         });
     });
 
-    test('creates IAM instance role for backend with S3 read/write', () => {
+    test('creates backend task role with S3 read/write', () => {
         template.hasResourceProperties('AWS::IAM::Policy', {
             PolicyDocument: {
                 Statement: Match.arrayWith([
@@ -149,36 +197,20 @@ describe('ComputeStack — Staging', () => {
         });
     });
 
-    test('creates ECR access role with pull permissions', () => {
-        template.hasResourceProperties('AWS::IAM::Policy', {
-            PolicyDocument: {
-                Statement: Match.arrayWith([
-                    Match.objectLike({
-                        Action: Match.arrayWith([
-                            'ecr:GetDownloadUrlForLayer',
-                            'ecr:BatchGetImage',
-                        ]),
-                        Effect: 'Allow',
-                    }),
-                ]),
-            },
+    test('configures auto-scaling for services', () => {
+        template.hasResourceProperties('AWS::ApplicationAutoScaling::ScalableTarget', {
+            MinCapacity: 1,
+            MaxCapacity: 2,
         });
     });
 
-    test('backend App Runner service uses ECR image source', () => {
-        template.hasResourceProperties('AWS::AppRunner::Service', {
-            SourceConfiguration: {
-                ImageRepository: Match.objectLike({
-                    ImageRepositoryType: 'ECR',
-                }),
-            },
-        });
-    });
-
-    test('auto-deploy is enabled', () => {
-        template.hasResourceProperties('AWS::AppRunner::Service', {
-            SourceConfiguration: Match.objectLike({
-                AutoDeploymentsEnabled: true,
+    test('configures target tracking scaling policy on CPU', () => {
+        template.hasResourceProperties('AWS::ApplicationAutoScaling::ScalingPolicy', {
+            TargetTrackingScalingPolicyConfiguration: Match.objectLike({
+                TargetValue: 70,
+                PredefinedMetricSpecification: {
+                    PredefinedMetricType: 'ECSServiceAverageCPUUtilization',
+                },
             }),
         });
     });
@@ -191,21 +223,40 @@ describe('ComputeStack — Production', () => {
         template = createComputeStack('production');
     });
 
-    test('production backend auto-scaling has maxSize 6', () => {
-        template.hasResourceProperties('AWS::AppRunner::AutoScalingConfiguration', {
-            MaxSize: 6,
+    test('production backend task definition has 1024 CPU and 2048 memory', () => {
+        template.hasResourceProperties('AWS::ECS::TaskDefinition', {
+            Cpu: '1024',
+            Memory: '2048',
+            RequiresCompatibilities: ['FARGATE'],
         });
     });
 
-    test('production frontend auto-scaling has maxSize 4', () => {
-        template.hasResourceProperties('AWS::AppRunner::AutoScalingConfiguration', {
-            MaxSize: 4,
+    test('production frontend task definition has 512 CPU and 1024 memory', () => {
+        template.hasResourceProperties('AWS::ECS::TaskDefinition', {
+            Cpu: '512',
+            Memory: '1024',
+            RequiresCompatibilities: ['FARGATE'],
         });
     });
 
-    test('production backend maxConcurrency is 80', () => {
-        template.hasResourceProperties('AWS::AppRunner::AutoScalingConfiguration', {
-            MaxConcurrency: 80,
+    test('production backend auto-scaling has maxCapacity 6', () => {
+        template.hasResourceProperties('AWS::ApplicationAutoScaling::ScalableTarget', {
+            MinCapacity: 2,
+            MaxCapacity: 6,
+        });
+    });
+
+    test('production frontend auto-scaling has maxCapacity 4', () => {
+        template.hasResourceProperties('AWS::ApplicationAutoScaling::ScalableTarget', {
+            MinCapacity: 2,
+            MaxCapacity: 4,
+        });
+    });
+
+    test('production services have desiredCount 2', () => {
+        template.hasResourceProperties('AWS::ECS::Service', {
+            DesiredCount: 2,
+            LaunchType: 'FARGATE',
         });
     });
 });

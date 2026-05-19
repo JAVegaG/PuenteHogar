@@ -17,8 +17,12 @@ function createMonitoringStack(environment: 'staging' | 'production'): Template 
     });
 
     const stack = new MonitoringStack(app, 'TestMonitoring', {
-        backendServiceArn: 'arn:aws:apprunner:us-east-1:123456789012:service/backend-service/abc123',
-        frontendServiceArn: 'arn:aws:apprunner:us-east-1:123456789012:service/frontend-service/def456',
+        albArn: 'arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/test-alb/abc123',
+        albFullName: 'app/test-alb/abc123',
+        backendTargetGroupFullName: 'targetgroup/backend-tg/def456',
+        ecsClusterName: 'test-cluster',
+        backendServiceName: 'test-backend-svc',
+        frontendServiceName: 'test-frontend-svc',
         dbInstance,
         environment,
     });
@@ -37,9 +41,9 @@ describe('MonitoringStack — Staging', () => {
         template.resourceCountIs('AWS::SNS::Topic', 1);
     });
 
-    test('creates API latency alarm with 800ms threshold', () => {
+    test('creates API latency alarm with 0.8s threshold (ALB reports in seconds)', () => {
         template.hasResourceProperties('AWS::CloudWatch::Alarm', {
-            Threshold: 800,
+            Threshold: 0.8,
             ComparisonOperator: 'GreaterThanThreshold',
         });
     });

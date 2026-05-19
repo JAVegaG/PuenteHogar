@@ -8,18 +8,18 @@ export interface EnvironmentConfig {
 
     readonly compute: {
         readonly backend: {
-            readonly cpu: 0.25 | 0.5 | 1 | 2 | 4;
-            readonly memory: 0.5 | 1 | 2 | 3 | 4 | 6 | 8 | 10 | 12;
-            readonly minInstances: number;
-            readonly maxInstances: number;
-            readonly maxConcurrency: number;
+            readonly cpu: number;
+            readonly memory: number;
+            readonly desiredCount: number;
+            readonly minCapacity: number;
+            readonly maxCapacity: number;
         };
         readonly frontend: {
-            readonly cpu: 0.25 | 0.5 | 1 | 2 | 4;
-            readonly memory: 0.5 | 1 | 2 | 3 | 4 | 6 | 8 | 10 | 12;
-            readonly minInstances: number;
-            readonly maxInstances: number;
-            readonly maxConcurrency: number;
+            readonly cpu: number;
+            readonly memory: number;
+            readonly desiredCount: number;
+            readonly minCapacity: number;
+            readonly maxCapacity: number;
         };
     };
 

@@ -60,7 +60,11 @@ describe('Snapshot Tests', () => {
                 { name: 'Data', subnetType: ec2.SubnetType.PRIVATE_ISOLATED, cidrMask: 24 },
             ],
         });
-        const vpcConnectorSg = new ec2.SecurityGroup(vpcStack, 'VpcConnectorSg', {
+        const ecsServiceSg = new ec2.SecurityGroup(vpcStack, 'EcsServiceSg', {
+            vpc,
+            allowAllOutbound: false,
+        });
+        const albSg = new ec2.SecurityGroup(vpcStack, 'AlbSg', {
             vpc,
             allowAllOutbound: false,
         });
@@ -72,7 +76,9 @@ describe('Snapshot Tests', () => {
         const stack = new ComputeStack(app, 'SnapshotCompute', {
             vpc,
             privateSubnets: vpc.selectSubnets({ subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }).subnets,
-            vpcConnectorSecurityGroup: vpcConnectorSg,
+            publicSubnets: vpc.selectSubnets({ subnetType: ec2.SubnetType.PUBLIC }).subnets,
+            ecsServiceSecurityGroup: ecsServiceSg,
+            albSecurityGroup: albSg,
             dbSecret,
             jwtSecret,
             piiKeySecret,
@@ -95,8 +101,6 @@ describe('Snapshot Tests', () => {
         const app = new cdk.App();
 
         // For snapshot, we test a simplified CDN stack with bucket in same stack
-        // to avoid the cross-stack OAI cyclic dependency.
-        // Full CDN behavior is verified in cdn-stack.test.ts assertion tests.
         const stack = new cdk.Stack(app, 'SnapshotCdn');
         new s3.Bucket(stack, 'AssetsBucket');
         new (require('aws-cdk-lib/aws-wafv2').CfnWebACL)(stack, 'WebAcl', {
@@ -121,8 +125,12 @@ describe('Snapshot Tests', () => {
         });
 
         const stack = new MonitoringStack(app, 'SnapshotMonitoring', {
-            backendServiceArn: 'arn:aws:apprunner:us-east-1:123456789012:service/backend-service/abc123',
-            frontendServiceArn: 'arn:aws:apprunner:us-east-1:123456789012:service/frontend-service/def456',
+            albArn: 'arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/test-alb/abc123',
+            albFullName: 'app/test-alb/abc123',
+            backendTargetGroupFullName: 'targetgroup/backend-tg/def456',
+            ecsClusterName: 'test-cluster',
+            backendServiceName: 'test-backend-svc',
+            frontendServiceName: 'test-frontend-svc',
             dbInstance,
             environment: 'staging',
         });

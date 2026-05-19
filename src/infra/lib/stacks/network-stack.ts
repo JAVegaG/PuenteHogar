@@ -11,9 +11,11 @@ export interface NetworkStackProps extends cdk.StackProps {
 
 export class NetworkStack extends cdk.Stack {
     public readonly vpc: ec2.IVpc;
+    public readonly publicSubnets: ec2.ISubnet[];
     public readonly privateSubnets: ec2.ISubnet[];
     public readonly dataSubnets: ec2.ISubnet[];
-    public readonly vpcConnectorSecurityGroup: ec2.ISecurityGroup;
+    public readonly ecsServiceSecurityGroup: ec2.ISecurityGroup;
+    public readonly albSecurityGroup: ec2.ISecurityGroup;
     public readonly dataSecurityGroup: ec2.ISecurityGroup;
 
     // Override availabilityZones to avoid AWS API calls during synthesis
@@ -25,7 +27,7 @@ export class NetworkStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props: NetworkStackProps) {
         super(scope, id, props);
 
-        // 2.1 — VPC with CIDR 10.0.0.0/16, 2 AZs, public + private + isolated subnets, NAT Gateway
+        // VPC with CIDR 10.0.0.0/16, 2 AZs, public + private + isolated subnets, NAT Gateway
         const vpc = new ec2.Vpc(this, 'Vpc', {
             ipAddresses: ec2.IpAddresses.cidr('10.0.0.0/16'),
             maxAzs: props.maxAzs,
@@ -49,44 +51,80 @@ export class NetworkStack extends cdk.Stack {
             ],
         });
 
-        // 2.3 — Data security group (inbound rules added below)
+        // Data security group (inbound rules added below)
         const dataSg = new ec2.SecurityGroup(this, 'DataSecurityGroup', {
             vpc,
             description: 'Security group for data stores (RDS, Redis)',
             allowAllOutbound: false,
         });
 
-        // 2.2 — VPC Connector security group (outbound to data SG on ports 5432, 6379 only)
-        const vpcConnectorSg = new ec2.SecurityGroup(this, 'VpcConnectorSecurityGroup', {
+        // ECS Service security group (outbound to data SG on ports 5432, 6379; outbound to internet for ECR pulls)
+        const ecsServiceSg = new ec2.SecurityGroup(this, 'EcsServiceSecurityGroup', {
             vpc,
-            description: 'Security group for App Runner VPC Connector',
+            description: 'Security group for ECS Fargate services',
             allowAllOutbound: false,
         });
 
-        vpcConnectorSg.addEgressRule(
+        ecsServiceSg.addEgressRule(
             dataSg,
             ec2.Port.tcp(5432),
             'Allow outbound to data SG on PostgreSQL port',
         );
-        vpcConnectorSg.addEgressRule(
+        ecsServiceSg.addEgressRule(
             dataSg,
             ec2.Port.tcp(6379),
             'Allow outbound to data SG on Redis port',
         );
+        // Outbound to internet on port 443 for ECR image pulls via NAT Gateway
+        ecsServiceSg.addEgressRule(
+            ec2.Peer.anyIpv4(),
+            ec2.Port.tcp(443),
+            'Allow outbound HTTPS for ECR image pulls via NAT',
+        );
 
-        // 2.3 — Data SG inbound from VPC Connector SG on ports 5432, 6379
+        // Data SG inbound from ECS Service SG on ports 5432, 6379
         dataSg.addIngressRule(
-            vpcConnectorSg,
+            ecsServiceSg,
             ec2.Port.tcp(5432),
-            'Allow inbound from VPC Connector SG on PostgreSQL port',
+            'Allow inbound from ECS Service SG on PostgreSQL port',
         );
         dataSg.addIngressRule(
-            vpcConnectorSg,
+            ecsServiceSg,
             ec2.Port.tcp(6379),
-            'Allow inbound from VPC Connector SG on Redis port',
+            'Allow inbound from ECS Service SG on Redis port',
         );
 
-        // 2.5 — EIC Endpoint security group (outbound to data SG on port 5432 only)
+        // ALB security group (inbound 80/443 from internet, outbound to ECS service SG on port 3000)
+        const albSg = new ec2.SecurityGroup(this, 'AlbSecurityGroup', {
+            vpc,
+            description: 'Security group for Application Load Balancer',
+            allowAllOutbound: false,
+        });
+
+        albSg.addIngressRule(
+            ec2.Peer.anyIpv4(),
+            ec2.Port.tcp(80),
+            'Allow inbound HTTP from internet',
+        );
+        albSg.addIngressRule(
+            ec2.Peer.anyIpv4(),
+            ec2.Port.tcp(443),
+            'Allow inbound HTTPS from internet',
+        );
+        albSg.addEgressRule(
+            ecsServiceSg,
+            ec2.Port.tcp(3000),
+            'Allow outbound to ECS service SG on application port',
+        );
+
+        // ECS Service SG inbound from ALB SG on port 3000
+        ecsServiceSg.addIngressRule(
+            albSg,
+            ec2.Port.tcp(3000),
+            'Allow inbound from ALB on application port',
+        );
+
+        // EIC Endpoint security group (outbound to data SG on port 5432 only)
         const eicSg = new ec2.SecurityGroup(this, 'EicEndpointSecurityGroup', {
             vpc,
             description: 'Security group for EC2 Instance Connect Endpoint',
@@ -99,14 +137,14 @@ export class NetworkStack extends cdk.Stack {
             'Allow outbound to data SG on PostgreSQL port',
         );
 
-        // 2.5 — Data SG also allows inbound from EIC SG on port 5432
+        // Data SG also allows inbound from EIC SG on port 5432
         dataSg.addIngressRule(
             eicSg,
             ec2.Port.tcp(5432),
             'Allow inbound from EIC Endpoint SG on PostgreSQL port',
         );
 
-        // 2.4 — EC2 Instance Connect Endpoint in the VPC for secure developer access to RDS
+        // EC2 Instance Connect Endpoint in the VPC for secure developer access to RDS
         new ec2.CfnInstanceConnectEndpoint(this, 'EicEndpoint', {
             subnetId: vpc.selectSubnets({
                 subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
@@ -115,7 +153,7 @@ export class NetworkStack extends cdk.Stack {
             preserveClientIp: false,
         });
 
-        // 2.6 — VPC Flow Logs to CloudWatch Logs
+        // VPC Flow Logs to CloudWatch Logs
         vpc.addFlowLog('FlowLog', {
             destination: ec2.FlowLogDestination.toCloudWatchLogs(
                 new logs.LogGroup(this, 'VpcFlowLogGroup', {
@@ -128,15 +166,19 @@ export class NetworkStack extends cdk.Stack {
             trafficType: ec2.FlowLogTrafficType.ALL,
         });
 
-        // 2.7 — Export all outputs as stack properties for cross-stack references
+        // Export all outputs as stack properties for cross-stack references
         this.vpc = vpc;
+        this.publicSubnets = vpc.selectSubnets({
+            subnetType: ec2.SubnetType.PUBLIC,
+        }).subnets;
         this.privateSubnets = vpc.selectSubnets({
             subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
         }).subnets;
         this.dataSubnets = vpc.selectSubnets({
             subnetType: ec2.SubnetType.PRIVATE_ISOLATED,
         }).subnets;
-        this.vpcConnectorSecurityGroup = vpcConnectorSg;
+        this.ecsServiceSecurityGroup = ecsServiceSg;
+        this.albSecurityGroup = albSg;
         this.dataSecurityGroup = dataSg;
     }
 }

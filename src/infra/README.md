@@ -4,16 +4,25 @@ Infrastructure as Code for the rental platform, using AWS CDK with TypeScript.
 
 ## Architecture
 
-The infrastructure is organized into modular CDK stacks:
+The infrastructure uses **ECS Fargate** for compute with an **Application Load Balancer (ALB)** for ingress and path-based routing. CloudFront sits in front for caching, WAF protection, and TLS termination.
 
 | Stack | Purpose |
 |-------|---------|
-| **NetworkStack** | VPC, subnets, NAT Gateway, security groups, EC2 Instance Connect Endpoint |
+| **NetworkStack** | VPC, subnets, NAT Gateway, security groups (ECS, ALB, Data, EIC), EC2 Instance Connect Endpoint |
 | **DataStack** | RDS PostgreSQL 16, ElastiCache Redis 7, S3 bucket, Secrets Manager |
 | **CiStack** | ECR repositories, GitHub Actions IAM role |
-| **ComputeStack** | App Runner services (backend + frontend), VPC Connector, IAM roles |
-| **CdnStack** | CloudFront distribution, WAF Web ACL, ACM certificate |
-| **MonitoringStack** | CloudWatch alarms, dashboards, log groups, SNS notifications |
+| **ComputeStack** | ECS Cluster, ALB, Fargate services (backend + frontend), task definitions, IAM roles, auto-scaling |
+| **CdnStack** | CloudFront distribution (ALB + S3 origins), WAF Web ACL, ACM certificate |
+| **MonitoringStack** | CloudWatch alarms (ALB/ECS metrics), dashboards, log groups, SNS notifications |
+
+### Request Flow
+
+```
+User → CloudFront (TLS) → WAF → ALB (HTTP, port 80)
+  /api/*    → Backend Target Group → ECS Backend Service (private subnet)
+  /assets/* → S3 (via OAC)
+  default   → Frontend Target Group → ECS Frontend Service (private subnet)
+```
 
 For the full architecture diagram and design rationale, see:
 [`.kiro/specs/aws-infrastructure-deployment/design.md`](../../.kiro/specs/aws-infrastructure-deployment/design.md)
@@ -59,7 +68,7 @@ This creates the CDKToolkit CloudFormation stack with an S3 bucket for assets an
 npm run deploy:staging
 ```
 
-This runs `cdk deploy --all -c env=staging` — deploys all stacks with staging configuration (scale-to-zero, single-AZ DB, smaller instances).
+This runs `cdk deploy --all -c env=staging` — deploys all stacks with staging configuration (single task per service, single-AZ DB, smaller task definitions).
 
 ### Production
 
@@ -67,7 +76,7 @@ This runs `cdk deploy --all -c env=staging` — deploys all stacks with staging 
 npm run deploy:production
 ```
 
-This runs `cdk deploy --all -c env=production --require-approval broadening` — deploys all stacks with production configuration (warm instances, Multi-AZ DB, WAF enabled). Requires manual approval for IAM/security changes.
+This runs `cdk deploy --all -c env=production --require-approval broadening` — deploys all stacks with production configuration (2+ tasks per service, Multi-AZ DB, larger task definitions, container insights). Requires manual approval for IAM/security changes.
 
 ## Common Commands
 
@@ -105,13 +114,13 @@ All environment variables are defined in CDK code — **zero manual configuratio
 ### Adding a New Non-Sensitive Variable
 
 1. Edit `lib/stacks/compute-stack.ts`
-2. Add the variable to the `runtimeEnvironmentVariables` array of the appropriate App Runner service:
+2. Add the variable to the `environment` map of the appropriate container definition:
 
 ```typescript
-runtimeEnvironmentVariables: [
+environment: {
     // ... existing vars
-    { name: 'MY_NEW_VAR', value: 'my-value' },
-],
+    MY_NEW_VAR: 'my-value',
+},
 ```
 
 3. If the value comes from another stack (e.g., a resource endpoint), pass it through stack props.
@@ -127,26 +136,22 @@ const myNewSecret = new secretsmanager.Secret(this, 'MyNewSecret', {
 });
 ```
 
-2. Pass the secret ARN to `ComputeStack` via props.
-3. Add it to the `runtimeEnvironmentSecrets` array in `compute-stack.ts`:
+2. Pass the secret to `ComputeStack` via props.
+3. Add it to the `secrets` map in the container definition:
 
 ```typescript
-runtimeEnvironmentSecrets: [
+secrets: {
     // ... existing secrets
-    { name: 'MY_NEW_SECRET', value: myNewSecret.secretArn },
-],
+    MY_NEW_SECRET: ecs.Secret.fromSecretsManager(props.myNewSecret),
+},
 ```
 
-4. Grant the backend instance role read access:
-
-```typescript
-myNewSecret.grantRead(backendInstanceRole);
-```
+4. Ensure the task execution role has `secretsmanager:GetSecretValue` on the secret ARN (already handled if you add it to the existing policy statement).
 
 ### How It Works
 
-- **Non-sensitive vars** (`runtimeEnvironmentVariables`): Resolved at deploy time from CDK cross-stack references (DB host, Redis endpoint, S3 bucket name, etc.)
-- **Sensitive vars** (`runtimeEnvironmentSecrets`): Reference Secrets Manager ARNs — App Runner resolves them at runtime, values never appear in CloudFormation templates.
+- **Non-sensitive vars** (`environment`): Resolved at deploy time from CDK cross-stack references (DB host, Redis endpoint, S3 bucket name, etc.)
+- **Sensitive vars** (`secrets`): Reference Secrets Manager ARNs — ECS resolves them at container start, values never appear in CloudFormation templates.
 
 ## Database Access via EC2 Instance Connect Endpoint
 
@@ -233,15 +238,17 @@ src/infra/
 
 | Setting | Staging | Production |
 |---------|---------|------------|
-| Backend min instances | 1 | 1 |
-| Backend max instances | 2 | 6 |
-| Frontend min instances | 1 | 1 |
-| Frontend max instances | 2 | 4 |
+| Backend CPU/Memory | 512 / 1024 MB | 1024 / 2048 MB |
+| Backend desired/min/max | 1 / 1 / 2 | 2 / 2 / 6 |
+| Frontend CPU/Memory | 256 / 512 MB | 512 / 1024 MB |
+| Frontend desired/min/max | 1 / 1 / 2 | 2 / 2 / 4 |
+| Auto-scaling target | CPU 70% | CPU 70% |
 | RDS instance | db.t3.micro | db.t3.medium |
 | RDS Multi-AZ | No | Yes |
 | RDS backup retention | 7 days | 30 days |
 | Redis node type | cache.t3.micro | cache.t3.small |
 | Log retention | 30 days | 90 days |
+| Container Insights | Disabled | Enhanced |
 
 ## Troubleshooting
 
@@ -255,8 +262,23 @@ The backend Dockerfile sets a dummy `DATABASE_URL` during build for Prisma clien
 
 ### Stack deployment fails with "Resource limit exceeded"
 
-Check your AWS account service quotas. App Runner, VPC, and NAT Gateway have default limits that may need increasing.
+Check your AWS account service quotas. ECS, VPC, and NAT Gateway have default limits that may need increasing.
 
-### App Runner service stuck in "Operation in progress"
+### ECS service stuck in "deployment in progress"
 
-App Runner deployments can take 5-10 minutes. If stuck longer, check the service events in the AWS Console or CloudWatch logs.
+ECS rolling deployments wait for new tasks to pass health checks. If stuck:
+1. Check CloudWatch logs for the service (`/ecs/{env}/backend` or `/ecs/{env}/frontend`)
+2. Verify the health check endpoint is responding (backend: `/api/health`, frontend: `/`)
+3. Check the ALB target group health in the AWS Console
+4. The circuit breaker will automatically roll back after repeated failures
+
+### Force a new deployment
+
+To force ECS to pull the latest image and redeploy:
+
+```bash
+aws ecs update-service \
+    --cluster CLUSTER_NAME \
+    --service SERVICE_NAME \
+    --force-new-deployment
+```
