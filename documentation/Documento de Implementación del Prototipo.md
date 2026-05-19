@@ -5,9 +5,9 @@
 El propósito de este documento es describir el proceso de implementación del prototipo funcional de la plataforma de gestión de arriendo de vivienda urbana, documentando la metodología de desarrollo utilizada, las herramientas empleadas, las decisiones tomadas durante la construcción y los mecanismos de automatización que permitieron acelerar y estandarizar el flujo de trabajo. Este documento complementa el Documento de Especificación de Requisitos de Software (SRS) y el Diseño Arquitectónico y Funcional, cerrando el ciclo documental del proyecto al cubrir la fase de construcción.
 ## Enfoque metodológico: Spec-Driven Development (SDD)
 La implementación adoptó un enfoque de **Spec-Driven Development (SDD)**, una metodología de desarrollo asistida por agentes de IA donde cada funcionalidad se especifica formalmente antes de su implementación a través de tres artefactos estructurados:
-1. [**requirements.md**](http://requirements.md) — Documento de requisitos con criterios de aceptación verificables
-2. [**design.md**](http://design.md) — Documento de diseño técnico con decisiones de implementación
-3. [**tasks.md**](http://tasks.md) — Lista de tareas ordenadas con checkpoints de verificación
+1. **requirements.md:** Documento de requisitos con criterios de aceptación verificables
+2. **design.md:** Documento de diseño técnico con decisiones de implementación
+3. **tasks.md:** Lista de tareas ordenadas con checkpoints de verificación
 Este flujo permite que el agente de IA trabaje de forma autónoma sobre tareas bien definidas, mientras el desarrollador mantiene control sobre el alcance, las decisiones de diseño y la calidad del resultado, bajo la hipótesis de reducir la subjetividad que queda por parte de la interpretación del agente, y por tanto la diferencia entre lo que se espera y lo que se obtiene. El ciclo SDD se repite iterativamente: se crea un spec, el agente implementa las tareas, se verifica el resultado y se documenta cualquier hallazgo post-implementación.
 ### Ventajas del enfoque SDD en este proyecto
 *   **Trazabilidad**: cada línea de código puede rastrearse hasta un requisito específico
@@ -22,32 +22,35 @@ La elección de Kiro como herramienta de desarrollo se fundamentó en:
 *   **Steering files**: Soporte nativo para reglas de contexto que se inyectan automáticamente según patrones de archivos
 *   **Hooks**: Sistema de automatización basado en eventos del IDE que permite ejecutar acciones del agente sin intervención manual
 *   **Powers y MCPs**: Extensibilidad mediante Model Context Protocol para integrar herramientas externas
+
 Kiro opera en dos modos de autonomía:
+
 *   **Autopilot**: el agente trabaja de forma autónoma completando tareas end-to-end
 *   **Supervised**: el agente solicita aprobación después de cada cambio
+
 Para este proyecto se utilizó predominantemente el modo **Autopilot** durante la ejecución de tareas de specs, y el modo **Supervised** para correcciones puntuales y ajustes de diseño.
+
 ### Flujos de SDD en Kiro
 Kiro ofrece **tres flujos distintos** para crear specs, cada uno adaptado a un escenario de desarrollo diferente:
 #### Flujo basado en Requerimientos (Requirements-first)
 El flujo más completo. El agente parte de una descripción funcional del usuario y genera secuencialmente:
-1. [**requirements.md**](http://requirements.md) — Requisitos con criterios de aceptación verificables (formato WHEN/THEN/SHALL)
-2. [**design.md**](http://design.md) — Diseño técnico con decisiones de implementación, estructura de archivos y contratos de API
-3. [**tasks.md**](http://tasks.md) — Lista de tareas ordenadas con checkpoints de verificación (build + tests)
+1. **requirements.md**:** Requisitos con criterios de aceptación verificables (formato WHEN/THEN/SHALL)
+2. **design.md:** Diseño técnico con decisiones de implementación, estructura de archivos y contratos de API
+3. **tasks.md**:** Lista de tareas ordenadas con checkpoints de verificación (build + tests)
 ![](https://t90132600355.p.clickup-attachments.com/t90132600355/0469da22-0d63-45b5-93dc-7a4067dc3412/image.png)
 ![](https://t90132600355.p.clickup-attachments.com/t90132600355/f3ebf15d-ced7-4800-b878-4f99b43eba17/Screenshot%202026-04-01%20at%206.38.10%E2%80%AFPM.png)
 Este flujo se utilizó para la mayoría de features del proyecto donde el punto de partida era una necesidad funcional del usuario ya identificada en las etapas previas del prototipo.
 #### Flujo basado en Diseño Técnico (Design-first)
 Un flujo abreviado donde el desarrollador ya tiene claro el diseño técnico y quiere saltar directamente a la implementación. El agente genera:
-1. [**design.md**](http://design.md) — Diseño técnico detallado (proporcionado o co-creado con el agente)
-2. **requirements.md** — _Opcionalmente_ — Requisitos con criterios de aceptación verificables (formato WHEN/THEN/SHALL)
-3. [**tasks.md**](http://tasks.md) — Lista de tareas derivadas del diseño
-![](https://t90132600355.p.clickup-attachments.com/t90132600355/c5901e49-d03d-4c4d-8cea-b69f4eb27077/image.png)
-Se puede omitir el documento de requisitos porque el contexto técnico ya está definido. Este flujo se utilizó para specs donde la solución técnica era clara desde el inicio.
+1. **design.md:** Diseño técnico detallado (proporcionado o co-creado con el agente)
+2. **requirements.md** _(Opcionalmente):_ Requisitos con criterios de aceptación verificables (formato WHEN/THEN/SHALL)
+3. **tasks.md:** Lista de tareas derivadas del diseño
+![](https://t90132600355.p.clickup-attachments.com/t90132600355/c5901e49-d03d-4c4d-8cea-b69f4eb27077/image.png)Se puede omitir el documento de requisitos porque el contexto técnico ya está definido. Este flujo se utilizó para specs donde la solución técnica era clara desde el inicio.
 #### Flujo de Corrección de Bugs (Bugfix)
 Un flujo especializado para resolver defectos. El agente analiza el bug, documenta las condiciones que lo producen, las propiedades que deben cumplirse y las preservaciones (comportamientos existentes que no deben romperse), y genera:
-1. [**bugfix.md**](http://bugfix.md) — Análisis del bug con el estado actual, esperado y estado que debe conservarse sin cambio
-2. [**design.md**](http://design.md) — Análisis del bug con Bug\_Condition, Property y Preservation
-3. [**tasks.md**](http://tasks.md) — Tareas de corrección con tests de regresión
+1. **bugfix.md:** Análisis del bug con el estado actual, esperado y estado que debe conservarse sin cambio
+2. **design.md:** Análisis del bug con Bug\_Condition, Property y Preservation
+3. **tasks.md:** Tareas de corrección con tests de regresión
 ![](https://t90132600355.p.clickup-attachments.com/t90132600355/b4bb9fdd-075f-4a6d-833a-bd58accd958a/Screenshot%202026-05-19%20at%204.06.25%E2%80%AFPM.png)
 No incluye `requirements.md` porque el "requisito" es implícito: el sistema debe comportarse correctamente según su especificación original.
 ### Clasificación de specs por flujo
@@ -94,26 +97,26 @@ Se instaló el **Figma Power** como extensión de Kiro para validar la implement
 Los steering files son documentos de contexto que se inyectan automáticamente en las interacciones con el agente de IA para guiar su comportamiento. Funcionan como "reglas del proyecto" que el agente debe seguir en toda ejecución, garantizando consistencia sin necesidad de repetir instrucciones manualmente.
 ## Steering iniciales
 Estos tres archivos se crearon al inicio del proyecto junto con la documentación de requisitos y diseño:
-### `tech.md` — Stack tecnológico y decisiones técnicas
+### Stack tecnológico y decisiones técnicas (`tech.md`)
 Define el stack completo (TypeScript full-stack, NestJS, Next.js, PostgreSQL, Prisma, Redis), la arquitectura (monolito modular con hexagonal por módulo), los patrones de seguridad (RBAC, PII encryption, circuit breaker), las convenciones de frontend (tipografía con `font-size: 62.5%`, tokens de diseño, patrones de componentes) y los comandos de desarrollo.
 **Impacto en SDD**: Garantiza que cada spec generado y cada tarea implementada siga las mismas convenciones técnicas sin necesidad de especificarlas repetidamente.
-### `structure.md` — Estructura del proyecto y convenciones
+### Estructura del proyecto y convenciones (`structure.md`)
 Documenta la organización de carpetas, la estructura hexagonal por módulo (`domain/`, `application/`, `infrastructure/`), las convenciones de naming (código en inglés, rutas en español, UI en español), las relaciones cross-schema y los componentes compartidos.
 **Impacto en SDD**: El agente genera código que respeta la estructura existente y ubica archivos en las carpetas correctas automáticamente.
-### `product.md` — Contexto de producto y negocio
+### Contexto de producto y negocio (`product.md`)
 Describe los usuarios objetivo (arrendadores adultos mayores con baja alfabetización digital, arrendatarios jóvenes), el alcance del MVP, los estados del proceso de arriendo y el contexto legal colombiano.
 **Impacto en SDD**: Permite al agente tomar decisiones de UX informadas (simplicidad, baja carga cognitiva) y respetar el alcance del MVP sin agregar funcionalidades fuera de scope.
 ## Steering agregados durante el desarrollo
 ### `cross-schema.md`
-**Inclusión**: Condicional — se activa solo cuando se leen archivos en `src/backend/modules/**`.
+**Inclusión**: Condicional, se activa solo cuando se leen archivos en `src/backend/modules/**`.
 **Objetivo**: Documentar los patrones de comunicación cross-schema que emergieron durante la implementación: resolución de nombres de usuario (nunca mostrar UUIDs), descifrado de PII, referencias entre esquemas como campos `String` planos, y el patrón fire-and-forget para notificaciones.
 **Motivación**: Durante la implementación de los módulos de contratos y arriendos, se detectaron errores recurrentes donde el agente intentaba hacer joins directos entre esquemas o mostraba UUIDs crudos en el frontend. Este steering eliminó esos errores al establecer reglas explícitas.
 ### `frontend-patterns.md`
-**Inclusión**: Condicional — se activa solo cuando se leen archivos en `src/frontend/**`.
+**Inclusión**: Condicional, se activa solo cuando se leen archivos en `src/frontend/**`.
 **Objetivo**: Consolidar los patrones de componentes frontend que se establecieron durante las primeras iteraciones: tipografía con tokens personalizados (nunca usar `text-sm`, `text-lg` de Tailwind), estilo de botón primario, layout de páginas, navegación (hamburguesa vs. back arrow), y formato de moneda COP.
 **Motivación**: El sistema de tipografía con `font-size: 62.5%` causaba que los tamaños por defecto de Tailwind resolvieran a valores incorrectos. Este steering previene ese error sistemáticamente.
 ### `soft-delete.md`
-**Inclusión**: Condicional — se activa solo cuando se leen archivos en `src/backend/**`.
+**Inclusión**: Condicional, se activa solo cuando se leen archivos en `src/backend/**`.
 **Objetivo**: Garantizar que toda query de lectura incluya `deleted_at: null` en el WHERE clause, usando las utilidades compartidas (`softDeleteFilter`, `softDeleteData()`, `withSoftDeleteFilter()`).
 **Motivación**: Se detectaron bugs donde contadores de arriendos activos incluían registros eliminados, o donde el estado de una unidad se derivaba incorrectamente de leases cancelados. Este steering eliminó toda una categoría de bugs al hacer explícita la regla.
 ### `spec-qa-stage.md`
@@ -234,7 +237,6 @@ El spec `backend-database-implementation` fue el más extenso y ambicioso, cubri
 *   Componentes transversales (guards, interceptors, circuit breaker, audit logger)
 *   Tests de propiedades (property-based testing) con fast-check
 *   Stubs para integraciones externas (pagos, firma, mensajería)
-
 ### Fase 2: Frontend Core (16–18 de abril)
 Tres specs construyeron la base del frontend:
 *   Exploración de inmuebles con filtros y paginación
@@ -245,20 +247,17 @@ Specs de soporte que enriquecieron la experiencia:
 *   Alineación visual con los diseños de Figma
 *   Catálogo de tipos de propiedad para formularios
 *   Catálogo geográfico colombiano (33 departamentos, 1.122 municipios)
-
 ### Fase 4: Módulos del Arrendador (19 de abril)
 Implementación de los flujos completos del arrendador:
 *   Gestión de arriendos (crear, cancelar, historial)
 *   Gestión de contratos (wizard de 3 pasos, firma)
 *   Publicación de unidades con fotos
 *   Reportes contables con filtros de periodo
-
 ### Fase 5: Gestión Avanzada (23 de abril)
 Specs que conectaron los módulos entre sí:
 *   Publicaciones gestionadas desde las unidades del portafolio
 *   Contratos con upload real a S3 y presigned URLs
 *   Flujos completos del arrendatario (arriendos, pagos, contratos)
-
 ### Fase 6: Calidad y Polish (4–6 de mayo)
 Specs enfocados en calidad, consistencia y corrección de bugs:
 *   Soft delete transversal, paginación, estadísticas de portafolio
@@ -267,7 +266,6 @@ Specs enfocados en calidad, consistencia y corrección de bugs:
 *   Wiring de notificaciones entre módulos
 *   Correcciones de UX descubiertas en QA manual
 *   Sincronización del ciclo de vida del arriendo
-
 ### Fase 7: Infraestructura (16 de mayo)
 El spec final desplegó la infraestructura en AWS:
 *   6 stacks CDK (Network, Data, CI, Compute, CDN, Monitoring)
@@ -290,6 +288,31 @@ Cada módulo incluye tests unitarios para:
 *   Funciones de validación puras (frontend y backend)
 *   Componentes compartidos (ProtectedRoute, StepIndicator)
 *   Helpers y utilidades (formatPrice, computePeriod, soft-delete utils)
+## Pruebas Funcionales y Validación Manual
+### La brecha entre especificación y resultado
+A pesar de que la hipótesis central del proyecto es que el enfoque SDD entrega mejores resultados que el "vibe coding" (desarrollo conversacional sin estructura formal), la experiencia de implementación demostró que **sigue existiendo una brecha entre lo que se especifica y lo que se obtiene**. El agente de IA puede generar código que compila, pasa tests y cumple los criterios de aceptación formales, pero esto no garantiza que la experiencia del usuario sea la esperada.
+Esta brecha se manifiesta principalmente en:
+*   **Aspectos visuales**: tipografía inconsistente, colores que no coinciden con el sistema de diseño, espaciados incorrectos, componentes que no se ven bien en ciertos tamaños de pantalla
+*   **Aspectos funcionales**: flujos que técnicamente funcionan pero resultan confusos para el usuario, información relevante que no se muestra en el momento adecuado, acciones importantes que quedan enterradas en la interfaz
+*   **Aspectos de contenido**: UUIDs crudos visibles al usuario, textos sin traducir al español, mensajes de error poco claros, estados sin etiqueta legible
+### Responsabilidad del desarrollador como usuario
+Por esta razón, **sigue siendo responsabilidad del desarrollador revisar cada flujo como si fuera un usuario final**, interactuando con la aplicación de forma funcional después de cada ciclo de implementación. Esta revisión manual permite percibir oportunidades de mejora que ningún test automatizado puede detectar, porque se trata de juicios cualitativos sobre la experiencia de uso.
+El proceso de validación manual seguido en este proyecto consistió en:
+1. Completar la implementación de un spec (todas las tareas marcadas como done, build y tests passing)
+2. Ejecutar la aplicación localmente y recorrer los flujos implementados como usuario final
+3. Documentar cada hallazgo (bug visual, funcionalidad faltante, UX confusa) como un nuevo requisito
+4. Agregar los hallazgos al spec existente en una sección "Post-Implementation Findings"
+5. Implementar las correcciones como tareas adicionales del mismo spec
+### Origen del steering de QA
+Fue precisamente a raíz de esta práctica recurrente de validación manual que surgió el steering `spec-qa-stage.md` (4 de mayo de 2026). Después de varias iteraciones donde los hallazgos post-implementación se documentaban de forma ad-hoc, se formalizó el proceso como una convención obligatoria: **toda lista de tareas de un spec debe incluir una etapa final de QA manual**.
+Este steering transformó el flujo SDD de un ciclo lineal a un ciclo con retroalimentación explícita:
+
+```bash
+Sin QA stage:  spec → implementar → build passes → done ✗
+Con QA stage:  spec → implementar → build passes → QA manual → documentar hallazgos → implementar fixes → done ✓
+```
+
+Los specs `ux-polish-fixes` y `lease-lifecycle-status-sync` son ejemplos directos de este proceso: ambos surgieron como resultado de la validación manual de flujos previamente implementados, donde se detectaron defectos que no eran visibles en los tests automatizados.
 # Integraciones Externas y Stubs del MVP
 El MVP utiliza **adaptadores stub** para las tres integraciones externas que serán reemplazadas post-MVP:
 
@@ -311,6 +334,7 @@ Los módulos exponen interfaces de consulta para evitar queries SQL directos ent
 | `PAYMENTS_CROSS_MODULE_QUERY` | payments | `hasPendingPayments()` |
 
 ## Cross-Module Service Ports
+
 Ports donde un módulo define la interfaz y otro provee la implementación:
 
 | Port | Define | Implementa | Propósito |
@@ -331,28 +355,55 @@ Cada módulo que dispara notificaciones define un adaptador local que delega a `
 
 # Infraestructura de Despliegue
 ## Arquitectura AWS
-
-La infraestructura se implementó con **AWS CDK** (Infrastructure as Code) organizada en 6 stacks modulares:
+La infraestructura se implementó con **AWS CDK** (Infrastructure as Code) organizada en 6 stacks modulares. La capa de cómputo utiliza **Amazon ECS Fargate** — un servicio de orquestación de contenedores serverless — con un **Application Load Balancer (ALB)** en subnets públicas para enrutamiento basado en path. CloudFront se ubica al frente para caching, protección WAF y terminación TLS.
 
 | Stack | Recursos |
 | ---| --- |
-| NetworkStack | VPC, subnets (3 tiers), NAT Gateway, Security Groups, EC2 Instance Connect Endpoint |
+| NetworkStack | VPC, subnets (3 tiers: públicas, privadas, aisladas), NAT Gateway, Security Groups (ECS, ALB, Data, EIC), EC2 Instance Connect Endpoint |
 | DataStack | RDS PostgreSQL 16, ElastiCache Redis 7, S3 bucket, Secrets Manager |
 | CiStack | ECR repositories, GitHub Actions IAM role |
-| ComputeStack | App Runner (backend + frontend), VPC Connector, IAM roles |
-| CdnStack | CloudFront distribution, WAF Web ACL, ACM certificate |
-| MonitoringStack | CloudWatch alarms, dashboards, log groups, SNS notifications |
+| ComputeStack | ECS Cluster, ALB con path-based routing, Fargate services (backend + frontend), task definitions, IAM roles, auto-scaling |
+| CdnStack | CloudFront distribution (ALB + S3 origins via OAC), WAF Web ACL, ACM certificate |
+| MonitoringStack | CloudWatch alarms (ALB/ECS metrics), dashboards, log groups, SNS notifications |
+
+### Flujo de requests
+
+```sql
+User → CloudFront (TLS) → WAF → ALB (HTTP, port 80)
+  /api/*    → Backend Target Group → ECS Backend Service (private subnet)
+  /assets/* → S3 (via Origin Access Control)
+  default   → Frontend Target Group → ECS Frontend Service (private subnet)
+```
 
 ## Gestión de variables de entorno
 Todas las variables de entorno son gestionadas por CDK — **cero configuración manual en la consola AWS**:
-*   Variables no sensibles: inyectadas como `runtimeEnvironmentVariables` en App Runner
-*   Secretos: almacenados en Secrets Manager y referenciados como `runtimeEnvironmentSecrets`
+*   Variables no sensibles: inyectadas en las task definitions de ECS como environment variables
+*   Secretos: almacenados en Secrets Manager y referenciados en las task definitions como secrets (resueltos en runtime por ECS)
+# Descubrimiento de requisitos emergentes
+Un hallazgo significativo del proceso de implementación fue que **la interacción funcional con el prototipo ya concebido reveló oportunidades de mejora y flujos funcionales que no se habían considerado durante las fases de obtención de requisitos ni de diseño de la solución**.
+Ejemplos concretos de requisitos emergentes descubiertos durante la implementación:
+*   La necesidad de **desactivar automáticamente un listing cuando se firma el contrato** (no contemplado en el SRS original)
+*   La necesidad de **crear automáticamente un pago programado al completar la firma** (descubierto al probar el flujo end-to-end)
+*   La necesidad de **sincronizar el estado de tracking cuando se sube un contrato** (gap entre módulos no detectado en diseño)
+*   La necesidad de **derivar el estado "Ocupado" de una unidad solo cuando el contrato está firmado** (regla de negocio refinada por uso real)
+*   La necesidad de **mostrar información de contacto del arrendatario en la notificación de interés** (UX descubierta al usar la app como arrendador)
+Estos descubrimientos son inherentes a cualquier proceso de desarrollo de software, pero el flujo acelerado mediante IA y en la medida que el desarrollador tenga contexto no solamente funcional sino también de la visión del negocio o estrategia, permite **detectarlos tempranamente**, en días o semanas en lugar de meses, gracias a que el prototipo funcional se materializa mucho antes de lo que permitiría un proceso tradicional.
+## Ventaja frente a metodologías tradicionales
+En un flujo en cascada tradicional, estos requisitos emergentes se descubrirían típicamente en las fases de testing de integración o de aceptación del usuario, cuando el cronograma ya está comprometido y los cambios representan un **riesgo alto de incumplimiento**. La rigidez del proceso hace que cada hallazgo tardío se convierta en un cambio costoso que compite con la fecha de entrega.
+En contraste, el flujo SDD asistido por IA permite:
+1. **Materializar el prototipo funcional en días**, no en meses
+2. **Descubrir gaps funcionales tempranamente** al interactuar con software real
+3. **Iterar rápidamente** sobre los hallazgos sin comprometer el cronograma
+4. **Documentar formalmente** cada descubrimiento como parte del spec (trazabilidad)
+5. **Implementar correcciones** en el mismo ciclo de desarrollo, no como "deuda técnica"
+Esta capacidad de descubrimiento temprano y corrección ágil es uno de los beneficios más significativos del enfoque adoptado, y refuerza la importancia de los procesos iterativos frente a los enfoques lineales para el desarrollo de productos digitales.
 # Conclusiones
-
-La implementación del prototipo demostró la viabilidad del enfoque **Spec-Driven Development** asistido por agentes de IA para la construcción de sistemas de complejidad media-alta. Los principales aprendizajes fueron:
-
-1. **Los steering files son fundamentales**: Sin reglas explícitas de contexto, el agente comete errores recurrentes (tipografía incorrecta, soft delete omitido, UUIDs expuestos). Los steering eliminan categorías completas de bugs.
-2. **La etapa de QA manual es indispensable**: A pesar de que el agente puede generar código funcional que pasa build y tests, los problemas de UX (traducciones, navegación, consistencia visual) solo se detectan con pruebas manuales.
-3. **Los hooks multiplican la productividad**: La documentación automática, los commits convencionales y la sincronización con herramientas de gestión eliminan trabajo repetitivo y mantienen la calidad sin esfuerzo adicional.
-4. **La arquitectura hexagonal facilita la evolución**: La separación por puertos y adaptadores permitió agregar funcionalidades (notificaciones, tracking, deactivación de listings) sin modificar la lógica de negocio existente.
-5. **Los MCPs conectan el flujo de desarrollo con el ecosistema**: La integración con ClickUp y Figma permitió mantener sincronizados el código, la gestión de proyecto y el diseño visual en un solo flujo de trabajo.
+*   La implementación del prototipo permitió evidenciar la viabilidad del enfoque _Spec-Driven Development (SDD)_ asistido por agentes de inteligencia artificial para el desarrollo de sistemas de complejidad media-alta, demostrando que el uso de especificaciones estructuradas y automatización puede acelerar significativamente la construcción de software manteniendo coherencia arquitectónica y funcional.
+*   Los resultados obtenidos demostraron que los _steering files_ son un componente fundamental dentro del flujo SDD, debido a que permiten transferir reglas arquitectónicas, restricciones técnicas y convenciones de diseño al agente de IA. Gracias a ello fue posible reducir errores recurrentes relacionados con consistencia visual, manejo de identificadores y reglas de persistencia, evidenciando que la calidad del resultado depende en gran medida de la claridad y precisión de las especificaciones entregadas.
+*   La experiencia de desarrollo permitió confirmar que la efectividad del enfoque SDD depende también de la calidad de las etapas previas de obtención de requerimientos y diseño arquitectónico. El trabajo realizado en el SRS y en el documento de diseño proporcionó un insumo sólido para la construcción de especificaciones y _steering files_, reduciendo la brecha entre el “qué” se debía construir y el “cómo” debía implementarse. Esto evidenció que el uso de IA sin un proceso previo riguroso de análisis y diseño puede incrementar el reproceso y las inconsistencias, mientras que una base documental clara potencia considerablemente la calidad y efectividad del desarrollo asistido por IA.
+*   La implementación permitió comprobar que, aunque los agentes de IA pueden generar código funcional y técnicamente válido, la etapa de validación manual continúa siendo indispensable para identificar problemas asociados a experiencia de usuario, navegación, consistencia visual y comportamiento funcional. Esto evidenció que el enfoque SDD no elimina la necesidad de QA humano, sino que transforma su rol hacia actividades de validación, refinamiento y aseguramiento de calidad orientadas al usuario final.
+*   A partir de las automatizaciones incorporadas mediante hooks y herramientas auxiliares, se evidenció una mejora significativa en la productividad del proceso de desarrollo, reduciendo trabajo repetitivo relacionado con documentación, validación de convenciones, estructuración de commits y sincronización con herramientas externas. Esto permitió mantener mayor consistencia y trazabilidad durante el desarrollo sin incrementar significativamente la carga operativa del proyecto.
+*   La arquitectura hexagonal implementada permitió validar la importancia de mantener separación entre dominio, puertos y adaptadores incluso en un contexto MVP, facilitando la incorporación progresiva de nuevas funcionalidades sin afectar considerablemente la lógica de negocio existente. Este resultado confirma que una arquitectura desacoplada favorece la mantenibilidad y evolución futura del sistema.
+*   La integración de MCPs con herramientas como ClickUp y Figma permitió mantener sincronización entre gestión del proyecto, diseño visual y desarrollo técnico dentro de un mismo flujo de trabajo, fortaleciendo la trazabilidad entre requerimientos, prototipos y funcionalidades implementadas. Esto evidenció el potencial de los ecosistemas integrados para reducir fricción entre las diferentes etapas del ciclo de desarrollo de software.
+*   El desarrollo temprano de un prototipo funcional permitió descubrir requerimientos, reglas de negocio y necesidades de interacción que no habían emergido durante las etapas iniciales de levantamiento de requisitos y diseño arquitectónico. Esto demostró que los ciclos acelerados de iteración asistidos por IA facilitan la detección temprana de vacíos funcionales y reducen el riesgo de desviaciones significativas en cronograma y alcance frente a enfoques tradicionales.
+*   En conjunto, la experiencia obtenida permitió concluir que el enfoque SDD asistido por agentes de inteligencia artificial no reemplaza el criterio humano dentro del desarrollo de software, sino que redefine el rol del desarrollador hacia actividades de supervisión, validación y toma de decisiones estratégicas. En consecuencia, el conocimiento de dominio, la capacidad de análisis y la comprensión de las necesidades del usuario continúan siendo factores fundamentales para garantizar la calidad y pertinencia de la solución desarrollada.
