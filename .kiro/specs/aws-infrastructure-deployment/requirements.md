@@ -16,19 +16,21 @@
 
 2.1. The stack MUST create a VPC with CIDR `10.0.0.0/16` spanning 2 availability zones.
 
-2.2. The VPC MUST have public subnets (for NAT Gateway placement), private subnets (for VPC Connector egress), and isolated subnets (for data stores — no internet access).
+2.2. The VPC MUST have public subnets (for ALB and NAT Gateway placement), private subnets (for ECS Fargate tasks), and isolated subnets (for data stores — no internet access).
 
-2.3. At least one NAT Gateway MUST be provisioned in a public subnet for VPC Connector outbound internet access.
+2.3. At least one NAT Gateway MUST be provisioned in a public subnet for private subnet outbound internet access (ECR image pulls, external API calls).
 
-2.4. A VPC Connector security group MUST be created that allows outbound traffic only to the data security group on ports 5432 (PostgreSQL) and 6379 (Redis).
+2.4. An ECS service security group MUST be created that allows outbound traffic to the data security group on ports 5432 (PostgreSQL) and 6379 (Redis), and outbound to the internet (for ECR pulls via NAT).
 
-2.5. A data security group MUST be created that allows inbound traffic only from the VPC Connector security group on ports 5432 and 6379.
+2.5. A data security group MUST be created that allows inbound traffic only from the ECS service security group on ports 5432 and 6379.
 
 2.6. VPC Flow Logs MUST be enabled and sent to CloudWatch Logs for network audit.
 
 2.7. An EC2 Instance Connect Endpoint MUST be provisioned in the VPC to allow secure, tunneled access to RDS from developer machines without a bastion host or public IP. Access is controlled via IAM policies (no SSH keys, no open inbound ports).
 
 2.8. A dedicated security group for the EC2 Instance Connect Endpoint MUST be created, allowing outbound to the data security group on port 5432 only. The data security group MUST allow inbound from this EIC security group on port 5432.
+
+2.9. An ALB security group MUST be created that allows inbound on ports 80 and 443 from `0.0.0.0/0` (public internet), and outbound to the ECS service security group on port 3000.
 
 ## 3. Data Stores (DataStack)
 
@@ -49,35 +51,47 @@
   - CORS configured for the application domain
   - Lifecycle rules for cost optimization (Intelligent-Tiering)
 
-## 4. Compute (ComputeStack — App Runner)
+## 4. Compute (ComputeStack — ECS Fargate)
 
-4.1. Two App Runner services MUST be created: one for the NestJS backend and one for the Next.js frontend.
+4.1. An ECS Cluster MUST be created for running containerized services.
 
-4.2. The backend App Runner service MUST have a VPC Connector attached to reach RDS and Redis in private/isolated subnets.
+4.2. Two ECS Fargate services MUST be created: one for the NestJS backend and one for the Next.js frontend.
 
-4.3. The frontend App Runner service MUST NOT have a VPC Connector (it calls the backend via its public URL).
+4.3. Both services MUST run in private subnets with outbound internet access via NAT Gateway (for ECR image pulls and external API calls).
 
-4.4. Auto-scaling MUST be configured per environment:
-  - Staging: `minInstances: 0` (scale to zero), `maxInstances: 2`
-  - Production: `minInstances: 1` (warm instance), `maxInstances: 6` (backend) / `4` (frontend)
+4.4. An Application Load Balancer (ALB) MUST be created in public subnets with:
+  - HTTPS listener on port 443 (with ACM certificate if domain provided)
+  - HTTP listener on port 80 redirecting to HTTPS
+  - Path-based routing: `/api/*` → backend target group, default → frontend target group
 
-4.5. Health checks MUST be configured: backend at `/api/health`, frontend at `/`.
+4.5. Auto-scaling MUST be configured per environment via ECS Service Auto Scaling:
+  - Staging: `desiredCount: 1`, `minCapacity: 1`, `maxCapacity: 2`
+  - Production: `desiredCount: 2` (backend) / `2` (frontend), `minCapacity: 2`, `maxCapacity: 6` (backend) / `4` (frontend)
+  - Scaling policy: target tracking on CPU utilization (70%) and request count per target
 
-4.6. Auto-deploy MUST be enabled: pushing a new image to ECR automatically triggers a new App Runner deployment.
+4.6. Health checks MUST be configured on the ALB target groups: backend at `/api/health`, frontend at `/`.
 
-4.7. App Runner services MUST use IAM instance roles with least-privilege permissions (Secrets Manager read, S3 read/write, CloudWatch logs).
+4.7. ECS task definitions MUST use IAM task roles with least-privilege permissions (Secrets Manager read, S3 read/write, CloudWatch logs) and a task execution role for ECR pulls and log creation.
+
+4.8. Container definitions MUST specify resource limits per environment:
+  - Staging backend: 0.5 vCPU, 1 GB memory
+  - Production backend: 1 vCPU, 2 GB memory
+  - Staging frontend: 0.25 vCPU, 0.5 GB memory
+  - Production frontend: 0.5 vCPU, 1 GB memory
+
+4.9. ECS services MUST be configured with rolling deployment (minimumHealthyPercent: 100, maximumPercent: 200) for zero-downtime deploys.
 
 ## 5. Environment Variable Injection
 
 5.1. ALL environment variables MUST be defined in CDK code — zero manual configuration in the AWS Console.
 
-5.2. Non-sensitive environment variables (DB host, Redis host, S3 bucket name, port, NODE_ENV) MUST be injected via App Runner `runtimeEnvironmentVariables` using CDK cross-stack references.
+5.2. Non-sensitive environment variables (DB host, Redis host, S3 bucket name, port, NODE_ENV) MUST be injected via ECS task definition `environment` using CDK cross-stack references.
 
-5.3. Sensitive environment variables (JWT_SECRET, PII_ENCRYPTION_KEY, DB password) MUST be injected via App Runner `runtimeEnvironmentSecrets` referencing Secrets Manager ARNs.
+5.3. Sensitive environment variables (JWT_SECRET, PII_ENCRYPTION_KEY, DB password) MUST be injected via ECS task definition `secrets` referencing Secrets Manager ARNs.
 
 5.4. The DATABASE_URL MUST be constructed from RDS construct outputs (endpoint address, port) combined with Secrets Manager credentials.
 
-5.5. The frontend MUST receive the backend service URL as `NEXT_PUBLIC_API_URL`, resolved from the backend App Runner service construct.
+5.5. The frontend MUST receive the backend URL as `NEXT_PUBLIC_API_URL`, resolved from the ALB DNS name or custom domain.
 
 5.6. Application secrets (JWT_SECRET, PII_ENCRYPTION_KEY) MUST be auto-generated via Secrets Manager `generateSecretString` during initial deployment.
 
@@ -86,8 +100,7 @@
 ## 6. CDN and Security (CdnStack)
 
 6.1. A CloudFront distribution MUST be created with three origins:
-  - Backend App Runner service URL (for `/api/*` paths)
-  - Frontend App Runner service URL (default behavior)
+  - ALB (for `/api/*` paths and default frontend behavior)
   - S3 bucket (for `/assets/*` paths)
 
 6.2. Cache behaviors MUST be configured:
@@ -122,28 +135,31 @@
 
 8.1. Every IAM role MUST follow the principle of least privilege — only the permissions required for the specific service/task.
 
-8.2. The App Runner instance role (backend) MUST have permissions limited to:
+8.2. The ECS task role (backend) MUST have permissions limited to:
   - `secretsmanager:GetSecretValue` on specific secret ARNs only (DB, JWT, PII key)
   - `s3:PutObject`, `s3:GetObject`, `s3:DeleteObject` on the assets bucket only
   - `logs:CreateLogStream`, `logs:PutLogEvents` for CloudWatch logging
 
-8.3. The App Runner instance role (frontend) MUST have permissions limited to:
+8.3. The ECS task role (frontend) MUST have permissions limited to:
   - `logs:CreateLogStream`, `logs:PutLogEvents` for CloudWatch logging
   - No S3, no Secrets Manager, no database access
 
-8.4. The App Runner ECR access role MUST have permissions limited to:
+8.4. The ECS task execution role MUST have permissions limited to:
   - `ecr:GetDownloadUrlForLayer`, `ecr:BatchGetImage`, `ecr:GetAuthorizationToken` on the specific ECR repositories only
+  - `secretsmanager:GetSecretValue` on specific secret ARNs (for secrets injection at container start)
+  - `logs:CreateLogGroup`, `logs:CreateLogStream`, `logs:PutLogEvents` for CloudWatch logging
 
 8.5. The CI/CD role (GitHub Actions) MUST have permissions limited to:
   - `ecr:PutImage`, `ecr:InitiateLayerUpload`, `ecr:CompleteLayerUpload` on specific repos
   - `sts:AssumeRole` for CDK deployment role
   - `cloudformation:*` scoped to the application stacks only
+  - `ecs:UpdateService` to trigger new deployments after image push
 
 8.6. The EC2 Instance Connect Endpoint access MUST be controlled via IAM policy — only authorized developers can open tunnels to the database.
 
-8.7. All security groups MUST deny all traffic by default (AWS default) and explicitly allow only required ports from required sources. No `0.0.0.0/0` inbound rules on any security group.
+8.7. All security groups MUST deny all traffic by default (AWS default) and explicitly allow only required ports from required sources. No `0.0.0.0/0` inbound rules on any security group except the ALB (which must accept public traffic on 80/443).
 
-8.8. The S3 bucket MUST have a bucket policy that denies all public access and allows access only from the backend App Runner instance role and CloudFront Origin Access Control (OAC).
+8.8. The S3 bucket MUST have a bucket policy that denies all public access and allows access only from the backend ECS task role and CloudFront Origin Access Control (OAC).
 
 ## 9. Monitoring (MonitoringStack)
 
@@ -176,7 +192,7 @@
 
 ## 11. Testing
 
-11.1. CDK assertion tests MUST verify: VPC CIDR, subnet isolation, RDS encryption enabled, Multi-AZ for production, App Runner VPC Connector attachment, security group rules.
+11.1. CDK assertion tests MUST verify: VPC CIDR, subnet isolation, RDS encryption enabled, Multi-AZ for production, ECS Fargate service configuration, ALB target groups, security group rules.
 
 11.2. Snapshot tests MUST be included to detect unintended infrastructure changes.
 

@@ -39,7 +39,7 @@ After evaluating AWS CDK (TypeScript) vs Terraform, this design recommends **AWS
 
 ## Architecture
 
-The compute layer uses **AWS App Runner** — a fully managed container service that scales to zero, eliminating idle costs during the MVP phase. App Runner connects to VPC resources (RDS, Redis) via VPC Connectors. When traffic grows and justifies always-on capacity, the migration path to ECS Fargate is straightforward since the same Docker images are used.
+The compute layer uses **Amazon ECS Fargate** — a serverless container orchestration service. ECS Fargate tasks run in private subnets with an Application Load Balancer (ALB) in public subnets handling ingress. This provides full VPC networking, fine-grained IAM control, and proven auto-scaling. CloudFront sits in front of the ALB for caching, WAF protection, and TLS termination.
 
 ```mermaid
 graph TD
@@ -48,10 +48,10 @@ graph TD
             CF[CloudFront CDN]
         end
 
-        subgraph "Compute - App Runner"
-            BE[App Runner - Backend]
-            FE[App Runner - Frontend]
-            VPCC[VPC Connector]
+        subgraph "Compute - ECS Fargate"
+            ALB[Application Load Balancer]
+            BE[ECS Service - Backend]
+            FE[ECS Service - Frontend]
         end
 
         subgraph "Data"
@@ -79,17 +79,17 @@ graph TD
 
     USER[Users] --> CF
     CF --> WAF
-    WAF --> BE
-    CF --> FE
+    WAF --> ALB
+    ALB --> BE
+    ALB --> FE
     CF --> S3
-    BE --> VPCC
-    VPCC --> RDS
-    VPCC --> REDIS
+    BE --> RDS
+    BE --> REDIS
     BE --> S3
     BE --> SM
-    FE --> BE
+    FE --> ALB
     RDS --> DATA
-    REDIS --> PRIV
+    REDIS --> DATA
     BE --> CW
 
 ```
@@ -105,16 +105,16 @@ sequenceDiagram
     participant ECR as ECR Registry
     participant CDK as CDK Deploy
     participant CF as CloudFormation
-    participant AR as App Runner
+    participant ECS as ECS Fargate
 
     Dev->>GH: Push to main
     GH->>GH: Run tests & build
     GH->>ECR: Push Docker images (backend + frontend)
     GH->>CDK: cdk deploy --all
     CDK->>CF: Submit changeset
-    CF->>AR: Update App Runner services (new image)
-    AR->>AR: Health check new revision
-    AR-->>CF: Deployment complete
+    CF->>ECS: Update ECS services (force new deployment)
+    ECS->>ECS: Rolling deployment + health check
+    ECS-->>CF: Deployment complete
     CF-->>CDK: Stack update complete
     CDK-->>GH: Deploy success
 ```
@@ -126,8 +126,9 @@ sequenceDiagram
     participant U as User Browser
     participant CF as CloudFront
     participant WAF as WAF
-    participant BE as App Runner Backend
-    participant FE as App Runner Frontend
+    participant ALB as Application Load Balancer
+    participant BE as ECS Backend
+    participant FE as ECS Frontend
     participant DB as RDS PostgreSQL
     participant Cache as ElastiCache Redis
     participant S3 as S3
@@ -137,15 +138,17 @@ sequenceDiagram
     WAF-->>CF: Allow
     
     alt Static asset / Frontend
-        CF->>FE: Forward to frontend service
+        CF->>ALB: Forward to ALB (default route)
+        ALB->>FE: Route to frontend target group
         FE-->>U: SSR HTML response
     else API request (/api/*)
-        CF->>BE: Forward to backend service
-        BE->>Cache: Check cache (via VPC Connector)
+        CF->>ALB: Forward to ALB (/api/*)
+        ALB->>BE: Route to backend target group
+        BE->>Cache: Check cache (via VPC networking)
         alt Cache hit
             Cache-->>BE: Cached data
         else Cache miss
-            BE->>DB: Query (via VPC Connector)
+            BE->>DB: Query (via VPC networking)
             DB-->>BE: Result
             BE->>Cache: Store in cache
         end
@@ -226,40 +229,48 @@ interface DataStackOutputs {
 - Create S3 bucket with versioning, lifecycle rules, and CORS for direct uploads
 - Store database credentials in Secrets Manager with rotation
 
-### Component 3: ComputeStack (App Runner)
+### Component 3: ComputeStack (ECS Fargate)
 
-**Purpose**: Provisions App Runner services for backend and frontend, with VPC Connector for database/cache access.
+**Purpose**: Provisions ECS Fargate services for backend and frontend with an Application Load Balancer for ingress and path-based routing.
 
 ```typescript
 interface ComputeStackProps extends cdk.StackProps {
   readonly vpc: ec2.IVpc;
   readonly privateSubnets: ec2.ISubnet[];
-  readonly vpcConnectorSecurityGroup: ec2.ISecurityGroup;
+  readonly publicSubnets: ec2.ISubnet[];
+  readonly ecsServiceSecurityGroup: ec2.ISecurityGroup;
+  readonly albSecurityGroup: ec2.ISecurityGroup;
   readonly dbSecret: secretsmanager.ISecret;
+  readonly jwtSecret: secretsmanager.ISecret;
+  readonly piiKeySecret: secretsmanager.ISecret;
+  readonly dbEndpointAddress: string;
+  readonly dbEndpointPort: string;
   readonly redisEndpoint: string;
   readonly assetsBucket: s3.IBucket;
   readonly environment: 'staging' | 'production';
   readonly backendImageUri: string;
   readonly frontendImageUri: string;
+  readonly backendRepoArn: string;
+  readonly frontendRepoArn: string;
 }
 
 interface ComputeStackOutputs {
-  readonly backendServiceUrl: string;
-  readonly frontendServiceUrl: string;
+  readonly albDnsName: string;
+  readonly albArn: string;
   readonly backendServiceArn: string;
   readonly frontendServiceArn: string;
-  readonly vpcConnector: apprunner.CfnVpcConnector;
 }
 ```
 
 **Responsibilities**:
-- Create VPC Connector pointing to private subnets
-- Create App Runner service for backend (NestJS) with VPC Connector
-- Create App Runner service for frontend (Next.js) — no VPC Connector needed (calls backend via public URL)
-- Configure auto-scaling: min 1, max based on environment
-- Inject environment variables and secrets into services
-- Configure health checks (backend: `/api/health`, frontend: `/`)
-- Set CPU/memory per environment
+- Create ECS Cluster
+- Create ALB in public subnets with path-based routing (/api/* → backend, default → frontend)
+- Create ECS Fargate services for backend (NestJS) and frontend (Next.js) in private subnets
+- Configure ECS Service Auto Scaling (target tracking on CPU utilization)
+- Inject environment variables and secrets into task definitions
+- Configure health checks on ALB target groups (backend: `/api/health`, frontend: `/`)
+- Set CPU/memory per environment via task definitions
+- Configure rolling deployments for zero-downtime updates
 
 ### Component 4: CdnStack
 
