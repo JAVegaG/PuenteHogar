@@ -26,7 +26,7 @@ export interface ContractSummary {
     signingDetails?: Array<{ role: string; hasSigned: boolean }>;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 async function extractErrorMessage(res: Response, fallback: string): Promise<string> {
     try {

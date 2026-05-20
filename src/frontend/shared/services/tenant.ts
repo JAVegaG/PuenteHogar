@@ -48,7 +48,7 @@ export interface TenantContractListItem {
     landlordName: string;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 function handleTenantError(status: number): never {
     if (status === 401) throw new Error('Sesión expirada');

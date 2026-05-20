@@ -248,15 +248,18 @@ export class ComputeStack extends cdk.Stack {
                 DB_HOST: props.dbEndpointAddress,
                 DB_PORT: props.dbEndpointPort,
                 DB_NAME: 'rental_platform',
+                DB_USER: 'app_user',
                 REDIS_HOST: props.redisEndpoint,
                 REDIS_PORT: '6379',
+                REDIS_URL: `redis://${props.redisEndpoint}:6379`,
                 S3_BUCKET_NAME: props.assetsBucket.bucketName,
                 S3_REGION: cdk.Stack.of(this).region,
                 NODE_ENV: isProduction ? 'production' : 'development',
                 PORT: '3000',
             },
             secrets: {
-                DB_SECRET: ecs.Secret.fromSecretsManager(props.dbSecret),
+                // Individual secret fields for the app to construct DATABASE_URL at runtime
+                DB_PASSWORD: ecs.Secret.fromSecretsManager(props.dbSecret, 'password'),
                 JWT_SECRET: ecs.Secret.fromSecretsManager(props.jwtSecret),
                 PII_ENCRYPTION_KEY: ecs.Secret.fromSecretsManager(props.piiKeySecret),
             },
@@ -292,7 +295,6 @@ export class ComputeStack extends cdk.Stack {
             containerName: 'frontend',
             portMappings: [{ containerPort: 3000, protocol: ecs.Protocol.TCP }],
             environment: {
-                NEXT_PUBLIC_API_URL: `http://${alb.loadBalancerDnsName}`,
                 NODE_ENV: isProduction ? 'production' : 'development',
                 PORT: '3000',
             },

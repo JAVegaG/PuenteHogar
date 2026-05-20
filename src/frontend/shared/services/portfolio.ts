@@ -13,7 +13,7 @@ import type {
   City,
 } from '@modules/landlord-portfolio/types';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 export const portfolioService = {
   async getUnits(portfolioId: string, token: string): Promise<PortfolioUnit[]> {

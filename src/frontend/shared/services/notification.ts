@@ -21,7 +21,7 @@ export interface NotificationPreferenceGroup {
     }[];
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 function handleNotificationError(status: number): never {
     if (status === 401) throw new Error('Sesión expirada');

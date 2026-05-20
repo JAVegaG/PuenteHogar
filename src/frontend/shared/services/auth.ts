@@ -6,7 +6,7 @@ import type {
   DocumentType,
 } from '@modules/users/types';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 export const authService = {
   async login(data: LoginRequest): Promise<LoginResponse> {
