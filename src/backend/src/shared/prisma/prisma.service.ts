@@ -83,7 +83,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     }
 
     const encodedPassword = encodeURIComponent(password);
-    const connectionString = `postgresql://${user}:${encodedPassword}@${host}:${port}/${dbName}`;
+    const connectionString = `postgresql://${user}:${encodedPassword}@${host}:${port}/${dbName}?sslmode=no-verify`;
 
     logger.log(
       `Constructed DATABASE_URL from env vars: postgresql://${user}:****@${host}:${port}/${dbName}`,

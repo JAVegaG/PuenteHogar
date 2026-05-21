@@ -57,7 +57,7 @@ describe('PrismaService — DATABASE_URL Construction', () => {
         new PrismaService();
 
         expect(process.env.DATABASE_URL).toBe(
-            'postgresql://admin:secretpass@my-rds-instance.amazonaws.com:5432/mydb',
+            'postgresql://admin:secretpass@my-rds-instance.amazonaws.com:5432/mydb?sslmode=no-verify',
         );
     });
 
@@ -82,7 +82,7 @@ describe('PrismaService — DATABASE_URL Construction', () => {
 
         const expectedPassword = encodeURIComponent('p@ss#w%rd!&=');
         expect(process.env.DATABASE_URL).toBe(
-            `postgresql://dbuser:${expectedPassword}@db.example.com:5432/testdb`,
+            `postgresql://dbuser:${expectedPassword}@db.example.com:5432/testdb?sslmode=no-verify`,
         );
     });
 
