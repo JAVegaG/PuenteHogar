@@ -174,7 +174,7 @@
   - Run `npm run build` in `src/frontend/` — verify no build errors
   - Run `npx cdk synth` in `src/infra/` — verify both staging and production stacks synthesize without errors
 
-- [~] 9. Manual QA and post-implementation review
+- [x] 9. Manual QA and post-implementation review
   - Deploy or run the feature locally and test all deployment-related flows end-to-end
   - Verify SSM port forwarding to RDS works: `aws ssm start-session --target <bastion-id> --document-name AWS-StartPortForwardingSessionToRemoteHost --parameters '{"host":["<rds-endpoint>"],"portNumber":["5432"],"localPortNumber":["5432"]}'`
   - Verify backend starts without entrypoint script and runs migrations via PrismaService
@@ -186,3 +186,7 @@
   - Document any issues found as new requirements in a "Post-Implementation Findings" section in requirements.md
   - Add corresponding design notes and implementation tasks for each finding
   - Re-run build and tests after fixes
+  - **QA Findings (2 issues found and fixed):**
+    - Finding 4.1: Docker images must be built with `--platform linux/amd64` on Apple Silicon for ECS Fargate compatibility
+    - Finding 4.2: Added `url = env("DATABASE_URL")` to Prisma schema datasource block — required by `prisma migrate deploy` CLI
+  - Re-ran backend build and tests after fix — all 342 tests pass

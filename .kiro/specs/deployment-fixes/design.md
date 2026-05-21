@@ -245,3 +245,22 @@ END FOR
 - CDK synth production → verify full infrastructure unchanged
 - Docker build backend → verify no entrypoint.sh, CMD is `node dist/src/main.js`
 - Frontend build with `NEXT_PUBLIC_API_URL=/api` → verify API calls use `/api` prefix
+
+
+## Post-Implementation Design Additions
+
+### Finding 4.1 — Multi-Architecture Docker Builds
+
+**Problem**: Local development machines (Apple Silicon) produce ARM images that are incompatible with ECS Fargate (x86_64).
+
+**Design Note**: All CI/CD pipelines and manual Docker build commands must specify `--platform linux/amd64`. This should be documented in the project README and enforced in any future GitHub Actions workflow. Alternatively, multi-arch builds via `docker buildx` can produce manifests supporting both architectures.
+
+**Affected Files**: No code changes — operational procedure for `docker build` commands.
+
+### Finding 4.2 — Prisma Schema Datasource URL
+
+**Problem**: The Prisma CLI (`prisma migrate deploy`) requires `url = env("DATABASE_URL")` in the `datasource` block of `schema.prisma`. Without it, the CLI cannot resolve the connection string even when the env var is set in the child process environment.
+
+**Design Note**: The `datasource db` block must always include `url = env("DATABASE_URL")`. The PrismaService constructs this URL from individual env vars (`DB_HOST`, `DB_PORT`, etc.) and sets `process.env.DATABASE_URL` before `execSync` spawns the migration child process. The schema's `url` property tells the CLI where to look.
+
+**Affected File**: `src/backend/db/prisma/schema.prisma` — added `url = env("DATABASE_URL")` to the `datasource db` block.

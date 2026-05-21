@@ -43,3 +43,24 @@ After the first AWS ECS Fargate deployment of the rental platform, four issues w
 3.7 WHEN the ALB receives requests THEN the system SHALL CONTINUE TO route `/api/*` to the backend target group and all other paths to the frontend target group
 
 3.8 WHEN the backend health check is performed THEN the system SHALL CONTINUE TO respond at `/api/health` with HTTP 200
+
+
+## Post-Implementation Findings
+
+Issues discovered during manual QA deployment testing (Task 9):
+
+### Finding 4.1 — Docker images built on ARM don't run on ECS Fargate
+
+**Observed**: WHEN Docker images are built on an Apple Silicon (ARM/M-series) Mac without specifying a target platform AND pushed to ECR THEN ECS Fargate tasks fail with `CannotPullContainerError: image Manifest does not contain descriptor matching platform 'linux/amd64'` because Fargate runs on x86_64 instances.
+
+**Root Cause**: Docker defaults to the host architecture (`linux/arm64` on Apple Silicon). ECS Fargate requires `linux/amd64` images.
+
+**Fix**: All Docker build commands MUST include `--platform linux/amd64` when building on ARM machines for ECS deployment.
+
+### Finding 4.2 — Prisma schema missing datasource URL for CLI commands
+
+**Observed**: WHEN the backend container starts and PrismaService runs `prisma migrate deploy` THEN the command fails with `Error: The datasource.url property is required in your Prisma config file when using prisma migrate deploy` even though `DATABASE_URL` is set in the environment.
+
+**Root Cause**: The `datasource db` block in `schema.prisma` did not include `url = env("DATABASE_URL")`. The Prisma CLI reads the schema file directly and requires an explicit `url` property — it does not auto-detect `DATABASE_URL` from the environment without it.
+
+**Fix**: Added `url = env("DATABASE_URL")` to the `datasource db` block in `src/backend/db/prisma/schema.prisma`. This allows the Prisma CLI to resolve the connection string from the environment variable that PrismaService constructs and sets.
