@@ -62,6 +62,9 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/db/prisma/schema.prisma ./db/prisma/schema.prisma
 COPY --from=build /app/db/prisma/migrations ./db/prisma/migrations
 
+# Copy Prisma config (needed by prisma migrate deploy to resolve datasource URL)
+COPY --from=build /app/prisma.config.ts ./prisma.config.ts
+
 # Copy package.json for metadata
 COPY --from=build /app/package.json ./package.json
 
