@@ -144,7 +144,7 @@
     - **EXPECTED OUTCOME**: Test PASSES (confirms bug is fixed)
     - _Requirements: 2.3_
 
-  - [~] 7.2 Verify preservation tests still pass
+  - [x] 7.2 Verify preservation tests still pass
     - **Property 2: Preservation** - Controller Routes and Service Patterns Unchanged
     - **IMPORTANT**: Re-run the SAME tests from task 2 - do NOT write new tests
     - Run preservation property tests from step 2
