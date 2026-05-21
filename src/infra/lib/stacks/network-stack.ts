@@ -178,6 +178,117 @@ export class NetworkStack extends cdk.Stack {
             role: bastionRole,
         });
 
+        // VPC Endpoints for private subnet access to AWS services when NAT Gateway is not present
+        if (props.natGateways === 0) {
+            // Security group for VPC endpoints allowing inbound HTTPS from ECS service SG
+            const vpcEndpointSg = new ec2.SecurityGroup(this, 'VpcEndpointSecurityGroup', {
+                vpc,
+                description: 'Security group for VPC Interface Endpoints',
+                allowAllOutbound: false,
+            });
+
+            vpcEndpointSg.addIngressRule(
+                ecsServiceSg,
+                ec2.Port.tcp(443),
+                'Allow inbound HTTPS from ECS Service SG',
+            );
+
+            vpcEndpointSg.addIngressRule(
+                bastionSg,
+                ec2.Port.tcp(443),
+                'Allow inbound HTTPS from Bastion SG for SSM',
+            );
+
+            // Add outbound rule on ECS service SG to VPC endpoint SG on port 443
+            ecsServiceSg.addEgressRule(
+                vpcEndpointSg,
+                ec2.Port.tcp(443),
+                'Allow outbound HTTPS to VPC Endpoints',
+            );
+
+            // Add outbound rule on Bastion SG to VPC endpoint SG on port 443 (for SSM)
+            bastionSg.addEgressRule(
+                vpcEndpointSg,
+                ec2.Port.tcp(443),
+                'Allow outbound HTTPS to VPC Endpoints for SSM',
+            );
+
+            // Interface VPC Endpoints (placed in private subnets)
+            const privateSubnets = vpc.selectSubnets({
+                subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
+            });
+
+            // ECR API endpoint
+            new ec2.InterfaceVpcEndpoint(this, 'EcrApiEndpoint', {
+                vpc,
+                service: ec2.InterfaceVpcEndpointAwsService.ECR,
+                subnets: privateSubnets,
+                securityGroups: [vpcEndpointSg],
+                privateDnsEnabled: true,
+            });
+
+            // ECR Docker endpoint
+            new ec2.InterfaceVpcEndpoint(this, 'EcrDockerEndpoint', {
+                vpc,
+                service: ec2.InterfaceVpcEndpointAwsService.ECR_DOCKER,
+                subnets: privateSubnets,
+                securityGroups: [vpcEndpointSg],
+                privateDnsEnabled: true,
+            });
+
+            // CloudWatch Logs endpoint
+            new ec2.InterfaceVpcEndpoint(this, 'CloudWatchLogsEndpoint', {
+                vpc,
+                service: ec2.InterfaceVpcEndpointAwsService.CLOUDWATCH_LOGS,
+                subnets: privateSubnets,
+                securityGroups: [vpcEndpointSg],
+                privateDnsEnabled: true,
+            });
+
+            // Secrets Manager endpoint
+            new ec2.InterfaceVpcEndpoint(this, 'SecretsManagerEndpoint', {
+                vpc,
+                service: ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER,
+                subnets: privateSubnets,
+                securityGroups: [vpcEndpointSg],
+                privateDnsEnabled: true,
+            });
+
+            // SSM endpoint (for bastion instance)
+            new ec2.InterfaceVpcEndpoint(this, 'SsmEndpoint', {
+                vpc,
+                service: ec2.InterfaceVpcEndpointAwsService.SSM,
+                subnets: privateSubnets,
+                securityGroups: [vpcEndpointSg],
+                privateDnsEnabled: true,
+            });
+
+            // SSM Messages endpoint (required for SSM Session Manager)
+            new ec2.InterfaceVpcEndpoint(this, 'SsmMessagesEndpoint', {
+                vpc,
+                service: ec2.InterfaceVpcEndpointAwsService.SSM_MESSAGES,
+                subnets: privateSubnets,
+                securityGroups: [vpcEndpointSg],
+                privateDnsEnabled: true,
+            });
+
+            // EC2 Messages endpoint (required for SSM Session Manager)
+            new ec2.InterfaceVpcEndpoint(this, 'Ec2MessagesEndpoint', {
+                vpc,
+                service: ec2.InterfaceVpcEndpointAwsService.EC2_MESSAGES,
+                subnets: privateSubnets,
+                securityGroups: [vpcEndpointSg],
+                privateDnsEnabled: true,
+            });
+
+            // S3 Gateway Endpoint (free, no security group needed)
+            new ec2.GatewayVpcEndpoint(this, 'S3GatewayEndpoint', {
+                vpc,
+                service: ec2.GatewayVpcEndpointAwsService.S3,
+                subnets: [privateSubnets],
+            });
+        }
+
         // Export bastion instance ID for developer convenience
         new cdk.CfnOutput(this, 'BastionInstanceId', {
             value: bastionInstance.instanceId,

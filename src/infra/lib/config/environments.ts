@@ -32,7 +32,7 @@ export const stagingConfig: EnvironmentConfig = {
     },
     network: {
         maxAzs: 2,
-        natGateways: 1,
+        natGateways: 0,
     },
 };
 

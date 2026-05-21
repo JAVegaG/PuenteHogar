@@ -71,27 +71,33 @@ export class DataStack extends cdk.Stack {
         });
 
         // 3.4 — ElastiCache Redis 7 replication group in isolated subnets
-        const redisSubnetGroup = new elasticache.CfnSubnetGroup(this, 'RedisSubnetGroup', {
-            description: 'Subnet group for ElastiCache Redis in data subnets',
-            subnetIds: props.dataSubnets.map(subnet => subnet.subnetId),
-            cacheSubnetGroupName: `${id}-redis-subnets`.toLowerCase(),
-        });
+        // Conditionally skip ElastiCache in staging to reduce costs (~$12/month savings)
+        let redisEndpointAddress = '';
 
-        const redisReplicationGroup = new elasticache.CfnReplicationGroup(this, 'RedisCluster', {
-            replicationGroupDescription: 'ElastiCache Redis 7 cluster for application caching',
-            engine: 'redis',
-            engineVersion: '7.1',
-            cacheNodeType: isProduction ? 'cache.t3.small' : 'cache.t3.micro',
-            numCacheClusters: isProduction ? 2 : 1,
-            automaticFailoverEnabled: isProduction,
-            cacheSubnetGroupName: redisSubnetGroup.cacheSubnetGroupName,
-            securityGroupIds: [props.dataSecurityGroup.securityGroupId],
-            atRestEncryptionEnabled: true,
-            transitEncryptionEnabled: true,
-            port: 6379,
-        });
+        if (isProduction) {
+            const redisSubnetGroup = new elasticache.CfnSubnetGroup(this, 'RedisSubnetGroup', {
+                description: 'Subnet group for ElastiCache Redis in data subnets',
+                subnetIds: props.dataSubnets.map(subnet => subnet.subnetId),
+                cacheSubnetGroupName: `${id}-redis-subnets`.toLowerCase(),
+            });
 
-        redisReplicationGroup.addDependency(redisSubnetGroup);
+            const redisReplicationGroup = new elasticache.CfnReplicationGroup(this, 'RedisCluster', {
+                replicationGroupDescription: 'ElastiCache Redis 7 cluster for application caching',
+                engine: 'redis',
+                engineVersion: '7.1',
+                cacheNodeType: 'cache.t3.small',
+                numCacheClusters: 2,
+                automaticFailoverEnabled: true,
+                cacheSubnetGroupName: redisSubnetGroup.cacheSubnetGroupName,
+                securityGroupIds: [props.dataSecurityGroup.securityGroupId],
+                atRestEncryptionEnabled: true,
+                transitEncryptionEnabled: true,
+                port: 6379,
+            });
+
+            redisReplicationGroup.addDependency(redisSubnetGroup);
+            redisEndpointAddress = redisReplicationGroup.attrPrimaryEndPointAddress;
+        }
 
         // 3.5 — S3 bucket with versioning, SSE-S3, block public access, CORS, lifecycle
         const assetsBucket = new s3.Bucket(this, 'AssetsBucket', {
@@ -149,7 +155,7 @@ export class DataStack extends cdk.Stack {
         // 3.7 — Export all outputs as stack properties
         this.dbInstance = dbInstance;
         this.dbSecret = dbSecret;
-        this.redisEndpoint = redisReplicationGroup.attrPrimaryEndPointAddress;
+        this.redisEndpoint = redisEndpointAddress;
         this.assetsBucket = assetsBucket;
         this.jwtSecret = jwtSecret;
         this.piiKeySecret = piiKeySecret;
