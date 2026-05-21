@@ -142,7 +142,10 @@ const myNewSecret = new secretsmanager.Secret(this, 'MyNewSecret', {
 ```typescript
 secrets: {
     // ... existing secrets
+    // Full secret value:
     MY_NEW_SECRET: ecs.Secret.fromSecretsManager(props.myNewSecret),
+    // Or extract a specific JSON field from a structured secret:
+    MY_FIELD: ecs.Secret.fromSecretsManager(props.myNewSecret, 'fieldName'),
 },
 ```
 
@@ -151,7 +154,34 @@ secrets: {
 ### How It Works
 
 - **Non-sensitive vars** (`environment`): Resolved at deploy time from CDK cross-stack references (DB host, Redis endpoint, S3 bucket name, etc.)
-- **Sensitive vars** (`secrets`): Reference Secrets Manager ARNs — ECS resolves them at container start, values never appear in CloudFormation templates.
+- **Sensitive vars** (`secrets`): Reference Secrets Manager ARNs — ECS resolves them at container start, values never appear in CloudFormation templates. Secrets can reference a full secret value or a specific JSON field within a structured secret (e.g., `DB_PASSWORD` extracts only the `password` field from the DB secret).
+
+### Current Backend Environment Variables
+
+| Variable | Source | Description |
+|----------|--------|-------------|
+| `DB_HOST` | DataStack (RDS endpoint) | PostgreSQL host address |
+| `DB_PORT` | DataStack (RDS port) | PostgreSQL port |
+| `DB_NAME` | Hardcoded | Database name (`rental_platform`) |
+| `DB_USER` | Hardcoded | Database user (`app_user`) |
+| `REDIS_HOST` | DataStack (ElastiCache endpoint) | Redis host address |
+| `REDIS_PORT` | Hardcoded | Redis port (`6379`) |
+| `REDIS_URL` | Computed | Full Redis connection URL |
+| `S3_BUCKET_NAME` | DataStack (S3 bucket) | Assets bucket name |
+| `S3_REGION` | Stack region | AWS region for S3 operations |
+| `NODE_ENV` | Environment config | `production` or `development` |
+| `PORT` | Hardcoded | Application port (`3000`) |
+| `DB_PASSWORD` | Secrets Manager (JSON field) | Extracted `password` field from DB secret |
+| `JWT_SECRET` | Secrets Manager | JWT signing key |
+| `PII_ENCRYPTION_KEY` | Secrets Manager | AES-256 key for PII encryption |
+
+The backend constructs `DATABASE_URL` at runtime from the individual `DB_*` components (with `?sslmode=no-verify` for TLS connections to RDS without certificate verification).
+
+### Automatic Migrations on Startup
+
+The backend container entrypoint runs `prisma migrate deploy` automatically before starting the application. This is idempotent — already-applied migrations are skipped, so it's safe to run on every container start (including rolling deployments with multiple tasks).
+
+If migrations fail (e.g., connectivity issue during startup), the container logs the error and continues starting the application anyway. This prevents a single migration failure from blocking all deployments when the schema is already up to date.
 
 ## Database Access via EC2 Instance Connect Endpoint
 
@@ -256,9 +286,21 @@ src/infra/
 
 Run `npm install` and `npm run build` first.
 
+### Frontend API routing
+
+The frontend uses **relative API paths** (e.g., `/api/*`) — no `NEXT_PUBLIC_API_URL` environment variable is needed. The ALB's path-based routing forwards `/api/*` requests to the backend target group, so the frontend simply calls `/api/...` and the infrastructure handles routing transparently. This works both locally (Next.js rewrites) and in production (ALB listener rules).
+
 ### Backend Docker build fails with "Cannot resolve environment variable: DATABASE_URL"
 
 The backend Dockerfile sets a dummy `DATABASE_URL` during build for Prisma client generation. If you see this error, ensure you're using the latest Dockerfile from `src/infra/docker/backend.Dockerfile`.
+
+### Migrations fail on container startup
+
+The entrypoint runs `prisma migrate deploy` before starting the app. If you see "Migration failed, continuing anyway..." in the logs:
+1. Check that the RDS instance is reachable from the ECS task's subnet (security group rules)
+2. Verify the `DB_PASSWORD` secret is correctly populated in Secrets Manager
+3. Check CloudWatch logs at `/ecs/{env}/backend` for the specific Prisma error
+4. Migrations are idempotent — if the schema is already current, the failure is harmless
 
 ### Stack deployment fails with "Resource limit exceeded"
 
