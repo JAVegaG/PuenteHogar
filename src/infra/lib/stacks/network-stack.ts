@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import { Construct } from 'constructs';
 
@@ -17,6 +18,7 @@ export class NetworkStack extends cdk.Stack {
     public readonly ecsServiceSecurityGroup: ec2.ISecurityGroup;
     public readonly albSecurityGroup: ec2.ISecurityGroup;
     public readonly dataSecurityGroup: ec2.ISecurityGroup;
+    public readonly bastionInstanceId: string;
 
     // Override availabilityZones to avoid AWS API calls during synthesis
     get availabilityZones(): string[] {
@@ -137,6 +139,52 @@ export class NetworkStack extends cdk.Stack {
             trafficType: ec2.FlowLogTrafficType.ALL,
         });
 
+        // SSM Bastion Instance for DB access via port forwarding
+        const bastionSg = new ec2.SecurityGroup(this, 'BastionSecurityGroup', {
+            vpc,
+            description: 'Security group for SSM Bastion instance',
+            allowAllOutbound: false,
+        });
+
+        bastionSg.addEgressRule(
+            dataSg,
+            ec2.Port.tcp(5432),
+            'Allow outbound to data SG on PostgreSQL port',
+        );
+
+        // Allow inbound from bastion SG to data SG on port 5432
+        dataSg.addIngressRule(
+            bastionSg,
+            ec2.Port.tcp(5432),
+            'Allow inbound from Bastion SG on PostgreSQL port',
+        );
+
+        // IAM Role for SSM Session Manager access
+        const bastionRole = new iam.Role(this, 'BastionRole', {
+            assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
+            description: 'IAM role for SSM Bastion instance',
+            managedPolicies: [
+                iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore'),
+            ],
+        });
+
+        // SSM Bastion EC2 Instance (t4g.nano, ARM-based, Amazon Linux 2023)
+        const bastionInstance = new ec2.Instance(this, 'BastionInstance', {
+            vpc,
+            vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+            instanceType: ec2.InstanceType.of(ec2.InstanceClass.T4G, ec2.InstanceSize.NANO),
+            machineImage: ec2.MachineImage.latestAmazonLinux2023({ cpuType: ec2.AmazonLinuxCpuType.ARM_64 }),
+            securityGroup: bastionSg,
+            role: bastionRole,
+        });
+
+        // Export bastion instance ID for developer convenience
+        new cdk.CfnOutput(this, 'BastionInstanceId', {
+            value: bastionInstance.instanceId,
+            description: 'SSM Bastion instance ID for port forwarding to RDS',
+            exportName: `${props.environment}-bastion-instance-id`,
+        });
+
         // Export all outputs as stack properties for cross-stack references
         this.vpc = vpc;
         this.publicSubnets = vpc.selectSubnets({
@@ -151,5 +199,6 @@ export class NetworkStack extends cdk.Stack {
         this.ecsServiceSecurityGroup = ecsServiceSg;
         this.albSecurityGroup = albSg;
         this.dataSecurityGroup = dataSg;
+        this.bastionInstanceId = bastionInstance.instanceId;
     }
 }

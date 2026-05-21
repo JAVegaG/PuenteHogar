@@ -131,11 +131,60 @@ describe('NetworkStack', () => {
         });
     });
 
-    test('creates 3 security groups (ECS service, ALB, Data)', () => {
-        template.resourceCountIs('AWS::EC2::SecurityGroup', 3);
+    test('creates 4 security groups (ECS service, ALB, Data, Bastion)', () => {
+        template.resourceCountIs('AWS::EC2::SecurityGroup', 4);
     });
 
     test('does not create an EC2 Instance Connect Endpoint', () => {
         template.resourceCountIs('AWS::EC2::InstanceConnectEndpoint', 0);
+    });
+
+    test('creates an SSM Bastion EC2 instance with t4g.nano', () => {
+        template.hasResourceProperties('AWS::EC2::Instance', {
+            InstanceType: 't4g.nano',
+        });
+    });
+
+    test('creates an IAM role with AmazonSSMManagedInstanceCore policy', () => {
+        template.hasResourceProperties('AWS::IAM::Role', {
+            ManagedPolicyArns: Match.arrayWith([
+                Match.objectLike({
+                    'Fn::Join': Match.arrayWith([
+                        Match.arrayWith([
+                            Match.stringLikeRegexp('AmazonSSMManagedInstanceCore'),
+                        ]),
+                    ]),
+                }),
+            ]),
+        });
+    });
+
+    test('creates an IAM instance profile for the bastion', () => {
+        template.resourceCountIs('AWS::IAM::InstanceProfile', 1);
+    });
+
+    test('creates bastion security group with outbound to data SG on port 5432', () => {
+        // Bastion SG has an egress rule to data SG on port 5432
+        template.hasResourceProperties('AWS::EC2::SecurityGroupEgress', {
+            IpProtocol: 'tcp',
+            FromPort: 5432,
+            ToPort: 5432,
+            Description: 'Allow outbound to data SG on PostgreSQL port',
+        });
+    });
+
+    test('creates data SG inbound rule from bastion SG on port 5432', () => {
+        template.hasResourceProperties('AWS::EC2::SecurityGroupIngress', {
+            IpProtocol: 'tcp',
+            FromPort: 5432,
+            ToPort: 5432,
+            Description: 'Allow inbound from Bastion SG on PostgreSQL port',
+        });
+    });
+
+    test('exports bastion instance ID as a CfnOutput', () => {
+        template.hasOutput('BastionInstanceId', {
+            Description: 'SSM Bastion instance ID for port forwarding to RDS',
+        });
     });
 });
