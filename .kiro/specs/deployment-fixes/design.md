@@ -282,3 +282,28 @@ END FOR
 **Design Note**: Redis-related environment variables (`REDIS_HOST`, `REDIS_PORT`, `REDIS_URL`) must only be injected into the ECS task definition when `redisEndpoint` is non-empty. This ensures the `RedisService` enters its no-op fallback path cleanly when ElastiCache is not provisioned.
 
 **Affected File**: `src/infra/lib/stacks/compute-stack.ts` — wrapped Redis env vars in a conditional spread.
+
+
+### Finding 4.5 — SSL Connection to RDS
+
+**Problem**: RDS enforces SSL (`rds.force_ssl=1`) and uses Amazon's CA certificate. Node.js `pg` driver rejects self-signed certificates by default.
+
+**Design Note**: The constructed `DATABASE_URL` must include `?sslmode=no-verify` to enable encryption without certificate validation. This is acceptable within a VPC where the network path is trusted. For production with stricter requirements, download the RDS CA bundle and set `ssl.ca` in the pg pool options.
+
+**Affected File**: `src/backend/src/shared/prisma/prisma.service.ts` — appended `?sslmode=no-verify` to the constructed connection string.
+
+### Finding 4.6 — ECS Deployment Strategy
+
+**Problem**: ECS doesn't automatically redeploy when a new image is pushed with the same tag.
+
+**Design Note**: After pushing images to ECR, always run `aws ecs update-service --force-new-deployment` to trigger a rolling update. Future CI/CD pipelines should use unique image tags (e.g., git SHA) and update the task definition to reference the new tag, which triggers automatic deployment.
+
+**Affected Files**: No code changes — operational procedure.
+
+### Finding 4.7 — Swagger Module Path Configuration
+
+**Problem**: `SwaggerModule.setup('api/docs', ...)` generates incorrect relative asset paths because it doesn't understand the global prefix context.
+
+**Design Note**: Always use `SwaggerModule.setup('docs', app, document, { useGlobalPrefix: true })` when a global prefix is configured. This lets the module correctly compute the full mount path (`/api/docs`) and generate proper relative URLs for CSS/JS assets.
+
+**Affected File**: `src/backend/src/main.ts` — changed setup path from `'api/docs'` to `'docs'` with `useGlobalPrefix: true`.

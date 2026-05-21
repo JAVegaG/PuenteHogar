@@ -82,3 +82,27 @@ Issues discovered during manual QA deployment testing (Task 9):
 **Root Cause**: The compute stack unconditionally set `REDIS_URL: redis://${props.redisEndpoint}:6379`. In staging, `redisEndpoint` is `''` (ElastiCache is skipped), resulting in `redis://:6379` which ioredis interprets as `localhost:6379`.
 
 **Fix**: Made Redis env vars (`REDIS_HOST`, `REDIS_PORT`, `REDIS_URL`) conditional in `src/infra/lib/stacks/compute-stack.ts` — only set when `props.redisEndpoint` is non-empty. In staging, the `RedisService` sees no `REDIS_URL` and enters no-op fallback mode cleanly.
+
+### Finding 4.5 — RDS requires SSL but DATABASE_URL lacked sslmode parameter
+
+**Observed**: WHEN the backend connects to RDS THEN queries fail with `no pg_hba.conf entry for host "10.0.3.17", user "app_user", database "rental_platform", no encryption` (PostgreSQL error code 28000).
+
+**Root Cause**: RDS PostgreSQL instances enforce SSL connections by default (`rds.force_ssl=1`). The constructed `DATABASE_URL` did not include any SSL parameter, so `@prisma/adapter-pg` connected without encryption. Using `sslmode=require` also failed because RDS uses Amazon's self-signed CA certificate which Node.js doesn't trust.
+
+**Fix**: Added `?sslmode=no-verify` to the constructed `DATABASE_URL` in `PrismaService.buildConnectionString()`. This enables SSL encryption but skips certificate validation (acceptable for RDS where the network path is already within the VPC).
+
+### Finding 4.6 — ECS service doesn't auto-deploy on image tag update
+
+**Observed**: WHEN a new Docker image is pushed to ECR with the same `latest` tag THEN the running ECS service continues using the old image until explicitly told to redeploy.
+
+**Root Cause**: ECS caches the image digest from the task definition. Pushing a new image with the same tag doesn't trigger a new deployment — the service must be explicitly updated.
+
+**Fix**: After pushing a new image, run `aws ecs update-service --cluster staging-compute-cluster --service <service-name> --force-new-deployment --region us-east-1` to force ECS to pull the latest image.
+
+### Finding 4.7 — Swagger UI asset paths broken behind ALB with global prefix
+
+**Observed**: WHEN accessing `/api/docs` via the ALB THEN the Swagger HTML loads but CSS/JS assets fail to load because they resolve to incorrect paths (double `docs` in path or HTTPS upgrade by browser).
+
+**Root Cause**: Using `SwaggerModule.setup('api/docs', ...)` caused NestJS Swagger to generate relative asset URLs like `./docs/swagger-ui.css` which resolved to `/api/docs/docs/swagger-ui.css` (incorrect). The module didn't know the full mount path structure.
+
+**Fix**: Changed to `SwaggerModule.setup('docs', app, document, { useGlobalPrefix: true })`. This tells NestJS Swagger that the path is `docs` under the global prefix `api`, so it correctly generates asset URLs relative to `/api/docs`.
