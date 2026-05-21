@@ -41,10 +41,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   private runMigrations(): void {
     try {
       this.logger.log('Running Prisma migrations...');
+      this.logger.log(`DATABASE_URL is ${process.env.DATABASE_URL ? 'set' : 'NOT set'} in process.env`);
       execSync(PrismaService.MIGRATE_COMMAND, {
         stdio: 'pipe',
         timeout: PrismaService.MIGRATE_TIMEOUT_MS,
-        env: { ...process.env },
       });
       this.logger.log('Prisma migrations applied successfully');
     } catch (error) {
