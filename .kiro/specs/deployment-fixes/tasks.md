@@ -31,9 +31,9 @@
   - Mark task complete when tests are written, run, and passing on unfixed code
   - _Requirements: 3.3, 3.4, 3.5, 3.7, 3.8_
 
-- [ ] 3. Fix Issue 1 — Replace EIC Endpoint with SSM Bastion for DB Access
+- [-] 3. Fix Issue 1 — Replace EIC Endpoint with SSM Bastion for DB Access
 
-  - [ ] 3.1 Remove EIC Endpoint from network-stack.ts
+  - [x] 3.1 Remove EIC Endpoint from network-stack.ts
     - Delete the `EicEndpointSecurityGroup` security group and its egress rule to data SG on port 5432
     - Delete the `dataSg.addIngressRule(eicSg, ...)` rule allowing inbound from EIC SG
     - Delete the `CfnInstanceConnectEndpoint` resource
