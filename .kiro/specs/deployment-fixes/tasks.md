@@ -133,7 +133,7 @@
     - _Expected_Behavior: Backend operates without Redis in staging using no-op cache fallback_
     - _Requirements: 2.4_
 
-- [-] 7. Verify fixes and run all tests
+- [x] 7. Verify fixes and run all tests
 
   - [x] 7.1 Verify bug condition exploration test now passes
     - **Property 1: Expected Behavior** - Frontend API Calls Reach Backend
@@ -162,7 +162,7 @@
     - Test: password with special characters is properly URL-encoded
     - _Requirements: 2.2, 3.1_
 
-  - [~] 7.5 Docker build verification
+  - [x] 7.5 Docker build verification
     - Build backend Docker image — verify no `entrypoint.sh`, CMD is `node dist/src/main.js`
     - Build frontend Docker image — verify `NEXT_PUBLIC_API_URL=/api` is set before build step
     - _Requirements: 2.2, 2.3_
