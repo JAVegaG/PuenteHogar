@@ -16,7 +16,7 @@
   - Mark task complete when test is written, run, and failure is documented
   - _Requirements: 2.3_
 
-- [ ] 2. Write preservation property tests (BEFORE implementing fix)
+- [x] 2. Write preservation property tests (BEFORE implementing fix)
   - **Property 2: Preservation** - Controller Routes and Service Patterns Unchanged
   - **IMPORTANT**: Follow observation-first methodology
   - Observe: NestJS controllers use bare decorators (`@Controller('auth')`, `@Controller('portfolio')`, etc.) — these must NOT change
