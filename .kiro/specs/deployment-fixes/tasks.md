@@ -50,9 +50,9 @@
     - _Expected_Behavior: Developers use `aws ssm start-session --target <instance-id> --document-name AWS-StartPortForwardingSessionToRemoteHost --parameters '{"host":["<rds-endpoint>"],"portNumber":["5432"],"localPortNumber":["5432"]}'`_
     - _Requirements: 2.1_
 
-- [ ] 4. Fix Issue 2 — Move DATABASE_URL Construction and Migrations to NestJS Application Code
+- [-] 4. Fix Issue 2 — Move DATABASE_URL Construction and Migrations to NestJS Application Code
 
-  - [ ] 4.1 Update PrismaService to construct DATABASE_URL from env vars
+  - [x] 4.1 Update PrismaService to construct DATABASE_URL from env vars
     - In `src/backend/src/shared/prisma/prisma.service.ts`, build the connection string from `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` environment variables inside the constructor
     - Fall back to `process.env.DATABASE_URL` if it is already set (for local development)
     - Use proper URL encoding for the password component
