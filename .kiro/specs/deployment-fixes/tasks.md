@@ -50,7 +50,7 @@
     - _Expected_Behavior: Developers use `aws ssm start-session --target <instance-id> --document-name AWS-StartPortForwardingSessionToRemoteHost --parameters '{"host":["<rds-endpoint>"],"portNumber":["5432"],"localPortNumber":["5432"]}'`_
     - _Requirements: 2.1_
 
-- [-] 4. Fix Issue 2 — Move DATABASE_URL Construction and Migrations to NestJS Application Code
+- [x] 4. Fix Issue 2 — Move DATABASE_URL Construction and Migrations to NestJS Application Code
 
   - [x] 4.1 Update PrismaService to construct DATABASE_URL from env vars
     - In `src/backend/src/shared/prisma/prisma.service.ts`, build the connection string from `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` environment variables inside the constructor
@@ -69,7 +69,7 @@
     - _Preservation: Migrations continue to run before serving requests (idempotent)_
     - _Requirements: 2.2, 3.2_
 
-  - [ ] 4.3 Remove entrypoint script from backend Dockerfile
+  - [x] 4.3 Remove entrypoint script from backend Dockerfile
     - Delete the `RUN printf ... > /app/entrypoint.sh` block from `src/infra/docker/backend.Dockerfile`
     - Remove `ENTRYPOINT ["/app/entrypoint.sh"]`
     - Change `CMD ["node", "dist/src/main.js"]` to be the sole startup command (no ENTRYPOINT)
