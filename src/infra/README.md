@@ -8,7 +8,7 @@ The infrastructure uses **ECS Fargate** for compute with an **Application Load B
 
 | Stack | Purpose |
 |-------|---------|
-| **NetworkStack** | VPC, subnets, NAT Gateway, security groups (ECS, ALB, Data, EIC), EC2 Instance Connect Endpoint |
+| **NetworkStack** | VPC, subnets, NAT Gateway, security groups (ECS, ALB, Data, Bastion), SSM Bastion instance for DB access |
 | **DataStack** | RDS PostgreSQL 16, ElastiCache Redis 7, S3 bucket, Secrets Manager |
 | **CiStack** | ECR repositories, GitHub Actions IAM role |
 | **ComputeStack** | ECS Cluster, ALB, Fargate services (backend + frontend), task definitions, IAM roles, auto-scaling |
@@ -183,27 +183,30 @@ The backend container entrypoint runs `prisma migrate deploy` automatically befo
 
 If migrations fail (e.g., connectivity issue during startup), the container logs the error and continues starting the application anyway. This prevents a single migration failure from blocking all deployments when the schema is already up to date.
 
-## Database Access via EC2 Instance Connect Endpoint
+## Database Access via SSM Bastion (Port Forwarding)
 
-The RDS instance is in isolated subnets with no public IP. To connect from your local machine, use the EC2 Instance Connect Endpoint (EIC) to open a secure tunnel:
+The RDS instance is in isolated subnets with no public IP. To connect from your local machine, use the SSM Bastion instance to open a port-forwarding session:
 
-### 1. Open a tunnel to RDS
+### 1. Get the Bastion Instance ID
+
+The bastion instance ID is exported as a CDK stack output (`{env}-bastion-instance-id`). You can also find it in the AWS Console under EC2 → Instances (look for the `BastionInstance` tag).
+
+### 2. Open a port-forwarding session to RDS
 
 ```bash
-aws ec2-instance-connect open-tunnel \
-    --instance-connect-endpoint-id ENDPOINT_ID \
-    --private-ip-address RDS_PRIVATE_IP \
-    --local-port 5432 \
-    --remote-port 5432
+aws ssm start-session \
+    --target BASTION_INSTANCE_ID \
+    --document-name AWS-StartPortForwardingSessionToRemoteHost \
+    --parameters '{"host":["RDS_ENDPOINT"],"portNumber":["5432"],"localPortNumber":["5432"]}'
 ```
 
 Replace:
-- `ENDPOINT_ID` — The EIC Endpoint ID (find it in the AWS Console under VPC → Endpoints, or from the CDK stack outputs)
-- `RDS_PRIVATE_IP` — The private IP of the RDS instance (from stack outputs or `aws rds describe-db-instances`)
+- `BASTION_INSTANCE_ID` — The EC2 instance ID of the bastion (from stack outputs or AWS Console)
+- `RDS_ENDPOINT` — The RDS endpoint hostname (from stack outputs or `aws rds describe-db-instances`)
 
-### 2. Connect via psql
+### 3. Connect via psql
 
-With the tunnel open, connect to `localhost:5432`:
+With the session open, connect to `localhost:5432`:
 
 ```bash
 psql -h localhost -p 5432 -U app_user -d rental_platform
@@ -220,17 +223,16 @@ aws secretsmanager get-secret-value \
 
 ### IAM Permissions Required
 
-Your IAM user/role must have the `ec2-instance-connect:OpenTunnel` permission scoped to the EIC Endpoint. This is controlled via IAM policy — no SSH keys or open inbound ports are needed.
+Your IAM user/role must have `ssm:StartSession` permission scoped to the bastion instance. No SSH keys or open inbound ports are needed — access is exclusively via SSM Session Manager.
 
 ### Using with Prisma Studio
 
 ```bash
-# Terminal 1: Open the tunnel
-aws ec2-instance-connect open-tunnel \
-    --instance-connect-endpoint-id ENDPOINT_ID \
-    --private-ip-address RDS_PRIVATE_IP \
-    --local-port 5432 \
-    --remote-port 5432
+# Terminal 1: Open the port-forwarding session
+aws ssm start-session \
+    --target BASTION_INSTANCE_ID \
+    --document-name AWS-StartPortForwardingSessionToRemoteHost \
+    --parameters '{"host":["RDS_ENDPOINT"],"portNumber":["5432"],"localPortNumber":["5432"]}'
 
 # Terminal 2: Run Prisma Studio pointing to localhost
 DATABASE_URL="postgresql://app_user:PASSWORD@localhost:5432/rental_platform" \
