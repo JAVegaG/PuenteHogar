@@ -156,7 +156,7 @@
     - `npx cdk synth` for production — verify full infrastructure unchanged (NAT Gateway, ElastiCache, ALB, all resources)
     - _Requirements: 3.5, 3.6_
 
-  - [~] 7.4 Run unit tests for PrismaService DATABASE_URL construction
+  - [x] 7.4 Run unit tests for PrismaService DATABASE_URL construction
     - Test: when `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` are set, DATABASE_URL is correctly constructed
     - Test: when `DATABASE_URL` is already set, it is used as-is (fallback behavior)
     - Test: password with special characters is properly URL-encoded
