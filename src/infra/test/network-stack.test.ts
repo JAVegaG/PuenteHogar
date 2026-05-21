@@ -125,30 +125,17 @@ describe('NetworkStack', () => {
         });
     });
 
-    test('creates an EC2 Instance Connect Endpoint', () => {
-        template.hasResourceProperties('AWS::EC2::InstanceConnectEndpoint', {
-            PreserveClientIp: false,
-        });
-    });
-
-    test('creates EIC security group with outbound to data SG on port 5432 only', () => {
-        const egressRules = template.findResources('AWS::EC2::SecurityGroupEgress', {
-            Properties: {
-                IpProtocol: 'tcp',
-                FromPort: 5432,
-                ToPort: 5432,
-            },
-        });
-        expect(Object.keys(egressRules).length).toBeGreaterThanOrEqual(1);
-    });
-
     test('enables VPC Flow Logs', () => {
         template.hasResourceProperties('AWS::EC2::FlowLog', {
             TrafficType: 'ALL',
         });
     });
 
-    test('creates 4 security groups (ECS service, ALB, Data, EIC)', () => {
-        template.resourceCountIs('AWS::EC2::SecurityGroup', 4);
+    test('creates 3 security groups (ECS service, ALB, Data)', () => {
+        template.resourceCountIs('AWS::EC2::SecurityGroup', 3);
+    });
+
+    test('does not create an EC2 Instance Connect Endpoint', () => {
+        template.resourceCountIs('AWS::EC2::InstanceConnectEndpoint', 0);
     });
 });

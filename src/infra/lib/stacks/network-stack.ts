@@ -124,35 +124,6 @@ export class NetworkStack extends cdk.Stack {
             'Allow inbound from ALB on application port',
         );
 
-        // EIC Endpoint security group (outbound to data SG on port 5432 only)
-        const eicSg = new ec2.SecurityGroup(this, 'EicEndpointSecurityGroup', {
-            vpc,
-            description: 'Security group for EC2 Instance Connect Endpoint',
-            allowAllOutbound: false,
-        });
-
-        eicSg.addEgressRule(
-            dataSg,
-            ec2.Port.tcp(5432),
-            'Allow outbound to data SG on PostgreSQL port',
-        );
-
-        // Data SG also allows inbound from EIC SG on port 5432
-        dataSg.addIngressRule(
-            eicSg,
-            ec2.Port.tcp(5432),
-            'Allow inbound from EIC Endpoint SG on PostgreSQL port',
-        );
-
-        // EC2 Instance Connect Endpoint in the VPC for secure developer access to RDS
-        new ec2.CfnInstanceConnectEndpoint(this, 'EicEndpoint', {
-            subnetId: vpc.selectSubnets({
-                subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
-            }).subnetIds[0],
-            securityGroupIds: [eicSg.securityGroupId],
-            preserveClientIp: false,
-        });
-
         // VPC Flow Logs to CloudWatch Logs
         vpc.addFlowLog('FlowLog', {
             destination: ec2.FlowLogDestination.toCloudWatchLogs(
