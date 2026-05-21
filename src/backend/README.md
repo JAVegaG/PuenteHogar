@@ -28,7 +28,7 @@ src/backend/
 │       └── states_citys_colombia.seed.csv   # Datos DANE: 33 departamentos, 1,122 municipios (delimitado por ;)
 ├── src/
 │   ├── app.module.ts           # Módulo raíz
-│   ├── main.ts                 # Bootstrap: NestExpressApplication, Helmet, trust proxy, ValidationPipe, Swagger, CORS, Morgan HTTP logging (format: 'dev' | 'combined' según NODE_ENV)
+│   ├── main.ts                 # Bootstrap: NestExpressApplication, global prefix `/api`, Helmet, trust proxy, ValidationPipe, Swagger (`/api/docs`), CORS, Morgan HTTP logging (format: 'dev' | 'combined' según NODE_ENV)
 │   ├── config/
 │   │   └── configuration.ts   # Variables de entorno tipadas
 │   └── shared/                 # Componentes transversales
@@ -192,6 +192,8 @@ const where = withSoftDeleteFilter({ is_active: true }); // => { is_active: true
 
 Disponible en `http://localhost:{PORT}/api/docs` cuando el servidor está corriendo.
 
+- **Global prefix**: todas las rutas de controladores se sirven bajo `/api/*` (configurado via `app.setGlobalPrefix('api')` en `main.ts`)
+- **Swagger setup path**: `'docs'` — se resuelve a `/api/docs` con el prefijo global
 - Autenticación: JWT Bearer token via el botón "Authorize" en Swagger UI
 - Todos los endpoints protegidos requieren `@ApiBearerAuth('JWT')`
 - Todos los controladores tienen `@ApiTags`, `@ApiOperation` y decoradores de respuesta por ruta
