@@ -29,6 +29,7 @@ COPY . .
 # Set environment for build
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+ENV NEXT_PUBLIC_API_URL=/api
 
 # Build the Next.js application (standalone output)
 RUN npm run build
