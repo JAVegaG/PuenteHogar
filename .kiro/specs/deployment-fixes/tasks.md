@@ -151,7 +151,7 @@
     - **EXPECTED OUTCOME**: Tests PASS (confirms no regressions)
     - Confirm controller decorators unchanged, frontend service patterns unchanged, production config unchanged
 
-  - [~] 7.3 Run CDK synth for staging and production
+  - [x] 7.3 Run CDK synth for staging and production
     - `npx cdk synth` for staging — verify no NAT Gateway, no ElastiCache, VPC endpoints present, SSM bastion present
     - `npx cdk synth` for production — verify full infrastructure unchanged (NAT Gateway, ElastiCache, ALB, all resources)
     - _Requirements: 3.5, 3.6_
