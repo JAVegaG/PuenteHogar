@@ -75,7 +75,7 @@
     - Change `CMD ["node", "dist/src/main.js"]` to be the sole startup command (no ENTRYPOINT)
     - _Requirements: 2.2_
 
-- [-] 5. Fix Issue 3 — Add Global `/api` Prefix to NestJS and Set NEXT_PUBLIC_API_URL
+- [x] 5. Fix Issue 3 — Add Global `/api` Prefix to NestJS and Set NEXT_PUBLIC_API_URL
 
   - [x] 5.1 Add `app.setGlobalPrefix('api')` in main.ts
     - Add `app.setGlobalPrefix('api')` after `const app = await NestFactory.create<NestExpressApplication>(AppModule)`
@@ -93,7 +93,7 @@
     - _Expected_Behavior: ALB health check at /api/health returns HTTP 200_
     - _Requirements: 3.8_
 
-  - [ ] 5.3 Set `NEXT_PUBLIC_API_URL=/api` in frontend Dockerfile
+  - [x] 5.3 Set `NEXT_PUBLIC_API_URL=/api` in frontend Dockerfile
     - Add `ENV NEXT_PUBLIC_API_URL=/api` in the build stage of `src/infra/docker/frontend.Dockerfile` BEFORE the `RUN npm run build` step
     - This ensures Next.js inlines `/api` as the API URL at build time
     - No changes needed to frontend service files — they already use `${API_URL}/auth/login` pattern
