@@ -186,7 +186,7 @@
   - Document any issues found as new requirements in a "Post-Implementation Findings" section in requirements.md
   - Add corresponding design notes and implementation tasks for each finding
   - Re-run build and tests after fixes
-  - **QA Findings (7 issues found and fixed):**
+  - **QA Findings (7 issues found and fixed + 1 enhancement):**
     - Finding 4.1: Docker images must be built with `--platform linux/amd64` on Apple Silicon for ECS Fargate compatibility
     - Finding 4.2: Prisma 7 removed `url` from schema.prisma — uses `prisma.config.ts` instead; copied config to Docker production stage
     - Finding 4.3: Removed restricted `env` from `execSync` — let it inherit full `process.env` so Prisma CLI can find its engines
@@ -194,4 +194,5 @@
     - Finding 4.5: Added `?sslmode=no-verify` to DATABASE_URL — RDS requires SSL but uses Amazon's self-signed CA
     - Finding 4.6: ECS requires `--force-new-deployment` after pushing new image with same tag
     - Finding 4.7: Swagger setup uses `useGlobalPrefix: true` with path `'docs'` for correct asset resolution behind ALB
+    - Enhancement: Added `staging:sleep` and `staging:wake` scripts to `src/infra/package.json` for cost optimization — tears down compute/network but preserves Data (RDS, S3) and Ci (ECR) stacks
   - Re-ran backend build and tests after fixes — all 342 tests pass, CDK synth passes for both environments
