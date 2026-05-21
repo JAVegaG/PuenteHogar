@@ -8,8 +8,8 @@ The infrastructure uses **ECS Fargate** for compute with an **Application Load B
 
 | Stack | Purpose |
 |-------|---------|
-| **NetworkStack** | VPC, subnets, NAT Gateway, security groups (ECS, ALB, Data, Bastion), SSM Bastion instance for DB access |
-| **DataStack** | RDS PostgreSQL 16, ElastiCache Redis 7, S3 bucket, Secrets Manager |
+| **NetworkStack** | VPC, subnets, NAT Gateway (production only), VPC Endpoints (staging only), security groups (ECS, ALB, Data, Bastion), SSM Bastion instance for DB access |
+| **DataStack** | RDS PostgreSQL 16, ElastiCache Redis 7 (production only), S3 bucket, Secrets Manager |
 | **CiStack** | ECR repositories, GitHub Actions IAM role |
 | **ComputeStack** | ECS Cluster, ALB, Fargate services (backend + frontend), task definitions, IAM roles, auto-scaling |
 | **CdnStack** | CloudFront distribution (ALB + S3 origins), WAF Web ACL, ACM certificate |
@@ -164,9 +164,9 @@ secrets: {
 | `DB_PORT` | DataStack (RDS port) | PostgreSQL port |
 | `DB_NAME` | Hardcoded | Database name (`rental_platform`) |
 | `DB_USER` | Hardcoded | Database user (`app_user`) |
-| `REDIS_HOST` | DataStack (ElastiCache endpoint) | Redis host address |
+| `REDIS_HOST` | DataStack (ElastiCache endpoint) | Redis host address (empty in staging) |
 | `REDIS_PORT` | Hardcoded | Redis port (`6379`) |
-| `REDIS_URL` | Computed | Full Redis connection URL |
+| `REDIS_URL` | Computed | Full Redis connection URL (empty in staging — triggers no-op cache fallback) |
 | `S3_BUCKET_NAME` | DataStack (S3 bucket) | Assets bucket name |
 | `S3_REGION` | Stack region | AWS region for S3 operations |
 | `NODE_ENV` | Environment config | `production` or `development` |
@@ -175,13 +175,13 @@ secrets: {
 | `JWT_SECRET` | Secrets Manager | JWT signing key |
 | `PII_ENCRYPTION_KEY` | Secrets Manager | AES-256 key for PII encryption |
 
-The backend constructs `DATABASE_URL` at runtime from the individual `DB_*` components (with `?sslmode=no-verify` for TLS connections to RDS without certificate verification).
+The backend's `PrismaService` constructs `DATABASE_URL` at runtime from the individual `DB_*` components (with URL-encoded password and `?sslmode=no-verify` for TLS connections to RDS). If `DATABASE_URL` is already set in the environment (e.g., local development), it is used as-is.
 
 ### Automatic Migrations on Startup
 
-The backend container entrypoint runs `prisma migrate deploy` automatically before starting the application. This is idempotent — already-applied migrations are skipped, so it's safe to run on every container start (including rolling deployments with multiple tasks).
+The backend runs `prisma migrate deploy` programmatically inside `PrismaService.onModuleInit()` before connecting to the database. This is idempotent — already-applied migrations are skipped, so it's safe to run on every container start (including rolling deployments with multiple tasks).
 
-If migrations fail (e.g., connectivity issue during startup), the container logs the error and continues starting the application anyway. This prevents a single migration failure from blocking all deployments when the schema is already up to date.
+If migrations fail (e.g., connectivity issue during startup), the error is logged via NestJS Logger and the application continues starting. This prevents a single migration failure from blocking all deployments when the schema is already up to date.
 
 ## Database Access via SSM Bastion (Port Forwarding)
 
@@ -270,6 +270,9 @@ src/infra/
 
 | Setting | Staging | Production |
 |---------|---------|------------|
+| NAT Gateways | 0 (uses VPC Endpoints) | 1 |
+| VPC Endpoints | ECR, CloudWatch Logs, Secrets Manager, SSM, S3 | None (uses NAT) |
+| ElastiCache Redis | Disabled (no-op cache fallback) | cache.t3.small, 2 nodes, failover |
 | Backend CPU/Memory | 512 / 1024 MB | 1024 / 2048 MB |
 | Backend desired/min/max | 1 / 1 / 2 | 2 / 2 / 6 |
 | Frontend CPU/Memory | 256 / 512 MB | 512 / 1024 MB |
@@ -278,7 +281,6 @@ src/infra/
 | RDS instance | db.t3.micro | db.t3.medium |
 | RDS Multi-AZ | No | Yes |
 | RDS backup retention | 7 days | 30 days |
-| Redis node type | cache.t3.micro | cache.t3.small |
 | Log retention | 30 days | 90 days |
 | Container Insights | Disabled | Enhanced |
 
@@ -290,15 +292,17 @@ Run `npm install` and `npm run build` first.
 
 ### Frontend API routing
 
-The frontend uses **relative API paths** (e.g., `/api/*`) — no `NEXT_PUBLIC_API_URL` environment variable is needed. The ALB's path-based routing forwards `/api/*` requests to the backend target group, so the frontend simply calls `/api/...` and the infrastructure handles routing transparently. This works both locally (Next.js rewrites) and in production (ALB listener rules).
+The frontend uses `NEXT_PUBLIC_API_URL=/api` (set at Docker build time in the frontend Dockerfile). All frontend service files use `${API_URL}/auth/login`, `${API_URL}/portfolio`, etc. — the `/api` prefix is injected via this environment variable. The ALB's path-based routing forwards `/api/*` requests to the backend target group, so the frontend calls `/api/...` and the infrastructure handles routing transparently.
+
+For local development, `src/frontend/.env.local` sets `NEXT_PUBLIC_API_URL` to point at the local backend (e.g., `http://192.168.0.100:3000/api`).
 
 ### Backend Docker build fails with "Cannot resolve environment variable: DATABASE_URL"
 
-The backend Dockerfile sets a dummy `DATABASE_URL` during build for Prisma client generation. If you see this error, ensure you're using the latest Dockerfile from `src/infra/docker/backend.Dockerfile`.
+The backend Dockerfile sets a dummy `DATABASE_URL` during build for Prisma client generation only. At runtime, `PrismaService` constructs the real connection string from individual `DB_*` environment variables. If you see this error, ensure you're using the latest Dockerfile from `src/infra/docker/backend.Dockerfile`.
 
 ### Migrations fail on container startup
 
-The entrypoint runs `prisma migrate deploy` before starting the app. If you see "Migration failed, continuing anyway..." in the logs:
+`PrismaService.onModuleInit()` runs `prisma migrate deploy` before connecting. If you see migration errors in the logs:
 1. Check that the RDS instance is reachable from the ECS task's subnet (security group rules)
 2. Verify the `DB_PASSWORD` secret is correctly populated in Secrets Manager
 3. Check CloudWatch logs at `/ecs/{env}/backend` for the specific Prisma error
