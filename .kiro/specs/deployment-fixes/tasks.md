@@ -61,7 +61,7 @@
     - _Expected_Behavior: PrismaService constructs DATABASE_URL internally from individual env vars_
     - _Requirements: 1.2, 2.2, 3.1_
 
-  - [ ] 4.2 Run Prisma migrations programmatically in onModuleInit
+  - [x] 4.2 Run Prisma migrations programmatically in onModuleInit
     - In `PrismaService.onModuleInit()`, run `prisma migrate deploy` programmatically using `execSync('npx prisma migrate deploy --schema=./db/prisma/schema.prisma')` before calling `$connect()`
     - Wrap in try/catch with NestJS Logger for proper error reporting
     - Log migration success/failure with structured output
