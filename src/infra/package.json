@@ -10,12 +10,14 @@
         "synth": "cdk synth --all",
         "synth:staging": "cdk synth --all -c env=staging",
         "synth:production": "cdk synth --all -c env=production",
-        "deploy:staging": "cdk deploy --all -c env=staging",
+        "deploy:staging": "cdk deploy --all -c env=staging --require-approval never",
         "deploy:production": "cdk deploy --all -c env=production --require-approval broadening",
         "diff": "cdk diff --all",
         "diff:staging": "cdk diff --all -c env=staging",
         "diff:production": "cdk diff --all -c env=production",
-        "destroy:staging": "cdk destroy --all -c env=staging",
+        "destroy:staging": "cdk destroy --all -c env=staging --force",
+        "staging:sleep": "cdk destroy staging-Monitoring staging-Cdn staging-Compute staging-Network -c env=staging --force",
+        "staging:wake": "cdk deploy staging-Network staging-Compute staging-Cdn staging-Monitoring -c env=staging --require-approval never",
         "bootstrap": "cdk bootstrap"
     },
     "dependencies": {
