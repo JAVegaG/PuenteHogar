@@ -101,16 +101,16 @@
     - _Preservation: Frontend service layer pattern (authService, portfolioService, centralized API_URL) remains unchanged_
     - _Requirements: 2.3, 3.4_
 
-- [ ] 6. Fix Issue 4 — Cost Optimization for Staging
+- [x] 6. Fix Issue 4 — Cost Optimization for Staging
 
-  - [ ] 6.1 Set natGateways to 0 for staging in environments.ts
+  - [x] 6.1 Set natGateways to 0 for staging in environments.ts
     - Change `natGateways: 1` to `natGateways: 0` in `stagingConfig.network` in `src/infra/lib/config/environments.ts`
     - Production config remains unchanged at `natGateways: 1`
     - _Bug_Condition: isBugCondition(input) where input.type == "STAGING_COST" AND input.monthlyTotal > 30_
     - _Preservation: Production environment continues to use full infrastructure_
     - _Requirements: 2.4, 3.5_
 
-  - [ ] 6.2 Add VPC Endpoints to network-stack.ts for staging
+  - [x] 6.2 Add VPC Endpoints to network-stack.ts for staging
     - When `props.natGateways === 0`, create Interface VPC Endpoints for: ECR API, ECR Docker, CloudWatch Logs, Secrets Manager, SSM, and a Gateway Endpoint for S3
     - Create a security group for VPC endpoints allowing inbound HTTPS (443) from the ECS service security group
     - Add outbound rule on ECS service security group to VPC endpoint security group on port 443
@@ -119,14 +119,14 @@
     - _Preservation: ECS Fargate services continue to have outbound access for ECR image pulls_
     - _Requirements: 2.4, 3.6_
 
-  - [ ] 6.3 Conditionally skip ElastiCache in staging (data-stack.ts)
+  - [x] 6.3 Conditionally skip ElastiCache in staging (data-stack.ts)
     - When `props.environment === 'staging'`, skip the `CfnSubnetGroup` and `CfnReplicationGroup` creation for ElastiCache
     - Set `this.redisEndpoint` to empty string `''` when ElastiCache is skipped
     - Production continues to create the full ElastiCache replication group
     - _Preservation: Production environment retains full ElastiCache infrastructure_
     - _Requirements: 2.4, 3.5_
 
-  - [ ] 6.4 Add graceful Redis fallback in backend
+  - [x] 6.4 Add graceful Redis fallback in backend
     - In the Redis service (or create `src/backend/src/shared/redis/redis.service.ts` if not existing), add a check: when `REDIS_URL` is empty or undefined, fall back to a no-op cache (methods return null/undefined, set operations are no-ops)
     - Log a warning at startup when running without Redis
     - This allows the backend to function in staging without ElastiCache
