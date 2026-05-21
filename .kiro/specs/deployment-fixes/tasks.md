@@ -86,7 +86,7 @@
     - _Preservation: Controller decorators remain unchanged (@Controller('auth'), @Controller('portfolio'), etc.)_
     - _Requirements: 2.3, 3.3, 3.7, 3.8_
 
-  - [ ] 5.2 Add health endpoint
+  - [x] 5.2 Add health endpoint
     - Create a `HealthController` at `src/backend/src/shared/health/health.controller.ts` with `@Controller('health')` returning `{ status: 'ok' }` on GET
     - Register it in `AppModule`
     - With the global prefix, this becomes `GET /api/health` matching the ALB health check path
