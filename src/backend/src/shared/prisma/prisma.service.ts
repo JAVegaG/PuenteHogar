@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma-generated/client';
 import { PrismaPg } from "@prisma/adapter-pg";
+import { execSync } from 'child_process';
 
 
 @Injectable()
@@ -11,9 +12,25 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     const connectionString = PrismaService.buildConnectionString();
     const adapter = new PrismaPg({ connectionString });
     super({ adapter });
+
+    // Ensure DATABASE_URL is available for the Prisma CLI (used by execSync migrate deploy)
+    if (!process.env.DATABASE_URL) {
+      process.env.DATABASE_URL = connectionString;
+    }
   }
 
   async onModuleInit() {
+    try {
+      this.logger.log('Running Prisma migrations...');
+      execSync('npx prisma migrate deploy --schema=./db/prisma/schema.prisma', {
+        stdio: 'pipe',
+      });
+      this.logger.log('Prisma migrations applied successfully');
+    } catch (error) {
+      this.logger.error('Failed to run Prisma migrations', error);
+      throw error;
+    }
+
     await this.$connect();
   }
 
