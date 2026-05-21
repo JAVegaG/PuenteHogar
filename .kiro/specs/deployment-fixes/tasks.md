@@ -31,7 +31,7 @@
   - Mark task complete when tests are written, run, and passing on unfixed code
   - _Requirements: 3.3, 3.4, 3.5, 3.7, 3.8_
 
-- [-] 3. Fix Issue 1 — Replace EIC Endpoint with SSM Bastion for DB Access
+- [x] 3. Fix Issue 1 — Replace EIC Endpoint with SSM Bastion for DB Access
 
   - [x] 3.1 Remove EIC Endpoint from network-stack.ts
     - Delete the `EicEndpointSecurityGroup` security group and its egress rule to data SG on port 5432
@@ -40,7 +40,7 @@
     - _Bug_Condition: isBugCondition(input) where input.type == "DB_ACCESS" AND input.method == "EIC_TUNNEL" AND input.port == 5432_
     - _Requirements: 1.1, 2.1_
 
-  - [ ] 3.2 Add SSM Bastion Instance to network-stack.ts
+  - [x] 3.2 Add SSM Bastion Instance to network-stack.ts
     - Create a `t4g.nano` EC2 instance in a private subnet with Amazon Linux 2023 AMI (SSM Agent pre-installed)
     - Create a security group for the bastion allowing outbound to `dataSg` on port 5432
     - Add inbound rule on `dataSg` allowing traffic from bastion security group on port 5432
