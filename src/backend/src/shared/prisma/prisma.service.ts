@@ -8,30 +8,53 @@ import { execSync } from 'child_process';
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(PrismaService.name);
 
+  /**
+   * SECURITY: Hardcoded migration command — no user input is interpolated.
+   * This runs exclusively at application startup (onModuleInit) and is never
+   * exposed to request handlers or external callers.
+   */
+  private static readonly MIGRATE_COMMAND =
+    'npx prisma migrate deploy --schema=./db/prisma/schema.prisma';
+
+  private static readonly MIGRATE_TIMEOUT_MS = 60_000;
+
   constructor() {
     const connectionString = PrismaService.buildConnectionString();
     const adapter = new PrismaPg({ connectionString });
     super({ adapter });
 
-    // Ensure DATABASE_URL is available for the Prisma CLI (used by execSync migrate deploy)
+    // Ensure DATABASE_URL is available for the Prisma CLI (used during startup migration)
     if (!process.env.DATABASE_URL) {
       process.env.DATABASE_URL = connectionString;
     }
   }
 
   async onModuleInit() {
+    this.runMigrations();
+    await this.$connect();
+  }
+
+  /**
+   * Runs Prisma migrations at startup. This method is private and only called
+   * from onModuleInit — it cannot be triggered by HTTP requests or external input.
+   */
+  private runMigrations(): void {
     try {
       this.logger.log('Running Prisma migrations...');
-      execSync('npx prisma migrate deploy --schema=./db/prisma/schema.prisma', {
+      execSync(PrismaService.MIGRATE_COMMAND, {
         stdio: 'pipe',
+        timeout: PrismaService.MIGRATE_TIMEOUT_MS,
+        env: {
+          PATH: process.env.PATH,
+          DATABASE_URL: process.env.DATABASE_URL,
+          NODE_ENV: process.env.NODE_ENV,
+        },
       });
       this.logger.log('Prisma migrations applied successfully');
     } catch (error) {
       this.logger.error('Failed to run Prisma migrations', error);
       throw error;
     }
-
-    await this.$connect();
   }
 
   async onModuleDestroy() {
