@@ -44,11 +44,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       execSync(PrismaService.MIGRATE_COMMAND, {
         stdio: 'pipe',
         timeout: PrismaService.MIGRATE_TIMEOUT_MS,
-        env: {
-          PATH: process.env.PATH,
-          DATABASE_URL: process.env.DATABASE_URL,
-          NODE_ENV: process.env.NODE_ENV,
-        },
+        env: { ...process.env },
       });
       this.logger.log('Prisma migrations applied successfully');
     } catch (error) {
