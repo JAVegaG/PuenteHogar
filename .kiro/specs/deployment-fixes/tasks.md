@@ -133,9 +133,9 @@
     - _Expected_Behavior: Backend operates without Redis in staging using no-op cache fallback_
     - _Requirements: 2.4_
 
-- [ ] 7. Verify fixes and run all tests
+- [-] 7. Verify fixes and run all tests
 
-  - [ ] 7.1 Verify bug condition exploration test now passes
+  - [x] 7.1 Verify bug condition exploration test now passes
     - **Property 1: Expected Behavior** - Frontend API Calls Reach Backend
     - **IMPORTANT**: Re-run the SAME test from task 1 - do NOT write a new test
     - The test from task 1 encodes the expected behavior (global prefix present, NEXT_PUBLIC_API_URL set)
@@ -144,37 +144,37 @@
     - **EXPECTED OUTCOME**: Test PASSES (confirms bug is fixed)
     - _Requirements: 2.3_
 
-  - [ ] 7.2 Verify preservation tests still pass
+  - [~] 7.2 Verify preservation tests still pass
     - **Property 2: Preservation** - Controller Routes and Service Patterns Unchanged
     - **IMPORTANT**: Re-run the SAME tests from task 2 - do NOT write new tests
     - Run preservation property tests from step 2
     - **EXPECTED OUTCOME**: Tests PASS (confirms no regressions)
     - Confirm controller decorators unchanged, frontend service patterns unchanged, production config unchanged
 
-  - [ ] 7.3 Run CDK synth for staging and production
+  - [~] 7.3 Run CDK synth for staging and production
     - `npx cdk synth` for staging — verify no NAT Gateway, no ElastiCache, VPC endpoints present, SSM bastion present
     - `npx cdk synth` for production — verify full infrastructure unchanged (NAT Gateway, ElastiCache, ALB, all resources)
     - _Requirements: 3.5, 3.6_
 
-  - [ ] 7.4 Run unit tests for PrismaService DATABASE_URL construction
+  - [~] 7.4 Run unit tests for PrismaService DATABASE_URL construction
     - Test: when `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` are set, DATABASE_URL is correctly constructed
     - Test: when `DATABASE_URL` is already set, it is used as-is (fallback behavior)
     - Test: password with special characters is properly URL-encoded
     - _Requirements: 2.2, 3.1_
 
-  - [ ] 7.5 Docker build verification
+  - [~] 7.5 Docker build verification
     - Build backend Docker image — verify no `entrypoint.sh`, CMD is `node dist/src/main.js`
     - Build frontend Docker image — verify `NEXT_PUBLIC_API_URL=/api` is set before build step
     - _Requirements: 2.2, 2.3_
 
-- [ ] 8. Checkpoint - Ensure all tests pass
+- [~] 8. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
   - Run `npm run build` in `src/backend/` — verify no TypeScript errors
   - Run `npm run test` in `src/backend/` — verify all unit tests pass
   - Run `npm run build` in `src/frontend/` — verify no build errors
   - Run `npx cdk synth` in `src/infra/` — verify both staging and production stacks synthesize without errors
 
-- [ ] 9. Manual QA and post-implementation review
+- [~] 9. Manual QA and post-implementation review
   - Deploy or run the feature locally and test all deployment-related flows end-to-end
   - Verify SSM port forwarding to RDS works: `aws ssm start-session --target <bastion-id> --document-name AWS-StartPortForwardingSessionToRemoteHost --parameters '{"host":["<rds-endpoint>"],"portNumber":["5432"],"localPortNumber":["5432"]}'`
   - Verify backend starts without entrypoint script and runs migrations via PrismaService
