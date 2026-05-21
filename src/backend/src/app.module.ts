@@ -9,6 +9,7 @@ import { AuditLoggerService } from './shared/audit/audit-logger.service';
 import { CircuitBreakerFactory } from './shared/circuit-breaker/circuit-breaker.factory';
 import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
 import { ValidationInterceptor } from './shared/interceptors/validation.interceptor';
+import { HealthController } from './shared/health/health.controller';
 import { UsersModule } from '@modules/users/users.module';
 import { PropertyListingsModule } from '@modules/property-listings/property-listings.module';
 import { LandlordPortfolioModule } from '@modules/landlord-portfolio/landlord-portfolio.module';
@@ -36,6 +37,7 @@ import { NotificationsModule } from '@modules/notifications/notifications.module
     RentalTrackingModule,
     NotificationsModule,
   ],
+  controllers: [HealthController],
   providers: [
     AuditLoggerService,
     CircuitBreakerFactory,
@@ -52,4 +54,4 @@ import { NotificationsModule } from '@modules/notifications/notifications.module
   ],
   exports: [AuditLoggerService, CircuitBreakerFactory],
 })
-export class AppModule {}
+export class AppModule { }
