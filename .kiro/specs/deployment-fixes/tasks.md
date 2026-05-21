@@ -167,7 +167,7 @@
     - Build frontend Docker image — verify `NEXT_PUBLIC_API_URL=/api` is set before build step
     - _Requirements: 2.2, 2.3_
 
-- [~] 8. Checkpoint - Ensure all tests pass
+- [x] 8. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
   - Run `npm run build` in `src/backend/` — verify no TypeScript errors
   - Run `npm run test` in `src/backend/` — verify all unit tests pass
