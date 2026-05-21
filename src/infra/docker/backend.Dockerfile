@@ -69,15 +69,11 @@ COPY --from=build /app/package.json ./package.json
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Create entrypoint script that constructs DATABASE_URL from individual env vars
-RUN printf '#!/bin/sh\nif [ -n "$DB_HOST" ] && [ -n "$DB_PASSWORD" ]; then\n  export DATABASE_URL="postgresql://${DB_USER:-app_user}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT:-5432}/${DB_NAME:-rental_platform}?sslmode=no-verify"\nfi\nif [ -n "$REDIS_HOST" ] && [ -z "$REDIS_URL" ]; then\n  export REDIS_URL="redis://${REDIS_HOST}:${REDIS_PORT:-6379}"\nfi\n# Run migrations on startup (idempotent — safe to run multiple times)\nif [ -n "$DATABASE_URL" ] && [ -f "./db/prisma/schema.prisma" ]; then\n  echo "Running Prisma migrations..."\n  npx prisma migrate deploy --schema=./db/prisma/schema.prisma || echo "Migration failed, continuing anyway..."\nfi\nexec "$@"\n' > /app/entrypoint.sh && chmod +x /app/entrypoint.sh
-
 # Switch to non-root user
 USER nestjs
 
 # Expose port
 EXPOSE 3000
 
-# Use entrypoint to construct DATABASE_URL, then start the app
-ENTRYPOINT ["/app/entrypoint.sh"]
+# Start the NestJS application (DATABASE_URL construction and migrations handled by PrismaService)
 CMD ["node", "dist/src/main.js"]
