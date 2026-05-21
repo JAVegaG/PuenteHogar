@@ -75,9 +75,9 @@
     - Change `CMD ["node", "dist/src/main.js"]` to be the sole startup command (no ENTRYPOINT)
     - _Requirements: 2.2_
 
-- [ ] 5. Fix Issue 3 — Add Global `/api` Prefix to NestJS and Set NEXT_PUBLIC_API_URL
+- [-] 5. Fix Issue 3 — Add Global `/api` Prefix to NestJS and Set NEXT_PUBLIC_API_URL
 
-  - [ ] 5.1 Add `app.setGlobalPrefix('api')` in main.ts
+  - [x] 5.1 Add `app.setGlobalPrefix('api')` in main.ts
     - Add `app.setGlobalPrefix('api')` after `const app = await NestFactory.create<NestExpressApplication>(AppModule)`
     - Adjust Swagger setup path from `'api/docs'` to `'docs'` so it resolves to `/api/docs` with the prefix (avoiding `/api/api/docs`)
     - Update the Swagger log message accordingly
