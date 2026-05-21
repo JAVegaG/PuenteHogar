@@ -81,7 +81,7 @@ modules/{nombre}/
 | `AuditLoggerService` | Registra acciones sensibles sin PII en texto plano |
 | `CircuitBreakerFactory` | Instancia circuit breakers por tipo de integración externa |
 | `RedisService` | Cache-aside con fallback transparente a PostgreSQL |
-| `PrismaService` | Cliente Prisma singleton compartido entre módulos (`@src/shared/prisma/`) |
+| `PrismaService` | Cliente Prisma singleton compartido entre módulos. Construye `DATABASE_URL` internamente desde variables individuales (`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`) o usa `DATABASE_URL` si ya está definida. Ejecuta `prisma migrate deploy` programáticamente en `onModuleInit` antes de conectar. (`@src/shared/prisma/`) |
 | `softDeleteFilter` / `softDeleteData()` / `withSoftDeleteFilter()` | Utilidades de soft delete para queries Prisma. Prisma 6+ no soporta la API `$use` middleware, así que el soft delete se implementa como helpers que los repositorios usan al construir sus queries. `softDeleteFilter` filtra registros eliminados en lecturas, `softDeleteData()` genera el payload para marcar como eliminado, `withSoftDeleteFilter()` inyecta el filtro condicionalmente. No aplica a tablas RAW. (`@src/shared/prisma/soft-delete.utils.ts`) |
 | `parsePayload<T>()` | Helper ETL para leer payloads de tablas RAW con compatibilidad hacia atrás (maneja tanto JSON propio como strings legacy). (`@src/shared/etl/parse-payload.ts`) |
 | `deployment/` | Property-based tests que validan condiciones de bug de deployment: routing ALB, global prefix `/api`, `NEXT_PUBLIC_API_URL`. (`@src/shared/deployment/`) |
@@ -225,7 +225,12 @@ npm run db:seed            # Seed de catálogos (roles, tipos de documento, tipo
 
 | Variable | Descripción |
 |----------|-------------|
-| `DATABASE_URL` | URL de conexión PostgreSQL |
+| `DATABASE_URL` | URL de conexión PostgreSQL (si se define, se usa directamente; si no, se construye desde `DB_*` vars) |
+| `DB_HOST` | Host de la base de datos PostgreSQL (requerido si `DATABASE_URL` no está definida) |
+| `DB_PORT` | Puerto de la base de datos PostgreSQL (requerido si `DATABASE_URL` no está definida) |
+| `DB_NAME` | Nombre de la base de datos (requerido si `DATABASE_URL` no está definida) |
+| `DB_USER` | Usuario de la base de datos (requerido si `DATABASE_URL` no está definida) |
+| `DB_PASSWORD` | Contraseña de la base de datos — se aplica URL-encoding automáticamente (requerido si `DATABASE_URL` no está definida) |
 | `REDIS_URL` | URL de conexión Redis |
 | `JWT_SECRET` | Secreto para firmar tokens JWT |
 | `JWT_EXPIRES_IN` | Expiración del token (ej. `1d`) |
