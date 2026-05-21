@@ -39,6 +39,7 @@ src/backend/
 │       ├── guards/             # JwtAuthGuard, RBACGuard
 │       ├── interceptors/       # ValidationInterceptor (XSS/SQL sanitization)
 │       │   └── validation-malicious-payload.spec.ts  # PBT Property 9: payloads maliciosos sanitizados
+│       ├── deployment/          # Property-based tests for deployment/routing bug conditions (ALB routing, global prefix, API URL)
 │       ├── prisma/             # PrismaModule + PrismaService + soft-delete utilities
 │       │   ├── soft-delete.utils.ts          # Utilidades de soft delete: softDeleteFilter, softDeleteData(), withSoftDeleteFilter()
 │       │   ├── soft-delete.utils.spec.ts     # Tests unitarios de soft-delete utilities
@@ -83,6 +84,7 @@ modules/{nombre}/
 | `PrismaService` | Cliente Prisma singleton compartido entre módulos (`@src/shared/prisma/`) |
 | `softDeleteFilter` / `softDeleteData()` / `withSoftDeleteFilter()` | Utilidades de soft delete para queries Prisma. Prisma 6+ no soporta la API `$use` middleware, así que el soft delete se implementa como helpers que los repositorios usan al construir sus queries. `softDeleteFilter` filtra registros eliminados en lecturas, `softDeleteData()` genera el payload para marcar como eliminado, `withSoftDeleteFilter()` inyecta el filtro condicionalmente. No aplica a tablas RAW. (`@src/shared/prisma/soft-delete.utils.ts`) |
 | `parsePayload<T>()` | Helper ETL para leer payloads de tablas RAW con compatibilidad hacia atrás (maneja tanto JSON propio como strings legacy). (`@src/shared/etl/parse-payload.ts`) |
+| `deployment/` | Property-based tests que validan condiciones de bug de deployment: routing ALB, global prefix `/api`, `NEXT_PUBLIC_API_URL`. (`@src/shared/deployment/`) |
 | `S3ClientFactory` | Crea y cachea una instancia de `S3Client` (AWS SDK v3); soporta endpoint personalizado para LocalStack/MinIO |
 | `@aws-sdk/s3-request-presigner` | Genera presigned URLs para descarga segura de archivos privados en S3 (usado por `ContractObjectStorageAdapter.getPresignedUrl()`) |
 
