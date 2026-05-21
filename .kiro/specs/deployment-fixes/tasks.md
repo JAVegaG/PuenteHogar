@@ -186,7 +186,9 @@
   - Document any issues found as new requirements in a "Post-Implementation Findings" section in requirements.md
   - Add corresponding design notes and implementation tasks for each finding
   - Re-run build and tests after fixes
-  - **QA Findings (2 issues found and fixed):**
+  - **QA Findings (4 issues found and fixed):**
     - Finding 4.1: Docker images must be built with `--platform linux/amd64` on Apple Silicon for ECS Fargate compatibility
-    - Finding 4.2: Added `url = env("DATABASE_URL")` to Prisma schema datasource block — required by `prisma migrate deploy` CLI
-  - Re-ran backend build and tests after fix — all 342 tests pass
+    - Finding 4.2: Prisma 7 removed `url` from schema.prisma — uses `prisma.config.ts` instead; copied config to Docker production stage
+    - Finding 4.3: Removed restricted `env` from `execSync` — let it inherit full `process.env` so Prisma CLI can find its engines
+    - Finding 4.4: Made REDIS env vars conditional in compute-stack — only set when `redisEndpoint` is non-empty (staging has no ElastiCache)
+  - Re-ran backend build and tests after fixes — all 342 tests pass, CDK synth passes for both environments

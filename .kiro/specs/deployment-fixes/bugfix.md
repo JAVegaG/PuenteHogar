@@ -57,10 +57,28 @@ Issues discovered during manual QA deployment testing (Task 9):
 
 **Fix**: All Docker build commands MUST include `--platform linux/amd64` when building on ARM machines for ECS deployment.
 
-### Finding 4.2 — Prisma schema missing datasource URL for CLI commands
+### Finding 4.2 — Prisma 7 no longer supports `url` in schema.prisma
 
-**Observed**: WHEN the backend container starts and PrismaService runs `prisma migrate deploy` THEN the command fails with `Error: The datasource.url property is required in your Prisma config file when using prisma migrate deploy` even though `DATABASE_URL` is set in the environment.
+**Observed**: WHEN the Docker image is built THEN `prisma generate` fails with `Error code: P1012 — The datasource property 'url' is no longer supported in schema files. Move connection URLs for Migrate to prisma.config.ts`.
 
-**Root Cause**: The `datasource db` block in `schema.prisma` did not include `url = env("DATABASE_URL")`. The Prisma CLI reads the schema file directly and requires an explicit `url` property — it does not auto-detect `DATABASE_URL` from the environment without it.
+**Root Cause**: Prisma 7.x removed support for `url = env("DATABASE_URL")` in the `datasource` block of `schema.prisma`. The connection URL must be configured exclusively in `prisma.config.ts` (which already had it). Additionally, `prisma.config.ts` was not being copied to the production Docker stage, so `prisma migrate deploy` at runtime couldn't find the config.
 
-**Fix**: Added `url = env("DATABASE_URL")` to the `datasource db` block in `src/backend/db/prisma/schema.prisma`. This allows the Prisma CLI to resolve the connection string from the environment variable that PrismaService constructs and sets.
+**Fix**:
+1. Removed `url = env("DATABASE_URL")` from `src/backend/db/prisma/schema.prisma`
+2. Added `COPY --from=build /app/prisma.config.ts ./prisma.config.ts` to the production stage of `src/infra/docker/backend.Dockerfile`
+
+### Finding 4.3 — execSync env isolation prevented DATABASE_URL from reaching Prisma CLI
+
+**Observed**: WHEN PrismaService runs `prisma migrate deploy` via `execSync` with a restricted `env` object THEN the Prisma CLI fails because it needs additional environment variables beyond `PATH`, `DATABASE_URL`, and `NODE_ENV` (e.g., `HOME` for Prisma engine resolution on Alpine Linux).
+
+**Root Cause**: Passing `env: { PATH, DATABASE_URL, NODE_ENV }` to `execSync` replaces the entire child process environment. The Prisma CLI needs the full environment to locate its engines and resolve `prisma.config.ts`.
+
+**Fix**: Removed the explicit `env` option from `execSync` so it inherits the parent's `process.env` directly (the default behavior). `DATABASE_URL` is already set in `process.env` by the constructor before `onModuleInit` runs.
+
+### Finding 4.4 — REDIS_URL set to empty host in staging causes connection to localhost
+
+**Observed**: WHEN the backend starts in staging THEN the RedisService repeatedly logs `Redis unavailable: connect ECONNREFUSED 127.0.0.1:6379` because the ECS task definition sets `REDIS_URL: redis://:6379` (empty `redisEndpoint` from data-stack).
+
+**Root Cause**: The compute stack unconditionally set `REDIS_URL: redis://${props.redisEndpoint}:6379`. In staging, `redisEndpoint` is `''` (ElastiCache is skipped), resulting in `redis://:6379` which ioredis interprets as `localhost:6379`.
+
+**Fix**: Made Redis env vars (`REDIS_HOST`, `REDIS_PORT`, `REDIS_URL`) conditional in `src/infra/lib/stacks/compute-stack.ts` — only set when `props.redisEndpoint` is non-empty. In staging, the `RedisService` sees no `REDIS_URL` and enters no-op fallback mode cleanly.

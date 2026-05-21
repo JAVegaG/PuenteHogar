@@ -257,10 +257,28 @@ END FOR
 
 **Affected Files**: No code changes — operational procedure for `docker build` commands.
 
-### Finding 4.2 — Prisma Schema Datasource URL
+### Finding 4.2 — Prisma 7 Config Migration
 
-**Problem**: The Prisma CLI (`prisma migrate deploy`) requires `url = env("DATABASE_URL")` in the `datasource` block of `schema.prisma`. Without it, the CLI cannot resolve the connection string even when the env var is set in the child process environment.
+**Problem**: Prisma 7.x removed `url` from `datasource` in `schema.prisma`. The URL must live in `prisma.config.ts`. Additionally, the Prisma CLI at runtime needs `prisma.config.ts` present in the working directory.
 
-**Design Note**: The `datasource db` block must always include `url = env("DATABASE_URL")`. The PrismaService constructs this URL from individual env vars (`DB_HOST`, `DB_PORT`, etc.) and sets `process.env.DATABASE_URL` before `execSync` spawns the migration child process. The schema's `url` property tells the CLI where to look.
+**Design Note**: The `datasource db` block in `schema.prisma` only declares `provider` and `schemas`. The connection URL is resolved via `prisma.config.ts` which reads `env("DATABASE_URL")`. The Docker production stage must copy `prisma.config.ts` alongside the schema and migrations.
 
-**Affected File**: `src/backend/db/prisma/schema.prisma` — added `url = env("DATABASE_URL")` to the `datasource db` block.
+**Affected Files**:
+- `src/backend/db/prisma/schema.prisma` — removed `url = env("DATABASE_URL")`
+- `src/infra/docker/backend.Dockerfile` — added `COPY --from=build /app/prisma.config.ts ./prisma.config.ts`
+
+### Finding 4.3 — execSync Environment Inheritance
+
+**Problem**: Passing a restricted `env` object to `execSync` replaces the entire child process environment. Prisma CLI needs `HOME`, `PATH`, and potentially other vars to locate its engines.
+
+**Design Note**: When spawning `prisma migrate deploy`, do not pass an explicit `env` option. Let `execSync` inherit `process.env` directly (the default). The `PrismaService` constructor sets `process.env.DATABASE_URL` before `onModuleInit` runs, so it's available to the child process.
+
+**Affected File**: `src/backend/src/shared/prisma/prisma.service.ts` — removed `env` option from `execSync` call.
+
+### Finding 4.4 — Conditional Redis Environment Variables
+
+**Problem**: Setting `REDIS_URL: redis://${emptyString}:6379` results in `redis://:6379` which ioredis resolves to `localhost:6379`, causing repeated connection failures in staging.
+
+**Design Note**: Redis-related environment variables (`REDIS_HOST`, `REDIS_PORT`, `REDIS_URL`) must only be injected into the ECS task definition when `redisEndpoint` is non-empty. This ensures the `RedisService` enters its no-op fallback path cleanly when ElastiCache is not provisioned.
+
+**Affected File**: `src/infra/lib/stacks/compute-stack.ts` — wrapped Redis env vars in a conditional spread.
