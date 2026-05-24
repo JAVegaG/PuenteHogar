@@ -6,6 +6,145 @@ Infrastructure as Code for the rental platform, using AWS CDK with TypeScript.
 
 The infrastructure uses **ECS Fargate** for compute with an **Application Load Balancer (ALB)** for ingress and path-based routing. CloudFront sits in front for caching, WAF protection, and TLS termination.
 
+### Production Architecture
+
+```mermaid
+graph TB
+    subgraph Internet
+        User[User / Browser]
+    end
+
+    subgraph AWS Cloud - Production
+        subgraph CDN Layer
+            CF[CloudFront Distribution]
+            WAF[AWS WAF]
+            ACM[ACM Certificate]
+        end
+
+        subgraph VPC - us-east-1
+            subgraph Public Subnets
+                NAT[NAT Gateway]
+                ALB[Application Load Balancer<br/>HTTP :80]
+            end
+
+            subgraph Private Subnets
+                subgraph ECS Cluster
+                    BE1[Backend Service<br/>NestJS - 2 tasks<br/>1024 CPU / 2048 MB]
+                    FE1[Frontend Service<br/>Next.js - 2 tasks<br/>512 CPU / 1024 MB]
+                end
+                Bastion[SSM Bastion<br/>t4g.nano]
+            end
+
+            subgraph Isolated Subnets
+                RDS[(RDS PostgreSQL 16<br/>db.t3.medium<br/>Multi-AZ)]
+                Redis[(ElastiCache Redis 7<br/>cache.t3.small<br/>2 nodes + failover)]
+            end
+        end
+
+        subgraph Storage
+            S3[S3 Bucket<br/>Assets / Files]
+            ECR[ECR Repositories<br/>Backend + Frontend]
+        end
+
+        subgraph Secrets
+            SM[Secrets Manager<br/>DB Password, JWT, PII Key]
+        end
+
+        subgraph Monitoring
+            CW[CloudWatch<br/>Logs + Alarms]
+            SNS[SNS Notifications]
+        end
+    end
+
+    User -->|HTTPS| CF
+    CF --> WAF
+    CF -->|/api/*, default| ALB
+    CF -->|/assets/*| S3
+    ALB -->|/api/*| BE1
+    ALB -->|default| FE1
+    BE1 --> RDS
+    BE1 --> Redis
+    BE1 --> S3
+    BE1 --> SM
+    FE1 -->|outbound via NAT| NAT
+    BE1 -->|outbound via NAT| NAT
+    Bastion -.->|port 5432| RDS
+    BE1 --> CW
+    FE1 --> CW
+    CW --> SNS
+```
+
+### Staging Architecture
+
+```mermaid
+graph TB
+    subgraph Internet
+        User[User / Browser]
+    end
+
+    subgraph AWS Cloud - Staging
+        subgraph CDN Layer
+            CF[CloudFront Distribution]
+            WAF[AWS WAF]
+        end
+
+        subgraph VPC - us-east-1
+            subgraph Public Subnets
+                ALB[Application Load Balancer<br/>HTTP :80]
+            end
+
+            subgraph Private Subnets
+                subgraph ECS Cluster
+                    BE1[Backend Service<br/>NestJS - 1 task<br/>512 CPU / 1024 MB]
+                    FE1[Frontend Service<br/>Next.js - 1 task<br/>256 CPU / 512 MB]
+                end
+                Bastion[SSM Bastion<br/>t4g.nano]
+                subgraph VPC Endpoints
+                    VPCE[ECR API, ECR Docker<br/>CloudWatch Logs<br/>Secrets Manager, SSM<br/>S3 Gateway]
+                end
+            end
+
+            subgraph Isolated Subnets
+                RDS[(RDS PostgreSQL 16<br/>db.t3.micro<br/>Single-AZ)]
+            end
+        end
+
+        subgraph Storage
+            S3[S3 Bucket<br/>Assets / Files]
+            ECR[ECR Repositories<br/>Backend + Frontend]
+        end
+
+        subgraph Secrets
+            SM[Secrets Manager<br/>DB Password, JWT, PII Key]
+        end
+    end
+
+    User -->|HTTPS| CF
+    CF --> WAF
+    CF -->|/api/*, default| ALB
+    CF -->|/assets/*| S3
+    ALB -->|/api/*| BE1
+    ALB -->|default| FE1
+    BE1 --> RDS
+    BE1 -.->|no Redis<br/>no-op cache| BE1
+    BE1 --> S3
+    BE1 --> SM
+    FE1 -->|AWS services via| VPCE
+    BE1 -->|AWS services via| VPCE
+    Bastion -.->|port 5432| RDS
+```
+
+### Key Differences: Staging vs Production
+
+| Component | Staging | Production |
+|-----------|---------|------------|
+| NAT Gateway | ❌ None (VPC Endpoints) | ✅ 1 NAT Gateway |
+| ElastiCache Redis | ❌ Disabled (no-op fallback) | ✅ 2-node cluster with failover |
+| RDS | Single-AZ, db.t3.micro | Multi-AZ, db.t3.medium |
+| ECS Tasks | 1 per service | 2+ per service (auto-scaling) |
+| Outbound access | VPC Endpoints only | NAT Gateway (full internet) |
+| Estimated cost | ~$15-20/month (RDS only when awake) | ~$150+/month |
+
 | Stack | Purpose |
 |-------|---------|
 | **NetworkStack** | VPC, subnets, NAT Gateway (production only), VPC Endpoints (staging only), security groups (ECS, ALB, Data, Bastion), SSM Bastion instance for DB access |
@@ -68,7 +207,7 @@ This creates the CDKToolkit CloudFormation stack with an S3 bucket for assets an
 npm run deploy:staging
 ```
 
-This runs `cdk deploy --all -c env=staging` — deploys all stacks with staging configuration (single task per service, single-AZ DB, smaller task definitions).
+This runs `cdk deploy --all -c env=staging --require-approval never` — deploys all stacks with staging configuration (single task per service, single-AZ DB, smaller task definitions). No manual approval is required.
 
 ### Production
 
@@ -99,6 +238,12 @@ npm run deploy:production
 
 # Destroy staging environment (production has deletion protection)
 npm run destroy:staging
+
+# Cost-saving: tear down expensive stacks while keeping Data + Ci
+npm run staging:sleep    # destroys Monitoring, Cdn, Compute, Network
+
+# Bring staging back up after sleep
+npm run staging:wake     # deploys Network, Compute, Cdn, Monitoring
 
 # Run CDK tests
 npm test
@@ -164,9 +309,9 @@ secrets: {
 | `DB_PORT` | DataStack (RDS port) | PostgreSQL port |
 | `DB_NAME` | Hardcoded | Database name (`rental_platform`) |
 | `DB_USER` | Hardcoded | Database user (`app_user`) |
-| `REDIS_HOST` | DataStack (ElastiCache endpoint) | Redis host address (empty in staging) |
-| `REDIS_PORT` | Hardcoded | Redis port (`6379`) |
-| `REDIS_URL` | Computed | Full Redis connection URL (empty in staging — triggers no-op cache fallback) |
+| `REDIS_HOST` | DataStack (ElastiCache endpoint) | Redis host address (production only — omitted in staging) |
+| `REDIS_PORT` | Hardcoded | Redis port (`6379`) (production only — omitted in staging) |
+| `REDIS_URL` | Computed | Full Redis connection URL (production only — omitted in staging, triggers no-op cache fallback) |
 | `S3_BUCKET_NAME` | DataStack (S3 bucket) | Assets bucket name |
 | `S3_REGION` | Stack region | AWS region for S3 operations |
 | `NODE_ENV` | Environment config | `production` or `development` |
@@ -175,11 +320,13 @@ secrets: {
 | `JWT_SECRET` | Secrets Manager | JWT signing key |
 | `PII_ENCRYPTION_KEY` | Secrets Manager | AES-256 key for PII encryption |
 
-The backend's `PrismaService` constructs `DATABASE_URL` at runtime from the individual `DB_*` components (with URL-encoded password and `?sslmode=no-verify` for TLS connections to RDS). If `DATABASE_URL` is already set in the environment (e.g., local development), it is used as-is.
+The backend's `PrismaService` constructs `DATABASE_URL` at runtime from the individual `DB_*` components (with URL-encoded password and `?sslmode=require` for TLS connections to RDS). If `DATABASE_URL` is already set in the environment (e.g., local development), it is used as-is.
 
 ### Automatic Migrations on Startup
 
 The backend runs `prisma migrate deploy` programmatically inside `PrismaService.onModuleInit()` before connecting to the database. This is idempotent — already-applied migrations are skipped, so it's safe to run on every container start (including rolling deployments with multiple tasks).
+
+The production Docker image includes the Prisma schema, migrations directory, and `prisma.config.ts` — all required by the `prisma migrate deploy` CLI to resolve the datasource URL and apply pending migrations.
 
 If migrations fail (e.g., connectivity issue during startup), the error is logged via NestJS Logger and the application continues starting. This prevents a single migration failure from blocking all deployments when the schema is already up to date.
 
@@ -299,6 +446,14 @@ For local development, `src/frontend/.env.local` sets `NEXT_PUBLIC_API_URL` to p
 ### Backend Docker build fails with "Cannot resolve environment variable: DATABASE_URL"
 
 The backend Dockerfile sets a dummy `DATABASE_URL` during build for Prisma client generation only. At runtime, `PrismaService` constructs the real connection string from individual `DB_*` environment variables. If you see this error, ensure you're using the latest Dockerfile from `src/infra/docker/backend.Dockerfile`.
+
+### Migrations fail with "Cannot find prisma.config.ts"
+
+The `prisma migrate deploy` CLI requires `prisma.config.ts` to resolve the datasource URL. This file is copied into the production image alongside the schema and migrations. If you see this error after a Dockerfile change, ensure the production stage includes:
+
+```dockerfile
+COPY --from=build /app/prisma.config.ts ./prisma.config.ts
+```
 
 ### Migrations fail on container startup
 
