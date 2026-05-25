@@ -1,5 +1,11 @@
 # Implementation Plan
 
+## Overview
+
+This task list implements fixes for four deployment issues discovered after the first AWS ECS Fargate deployment: replacing EIC Endpoint with SSM Bastion for DB access, moving DATABASE_URL construction and migrations into NestJS application code, adding a global `/api` prefix for frontend-backend routing, and cost optimization for the staging environment.
+
+## Tasks
+
 - [x] 1. Write bug condition exploration test
   - **Property 1: Bug Condition** - Frontend API Calls Fail to Reach Backend
   - **CRITICAL**: This test MUST FAIL on unfixed code - failure confirms the bug exists
@@ -196,3 +202,25 @@
     - Finding 4.7: Swagger setup uses `useGlobalPrefix: true` with path `'docs'` for correct asset resolution behind ALB
     - Enhancement: Added `staging:sleep` and `staging:wake` scripts to `src/infra/package.json` for cost optimization — tears down compute/network but preserves Data (RDS, S3) and Ci (ECR) stacks
   - Re-ran backend build and tests after fixes — all 342 tests pass, CDK synth passes for both environments
+
+## Task Dependency Graph
+
+```json
+{
+  "waves": [
+    ["1. Write bug condition exploration test", "2. Write preservation property tests"],
+    ["3. Fix Issue 1 — Replace EIC Endpoint with SSM Bastion for DB Access", "4. Fix Issue 2 — Move DATABASE_URL Construction and Migrations to NestJS Application Code", "5. Fix Issue 3 — Add Global /api Prefix to NestJS and Set NEXT_PUBLIC_API_URL", "6. Fix Issue 4 — Cost Optimization for Staging"],
+    ["7. Verify fixes and run all tests"],
+    ["8. Checkpoint - Ensure all tests pass"],
+    ["9. Manual QA and post-implementation review"]
+  ]
+}
+```
+
+## Notes
+
+- All tasks are complete. The spec covered 4 deployment issues and a QA stage that uncovered 7 additional findings (all resolved).
+- The exploration and preservation tests (tasks 1–2) were written before any fixes to establish the bug condition and baseline behavior.
+- Implementation tasks (3–6) are independent of each other and could be executed in parallel, but all depend on the exploration/preservation tests being written first.
+- Task 7 re-runs the same tests from tasks 1–2 to confirm the fixes work and no regressions were introduced.
+- QA findings from task 9 addressed platform-specific Docker builds, Prisma 7 config changes, SSL requirements, and ECS deployment nuances.

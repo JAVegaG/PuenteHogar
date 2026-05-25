@@ -1,5 +1,5 @@
 # CDK output
-cdk.out/
+cdk.out*/
 
 # Dependencies
 node_modules/

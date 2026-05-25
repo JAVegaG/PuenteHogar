@@ -28,7 +28,7 @@ src/backend/
 │       └── states_citys_colombia.seed.csv   # Datos DANE: 33 departamentos, 1,122 municipios (delimitado por ;)
 ├── src/
 │   ├── app.module.ts           # Módulo raíz
-│   ├── main.ts                 # Bootstrap: NestExpressApplication, global prefix `/api`, Helmet, trust proxy, ValidationPipe, Swagger (`/api/docs`), CORS, Morgan HTTP logging (format: 'dev' | 'combined' según NODE_ENV)
+│   ├── main.ts                 # Bootstrap: NestExpressApplication, global prefix `/api`, Helmet, trust proxy, ValidationPipe, Swagger (`/api/docs` — ruta explícita), CORS, Morgan HTTP logging (format: 'dev' | 'combined' según NODE_ENV)
 │   ├── config/
 │   │   └── configuration.ts   # Variables de entorno tipadas
 │   └── shared/                 # Componentes transversales
@@ -40,6 +40,7 @@ src/backend/
 │       ├── interceptors/       # ValidationInterceptor (XSS/SQL sanitization)
 │       │   └── validation-malicious-payload.spec.ts  # PBT Property 9: payloads maliciosos sanitizados
 │       ├── deployment/          # Property-based tests for deployment/routing bug conditions (ALB routing, global prefix, API URL)
+│       ├── health/             # HealthController — GET /api/health (ALB health check)
 │       ├── prisma/             # PrismaModule + PrismaService + soft-delete utilities
 │       │   ├── soft-delete.utils.ts          # Utilidades de soft delete: softDeleteFilter, softDeleteData(), withSoftDeleteFilter()
 │       │   ├── soft-delete.utils.spec.ts     # Tests unitarios de soft-delete utilities
@@ -80,11 +81,12 @@ modules/{nombre}/
 | `ValidationInterceptor` | Sanitiza XSS y SQL injection en `request.body` |
 | `AuditLoggerService` | Registra acciones sensibles sin PII en texto plano |
 | `CircuitBreakerFactory` | Instancia circuit breakers por tipo de integración externa |
-| `RedisService` | Cache-aside con fallback transparente a PostgreSQL |
-| `PrismaService` | Cliente Prisma singleton compartido entre módulos. Construye `DATABASE_URL` internamente desde variables individuales (`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`) o usa `DATABASE_URL` si ya está definida. Ejecuta `prisma migrate deploy` programáticamente en `onModuleInit` antes de conectar. (`@src/shared/prisma/`) |
+| `RedisService` | Cache-aside con fallback graceful: cuando `REDIS_URL` no está definida o Redis no está disponible, las operaciones son no-op (get retorna `null`, set/del no hacen nada). Permite operar sin Redis en staging. (`@src/shared/redis/`) |
+| `PrismaService` | Cliente Prisma singleton compartido entre módulos. Usa `PrismaPg` adapter (`@prisma/adapter-pg`) para la conexión. Construye `DATABASE_URL` internamente desde variables individuales (`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`) con `?sslmode=no-verify` para conexiones TLS a RDS (acepta certificados auto-firmados), o usa `DATABASE_URL` si ya está definida. Ejecuta `prisma migrate deploy` programáticamente en `onModuleInit` (hereda el entorno del proceso, incluyendo `DATABASE_URL` inyectada en el constructor) antes de conectar. (`@src/shared/prisma/`) |
 | `softDeleteFilter` / `softDeleteData()` / `withSoftDeleteFilter()` | Utilidades de soft delete para queries Prisma. Prisma 6+ no soporta la API `$use` middleware, así que el soft delete se implementa como helpers que los repositorios usan al construir sus queries. `softDeleteFilter` filtra registros eliminados en lecturas, `softDeleteData()` genera el payload para marcar como eliminado, `withSoftDeleteFilter()` inyecta el filtro condicionalmente. No aplica a tablas RAW. (`@src/shared/prisma/soft-delete.utils.ts`) |
 | `parsePayload<T>()` | Helper ETL para leer payloads de tablas RAW con compatibilidad hacia atrás (maneja tanto JSON propio como strings legacy). (`@src/shared/etl/parse-payload.ts`) |
 | `deployment/` | Property-based tests que validan condiciones de bug de deployment: routing ALB, global prefix `/api`, `NEXT_PUBLIC_API_URL`. (`@src/shared/deployment/`) |
+| `HealthController` | Endpoint público `GET /api/health` que retorna `{ status: 'ok' }` — usado como health check del ALB. (`@src/shared/health/`) |
 | `S3ClientFactory` | Crea y cachea una instancia de `S3Client` (AWS SDK v3); soporta endpoint personalizado para LocalStack/MinIO |
 | `@aws-sdk/s3-request-presigner` | Genera presigned URLs para descarga segura de archivos privados en S3 (usado por `ContractObjectStorageAdapter.getPresignedUrl()`) |
 
@@ -193,7 +195,7 @@ const where = withSoftDeleteFilter({ is_active: true }); // => { is_active: true
 Disponible en `http://localhost:{PORT}/api/docs` cuando el servidor está corriendo.
 
 - **Global prefix**: todas las rutas de controladores se sirven bajo `/api/*` (configurado via `app.setGlobalPrefix('api')` en `main.ts`)
-- **Swagger setup path**: `'docs'` — se resuelve a `/api/docs` con el prefijo global
+- **Swagger setup path**: `'docs'` con `useGlobalPrefix: true` — se resuelve a `/api/docs`
 - Autenticación: JWT Bearer token via el botón "Authorize" en Swagger UI
 - Todos los endpoints protegidos requieren `@ApiBearerAuth('JWT')`
 - Todos los controladores tienen `@ApiTags`, `@ApiOperation` y decoradores de respuesta por ruta

@@ -61,7 +61,7 @@ No incluye `requirements.md` porque el "requisito" es implícito: el sistema deb
 | Design-first | `aws-infrastructure-deployment` |
 | Bugfix | `ux-polish-fixes`, `lease-lifecycle-status-sync` |
 
-Los 17 specs de tipo **Requirements-first** siguieron el ciclo completo (requirements → design → tasks), generando documentación trazable desde la necesidad funcional hasta la implementación. Mientras que, los 2 specs de tipo **Bugfix** utilizaron el flujo especializado con análisis de condiciones de bug, propiedades esperadas y preservaciones, sin documento de requisitos separado. Por otro lado, solo se utilizó el flujo **Design-first** para la construcción de la infraestructura como código, dado que en gran medida este diseño ya estaba documentado.
+Los 17 specs de tipo **Requirements-first** siguieron el ciclo completo (requirements → design → tasks), generando documentación trazable desde la necesidad funcional hasta la implementación. Mientras que, los 2 specs de tipo **Bugfix** utilizaron el flujo especializado con análisis de condiciones de bug, propiedades esperadas y preservaciones, sin documento de requisitos separado. Por otro lado, solo se utilizó el flujo **Design-first** para la construcción de la infraestructura como código, dado que en gran medida este diseño ya estaba documentado y su propósito principal era habilitar el acceso por internet al prototipo para la evaluación.
 ## Model Context Protocol (MCP)
 Se configuró un servidor MCP para integrar el flujo de desarrollo con herramientas externas:
 ### ClickUp MCP
@@ -104,8 +104,8 @@ Define el stack completo (TypeScript full-stack, NestJS, Next.js, PostgreSQL, Pr
 Documenta la organización de carpetas, la estructura hexagonal por módulo (`domain/`, `application/`, `infrastructure/`), las convenciones de naming (código en inglés, rutas en español, UI en español), las relaciones cross-schema y los componentes compartidos.
 **Impacto en SDD**: El agente genera código que respeta la estructura existente y ubica archivos en las carpetas correctas automáticamente.
 ### Contexto de producto y negocio (`product.md`)
-Describe los usuarios objetivo (arrendadores adultos mayores con baja alfabetización digital, arrendatarios jóvenes), el alcance del MVP, los estados del proceso de arriendo y el contexto legal colombiano.
-**Impacto en SDD**: Permite al agente tomar decisiones de UX informadas (simplicidad, baja carga cognitiva) y respetar el alcance del MVP sin agregar funcionalidades fuera de scope.
+Describe los usuarios objetivo (arrendadores adultos mayores con baja alfabetización digital, arrendatarios jóvenes), el alcance del prototipo, los estados del proceso de arriendo y el contexto legal colombiano.
+**Impacto en SDD**: Permite al agente tomar decisiones de UX informadas (simplicidad, baja carga cognitiva) y respetar el alcance del prototipo sin agregar funcionalidades fuera de scope.
 ## Steering agregados durante el desarrollo
 ### `cross-schema.md`
 **Inclusión**: Condicional, se activa solo cuando se leen archivos en `src/backend/modules/**`.
@@ -168,6 +168,66 @@ Los primeros hooks creados fueron los de actualización automática de READMEs:
 
 **Objetivo**: Validar que los archivos frontend editados cumplan con el sistema de diseño definido en Figma. Verifica tipografía, colores, espaciado, radios de borde, sombras, targets táctiles y patrones de componentes.
 **Activación**: Manual (el desarrollador lo ejecuta cuando quiere validar un componente contra Figma). Se eligió activación manual en lugar de automática para evitar llamadas excesivas al MCP de Figma durante iteraciones rápidas.
+
+## Comparación entre diseño Figma e implementación funcional
+
+Durante la implementación del prototipo se realizó una comparación cualitativa entre las pantallas diseñadas en Figma y las pantallas implementadas mediante SDD con apoyo del Figma MCP. Esta revisión permitió observar que la existencia de un sistema de diseño y de un prototipo navegable no garantizaba una equivalencia exacta entre diseño e implementación, especialmente cuando el software comenzaba a operar con datos, estados funcionales, reglas de negocio y flujos integrados entre módulos.
+
+La comparación se enfocó en tres pantallas representativas del prototipo:
+
+1. **Exploración de oferta**: pantalla orientada al arrendatario para consultar inmuebles disponibles, aplicar filtros y acceder a una vista de detalle.
+2. **Detalle de inmueble en arriendo**: pantalla del dominio de exploración de oferta, orientada a presentar información ampliada del inmueble, fotografías, características y acciones posteriores.
+3. **Portafolio del arrendador**: pantalla orientada al propietario para administrar inmuebles, unidades y acciones relacionadas con publicación, contratos y seguimiento.
+
+Estas pantallas fueron seleccionadas porque conectan los dos perfiles centrales del producto: arrendatarios que buscan vivienda y arrendadores que autogestionan su oferta. Además, representan puntos donde el diseño visual debía convivir con reglas funcionales del prototipo, como estados de publicación, disponibilidad de unidades, relación con contratos, seguimiento del proceso y acciones administrativas.
+
+| Pantalla | Propuesta en Figma | Implementación con SDD + Figma MCP | Drift observado | Acciones de control |
+| --- | --- | --- | --- | --- |
+| Exploración de oferta | Vista simple de inmuebles disponibles, con tarjetas, filtros básicos y navegación hacia detalle. | Se implementó una experiencia conectada a datos funcionales, con filtros dinámicos, estados de publicación y navegación real hacia la vista ampliada. | El diseño original cubría la intención visual, pero no todos los estados derivados de datos reales ni la lógica de disponibilidad. | Se usaron tokens y patrones del sistema de diseño, además de revisión manual para ajustar jerarquía, estados y claridad de filtros. |
+| Detalle de inmueble en arriendo | Presentación ampliada de información, fotografías, características principales y acciones de interés. | Se ajustó para integrar datos complementarios, señales de estado, rutas de navegación y acciones coherentes con el flujo funcional. | El detalle requirió más estructura informativa que la prevista inicialmente, porque el usuario necesitaba entender disponibilidad, condiciones y continuidad del proceso. | Se validó contra el sistema de diseño mediante Figma MCP y se revisó manualmente la comprensión de información y acciones visibles. |
+| Portafolio del arrendador | Vista administrativa para que el propietario consultara y gestionara sus inmuebles. | Se implementó con acciones adicionales para publicación, edición, seguimiento, relación con contratos y estados administrativos. | Fue la pantalla con mayor drift funcional, porque durante la implementación emergieron reglas de administración no completamente representadas en Figma. | Se aplicaron steering files de producto y frontend, se documentaron hallazgos en QA manual y se ajustaron tareas posteriores del spec. |
+
+### Tipos de drift identificados
+
+El drift entre diseño e implementación no se limitó a diferencias visuales. Se identificaron al menos cuatro tipos:
+
+* **Drift funcional**: aparecieron acciones y estados no previstos inicialmente en Figma, por ejemplo estados de publicación, relación entre unidad y contrato, y cambios derivados de la disponibilidad del inmueble.
+* **Drift de información**: algunas pantallas necesitaron mostrar datos adicionales para que el usuario comprendiera mejor el estado del proceso, especialmente en detalle de inmueble y portafolio.
+* **Drift de navegación**: la implementación obligó a resolver rutas reales entre exploración, detalle, autenticación, portafolio y flujos administrativos que en el prototipo visual estaban representadas de forma más abstracta.
+* **Drift de prioridad visual**: algunas acciones que parecían secundarias en el diseño se volvieron más relevantes al probar el flujo funcional, por lo que fue necesario ajustar jerarquía, ubicación o énfasis.
+
+### Rol del Figma MCP
+
+El Figma MCP permitió reducir el drift visual al darle al agente acceso al sistema de diseño y a las pantallas de referencia. En la práctica, esto ayudó a:
+
+* Consultar tokens de color, tipografía, espaciado, radios y sombras.
+* Mantener consistencia entre componentes implementados y patrones visuales definidos.
+* Validar que los cambios frontend no se alejaran completamente del manual de marca.
+* Contrastar componentes editados contra la intención visual del prototipo.
+
+Sin embargo, el MCP no eliminó por completo las diferencias entre diseño e implementación, porque muchas variaciones no provenían de desconocimiento visual, sino de reglas funcionales emergentes. Por esta razón, el MCP funcionó como mecanismo de alineación visual, pero no como sustituto del criterio de producto ni de la validación manual.
+
+### Relación con steering files
+
+Los steering files fueron relevantes para controlar el drift porque aportaron reglas que el diseño visual por sí solo no contenía. En particular:
+
+* `product.md` ayudó a recordar el alcance del prototipo, los perfiles de usuario y el principio de baja carga cognitiva.
+* `frontend-patterns.md` permitió sostener convenciones de componentes, tipografía, botones, navegación y formato de moneda.
+* `structure.md` ayudó a ubicar cambios en los módulos y carpetas correctas.
+* `spec-qa-stage.md` formalizó la revisión manual posterior a cada spec, evitando cerrar una implementación solo porque compilaba o pasaba tests.
+
+De este modo, Figma MCP y los steering files cumplieron roles complementarios. Figma aportó referencia visual y sistema de diseño, mientras que los steering aportaron reglas de producto, arquitectura, estructura y QA. Esta combinación permitió que las pantallas implementadas variaran cuando era necesario por razones funcionales, pero sin perder coherencia general con la guía de estilos y el manual de marca.
+
+### Relación con QA manual
+
+La comparación entre Figma e implementación reforzó la necesidad del QA manual. Aunque el agente podía implementar una pantalla funcional, la revisión humana permitió identificar si esa pantalla comunicaba correctamente el estado del proceso, si las acciones estaban visibles, si el lenguaje era claro y si las variaciones frente al diseño estaban justificadas por una necesidad funcional real.
+
+Por ello, los hallazgos de drift no se trataron como simples errores visuales. Cuando la variación respondía a una regla emergente del dominio, se documentaba como ajuste funcional o de experiencia. Cuando la variación se debía a pérdida de consistencia visual, se corregía usando el sistema de diseño, el hook de validación Figma y los patrones definidos en `frontend-patterns.md`.
+
+### Aprendizaje principal
+
+La experiencia permitió concluir que el uso de IA, Figma MCP y steering files no elimina la brecha entre diseño e implementación, pero sí ofrece mecanismos para gestionarla de forma controlada. El drift fue especialmente visible cuando el prototipo dejó de ser una representación visual y comenzó a operar como software funcional, con datos, estados, reglas y navegación real. En ese contexto, la combinación de sistema de diseño, reglas de dirección y QA manual permitió mantener coherencia visual y de marca mientras se incorporaban necesidades funcionales descubiertas durante la construcción.
+
 ### Hook de sincronización con ClickUp
 
 ```json
@@ -313,8 +373,8 @@ Con QA stage:  spec → implementar → build passes → QA manual → documenta
 ```
 
 Los specs `ux-polish-fixes` y `lease-lifecycle-status-sync` son ejemplos directos de este proceso: ambos surgieron como resultado de la validación manual de flujos previamente implementados, donde se detectaron defectos que no eran visibles en los tests automatizados.
-# Integraciones Externas y Stubs del MVP
-El MVP utiliza **adaptadores stub** para las tres integraciones externas que serán reemplazadas post-MVP:
+# Integraciones Externas y Stubs del Prototipo
+El prototipo utiliza **adaptadores stub** para las tres integraciones externas que serán reemplazadas en una etapa posterior:
 
 | Integración | Stub | Comportamiento |
 | ---| ---| --- |
@@ -322,7 +382,7 @@ El MVP utiliza **adaptadores stub** para las tres integraciones externas que ser
 | Pasarela de pagos | `PaymentGatewayAdapter` | Retorna `APPROVED` con URL de redirección mock; requiere webhook manual |
 | Canal de mensajería | `MessagingChannelAdapter` | Registra notificaciones en consola del servidor |
 
-Para avanzar el estado de la aplicación durante testing, se documentó una **guía de testing con stubs** (`documentation/MVP-STUB-TESTING-GUIDE.md`) que incluye los comandos curl necesarios para simular los webhooks de firma y pago.
+Para avanzar el estado de la aplicación durante testing, se documentó una **guía de testing con stubs** (`documentation/MVP-STUB-TESTING-GUIDE.md`) que incluye los comandos curl necesarios para simular los webhooks de firma y pago. El nombre del archivo conserva la convención técnica usada durante la implementación, aunque en el informe consolidado se prefirió hablar de prototipo funcional.
 # Patrones de Comunicación Inter-Módulo
 ## Cross-Module Query Ports
 Los módulos exponen interfaces de consulta para evitar queries SQL directos entre esquemas:
@@ -354,6 +414,12 @@ Cada módulo que dispara notificaciones define un adaptador local que delega a `
 | rental-tracking | `CONTACT_INITIATED`, `CONTRACT_SIGNED`, `PAYMENT_RECEIVED` |
 
 # Infraestructura de Despliegue
+La infraestructura de despliegue se implementó como un habilitador operativo para compartir el prototipo por internet durante la evaluación del objetivo 4. No debe interpretarse como una arquitectura productiva definitiva ni como una propuesta completa de operación comercial. Su propósito fue permitir acceso remoto al prototipo, facilitar pruebas con sujetos externos y reducir fricción logística durante la fase de validación.
+
+En esta parte se otorgó mayor libertad operativa al agente de IA que en otras fases funcionales, pero dicha libertad permaneció acotada por los steering files técnicos y de producto, el diseño arquitectónico previamente definido, las restricciones del prototipo y la necesidad concreta de habilitar evaluación remota. La selección de AWS respondió a una decisión pragmática: el implementador tenía familiaridad con esta nube, contaba con una cuenta activa y configurada, y podía realizar troubleshooting y gestión de accesos con menor fricción.
+
+Aunque la infraestructura fue modelada con una separación conceptual que permitiría evolucionar hacia ambientes más formales, durante esta etapa se utilizó principalmente el entorno `stg`. Por tanto, no se ejecutó un proceso formal de operación `stg/prod`; el despliegue debe entenderse como una base temporal y suficiente para la evaluación, no como cierre de diseño de infraestructura.
+
 ## Arquitectura AWS
 La infraestructura se implementó con **AWS CDK** (Infrastructure as Code) organizada en 6 stacks modulares. La capa de cómputo utiliza **Amazon ECS Fargate** — un servicio de orquestación de contenedores serverless — con un **Application Load Balancer (ALB)** en subnets públicas para enrutamiento basado en path. CloudFront se ubica al frente para caching, protección WAF y terminación TLS.
 
@@ -379,6 +445,12 @@ User → CloudFront (TLS) → WAF → ALB (HTTP, port 80)
 Todas las variables de entorno son gestionadas por CDK — **cero configuración manual en la consola AWS**:
 *   Variables no sensibles: inyectadas en las task definitions de ECS como environment variables
 *   Secretos: almacenados en Secrets Manager y referenciados en las task definitions como secrets (resueltos en runtime por ECS)
+
+## Aclaración de alcance y trabajo futuro en infraestructura
+
+El despliegue descrito fue suficiente para publicar el prototipo y habilitar su evaluación por internet; sin embargo, no reemplaza una iteración específica de diseño de infraestructura orientada a operación sostenida. Para una evolución posterior, sería necesario revisar arquitectura de ambientes, estrategia formal de `stg` y `prod`, costos, observabilidad, seguridad, respaldo, recuperación ante fallos, gestión de secretos, dominios, certificados, políticas de acceso y procesos de despliegue.
+
+En ese sentido, la infraestructura debe leerse como una solución pragmática y trazable para la etapa de evaluación, no como una decisión final de arquitectura cloud. La recomendación para trabajo futuro es dedicar iteraciones adicionales a diseñar una infraestructura coherente con los objetivos de negocio, el nivel de riesgo, el volumen esperado de usuarios y las restricciones de cumplimiento del proyecto.
 # Descubrimiento de requisitos emergentes
 Un hallazgo significativo del proceso de implementación fue que **la interacción funcional con el prototipo ya concebido reveló oportunidades de mejora y flujos funcionales que no se habían considerado durante las fases de obtención de requisitos ni de diseño de la solución**.
 Ejemplos concretos de requisitos emergentes descubiertos durante la implementación:
@@ -403,7 +475,7 @@ Esta capacidad de descubrimiento temprano y corrección ágil es uno de los bene
 *   La experiencia de desarrollo permitió confirmar que la efectividad del enfoque SDD depende también de la calidad de las etapas previas de obtención de requerimientos y diseño arquitectónico. El trabajo realizado en el SRS y en el documento de diseño proporcionó un insumo sólido para la construcción de especificaciones y _steering files_, reduciendo la brecha entre el “qué” se debía construir y el “cómo” debía implementarse. Esto evidenció que el uso de IA sin un proceso previo riguroso de análisis y diseño puede incrementar el reproceso y las inconsistencias, mientras que una base documental clara potencia considerablemente la calidad y efectividad del desarrollo asistido por IA.
 *   La implementación permitió comprobar que, aunque los agentes de IA pueden generar código funcional y técnicamente válido, la etapa de validación manual continúa siendo indispensable para identificar problemas asociados a experiencia de usuario, navegación, consistencia visual y comportamiento funcional. Esto evidenció que el enfoque SDD no elimina la necesidad de QA humano, sino que transforma su rol hacia actividades de validación, refinamiento y aseguramiento de calidad orientadas al usuario final.
 *   A partir de las automatizaciones incorporadas mediante hooks y herramientas auxiliares, se evidenció una mejora significativa en la productividad del proceso de desarrollo, reduciendo trabajo repetitivo relacionado con documentación, validación de convenciones, estructuración de commits y sincronización con herramientas externas. Esto permitió mantener mayor consistencia y trazabilidad durante el desarrollo sin incrementar significativamente la carga operativa del proyecto.
-*   La arquitectura hexagonal implementada permitió validar la importancia de mantener separación entre dominio, puertos y adaptadores incluso en un contexto MVP, facilitando la incorporación progresiva de nuevas funcionalidades sin afectar considerablemente la lógica de negocio existente. Este resultado confirma que una arquitectura desacoplada favorece la mantenibilidad y evolución futura del sistema.
+*   La arquitectura hexagonal implementada permitió validar la importancia de mantener separación entre dominio, puertos y adaptadores incluso en un contexto de prototipo, facilitando la incorporación progresiva de nuevas funcionalidades sin afectar considerablemente la lógica de negocio existente. Este resultado confirma que una arquitectura desacoplada favorece la mantenibilidad y evolución futura del sistema.
 *   La integración de MCPs con herramientas como ClickUp y Figma permitió mantener sincronización entre gestión del proyecto, diseño visual y desarrollo técnico dentro de un mismo flujo de trabajo, fortaleciendo la trazabilidad entre requerimientos, prototipos y funcionalidades implementadas. Esto evidenció el potencial de los ecosistemas integrados para reducir fricción entre las diferentes etapas del ciclo de desarrollo de software.
 *   El desarrollo temprano de un prototipo funcional permitió descubrir requerimientos, reglas de negocio y necesidades de interacción que no habían emergido durante las etapas iniciales de levantamiento de requisitos y diseño arquitectónico. Esto demostró que los ciclos acelerados de iteración asistidos por IA facilitan la detección temprana de vacíos funcionales y reducen el riesgo de desviaciones significativas en cronograma y alcance frente a enfoques tradicionales.
 *   En conjunto, la experiencia obtenida permitió concluir que el enfoque SDD asistido por agentes de inteligencia artificial no reemplaza el criterio humano dentro del desarrollo de software, sino que redefine el rol del desarrollador hacia actividades de supervisión, validación y toma de decisiones estratégicas. En consecuencia, el conocimiento de dominio, la capacidad de análisis y la comprensión de las necesidades del usuario continúan siendo factores fundamentales para garantizar la calidad y pertinencia de la solución desarrollada.
