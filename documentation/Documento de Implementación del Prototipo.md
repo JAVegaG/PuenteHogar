@@ -59,9 +59,9 @@ No incluye `requirements.md` porque el "requisito" es implícito: el sistema deb
 | ---| --- |
 | Requirements-first | `backend-database-implementation`, `explore-properties-frontend`, `users-auth-frontend`, `landlord-portfolio-frontend`, `portfolio-figma-alignment`, `property-type-catalog`, `colombian-geo-catalog`, `landlord-modules-frontend`, `object-storage-implementation`, `portfolio-unit-listings-management`, `portfolio-contracts-management`, `contract-file-management`, `tenant-flows-frontend`, `platform-wide-improvements`, `multirole-notifications-frontend`, `listing-search-and-ux-enhancements`, `in-app-notifications-wiring` |
 | Design-first | `aws-infrastructure-deployment` |
-| Bugfix | `ux-polish-fixes`, `lease-lifecycle-status-sync` |
+| Bugfix | `ux-polish-fixes`, `lease-lifecycle-status-sync`, `deployment-fixes` |
 
-Los 17 specs de tipo **Requirements-first** siguieron el ciclo completo (requirements → design → tasks), generando documentación trazable desde la necesidad funcional hasta la implementación. Mientras que, los 2 specs de tipo **Bugfix** utilizaron el flujo especializado con análisis de condiciones de bug, propiedades esperadas y preservaciones, sin documento de requisitos separado. Por otro lado, solo se utilizó el flujo **Design-first** para la construcción de la infraestructura como código, dado que en gran medida este diseño ya estaba documentado y su propósito principal era habilitar el acceso por internet al prototipo para la evaluación.
+Los 17 specs de tipo **Requirements-first** siguieron el ciclo completo (requirements → design → tasks), generando documentación trazable desde la necesidad funcional hasta la implementación. Mientras que, los 3 specs de tipo **Bugfix** utilizaron el flujo especializado con análisis de condiciones de bug, propiedades esperadas y preservaciones, sin documento de requisitos separado. Por otro lado, solo se utilizó el flujo **Design-first** para la construcción de la infraestructura como código, dado que en gran medida este diseño ya estaba documentado y su propósito principal era habilitar el acceso por internet al prototipo para la evaluación.
 ## Model Context Protocol (MCP)
 Se configuró un servidor MCP para integrar el flujo de desarrollo con herramientas externas:
 ### ClickUp MCP
@@ -135,6 +135,7 @@ Los primeros hooks creados fueron los de actualización automática de READMEs:
 | `update-backend-readme` | `fileEdited` en `src/backend/**/*.ts` o `*.json` | Revisa el estado del backend y actualiza `src/backend/README.md` |
 | `update-db-readme` | `fileEdited` en `db/**/*.prisma`, `*.ts`, `*.sql` | Revisa el schema Prisma y actualiza `db/README.md` |
 | `update-frontend-readme` | `fileEdited` en `src/frontend/**/*.ts`, `*.tsx`, `*.json` | Revisa el frontend y actualiza `src/frontend/README.md` |
+| `update-infra-readme` | `fileEdited` en `src/infra/**/*.ts`, `*.json`, `docker/*` | Revisa CDK y actualiza `src/infra/README.md` |
 
 **Objetivo**: Mantener la documentación técnica siempre sincronizada con el código sin esfuerzo manual. Cada vez que se edita un archivo de código, el agente revisa si el README correspondiente necesita actualizarse y lo hace automáticamente.
 **Impacto**: Los READMEs del proyecto reflejan fielmente el estado actual del código en todo momento, sirviendo como documentación viva que no se desactualiza.
@@ -263,7 +264,7 @@ La experiencia permitió concluir que el uso de IA, Figma MCP y steering files n
 **Objetivo**: Mantener actualizado el README de infraestructura cuando se modifican stacks CDK, configuraciones o Dockerfiles.
 # Specs: Especificaciones de Implementación
 ## Resumen de specs creados
-Se crearon **20 specs** a lo largo del proyecto, cada uno cubriendo una funcionalidad o conjunto de mejoras específico. A continuación se presenta el orden cronológico de ejecución basado en la última modificación de sus archivos de tareas:
+Se crearon **21 specs** a lo largo del proyecto, cada uno cubriendo una funcionalidad o conjunto de mejoras específico. A continuación se presenta el orden cronológico de ejecución basado en la última modificación de sus archivos de tareas:
 
 | # | Spec | Fecha | Alcance |
 | ---| ---| ---| --- |
@@ -286,7 +287,8 @@ Se crearon **20 specs** a lo largo del proyecto, cada uno cubriendo una funciona
 | 17 | `in-app-notifications-wiring` | 4 may | Wiring de notificaciones: adaptadores por módulo, fire-and-forget |
 | 18 | `ux-polish-fixes` | 5 may | Correcciones de UX post-QA: bugs, traducciones, navegación |
 | 19 | `lease-lifecycle-status-sync` | 6 may | Sincronización del ciclo de vida: tracking status, cancelación, derivación |
-| 20 | `aws-infrastructure-deployment` | 16 may | Infraestructura AWS: CDK, VPC, RDS, App Runner, CloudFront, WAF |
+| 20 | `aws-infrastructure-deployment` | 16 may | Infraestructura AWS: CDK, VPC, RDS, ECS Fargate, CloudFront, WAF |
+| 21 | `deployment-fixes` | 19 may | Estabilización post-despliegue: routing ALB, PrismaService, costos staging, SSM Bastion |
 
 ## Fases de implementación
 ### Fase 1: Fundación (16 de abril)
@@ -326,14 +328,29 @@ Specs enfocados en calidad, consistencia y corrección de bugs:
 *   Wiring de notificaciones entre módulos
 *   Correcciones de UX descubiertas en QA manual
 *   Sincronización del ciclo de vida del arriendo
-### Fase 7: Infraestructura (16 de mayo)
-El spec final desplegó la infraestructura en AWS:
+### Fase 7: Infraestructura y Estabilización del Despliegue (16–19 de mayo)
+La infraestructura se implementó como habilitador operativo para compartir el prototipo por internet con los sujetos de prueba de la etapa de evaluación (posterior a la implementación), eliminando la distancia geográfica como barrera para la validación. Se requería que los evaluadores pudieran acceder al prototipo funcional desde sus propios dispositivos sin depender de la presencia física del implementador.
+
+El spec `aws-infrastructure-deployment` desplegó la infraestructura inicial en AWS:
 *   6 stacks CDK (Network, Data, CI, Compute, CDN, Monitoring)
 *   VPC con subnets públicas, privadas y aisladas
 *   RDS PostgreSQL + ElastiCache Redis + S3
 *   ECS Fargate para backend y frontend (containerizado)
 *   CloudFront + WAF para CDN y protección
 *   Monitoreo con CloudWatch, alarmas y dashboards
+
+Para esta fase se otorgó mayor libertad operativa al agente de IA que en las fases funcionales, dado que el objetivo era pragmático (habilitar acceso remoto) y no un diseño de infraestructura definitivo. No obstante, dicha libertad permaneció acotada por los steering files técnicos y de producto, el diseño arquitectónico previamente definido y las restricciones del prototipo.
+
+El spec `deployment-fixes` (tipo Bugfix) estabilizó el despliegue tras el primer intento en ECS Fargate, corrigiendo:
+*   Mecanismo de acceso a RDS (EIC Endpoint → SSM Bastion con port forwarding)
+*   Construcción interna de `DATABASE_URL` en PrismaService (eliminación del entrypoint bash)
+*   Routing frontend→backend (prefijo `/api` en todas las llamadas fetch)
+*   Optimización de costos de staging (eliminación de NAT Gateway y ElastiCache, reemplazo por VPC Endpoints y cache no-op)
+*   7 hallazgos post-implementación adicionales: Docker ARM en Fargate, Prisma 7 breaking change, SSL en RDS, Redis no-op en staging, Swagger paths tras ALB, ECS image caching, y aislamiento de env en execSync
+
+Este spec es otro ejemplo directo del patrón QA → hallazgos → corrección que caracteriza al flujo SDD con retroalimentación: el primer despliegue reveló condiciones que no eran detectables en desarrollo local, y el flujo de bugfix permitió documentarlas y resolverlas de forma trazable.
+
+Aunque la infraestructura fue modelada con una separación conceptual `stg`/`prod` que permitiría evolucionar hacia ambientes más formales, durante esta etapa se utilizó exclusivamente el entorno `stg`, considerando que su único propósito era habilitar la evaluación remota del prototipo. En línea con el trabajo futuro, vale la pena dedicar iteraciones adicionales y esfuerzo de diseño a plantear una infraestructura de despliegue adecuada según el diseño arquitectónico ya elaborado, los objetivos de negocio, el nivel de riesgo, el volumen esperado de usuarios y las restricciones de cumplimiento del proyecto.
 # Estrategia de Testing
 ## Property-Based Testing (PBT)
 El backend utiliza **property-based testing** con la librería `fast-check` para verificar propiedades invariantes del sistema. Cada test está vinculado a un requisito específico del spec mediante comentarios de trazabilidad.
@@ -343,11 +360,14 @@ El backend utiliza **property-based testing** con la librería `fast-check` para
 *   Restricciones de unicidad en la base de datos
 *   Round-trip de transformación ETL (RAW → curado)
 *   Invariantes de dominio por módulo (auth, portfolio, listings, contracts, payments, accounting, tracking, notifications)
+*   Invariantes de infraestructura y configuración (routing ALB, global prefix `/api`, `NEXT_PUBLIC_API_URL`) — surgidos del spec `deployment-fixes`
 ## Tests unitarios
 Cada módulo incluye tests unitarios para:
 *   Funciones de validación puras (frontend y backend)
 *   Componentes compartidos (ProtectedRoute, StepIndicator)
 *   Helpers y utilidades (formatPrice, computePeriod, soft-delete utils)
+## Tests de infraestructura (CDK)
+El proyecto de infraestructura (`src/infra/test/`) incluye tests de assertion y snapshot sobre los templates CloudFormation generados por CDK, validando que los stacks producen los recursos esperados sin necesidad de desplegar.
 ## Pruebas Funcionales y Validación Manual
 ### La brecha entre especificación y resultado
 A pesar de que la hipótesis central del proyecto es que el enfoque SDD entrega mejores resultados que el "vibe coding" (desarrollo conversacional sin estructura formal), la experiencia de implementación demostró que **sigue existiendo una brecha entre lo que se especifica y lo que se obtiene**. El agente de IA puede generar código que compila, pasa tests y cumple los criterios de aceptación formales, pero esto no garantiza que la experiencia del usuario sea la esperada.
@@ -372,9 +392,9 @@ Sin QA stage:  spec → implementar → build passes → done ✗
 Con QA stage:  spec → implementar → build passes → QA manual → documentar hallazgos → implementar fixes → done ✓
 ```
 
-Los specs `ux-polish-fixes` y `lease-lifecycle-status-sync` son ejemplos directos de este proceso: ambos surgieron como resultado de la validación manual de flujos previamente implementados, donde se detectaron defectos que no eran visibles en los tests automatizados.
+Los specs `ux-polish-fixes`, `lease-lifecycle-status-sync` y `deployment-fixes` son ejemplos directos de este proceso: los dos primeros surgieron como resultado de la validación manual de flujos previamente implementados, donde se detectaron defectos que no eran visibles en los tests automatizados; el tercero surgió del primer despliegue en infraestructura de nube, donde se detectaron condiciones operativas no reproducibles en desarrollo local.
 # Integraciones Externas y Stubs del Prototipo
-El prototipo utiliza **adaptadores stub** para las tres integraciones externas que serán reemplazadas en una etapa posterior:
+El prototipo utiliza **adaptadores stub** para tres integraciones externas que serán reemplazadas en una etapa posterior. Cabe señalar que el almacenamiento de objetos (S3) **ya fue implementado con integración real** mediante AWS SDK v3 en el spec `object-storage-implementation` (presigned URLs, upload de fotos y contratos), por lo que no se considera un stub pendiente.
 
 | Integración | Stub | Comportamiento |
 | ---| ---| --- |
@@ -414,11 +434,11 @@ Cada módulo que dispara notificaciones define un adaptador local que delega a `
 | rental-tracking | `CONTACT_INITIATED`, `CONTRACT_SIGNED`, `PAYMENT_RECEIVED` |
 
 # Infraestructura de Despliegue
-La infraestructura de despliegue se implementó como un habilitador operativo para compartir el prototipo por internet durante la evaluación del objetivo 4. No debe interpretarse como una arquitectura productiva definitiva ni como una propuesta completa de operación comercial. Su propósito fue permitir acceso remoto al prototipo, facilitar pruebas con sujetos externos y reducir fricción logística durante la fase de validación.
+La infraestructura de despliegue se implementó como un habilitador operativo para compartir el prototipo por internet durante la evaluación del objetivo 4. La necesidad surgió de que los sujetos de prueba de la etapa de evaluación (posterior a la implementación) se encontraban a distancia del implementador, y se requería que pudieran acceder al prototipo funcional desde sus propios dispositivos a través de un enlace web, sin depender de presencia física ni de configuraciones locales. No debe interpretarse como una arquitectura productiva definitiva ni como una propuesta completa de operación comercial.
 
-En esta parte se otorgó mayor libertad operativa al agente de IA que en otras fases funcionales, pero dicha libertad permaneció acotada por los steering files técnicos y de producto, el diseño arquitectónico previamente definido, las restricciones del prototipo y la necesidad concreta de habilitar evaluación remota. La selección de AWS respondió a una decisión pragmática: el implementador tenía familiaridad con esta nube, contaba con una cuenta activa y configurada, y podía realizar troubleshooting y gestión de accesos con menor fricción.
+En esta parte se otorgó mayor libertad operativa al agente de IA que en otras fases funcionales, dado que el objetivo era pragmático y acotado: habilitar acceso remoto para evaluación. No obstante, dicha libertad permaneció acotada por los steering files técnicos y de producto, el diseño arquitectónico previamente definido, las restricciones del prototipo y la necesidad concreta de habilitar evaluación remota. La selección de AWS respondió a una decisión pragmática: el implementador tenía familiaridad con esta nube, contaba con una cuenta activa y configurada, y podía realizar troubleshooting y gestión de accesos con menor fricción.
 
-Aunque la infraestructura fue modelada con una separación conceptual que permitiría evolucionar hacia ambientes más formales, durante esta etapa se utilizó principalmente el entorno `stg`. Por tanto, no se ejecutó un proceso formal de operación `stg/prod`; el despliegue debe entenderse como una base temporal y suficiente para la evaluación, no como cierre de diseño de infraestructura.
+Aunque la infraestructura fue modelada con una separación conceptual que permitiría evolucionar hacia ambientes más formales (`stg` y `prod`), durante esta etapa se utilizó exclusivamente el entorno `stg`. No se ejecutó un proceso formal de operación multi-ambiente; el despliegue debe entenderse como una base temporal y suficiente para la evaluación, no como cierre de diseño de infraestructura.
 
 ## Arquitectura AWS
 La infraestructura se implementó con **AWS CDK** (Infrastructure as Code) organizada en 6 stacks modulares. La capa de cómputo utiliza **Amazon ECS Fargate** — un servicio de orquestación de contenedores serverless — con un **Application Load Balancer (ALB)** en subnets públicas para enrutamiento basado en path. CloudFront se ubica al frente para caching, protección WAF y terminación TLS.
@@ -448,9 +468,13 @@ Todas las variables de entorno son gestionadas por CDK — **cero configuración
 
 ## Aclaración de alcance y trabajo futuro en infraestructura
 
-El despliegue descrito fue suficiente para publicar el prototipo y habilitar su evaluación por internet; sin embargo, no reemplaza una iteración específica de diseño de infraestructura orientada a operación sostenida. Para una evolución posterior, sería necesario revisar arquitectura de ambientes, estrategia formal de `stg` y `prod`, costos, observabilidad, seguridad, respaldo, recuperación ante fallos, gestión de secretos, dominios, certificados, políticas de acceso y procesos de despliegue.
+El despliegue descrito fue suficiente para publicar el prototipo y habilitar su evaluación por internet, eliminando la distancia geográfica como barrera entre el implementador y los sujetos de prueba; sin embargo, no reemplaza una iteración específica de diseño de infraestructura orientada a operación sostenida.
 
-En ese sentido, la infraestructura debe leerse como una solución pragmática y trazable para la etapa de evaluación, no como una decisión final de arquitectura cloud. La recomendación para trabajo futuro es dedicar iteraciones adicionales a diseñar una infraestructura coherente con los objetivos de negocio, el nivel de riesgo, el volumen esperado de usuarios y las restricciones de cumplimiento del proyecto.
+En la práctica, solo se desplegó y utilizó el entorno `stg` — la configuración de `prod` existe como modelo conceptual en el código CDK pero no fue instanciada, dado que el único propósito del despliegue era habilitar la evaluación remota del prototipo. Por tanto, la infraestructura actual no representa un proceso formal de diseño o implementación a nivel de infraestructura, sino un habilitador temporal.
+
+Para una evolución posterior, la recomendación es dedicar iteraciones adicionales y esfuerzo de diseño específico a plantear una infraestructura de despliegue adecuada según el diseño arquitectónico ya elaborado, los objetivos de negocio, el nivel de riesgo, el volumen esperado de usuarios y las restricciones de cumplimiento del proyecto. Esto incluiría revisar: arquitectura de ambientes, estrategia formal de `stg` y `prod`, costos, observabilidad, seguridad, respaldo, recuperación ante fallos, gestión de secretos, dominios, certificados, políticas de acceso y procesos de despliegue continuo.
+
+En ese sentido, la infraestructura debe leerse como una solución pragmática y trazable para la etapa de evaluación, no como una decisión final de arquitectura cloud.
 # Descubrimiento de requisitos emergentes
 Un hallazgo significativo del proceso de implementación fue que **la interacción funcional con el prototipo ya concebido reveló oportunidades de mejora y flujos funcionales que no se habían considerado durante las fases de obtención de requisitos ni de diseño de la solución**.
 Ejemplos concretos de requisitos emergentes descubiertos durante la implementación:
@@ -460,6 +484,15 @@ Ejemplos concretos de requisitos emergentes descubiertos durante la implementaci
 *   La necesidad de **derivar el estado "Ocupado" de una unidad solo cuando el contrato está firmado** (regla de negocio refinada por uso real)
 *   La necesidad de **mostrar información de contacto del arrendatario en la notificación de interés** (UX descubierta al usar la app como arrendador)
 Estos descubrimientos son inherentes a cualquier proceso de desarrollo de software, pero el flujo acelerado mediante IA y en la medida que el desarrollador tenga contexto no solamente funcional sino también de la visión del negocio o estrategia, permite **detectarlos tempranamente**, en días o semanas en lugar de meses, gracias a que el prototipo funcional se materializa mucho antes de lo que permitiría un proceso tradicional.
+
+De manera análoga, el primer despliegue en infraestructura de nube reveló **requisitos emergentes operativos** que no eran detectables en desarrollo local:
+*   La necesidad de que Docker construya imágenes `linux/amd64` explícitamente cuando el desarrollador trabaja en Apple Silicon (ARM)
+*   La necesidad de que `PrismaService` construya `DATABASE_URL` internamente con `sslmode=no-verify` para conexiones TLS a RDS
+*   La necesidad de eliminar componentes costosos (NAT Gateway, ElastiCache) en staging y reemplazarlos por VPC Endpoints y cache no-op
+*   La necesidad de que el frontend prefije todas las llamadas fetch con `/api` para alinearse con el routing del ALB
+*   La incompatibilidad de Prisma 7 con `url` en `schema.prisma` (breaking change no documentado en la migración)
+
+Estos hallazgos operativos refuerzan la misma tesis: el prototipado temprano — incluyendo el despliegue — permite descubrir condiciones que solo se manifiestan en entornos reales, y el flujo SDD permite documentarlas y resolverlas de forma trazable dentro del mismo ciclo de desarrollo.
 ## Ventaja frente a metodologías tradicionales
 En un flujo en cascada tradicional, estos requisitos emergentes se descubrirían típicamente en las fases de testing de integración o de aceptación del usuario, cuando el cronograma ya está comprometido y los cambios representan un **riesgo alto de incumplimiento**. La rigidez del proceso hace que cada hallazgo tardío se convierta en un cambio costoso que compite con la fecha de entrega.
 En contraste, el flujo SDD asistido por IA permite:
