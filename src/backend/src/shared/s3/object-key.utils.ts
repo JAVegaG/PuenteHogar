@@ -2,17 +2,18 @@ import crypto from 'crypto';
 import { ObjectStorageValidationException } from './object-storage.exceptions';
 
 /**
- * Genera un object key con formato: {prefix}/{timestamp}-{uuid}-{filename}
+ * Genera un object key con formato: assets/{prefix}/{timestamp}-{uuid}-{filename}
+ * The "assets/" prefix matches the CloudFront behavior pattern (/assets/*).
  */
 export function generateObjectKey(prefix: string, filename: string): string {
     const timestamp = Date.now();
     const uuid = crypto.randomUUID();
-    return `${prefix}/${timestamp}-${uuid}-${filename}`;
+    return `assets/${prefix}/${timestamp}-${uuid}-${filename}`;
 }
 
 /**
  * Parsea un object key en sus componentes.
- * Formato esperado: {prefix}/{timestamp}-{uuid}-{filename}
+ * Formato esperado: assets/{prefix}/{timestamp}-{uuid}-{filename}
  */
 export function parseObjectKey(key: string): {
     prefix: string;
@@ -20,9 +21,12 @@ export function parseObjectKey(key: string): {
     uuid: string;
     filename: string;
 } {
-    const slashIndex = key.indexOf('/');
-    const prefix = key.substring(0, slashIndex);
-    const rest = key.substring(slashIndex + 1);
+    // Strip the "assets/" prefix if present
+    const normalizedKey = key.startsWith('assets/') ? key.substring('assets/'.length) : key;
+
+    const slashIndex = normalizedKey.indexOf('/');
+    const prefix = normalizedKey.substring(0, slashIndex);
+    const rest = normalizedKey.substring(slashIndex + 1);
 
     // rest = {timestamp}-{uuid}-{filename}
     // timestamp is digits, uuid is 36 chars (8-4-4-4-12), filename is the remainder
@@ -40,13 +44,19 @@ export function parseObjectKey(key: string): {
 }
 
 /**
- * Construye la URL pública del objeto en S3.
+ * Construye la URL pública del objeto, usando el CDN si está configurado.
+ * En producción/staging, devuelve una URL de CloudFront (key ya incluye "assets/" prefix).
+ * En desarrollo local (sin CDN), devuelve la URL directa de S3.
  */
 export function buildObjectUrl(
     bucket: string,
     region: string,
     key: string,
 ): string {
+    const cdnDomain = process.env.CDN_DOMAIN;
+    if (cdnDomain) {
+        return `https://${cdnDomain}/${key}`;
+    }
     return `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
 }
 

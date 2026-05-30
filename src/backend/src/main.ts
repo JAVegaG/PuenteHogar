@@ -5,9 +5,35 @@ import { AppModule } from './app.module';
 import logger from 'morgan'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import helmet from 'helmet'
+import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm';
+
+/**
+ * Resolves CDN_DOMAIN from SSM Parameter Store if not already set.
+ * Non-fatal: if SSM is unreachable or param doesn't exist, falls back to direct S3 URLs.
+ */
+async function resolveCdnDomain(): Promise<void> {
+  if (process.env.CDN_DOMAIN) return; // Already set (e.g., local dev override)
+
+  const paramName = process.env.CDN_SSM_PARAM;
+  if (!paramName) return; // No SSM param configured (local dev)
+
+  try {
+    const ssm = new SSMClient({ region: process.env.OBJECT_STORAGE_REGION || 'us-east-1' });
+    const result = await ssm.send(new GetParameterCommand({ Name: paramName }));
+    if (result.Parameter?.Value) {
+      process.env.CDN_DOMAIN = result.Parameter.Value;
+      new Logger('Bootstrap').log(`CDN_DOMAIN resolved from SSM: ${result.Parameter.Value}`);
+    }
+  } catch {
+    // Non-fatal — CDN stack may not be deployed yet
+    new Logger('Bootstrap').warn(`Could not resolve CDN_DOMAIN from SSM param "${paramName}" — using direct S3 URLs`);
+  }
+}
 
 
 async function bootstrap() {
+  await resolveCdnDomain();
+
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.setGlobalPrefix('api');

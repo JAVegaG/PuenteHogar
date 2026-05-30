@@ -9,10 +9,10 @@ import { ObjectStorageValidationException } from './object-storage.exceptions';
 
 describe('object-key.utils', () => {
     describe('generateObjectKey', () => {
-        it('should produce a key matching {prefix}/{timestamp}-{uuid}-{filename}', () => {
+        it('should produce a key matching assets/{prefix}/{timestamp}-{uuid}-{filename}', () => {
             const key = generateObjectKey('listings', 'photo.jpg');
             const pattern =
-                /^listings\/\d+-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-photo\.jpg$/;
+                /^assets\/listings\/\d+-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-photo\.jpg$/;
             expect(key).toMatch(pattern);
         });
 
@@ -35,8 +35,9 @@ describe('object-key.utils', () => {
                 /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
             );
 
+            // Reconstructed key (without assets/ prefix) should match the stripped version
             const reconstructed = `${parsed.prefix}/${parsed.timestamp}-${parsed.uuid}-${parsed.filename}`;
-            expect(reconstructed).toBe(key);
+            expect(`assets/${reconstructed}`).toBe(key);
         });
     });
 
