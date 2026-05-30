@@ -55,7 +55,7 @@ function isSignedLease(unit: PortfolioUnit): boolean {
 }
 
 /** Resolves the badge status and variant for a unit based on its trackingStatus */
-function getLeaseStatusInfo(unit: PortfolioUnit): { status: string; variant: 'lease' | 'tracking' } {
+function getLeaseStatusInfo(unit: PortfolioUnit): { status: string; variant: 'lease' | 'tracking' | 'unit' } {
     if (isSignedLease(unit)) {
         return { status: 'Vigente', variant: 'lease' };
     }
@@ -63,8 +63,8 @@ function getLeaseStatusInfo(unit: PortfolioUnit): { status: string; variant: 'le
     if (unit.trackingStatus) {
         return { status: unit.trackingStatus, variant: 'tracking' };
     }
-    // Fallback for units without tracking status
-    return { status: 'Acordado', variant: 'lease' };
+    // No active lease — unit is available
+    return { status: 'Disponible', variant: 'unit' };
 }
 
 function PortfolioReportContent() {
