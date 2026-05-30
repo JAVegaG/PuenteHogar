@@ -9,6 +9,7 @@ Aplicación Next.js (App Router) con Tailwind CSS y TypeScript para la plataform
 - Tailwind CSS
 - Vitest (testing)
 - Fuente Inter (400, 600, 700)
+- Imágenes remotas restringidas a `*.s3.*.amazonaws.com` y `*.cloudfront.net`; optimización de imagen deshabilitada en producción (`unoptimized: true`) ya que CloudFront maneja el caching
 
 ## Estructura del Proyecto
 

@@ -151,7 +151,7 @@ graph TB
 | **DataStack** | RDS PostgreSQL 16, ElastiCache Redis 7 (production only), S3 bucket, Secrets Manager |
 | **CiStack** | ECR repositories, GitHub Actions IAM role |
 | **ComputeStack** | ECS Cluster, ALB, Fargate services (backend + frontend), task definitions, IAM roles, auto-scaling |
-| **CdnStack** | CloudFront distribution (ALB + S3 origins), WAF Web ACL, ACM certificate |
+| **CdnStack** | CloudFront distribution (ALB + S3 origins), WAF Web ACL, ACM certificate, SSM parameter for CDN domain |
 | **MonitoringStack** | CloudWatch alarms (ALB/ECS metrics), dashboards, log groups, SNS notifications |
 
 ### Request Flow
@@ -301,6 +301,17 @@ secrets: {
 - **Non-sensitive vars** (`environment`): Resolved at deploy time from CDK cross-stack references (DB host, Redis endpoint, S3 bucket name, etc.)
 - **Sensitive vars** (`secrets`): Reference Secrets Manager ARNs — ECS resolves them at container start, values never appear in CloudFormation templates. Secrets can reference a full secret value or a specific JSON field within a structured secret (e.g., `DB_PASSWORD` extracts only the `password` field from the DB secret).
 
+### CDN Domain Discovery (SSM Parameter)
+
+The `CDN_DOMAIN` environment variable tells the backend which CloudFront domain to use when building public asset URLs. However, there's a circular dependency: the CDN stack depends on the Compute stack (it needs the ALB DNS name), so the Compute stack cannot reference the CDN stack's distribution domain at deploy time.
+
+Two mechanisms solve this:
+
+1. **Static config** (current): `cdnDomain` is hardcoded in `lib/config/environments.ts` for staging (where the distribution domain is known). The Compute stack injects it as `CDN_DOMAIN` at deploy time.
+2. **SSM parameter** (runtime fallback): The CDN stack writes the distribution domain to `/{environment}/cdn/domain` in SSM Parameter Store. This allows the backend (or CI pipelines) to discover the CDN domain at runtime without a deploy-time circular dependency.
+
+If `CDN_DOMAIN` is not set in the container environment (e.g., production first deploy before the domain is known), the backend falls back to direct S3 URLs for assets.
+
 ### Current Backend Environment Variables
 
 | Variable | Source | Description |
@@ -314,6 +325,9 @@ secrets: {
 | `REDIS_URL` | Computed | Full Redis connection URL (production only — omitted in staging, triggers no-op cache fallback) |
 | `S3_BUCKET_NAME` | DataStack (S3 bucket) | Assets bucket name |
 | `S3_REGION` | Stack region | AWS region for S3 operations |
+| `OBJECT_STORAGE_BUCKET` | DataStack (S3 bucket) | Bucket name used by the ObjectStorage adapter |
+| `OBJECT_STORAGE_REGION` | Stack region | AWS region for the ObjectStorage adapter |
+| `CDN_DOMAIN` | Config (`cdnDomain`) | CloudFront distribution domain for asset URLs (conditional — omitted if not configured) |
 | `NODE_ENV` | Environment config | `production` or `development` |
 | `PORT` | Hardcoded | Application port (`3000`) |
 | `DB_PASSWORD` | Secrets Manager (JSON field) | Extracted `password` field from DB secret |
