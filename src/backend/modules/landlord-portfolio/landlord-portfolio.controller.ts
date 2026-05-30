@@ -135,10 +135,10 @@ export class LandlordPortfolioController {
   @ApiOkResponse({ description: 'Lista de unidades de portafolio', type: [PortfolioUnitResponseDto] })
   @ApiNotFoundResponse({ description: 'Portafolio no encontrado' })
   getUnits(
-    @Param('portfolioId') _portfolioId: string,
+    @Param('portfolioId') portfolioId: string,
     @Req() req: AuthenticatedRequest,
   ) {
-    return this.getPortfolioUseCase.execute(req.user.id);
+    return this.getPortfolioUseCase.execute(req.user.id, portfolioId);
   }
 
   @Patch(':portfolioId/units/:id')

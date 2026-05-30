@@ -13,8 +13,10 @@ export class GetPortfolioUseCase {
     private readonly prisma: PrismaService,
   ) { }
 
-  async execute(userId: string): Promise<PortfolioUnitResponseDto[]> {
-    const units = await this.portfolioRepository.findUnitsByUserId(userId);
+  async execute(userId: string, portfolioId?: string): Promise<PortfolioUnitResponseDto[]> {
+    const units = portfolioId
+      ? await this.portfolioRepository.findUnitsByPortfolioId(portfolioId)
+      : await this.portfolioRepository.findUnitsByUserId(userId);
     return Promise.all(units.map((unit) => this.toResponseDto(unit)));
   }
 

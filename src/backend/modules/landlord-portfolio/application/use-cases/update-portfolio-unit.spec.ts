@@ -73,7 +73,7 @@ function buildMocks(unit: PortfolioUnitEntity, ownerId: string) {
   const repo: jest.Mocked<IPortfolioRepository> = {
     findOrCreatePortfolio: jest.fn(),
     createUnit: jest.fn(),
-    findUnitsByUserId: jest.fn(),
+    findUnitsByUserId: jest.fn(), findUnitsByPortfolioId: jest.fn(),
     findUnitById: jest.fn().mockResolvedValue(unit),
     updateUnit,
     getPortfolioOwnerUserId: jest.fn().mockResolvedValue(ownerId),
@@ -161,7 +161,7 @@ describe('UpdatePortfolioUnitUseCase — Property 13: round-trip update persists
           const repo: jest.Mocked<IPortfolioRepository> = {
             findOrCreatePortfolio: jest.fn(),
             createUnit: jest.fn(),
-            findUnitsByUserId: jest.fn(),
+            findUnitsByUserId: jest.fn(), findUnitsByPortfolioId: jest.fn(),
             findUnitById: jest.fn().mockResolvedValue(null),
             updateUnit: jest.fn(),
             getPortfolioOwnerUserId: jest.fn().mockResolvedValue(null),

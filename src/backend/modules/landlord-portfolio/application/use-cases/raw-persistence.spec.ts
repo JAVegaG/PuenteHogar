@@ -129,7 +129,7 @@ describe('Property 14: Datos de entrada se persisten en RAW_Table antes de trans
             const mockRepo: jest.Mocked<IPortfolioRepository> = {
               findOrCreatePortfolio: jest.fn().mockResolvedValue({ id: portfolioId }),
               createUnit: jest.fn().mockResolvedValue(unit),
-              findUnitsByUserId: jest.fn(),
+              findUnitsByUserId: jest.fn(), findUnitsByPortfolioId: jest.fn(),
               findUnitById: jest.fn(),
               updateUnit: jest.fn(),
               getPortfolioOwnerUserId: jest.fn(),
@@ -195,7 +195,7 @@ describe('Property 14: Datos de entrada se persisten en RAW_Table antes de trans
             const mockRepo: jest.Mocked<IPortfolioRepository> = {
               findOrCreatePortfolio: jest.fn().mockResolvedValue({ id: portfolioId }),
               createUnit: jest.fn().mockResolvedValue(unit),
-              findUnitsByUserId: jest.fn(),
+              findUnitsByUserId: jest.fn(), findUnitsByPortfolioId: jest.fn(),
               findUnitById: jest.fn(),
               updateUnit: jest.fn(),
               getPortfolioOwnerUserId: jest.fn(),

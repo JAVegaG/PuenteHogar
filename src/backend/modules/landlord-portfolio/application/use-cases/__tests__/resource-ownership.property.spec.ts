@@ -60,7 +60,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
       await fc.assert(
         fc.asyncProperty(fc.uuid(), async (userId) => {
           const mockRepo: jest.Mocked<IPortfolioRepository> = {
-            findUnitsByUserId: jest.fn().mockResolvedValue([]),
+            findUnitsByUserId: jest.fn(), findUnitsByPortfolioId: jest.fn().mockResolvedValue([]),
             findOrCreatePortfolio: jest.fn(),
             createUnit: jest.fn(),
             findUnitById: jest.fn(),
@@ -113,7 +113,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             getPortfolioOwnerUserId: jest.fn().mockResolvedValue(ownerUserId),
             findOrCreatePortfolio: jest.fn(),
             createUnit: jest.fn(),
-            findUnitsByUserId: jest.fn(),
+            findUnitsByUserId: jest.fn(), findUnitsByPortfolioId: jest.fn(),
             findUnitById: jest.fn(),
             updateUnit: jest.fn(),
             findPortfoliosByUserId: jest.fn(),
@@ -162,7 +162,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             getPortfolioOwnerUserId: jest.fn().mockResolvedValue(null),
             findOrCreatePortfolio: jest.fn(),
             createUnit: jest.fn(),
-            findUnitsByUserId: jest.fn(),
+            findUnitsByUserId: jest.fn(), findUnitsByPortfolioId: jest.fn(),
             findUnitById: jest.fn(),
             updateUnit: jest.fn(),
             findPortfoliosByUserId: jest.fn(),
@@ -697,7 +697,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
               getPortfolioOwnerUserId: jest.fn().mockResolvedValue(ownerUserId),
               findOrCreatePortfolio: jest.fn(),
               createUnit: jest.fn(),
-              findUnitsByUserId: jest.fn(),
+              findUnitsByUserId: jest.fn(), findUnitsByPortfolioId: jest.fn(),
               findUnitById: jest.fn(),
               updateUnit: jest.fn(),
               findPortfoliosByUserId: jest.fn(),

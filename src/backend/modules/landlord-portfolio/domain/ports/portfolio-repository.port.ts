@@ -60,6 +60,7 @@ export interface IPortfolioRepository {
   findOrCreatePortfolio(userId: string): Promise<{ id: string }>;
   createUnit(data: CreatePortfolioUnitData): Promise<PortfolioUnitEntity>;
   findUnitsByUserId(userId: string): Promise<PortfolioUnitEntity[]>;
+  findUnitsByPortfolioId(portfolioId: string): Promise<PortfolioUnitEntity[]>;
   findUnitById(unitId: string): Promise<PortfolioUnitEntity | null>;
   updateUnit(unitId: string, data: UpdatePortfolioUnitData): Promise<PortfolioUnitEntity>;
   getPortfolioOwnerUserId(unitId: string): Promise<string | null>;

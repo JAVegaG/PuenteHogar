@@ -67,8 +67,20 @@ export class PrismaPortfolioRepository implements IPortfolioRepository {
         portfolio: {
           user_id: userId,
         },
+        deleted_at: null,
       },
       include: { portfolio: true },
+    });
+
+    return units.map((unit) => this.toEntity(unit));
+  }
+
+  async findUnitsByPortfolioId(portfolioId: string): Promise<PortfolioUnitEntity[]> {
+    const units = await this.prisma.portfolioUnit.findMany({
+      where: {
+        portfolio_id: portfolioId,
+        deleted_at: null,
+      },
     });
 
     return units.map((unit) => this.toEntity(unit));
