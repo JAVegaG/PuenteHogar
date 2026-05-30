@@ -202,6 +202,15 @@ export class ComputeStack extends cdk.Stack {
             resources: ['*'],
         }));
 
+        backendTaskRole.addToPolicy(new iam.PolicyStatement({
+            sid: 'SsmReadCdnDomain',
+            effect: iam.Effect.ALLOW,
+            actions: ['ssm:GetParameter'],
+            resources: [
+                `arn:aws:ssm:${cdk.Stack.of(this).region}:${cdk.Stack.of(this).account}:parameter/${props.environment}/cdn/domain`,
+            ],
+        }));
+
         // ─────────────────────────────────────────────────────────────────────
         // 5.9 — Frontend Task Role (CloudWatch logs only)
         // ─────────────────────────────────────────────────────────────────────
@@ -256,6 +265,9 @@ export class ComputeStack extends cdk.Stack {
                 } : {}),
                 S3_BUCKET_NAME: props.assetsBucket.bucketName,
                 S3_REGION: cdk.Stack.of(this).region,
+                OBJECT_STORAGE_BUCKET: props.assetsBucket.bucketName,
+                OBJECT_STORAGE_REGION: cdk.Stack.of(this).region,
+                CDN_SSM_PARAM: `/${props.environment}/cdn/domain`,
                 NODE_ENV: isProduction ? 'production' : 'development',
                 PORT: '3000',
             },
@@ -321,6 +333,7 @@ export class ComputeStack extends cdk.Stack {
             maxHealthyPercent: 200,
             serviceName: `${id}-backend-svc`.toLowerCase(),
             circuitBreaker: { rollback: true },
+            healthCheckGracePeriod: cdk.Duration.seconds(120),
         });
 
         backendService.attachToApplicationTargetGroup(backendTargetGroup);

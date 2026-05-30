@@ -197,6 +197,14 @@ export class CdnStack extends cdk.Stack {
         this.distribution = distribution;
         this.wafAcl = wafAcl;
 
+        // Store the distribution domain in SSM so the backend can read it at runtime.
+        // This avoids a circular dependency (CDN depends on Compute, Compute can't depend on CDN).
+        new cdk.aws_ssm.StringParameter(this, 'CdnDomainParam', {
+            parameterName: `/${props.environment}/cdn/domain`,
+            stringValue: distribution.distributionDomainName,
+            description: 'CloudFront distribution domain name for asset URLs',
+        });
+
         new cdk.CfnOutput(this, 'DistributionDomainName', {
             value: distribution.distributionDomainName,
             description: 'CloudFront distribution domain name',

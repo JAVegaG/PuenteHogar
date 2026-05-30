@@ -2,6 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as rds from 'aws-cdk-lib/aws-rds';
 import * as elasticache from 'aws-cdk-lib/aws-elasticache';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import { Construct } from 'constructs';
@@ -134,6 +135,22 @@ export class DataStack extends cdk.Stack {
                 },
             ],
         });
+
+        // Allow CloudFront OAC to read objects from this bucket.
+        // This is needed because the CDN stack imports the bucket by ARN/name (cross-stack),
+        // and CDK cannot auto-update the policy of an imported bucket.
+        assetsBucket.addToResourcePolicy(new iam.PolicyStatement({
+            sid: 'AllowCloudFrontOAC',
+            effect: iam.Effect.ALLOW,
+            principals: [new iam.ServicePrincipal('cloudfront.amazonaws.com')],
+            actions: ['s3:GetObject'],
+            resources: [`${assetsBucket.bucketArn}/*`],
+            conditions: {
+                StringEquals: {
+                    'AWS:SourceAccount': cdk.Stack.of(this).account,
+                },
+            },
+        }));
 
         // 3.6 — Secrets Manager secrets for application secrets
         const jwtSecret = new secretsmanager.Secret(this, 'JwtSecret', {
