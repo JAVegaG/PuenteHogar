@@ -8,6 +8,9 @@ import { execSync } from 'child_process';
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(PrismaService.name);
 
+  /** Ensures migrations and seeds run only once across all module instantiations. */
+  private static initialized = false;
+
   /**
    * SECURITY: Hardcoded migration command — no user input is interpolated.
    * This runs exclusively at application startup (onModuleInit) and is never
@@ -33,9 +36,15 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   }
 
   async onModuleInit() {
-    this.runMigrations();
-    this.runSeeds();
-    await this.$connect();
+    if (!PrismaService.initialized) {
+      PrismaService.initialized = true;
+      this.runMigrations();
+      await this.$connect();
+      // Run seeds in the background after connect so health checks pass quickly.
+      this.runSeedsAsync();
+    } else {
+      await this.$connect();
+    }
   }
 
   /**
@@ -58,24 +67,25 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   }
 
   /**
-   * Runs catalog seed script at startup. Uses upserts so it is idempotent —
-   * safe to run on every boot without duplicating data.
-   * This method is private and only called from onModuleInit.
+   * Runs catalog seed script asynchronously after the app is ready.
+   * Uses upserts so it is idempotent — safe to run on every boot.
+   * Non-blocking: does not delay app startup or health check readiness.
    */
-  private runSeeds(): void {
-    try {
-      this.logger.log('Running catalog seeds...');
-      execSync(PrismaService.SEED_COMMAND, {
-        stdio: 'pipe',
-        timeout: PrismaService.SEED_TIMEOUT_MS,
-        env: { ...process.env },
-      });
-      this.logger.log('Catalog seeds applied successfully');
-    } catch (error) {
-      // Seeds are non-critical — log the error but don't crash the app.
-      // Catalog data may already exist from a previous boot.
-      this.logger.error('Failed to run catalog seeds (non-fatal)', error);
-    }
+  private runSeedsAsync(): void {
+    setImmediate(() => {
+      try {
+        this.logger.log('Running catalog seeds (background)...');
+        execSync(PrismaService.SEED_COMMAND, {
+          stdio: 'pipe',
+          timeout: PrismaService.SEED_TIMEOUT_MS,
+          env: { ...process.env },
+        });
+        this.logger.log('Catalog seeds applied successfully');
+      } catch (error) {
+        // Seeds are non-critical — log the error but don't crash the app.
+        this.logger.error('Failed to run catalog seeds (non-fatal)', error);
+      }
+    });
   }
 
   async onModuleDestroy() {
