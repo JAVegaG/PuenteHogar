@@ -3,6 +3,9 @@
  *
  * Run from src/backend/:
  *   npm run db:seed
+ *
+ * Also executed automatically at container startup via PrismaService.
+ * All operations use upserts — safe to run repeatedly (idempotent).
  */
 
 import 'dotenv/config';
@@ -60,55 +63,65 @@ async function main() {
   console.log('✅ Property types seeded');
 
   // ── Departments & Cities (DANE CSV) ────────────────────────────────────────
-  const csvPath = path.join(__dirname, 'states_citys_colombia.seed.csv');
-  const csvContent = fs.readFileSync(csvPath, 'utf-8');
-  const lines = csvContent.split('\n').filter((line) => line.trim().length > 0);
+  // In production, the compiled seed runs from dist/db/seeds/ but the CSV lives at db/seeds/.
+  // Try the source location first (relative to project root), then fall back to __dirname.
+  const csvCandidates = [
+    path.join(process.cwd(), 'db', 'seeds', 'states_citys_colombia.seed.csv'),
+    path.join(__dirname, 'states_citys_colombia.seed.csv'),
+  ];
+  const csvPath = csvCandidates.find((p) => fs.existsSync(p));
+  if (!csvPath) {
+    console.error('⚠️  CSV file not found at any expected location, skipping departments/cities seed');
+  } else {
+    const csvContent = fs.readFileSync(csvPath, 'utf-8');
+    const lines = csvContent.split('\n').filter((line) => line.trim().length > 0);
 
-  // Parse header — trim whitespace from each column name
-  const headers = lines[0].split(';').map((h) => h.trim());
-  const codeDeptIdx = headers.indexOf('Código_Departamento');
-  const nameDeptIdx = headers.indexOf('Nombre_Departamento');
-  const codeMunIdx = headers.indexOf('Código_Municipio');
-  const nameMunIdx = headers.indexOf('Nombre_Municipio');
+    // Parse header — trim whitespace from each column name
+    const headers = lines[0].split(';').map((h) => h.trim());
+    const codeDeptIdx = headers.indexOf('Código_Departamento');
+    const nameDeptIdx = headers.indexOf('Nombre_Departamento');
+    const codeMunIdx = headers.indexOf('Código_Municipio');
+    const nameMunIdx = headers.indexOf('Nombre_Municipio');
 
-  // Extract unique departments
-  const departmentMap = new Map<string, string>(); // code → name
-  for (let i = 1; i < lines.length; i++) {
-    const cols = lines[i].split(';').map((c) => c.trim());
-    const deptCode = cols[codeDeptIdx];
-    const deptName = cols[nameDeptIdx];
-    if (deptCode && deptName && !departmentMap.has(deptCode)) {
-      departmentMap.set(deptCode, deptName);
+    // Extract unique departments
+    const departmentMap = new Map<string, string>(); // code → name
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(';').map((c) => c.trim());
+      const deptCode = cols[codeDeptIdx];
+      const deptName = cols[nameDeptIdx];
+      if (deptCode && deptName && !departmentMap.has(deptCode)) {
+        departmentMap.set(deptCode, deptName);
+      }
     }
-  }
 
-  // Upsert departments
-  for (const [code, name] of departmentMap) {
-    await prisma.department.upsert({
-      where: { code },
-      update: { name, is_active: true },
-      create: { code, name, is_active: true },
-    });
-  }
-  console.log(`✅ Departments seeded: ${departmentMap.size}`);
-
-  // Upsert cities
-  let cityCount = 0;
-  for (let i = 1; i < lines.length; i++) {
-    const cols = lines[i].split(';').map((c) => c.trim());
-    const cityCode = cols[codeMunIdx];
-    const cityName = cols[nameMunIdx];
-    const deptCode = cols[codeDeptIdx];
-    if (cityCode && cityName && deptCode) {
-      await prisma.city.upsert({
-        where: { code: cityCode },
-        update: { name: cityName, department_code: deptCode, is_active: true },
-        create: { code: cityCode, name: cityName, department_code: deptCode, is_active: true },
+    // Upsert departments
+    for (const [code, name] of departmentMap) {
+      await prisma.department.upsert({
+        where: { code },
+        update: { name, is_active: true },
+        create: { code, name, is_active: true },
       });
-      cityCount++;
     }
+    console.log(`✅ Departments seeded: ${departmentMap.size}`);
+
+    // Upsert cities
+    let cityCount = 0;
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(';').map((c) => c.trim());
+      const cityCode = cols[codeMunIdx];
+      const cityName = cols[nameMunIdx];
+      const deptCode = cols[codeDeptIdx];
+      if (cityCode && cityName && deptCode) {
+        await prisma.city.upsert({
+          where: { code: cityCode },
+          update: { name: cityName, department_code: deptCode, is_active: true },
+          create: { code: cityCode, name: cityName, department_code: deptCode, is_active: true },
+        });
+        cityCount++;
+      }
+    }
+    console.log(`✅ Cities seeded: ${cityCount}`);
   }
-  console.log(`✅ Cities seeded: ${cityCount}`);
 
   // ── Roles ────────────────────────────────────────────────────────────────────
   const roles = [
@@ -287,11 +300,11 @@ async function main() {
     { name: 'ARCHIVED', description: 'Archivo archivado' },
   ];
 
-  for (const fs of fileStatuses) {
+  for (const fst of fileStatuses) {
     await prisma.fileStatus.upsert({
-      where: { name: fs.name },
-      update: { description: fs.description },
-      create: { name: fs.name, description: fs.description },
+      where: { name: fst.name },
+      update: { description: fst.description },
+      create: { name: fst.name, description: fst.description },
     });
   }
   console.log('✅ File types and statuses seeded');

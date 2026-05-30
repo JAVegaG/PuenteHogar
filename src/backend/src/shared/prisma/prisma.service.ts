@@ -16,7 +16,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   private static readonly MIGRATE_COMMAND =
     'npx prisma migrate deploy --schema=./db/prisma/schema.prisma';
 
+  private static readonly SEED_COMMAND = 'node dist/db/seeds/seed.js';
+
   private static readonly MIGRATE_TIMEOUT_MS = 60_000;
+  private static readonly SEED_TIMEOUT_MS = 120_000;
 
   constructor() {
     const connectionString = PrismaService.buildConnectionString();
@@ -31,6 +34,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
 
   async onModuleInit() {
     this.runMigrations();
+    this.runSeeds();
     await this.$connect();
   }
 
@@ -50,6 +54,27 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     } catch (error) {
       this.logger.error('Failed to run Prisma migrations', error);
       throw error;
+    }
+  }
+
+  /**
+   * Runs catalog seed script at startup. Uses upserts so it is idempotent —
+   * safe to run on every boot without duplicating data.
+   * This method is private and only called from onModuleInit.
+   */
+  private runSeeds(): void {
+    try {
+      this.logger.log('Running catalog seeds...');
+      execSync(PrismaService.SEED_COMMAND, {
+        stdio: 'pipe',
+        timeout: PrismaService.SEED_TIMEOUT_MS,
+        env: { ...process.env },
+      });
+      this.logger.log('Catalog seeds applied successfully');
+    } catch (error) {
+      // Seeds are non-critical — log the error but don't crash the app.
+      // Catalog data may already exist from a previous boot.
+      this.logger.error('Failed to run catalog seeds (non-fatal)', error);
     }
   }
 

@@ -62,6 +62,10 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/db/prisma/schema.prisma ./db/prisma/schema.prisma
 COPY --from=build /app/db/prisma/migrations ./db/prisma/migrations
 
+# Copy compiled seed script and CSV data (needed for catalog seeding at startup)
+COPY --from=build /app/dist/db/seeds ./dist/db/seeds
+COPY --from=build /app/db/seeds/states_citys_colombia.seed.csv ./db/seeds/states_citys_colombia.seed.csv
+
 # Copy Prisma config (needed by prisma migrate deploy to resolve datasource URL)
 COPY --from=build /app/prisma.config.ts ./prisma.config.ts
 

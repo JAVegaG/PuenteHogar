@@ -326,7 +326,7 @@ The backend's `PrismaService` constructs `DATABASE_URL` at runtime from the indi
 
 The backend runs `prisma migrate deploy` programmatically inside `PrismaService.onModuleInit()` before connecting to the database. This is idempotent — already-applied migrations are skipped, so it's safe to run on every container start (including rolling deployments with multiple tasks).
 
-The production Docker image includes the Prisma schema, migrations directory, and `prisma.config.ts` — all required by the `prisma migrate deploy` CLI to resolve the datasource URL and apply pending migrations.
+The production Docker image includes the Prisma schema, migrations directory, `prisma.config.ts`, compiled seed scripts (`dist/db/seeds/`), and the Colombian geo-catalog CSV (`db/seeds/states_citys_colombia.seed.csv`) — all required by the `prisma migrate deploy` CLI and catalog seeding at startup.
 
 If migrations fail (e.g., connectivity issue during startup), the error is logged via NestJS Logger and the application continues starting. This prevents a single migration failure from blocking all deployments when the schema is already up to date.
 
@@ -453,6 +453,15 @@ The `prisma migrate deploy` CLI requires `prisma.config.ts` to resolve the datas
 
 ```dockerfile
 COPY --from=build /app/prisma.config.ts ./prisma.config.ts
+```
+
+### Seed/catalog data missing at startup
+
+The backend seeds catalog tables (departments, cities, property types, etc.) on startup. The production image includes the compiled seed script and the Colombian geo-catalog CSV. If catalog data is missing after deployment, ensure the Dockerfile production stage includes:
+
+```dockerfile
+COPY --from=build /app/dist/db/seeds ./dist/db/seeds
+COPY --from=build /app/db/seeds/states_citys_colombia.seed.csv ./db/seeds/states_citys_colombia.seed.csv
 ```
 
 ### Migrations fail on container startup
