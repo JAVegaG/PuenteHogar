@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import { Header } from '@/shared/components/Header';
@@ -22,6 +22,7 @@ type PageState =
 export default function ListingDetailPage() {
   const params = useParams<{ id: string }>();
   const id = params.id;
+  const router = useRouter();
 
   const [state, setState] = useState<PageState>({ status: 'loading' });
 
@@ -54,8 +55,9 @@ export default function ListingDetailPage() {
   }, [loadDetail]);
 
   const backButton = (
-    <Link
-      href="/explorar"
+    <button
+      type="button"
+      onClick={() => router.back()}
       aria-label="Volver a explorar"
       className="flex items-center justify-center w-[44px] h-[44px] rounded-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
     >
@@ -73,7 +75,7 @@ export default function ListingDetailPage() {
         <path d="M19 12H5" />
         <path d="M12 19l-7-7 7-7" />
       </svg>
-    </Link>
+    </button>
   );
 
   return (
