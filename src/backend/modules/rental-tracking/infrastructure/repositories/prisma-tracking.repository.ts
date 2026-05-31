@@ -189,7 +189,7 @@ export class PrismaTrackingRepository implements ITrackingRepository {
   async createLeaseForListing(listingId: string, tenantUserId: string): Promise<string | null> {
     const listing = await this.prisma.listing.findFirst({
       where: { id: listingId, deleted_at: null },
-      select: { portfolio_unit_id: true, price: true, currency: true },
+      select: { portfolio_unit_id: true },
     });
     if (!listing) return null;
 
@@ -198,8 +198,6 @@ export class PrismaTrackingRepository implements ITrackingRepository {
         portfolio_unit_id: listing.portfolio_unit_id,
         user_id: tenantUserId,
         start_date: new Date(),
-        monthly_amount: listing.price,
-        currency: listing.currency,
       },
     });
     return lease.id;
