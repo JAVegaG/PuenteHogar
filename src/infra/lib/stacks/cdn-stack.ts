@@ -3,6 +3,8 @@ import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
+import * as route53 from 'aws-cdk-lib/aws-route53';
+import * as route53Targets from 'aws-cdk-lib/aws-route53-targets';
 import * as wafv2 from 'aws-cdk-lib/aws-wafv2';
 import { Construct } from 'constructs';
 
@@ -108,13 +110,21 @@ export class CdnStack extends cdk.Stack {
         // ─────────────────────────────────────────────────────────────────────
         // 6.6 — Conditionally create ACM certificate if domainName is provided
         // ─────────────────────────────────────────────────────────────────────
+        // ─────────────────────────────────────────────────────────────────────
+        // 6.6 — ACM certificate + Route 53 DNS validation (if domainName provided)
+        // ─────────────────────────────────────────────────────────────────────
         let certificate: acm.ICertificate | undefined;
+        let hostedZone: route53.IHostedZone | undefined;
 
         if (props.domainName) {
+            hostedZone = route53.HostedZone.fromLookup(this, 'HostedZone', {
+                domainName: props.domainName,
+            });
+
             certificate = new acm.Certificate(this, 'Certificate', {
                 domainName: props.domainName,
                 subjectAlternativeNames: [`*.${props.domainName}`],
-                validation: acm.CertificateValidation.fromDns(),
+                validation: acm.CertificateValidation.fromDns(hostedZone),
             });
         }
 
@@ -197,12 +207,25 @@ export class CdnStack extends cdk.Stack {
         this.distribution = distribution;
         this.wafAcl = wafAcl;
 
-        // Store the distribution domain in SSM so the backend can read it at runtime.
-        // This avoids a circular dependency (CDN depends on Compute, Compute can't depend on CDN).
+        // ─────────────────────────────────────────────────────────────────────
+        // 6.7 — Route 53 alias record pointing domain to CloudFront
+        // ─────────────────────────────────────────────────────────────────────
+        if (hostedZone && props.domainName) {
+            new route53.ARecord(this, 'DomainAlias', {
+                zone: hostedZone,
+                recordName: props.domainName,
+                target: route53.RecordTarget.fromAlias(
+                    new route53Targets.CloudFrontTarget(distribution),
+                ),
+            });
+        }
+
+        // Store the CDN domain in SSM so the backend can read it at runtime.
+        // Use the custom domain if configured, otherwise fall back to the CloudFront domain.
         new cdk.aws_ssm.StringParameter(this, 'CdnDomainParam', {
             parameterName: `/${props.environment}/cdn/domain`,
-            stringValue: distribution.distributionDomainName,
-            description: 'CloudFront distribution domain name for asset URLs',
+            stringValue: props.domainName ?? distribution.distributionDomainName,
+            description: 'CDN domain for asset URLs (custom domain or CloudFront)',
         });
 
         new cdk.CfnOutput(this, 'DistributionDomainName', {

@@ -4,6 +4,7 @@ export const stagingConfig: EnvironmentConfig = {
     account: process.env.CDK_DEFAULT_ACCOUNT!,
     region: 'us-east-1',
     environment: 'staging',
+    domainName: 'puentehogar.co',
     compute: {
         backend: {
             cpu: 512,
