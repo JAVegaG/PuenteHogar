@@ -65,7 +65,6 @@ export class PrismaListingRepository implements IListingRepository {
     const hasPropertyFilter =
       departmentName ||
       filters.city ||
-      filters.neighborhood ||
       filters.propertyType ||
       filters.rooms !== undefined ||
       filters.bathrooms !== undefined ||
@@ -74,16 +73,16 @@ export class PrismaListingRepository implements IListingRepository {
       (filters.additionalFeatures && Object.keys(filters.additionalFeatures).length > 0);
 
     if (hasPropertyFilter) {
-      // Start from Address if department/city/neighborhood filters exist
+      // Start from Address if department/city filters exist
       let propertyIds: string[] | null = null;
 
-      if (departmentName || filters.city || filters.neighborhood) {
+      if (departmentName || filters.city) {
+        const addressWhere: Record<string, unknown> = {};
+        if (departmentName) addressWhere.state = { equals: departmentName, mode: 'insensitive' as const };
+        if (filters.city) addressWhere.city = { contains: filters.city, mode: 'insensitive' as const };
+
         const addresses = await this.prisma.address.findMany({
-          where: {
-            ...(departmentName && { state: { equals: departmentName, mode: 'insensitive' as const } }),
-            ...(filters.city && { city: { contains: filters.city, mode: 'insensitive' as const } }),
-            ...(filters.neighborhood && { neighborhood: { contains: filters.neighborhood, mode: 'insensitive' as const } }),
-          },
+          where: addressWhere,
           select: { property_id: true },
         });
         propertyIds = addresses.map((a) => a.property_id);
@@ -151,9 +150,32 @@ export class PrismaListingRepository implements IListingRepository {
     }
 
     // --- Step 2: Build Listing query with remaining filters ---
-    const listingWhere: Record<string, unknown> = { is_active: true };
+    const listingWhere: Record<string, unknown> = { is_active: true, deleted_at: null };
 
-    if (constrainedUnitIds) {
+    if (constrainedUnitIds && filters.neighborhood) {
+      // Neighborhood filter: match by address OR by listing title/description.
+      // This is a temporary workaround until Address.neighborhood is properly populated.
+      // TODO: Remove title/description fallback once neighborhood field is filled during unit creation.
+      const textConditions = [
+        { title: { contains: filters.neighborhood, mode: 'insensitive' as const } },
+        { description: { contains: filters.neighborhood, mode: 'insensitive' as const } },
+      ];
+
+      if (constrainedUnitIds.length > 0) {
+        listingWhere.OR = [
+          { portfolio_unit_id: { in: constrainedUnitIds } },
+          ...textConditions,
+        ];
+      } else {
+        listingWhere.OR = textConditions;
+      }
+    } else if (filters.neighborhood && !constrainedUnitIds) {
+      // Only neighborhood filter active (no department/city), no address matches found
+      listingWhere.OR = [
+        { title: { contains: filters.neighborhood, mode: 'insensitive' as const } },
+        { description: { contains: filters.neighborhood, mode: 'insensitive' as const } },
+      ];
+    } else if (constrainedUnitIds) {
       listingWhere.portfolio_unit_id = { in: constrainedUnitIds };
     }
 
