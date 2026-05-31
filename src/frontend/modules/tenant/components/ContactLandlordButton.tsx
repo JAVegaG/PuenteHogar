@@ -26,14 +26,6 @@ export function ContactLandlordButton({ listingId }: ContactLandlordButtonProps)
             return;
         }
 
-        if (!user.roles.includes('TENANT')) {
-            setMessage({
-                type: 'error',
-                text: 'Solo los arrendatarios pueden contactar arrendadores',
-            });
-            return;
-        }
-
         setIsDialogOpen(true);
     };
 
