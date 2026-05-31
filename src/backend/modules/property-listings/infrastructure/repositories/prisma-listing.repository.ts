@@ -153,24 +153,17 @@ export class PrismaListingRepository implements IListingRepository {
     const listingWhere: Record<string, unknown> = { is_active: true, deleted_at: null };
 
     if (constrainedUnitIds && filters.neighborhood) {
-      // Neighborhood filter: match by address OR by listing title/description.
+      // Apply unit constraint from department/city filters
+      listingWhere.portfolio_unit_id = { in: constrainedUnitIds };
+      // Additionally filter by neighborhood text in title/description.
       // This is a temporary workaround until Address.neighborhood is properly populated.
       // TODO: Remove title/description fallback once neighborhood field is filled during unit creation.
-      const textConditions = [
+      listingWhere.OR = [
         { title: { contains: filters.neighborhood, mode: 'insensitive' as const } },
         { description: { contains: filters.neighborhood, mode: 'insensitive' as const } },
       ];
-
-      if (constrainedUnitIds.length > 0) {
-        listingWhere.OR = [
-          { portfolio_unit_id: { in: constrainedUnitIds } },
-          ...textConditions,
-        ];
-      } else {
-        listingWhere.OR = textConditions;
-      }
     } else if (filters.neighborhood && !constrainedUnitIds) {
-      // Only neighborhood filter active (no department/city), no address matches found
+      // Only neighborhood filter active (no department/city constraint)
       listingWhere.OR = [
         { title: { contains: filters.neighborhood, mode: 'insensitive' as const } },
         { description: { contains: filters.neighborhood, mode: 'insensitive' as const } },
