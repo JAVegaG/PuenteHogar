@@ -189,7 +189,7 @@ export default function TenantContractDetailView() {
                                                             {ROLE_LABELS[party.role] ?? party.role}
                                                         </span>
                                                         <span className="text-body text-neutral-900">
-                                                            {party.userId}
+                                                            {party.name ?? party.userId}
                                                         </span>
                                                     </li>
                                                 ))}
