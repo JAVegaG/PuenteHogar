@@ -202,6 +202,19 @@ This task list implements fixes for four deployment issues discovered after the 
     - Finding 4.7: Swagger setup uses `useGlobalPrefix: true` with path `'docs'` for correct asset resolution behind ALB
     - Enhancement: Added `staging:sleep` and `staging:wake` scripts to `src/infra/package.json` for cost optimization — tears down compute/network but preserves Data (RDS, S3) and Ci (ECR) stacks
   - Re-ran backend build and tests after fixes — all 342 tests pass, CDK synth passes for both environments
+  - **Post-Deployment QA Findings (staging live testing — 2026-05-30):**
+    - Finding 5.1: Catalog seeds not running on deploy — added seed-on-startup to PrismaService with `static initialized` guard to prevent duplicate runs across module instantiations; seeds run via `setImmediate` (non-blocking) so health checks pass quickly
+    - Finding 5.2: S3 upload failing — ECS task definition used `S3_BUCKET_NAME`/`S3_REGION` but app config reads `OBJECT_STORAGE_BUCKET`/`OBJECT_STORAGE_REGION`; added correct env vars to compute-stack
+    - Finding 5.3: CloudFront OAC bucket policy missing — imported bucket can't have policy auto-managed by CDK; added explicit `AllowCloudFrontOAC` policy statement in DataStack
+    - Finding 5.4: Asset URLs returning 403 — backend returned raw S3 URLs but bucket blocks public access; changed `buildObjectUrl` to return CloudFront URLs via CDN_DOMAIN resolved from SSM parameter (`/{env}/cdn/domain`); keys now prefixed with `assets/` to match CloudFront behavior pattern
+    - Finding 5.5: Next.js Image Optimization failing with 500 — frontend container in private subnet (no NAT) can't reach CloudFront to fetch images; set `unoptimized: true` in production so browser fetches directly from CDN
+    - Finding 5.6: Portfolio units endpoint returning all user units regardless of portfolio — `GET /:portfolioId/units` ignored the `portfolioId` param; added `findUnitsByPortfolioId` to repository and wired it through controller/use-case
+    - Finding 5.7: Accounting report showing "Acordado" for units without active lease — fallback in `getLeaseStatusInfo` incorrectly defaulted to "Acordado"; changed to "Disponible" with `unit` variant badge
+    - Finding 5.8: Neighborhood/zone filter always returning empty — `Address.neighborhood` is never populated (hardcoded to `''` during unit creation); as temporary workaround, filter now searches listing `title` and `description` (case-insensitive contains) while respecting department/city constraints; TODO: add neighborhood field to CreateEnrichedUnitDto
+    - Finding 5.9: "Contactar arrendador" failing with "No se encontró un arriendo asociado" — flow assumed a lease pre-existed; added auto-creation of lease on `CONTACT_INITIATED` when none exists
+    - Finding 5.10: Lease creation used invalid `monthly_amount`/`currency` fields — Lease model only has `portfolio_unit_id`, `user_id`, `start_date`; removed non-existent fields
+    - Finding 5.11: Listing detail back button losing filters — hardcoded `href="/explorar"` discarded query params; changed to `router.back()` to preserve filter state in URL
+    - Finding 5.12: "Contactar arrendador" restricted to TENANT role only — removed role check so any authenticated user can initiate contact
 
 ## Task Dependency Graph
 
