@@ -24,9 +24,20 @@ export class TransitionLeaseStateUseCase {
     if (!leaseId && dto.listingId) {
       const resolved = await this.repository.findLeaseIdByListingId(dto.listingId);
       if (!resolved) {
-        throw new NotFoundException('No se encontró un arriendo asociado a este inmueble');
+        // For CONTACT_INITIATED, auto-create a lease if none exists yet.
+        // This is the first step in the rental lifecycle — a tenant expressing interest.
+        if (dto.newState === 'CONTACT_INITIATED') {
+          const created = await this.repository.createLeaseForListing(dto.listingId, requestingUserId);
+          if (!created) {
+            throw new NotFoundException('No se encontró la publicación');
+          }
+          leaseId = created;
+        } else {
+          throw new NotFoundException('No se encontró un arriendo asociado a este inmueble');
+        }
+      } else {
+        leaseId = resolved;
       }
-      leaseId = resolved;
     }
 
     if (!leaseId) {

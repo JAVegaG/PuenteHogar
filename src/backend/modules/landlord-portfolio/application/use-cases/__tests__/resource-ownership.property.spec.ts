@@ -543,7 +543,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
               getStatusHistory: jest.fn(),
               recordTransition: jest.fn(),
               getActiveLeasesForUser: jest.fn(),
-              findLeaseIdByListingId: jest.fn(),
+              findLeaseIdByListingId: jest.fn(), createLeaseForListing: jest.fn(),
               getTenantContactInfo: jest.fn().mockResolvedValue(null),
             };
 
@@ -583,7 +583,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
               getStatusHistory: jest.fn().mockResolvedValue([]),
               recordTransition: jest.fn(),
               getActiveLeasesForUser: jest.fn(),
-              findLeaseIdByListingId: jest.fn(),
+              findLeaseIdByListingId: jest.fn(), createLeaseForListing: jest.fn(),
               getTenantContactInfo: jest.fn().mockResolvedValue(null),
             };
 
@@ -624,7 +624,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
               getStatusHistory: jest.fn().mockResolvedValue([]),
               recordTransition: jest.fn(),
               getActiveLeasesForUser: jest.fn(),
-              findLeaseIdByListingId: jest.fn(),
+              findLeaseIdByListingId: jest.fn(), createLeaseForListing: jest.fn(),
               getTenantContactInfo: jest.fn().mockResolvedValue(null),
             };
 
@@ -658,7 +658,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
             getStatusHistory: jest.fn(),
             recordTransition: jest.fn(),
             getActiveLeasesForUser: jest.fn(),
-            findLeaseIdByListingId: jest.fn(),
+            findLeaseIdByListingId: jest.fn(), createLeaseForListing: jest.fn(),
             getTenantContactInfo: jest.fn().mockResolvedValue(null),
           };
 

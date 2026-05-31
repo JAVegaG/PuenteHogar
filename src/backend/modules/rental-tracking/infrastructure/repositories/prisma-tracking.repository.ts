@@ -186,6 +186,25 @@ export class PrismaTrackingRepository implements ITrackingRepository {
     return lease?.id ?? null;
   }
 
+  async createLeaseForListing(listingId: string, tenantUserId: string): Promise<string | null> {
+    const listing = await this.prisma.listing.findFirst({
+      where: { id: listingId, deleted_at: null },
+      select: { portfolio_unit_id: true, price: true, currency: true },
+    });
+    if (!listing) return null;
+
+    const lease = await this.prisma.lease.create({
+      data: {
+        portfolio_unit_id: listing.portfolio_unit_id,
+        user_id: tenantUserId,
+        start_date: new Date(),
+        monthly_amount: listing.price,
+        currency: listing.currency,
+      },
+    });
+    return lease.id;
+  }
+
   async getTenantContactInfo(tenantUserId: string): Promise<TenantContactInfo | null> {
     const user = await this.prisma.user.findUnique({
       where: { id: tenantUserId },

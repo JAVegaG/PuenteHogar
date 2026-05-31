@@ -27,6 +27,9 @@ export interface ITrackingRepository {
   /** Resolves a listing ID to its associated lease ID via portfolio_unit_id */
   findLeaseIdByListingId(listingId: string): Promise<string | null>;
 
+  /** Creates a lease for a listing's portfolio unit, associating the given tenant. Returns the new lease ID. */
+  createLeaseForListing(listingId: string, tenantUserId: string): Promise<string | null>;
+
   /** Resolves tenant contact info (name, email, phone) for notification purposes */
   getTenantContactInfo(tenantUserId: string): Promise<TenantContactInfo | null>;
 }
