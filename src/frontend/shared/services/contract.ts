@@ -113,7 +113,7 @@ export const contractService = {
     async signContract(
         contractId: string,
         token: string
-    ): Promise<ContractSummary> {
+    ): Promise<{ message: string; externalId?: string }> {
         let res: Response;
         try {
             res = await fetch(`${API_URL}/contracts/${contractId}/sign`, {

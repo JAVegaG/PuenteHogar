@@ -105,8 +105,9 @@ export default function ContractDetailView({ contractId }: ContractDetailViewPro
         setSignError(null);
 
         try {
-            const updated = await contractService.signContract(contractId, token);
-            setContract(updated);
+            await contractService.signContract(contractId, token);
+            // Re-fetch the contract to get the updated state (SIGNATURE_PENDING)
+            await fetchContract();
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Error desconocido';
             if (message === 'Sesión expirada') {
