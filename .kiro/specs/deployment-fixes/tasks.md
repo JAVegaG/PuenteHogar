@@ -215,6 +215,7 @@ This task list implements fixes for four deployment issues discovered after the 
     - Finding 5.10: Lease creation used invalid `monthly_amount`/`currency` fields — Lease model only has `portfolio_unit_id`, `user_id`, `start_date`; removed non-existent fields
     - Finding 5.11: Listing detail back button losing filters — hardcoded `href="/explorar"` discarded query params; changed to `router.back()` to preserve filter state in URL
     - Finding 5.12: "Contactar arrendador" restricted to TENANT role only — removed role check so any authenticated user can initiate contact
+    - Finding 5.13: Tenant contract detail showing raw UUIDs for party names — frontend rendered `party.userId` instead of `party.name`; backend already resolves names cross-schema via `GetContractSummaryUseCase`
 
 ## Task Dependency Graph
 
