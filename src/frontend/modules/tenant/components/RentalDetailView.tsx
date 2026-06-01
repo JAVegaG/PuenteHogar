@@ -205,13 +205,15 @@ export default function RentalDetailView() {
                                                 <h2 className="text-h2 font-bold text-neutral-900">
                                                     {data.propertyType}
                                                 </h2>
-                                                <div className="flex items-center gap-1 mt-1">
-                                                    <LocationIcon />
-                                                    <span className="text-caption text-neutral-600">
-                                                        {data.neighborhood}
-                                                    </span>
-                                                </div>
-                                                <p className="text-caption text-neutral-600 ml-[20px]">
+                                                {data.neighborhood && (
+                                                    <div className="flex items-center gap-1 mt-1">
+                                                        <LocationIcon />
+                                                        <span className="text-caption text-neutral-600">
+                                                            {data.neighborhood}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                <p className="text-caption text-neutral-600 pl-[20px]">
                                                     {data.address}
                                                 </p>
                                             </div>
@@ -230,7 +232,7 @@ export default function RentalDetailView() {
                                 </section>
 
                                 {/* Next payment card */}
-                                {data.nextPayment && (
+                                {data.nextPayment ? (
                                     <section aria-label="Próximo pago">
                                         <div className="border border-neutral-200 rounded-card bg-white p-6">
                                             <div className="flex items-center justify-between mb-4">
@@ -263,6 +265,17 @@ export default function RentalDetailView() {
                                                     </p>
                                                 </div>
                                             </div>
+                                        </div>
+                                    </section>
+                                ) : (
+                                    <section aria-label="Pagos al día">
+                                        <div className="border border-neutral-200 rounded-card bg-white p-6 text-center">
+                                            <p className="text-body font-medium text-neutral-700">
+                                                No tienes pagos pendientes
+                                            </p>
+                                            <p className="text-caption text-neutral-500 mt-1">
+                                                Estás al día con tus pagos.
+                                            </p>
                                         </div>
                                     </section>
                                 )}
