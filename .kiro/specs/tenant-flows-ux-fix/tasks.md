@@ -189,9 +189,9 @@
     - Test rejects non-tenant users (403)
     - _Requirements: 2.5, 2.6_
 
-- [ ] 7. Frontend: Refactor `RentalDetailView` to show property info + payment CTAs (no tracking)
+- [x] 7. Frontend: Refactor `RentalDetailView` to show property info + payment CTAs (no tracking)
 
-  - [~] 7.1 Update `tenant.ts` service with new API calls
+  - [x] 7.1 Update `tenant.ts` service with new API calls
     - File: `src/frontend/shared/services/tenant.ts`
     - Add `getTenantLeaseDetail(leaseId, token)` → `GET /leases/:leaseId/detail`
     - Add `getPaymentUnits(token)` → `GET /payments/units`
@@ -199,7 +199,7 @@
     - Add `getPaymentDetail(paymentId, token)` → `GET /payments/:paymentId/detail`
     - _Requirements: 2.1, 2.3, 2.4, 2.5, 2.6_
 
-  - [~] 7.2 Refactor `RentalDetailView` component
+  - [x] 7.2 Refactor `RentalDetailView` component
     - File: `src/frontend/modules/tenant/components/RentalDetailView.tsx`
     - Replace tracking-only view with property-info-centric layout
     - Call `getTenantLeaseDetail(leaseId, token)` for property info + next payment
@@ -215,9 +215,9 @@
     - _Expected_Behavior: property_info_card + monthly_rent + next_payment + CTAs, NO tracking_
     - _Requirements: 2.1_
 
-- [ ] 8. Frontend: Refactor `PaymentsView` to show unit cards
+- [x] 8. Frontend: Refactor `PaymentsView` to show unit cards
 
-  - [~] 8.1 Refactor `PaymentsView` component
+  - [x] 8.1 Refactor `PaymentsView` component
     - File: `src/frontend/modules/tenant/components/PaymentsView.tsx`
     - Replace flat payment list with unit cards (call `getPaymentUnits(token)`)
     - Each card shows property name + lease status badge (use `StatusBadge` with `variant='lease'`)
@@ -229,9 +229,9 @@
     - _Preservation: Empty state message preserved_
     - _Requirements: 2.3, 3.3_
 
-- [ ] 9. Frontend: New route `/mis-pagos/[unitId]/page.tsx` with `PaymentHistoryView`
+- [x] 9. Frontend: New route `/mis-pagos/[unitId]/page.tsx` with `PaymentHistoryView`
 
-  - [~] 9.1 Create `PaymentHistoryView` component
+  - [x] 9.1 Create `PaymentHistoryView` component
     - File: `src/frontend/modules/tenant/components/PaymentHistoryView.tsx`
     - Filter tabs: Todos, Pendientes, Pagados, Vencidos
     - List of monthly payment cards: month/year title, due date, amount, status badge, "Pagar >" link (pending), "Ver comprobante" link (paid)
@@ -242,15 +242,15 @@
     - Back button navigates to `/mis-pagos`
     - _Requirements: 2.4_
 
-  - [~] 9.2 Create page route file
+  - [x] 9.2 Create page route file
     - File: `src/frontend/app/mis-pagos/[unitId]/page.tsx`
     - Import and render `PaymentHistoryView`
     - Follow centered container standard, back button pattern, Header with `leftAction`
     - _Requirements: 2.4_
 
-- [ ] 10. Frontend: New route `/mis-pagos/[unitId]/[paymentId]/page.tsx` with `PaymentDetailView`
+- [x] 10. Frontend: New route `/mis-pagos/[unitId]/[paymentId]/page.tsx` with `PaymentDetailView`
 
-  - [~] 10.1 Create `PaymentDetailView` component
+  - [x] 10.1 Create `PaymentDetailView` component
     - File: `src/frontend/modules/tenant/components/PaymentDetailView.tsx`
     - Conditional rendering based on payment status:
       - **PENDING**: "Resumen de la cuota" with line items, due date warning banner, payment method selection (Tarjeta débito/crédito, Transferencia bancaria / PSE), "Continuar con pago" primary button
@@ -263,7 +263,7 @@
     - _Expected_Behavior: pending → checkout UI; paid → read-only receipt_
     - _Requirements: 2.5, 2.6_
 
-  - [~] 10.2 Create page route file
+  - [x] 10.2 Create page route file
     - File: `src/frontend/app/mis-pagos/[unitId]/[paymentId]/page.tsx`
     - Import and render `PaymentDetailView`
     - Follow centered container standard, back button pattern, Header with `leftAction`
