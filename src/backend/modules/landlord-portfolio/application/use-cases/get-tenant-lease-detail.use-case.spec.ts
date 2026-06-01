@@ -26,7 +26,7 @@ function createMockPrisma() {
         leaseCurrentStatus: {
             findUnique: jest.fn(),
         },
-    } as unknown as jest.Mocked<PrismaService>;
+    } as any;
 }
 
 function createMockPaymentsQuery(): jest.Mocked<IPaymentsCrossModuleQuery> {

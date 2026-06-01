@@ -152,7 +152,7 @@ describe('Preservation Property Tests — HandleSigningWebhookUseCase', () => {
                 fc.asyncProperty(
                     fc.record({
                         externalSigningId: fc.string({ minLength: 1, maxLength: 50 }),
-                        completedAt: fc.date({
+                        completedAt: fc.date({ noInvalidDate: true,
                             min: new Date('2024-01-01'),
                             max: new Date('2027-12-31'),
                         }),
@@ -333,7 +333,7 @@ describe('Preservation Property Tests — HandleSigningWebhookUseCase', () => {
                 fc.asyncProperty(
                     fc.record({
                         externalSigningId: fc.string({ minLength: 1, maxLength: 50 }),
-                        completedAt: fc.date({
+                        completedAt: fc.date({ noInvalidDate: true,
                             min: new Date('2024-01-01'),
                             max: new Date('2027-12-31'),
                         }),

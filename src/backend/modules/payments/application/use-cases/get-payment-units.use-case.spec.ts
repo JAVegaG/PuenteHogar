@@ -19,7 +19,7 @@ function createMockPrisma() {
         scheduledPayment: {
             findMany: jest.fn(),
         },
-    } as unknown as jest.Mocked<PrismaService>;
+    } as any;
 }
 
 function createMockPortfolioQuery(): jest.Mocked<IPortfolioCrossModuleQuery> {

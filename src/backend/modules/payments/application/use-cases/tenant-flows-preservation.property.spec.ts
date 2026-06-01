@@ -38,7 +38,7 @@ const arbitraryPaymentRequest: fc.Arbitrary<PaymentRequest> = fc.record({
 const arbitraryNonTenantRoles = fc.array(
     fc.constantFrom('LANDLORD', 'ADMIN', 'VIEWER', 'MANAGER'),
     { minLength: 1, maxLength: 3 },
-).filter((roles) => !roles.includes('TENANT'));
+);
 
 // ─── Payment Gateway Adapter Tests ───────────────────────────────────────────
 
@@ -163,7 +163,7 @@ describe('Property 2: Preservation — InitiatePaymentUseCase Rejects Non-TENANT
                 arbitraryNonTenantRoles,
                 (userRoles) => {
                     // The use case checks: if (!userRoles.includes('TENANT'))
-                    const hasTenantRole = userRoles.includes('TENANT');
+                    const hasTenantRole = (userRoles as string[]).includes('TENANT');
                     expect(hasTenantRole).toBe(false);
 
                     // When hasTenantRole is false, the use case throws ForbiddenException

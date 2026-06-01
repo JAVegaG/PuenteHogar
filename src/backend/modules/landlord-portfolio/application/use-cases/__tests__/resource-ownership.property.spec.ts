@@ -60,7 +60,7 @@ describe('Property 12: Resource ownership — usuario solo accede a sus propios 
       await fc.assert(
         fc.asyncProperty(fc.uuid(), async (userId) => {
           const mockRepo: jest.Mocked<IPortfolioRepository> = {
-            findUnitsByUserId: jest.fn(), findUnitsByPortfolioId: jest.fn().mockResolvedValue([]),
+            findUnitsByUserId: jest.fn().mockResolvedValue([]), findUnitsByPortfolioId: jest.fn().mockResolvedValue([]),
             findOrCreatePortfolio: jest.fn(),
             createUnit: jest.fn(),
             findUnitById: jest.fn(),
