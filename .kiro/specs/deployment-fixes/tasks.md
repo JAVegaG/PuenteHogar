@@ -216,6 +216,9 @@ This task list implements fixes for four deployment issues discovered after the 
     - Finding 5.11: Listing detail back button losing filters — hardcoded `href="/explorar"` discarded query params; changed to `router.back()` to preserve filter state in URL
     - Finding 5.12: "Contactar arrendador" restricted to TENANT role only — removed role check so any authenticated user can initiate contact
     - Finding 5.13: Tenant contract detail showing raw UUIDs for party names — frontend rendered `party.userId` instead of `party.name`; backend already resolves names cross-schema via `GetContractSummaryUseCase`
+    - Finding 5.14: "Iniciar firma" breaks contract detail view — `initiateSigning` endpoint returns `{ message, externalId }` not a `ContractSummary`; frontend was replacing contract state with this response causing empty UI; fixed to re-fetch contract after signing
+    - Finding 5.15: `staging:sleep` script destroyed Network stack causing RDS data loss — VPC subnets deleted while RDS depended on them; fixed script to only destroy Monitoring + Cdn + Compute (stateless layers), preserving Network + Data
+    - Finding 5.16: Favicon SVG was 680×200 (rectangular with excessive whitespace) — cropped to square 280×280 viewBox, renamed to `app/icon.svg` for Next.js auto-detection
 
 ## Task Dependency Graph
 

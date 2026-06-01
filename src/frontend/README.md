@@ -25,9 +25,9 @@ src/frontend/
 │   │   └── registro/
 │   │       └── page.tsx      # Página de registro multi-paso (Client Component)
 │   ├── explorar/
-│   │   ├── page.tsx          # Página de listado (Server Component)
+│   │   ├── page.tsx          # Página de listado (Client Component)
 │   │   └── [id]/
-│   │       └── page.tsx      # Página de detalle (Server Component)
+│   │       └── page.tsx      # Página de detalle (Client Component)
 │   ├── mi-perfil/
 │   │   └── page.tsx          # Página de perfil con gestión de roles y navegación rápida (Client Component, protegida)
 │   ├── mis-notificaciones/
@@ -251,8 +251,8 @@ npm run lint       # Linting
 | Ruta | Tipo | Auth | Descripción |
 |------|------|------|-------------|
 | `/` | Server Component | No | Landing page estática con nav responsive (desktop/mobile), hero con icono e descripción de la plataforma, CTA "Buscar inmuebles", sección de propuestas de valor (Sencillo, Seguro, Accesible) y footer |
-| `/explorar` | Server Component | No | Listado de inmuebles con filtros, ordenamiento y paginación |
-| `/explorar/[id]` | Server Component | No | Detalle del inmueble con galería de fotos |
+| `/explorar` | Client Component | No | Listado de inmuebles con filtros, ordenamiento y paginación |
+| `/explorar/[id]` | Client Component | No | Detalle del inmueble con galería de fotos |
 | `/auth/login` | Client Component | No | Inicio de sesión (email + contraseña) |
 | `/auth/registro` | Client Component | No | Registro multi-paso (rol, datos personales, credenciales) |
 | `/mi-perfil` | Client Component | Sí | Perfil del usuario con gestión de roles y navegación rápida por rol |
@@ -315,7 +315,7 @@ Gestión de arriendos: historial de arriendos por unidad con tarjetas de estado 
 
 ### landlord-contracts
 
-Creación y gestión de contratos: wizard de 3 pasos (arrendatario, términos, documento PDF) con indicador de progreso, validación por paso (incluye validación de fecha para prevenir "Invalid Date"), pre-población desde datos del arriendo (startDate convertido de ISO a YYYY-MM-DD para compatibilidad con `<input type="date">`), carga de archivo PDF, y envío al backend. Listado de contratos del arrendador con badges de estado en formato tarjeta, vista de detalle con secciones en tarjetas (Términos, Partes, Documento) y acciones contextuales (iniciar firma, ver estado), y página de creación con wrapper del wizard. Componentes: ContractsListView, ContractDetailView, ContractCreationView, ContractWizard, WizardProgress, StepTenant, StepTerms, StepDocument.
+Creación y gestión de contratos: wizard de 3 pasos (arrendatario, términos, documento PDF) con indicador de progreso, validación por paso (incluye validación de fecha para prevenir "Invalid Date"), pre-población desde datos del arriendo (startDate convertido de ISO a YYYY-MM-DD para compatibilidad con `<input type="date">`), carga de archivo PDF, y envío al backend. Listado de contratos del arrendador con badges de estado en formato tarjeta, vista de detalle con secciones en tarjetas (Términos, Partes, Documento) y acciones contextuales (iniciar firma con re-fetch de estado, reemplazar PDF, eliminar contrato, ver estado), y página de creación con wrapper del wizard. Componentes: ContractsListView, ContractDetailView, ContractCreationView, ContractWizard, WizardProgress, StepTenant, StepTerms, StepDocument.
 
 ### landlord-publish
 
@@ -348,7 +348,7 @@ Publicación de unidades: formulario para publicar una unidad del portafolio com
 | Auth | `auth.ts` | login, register, getProfile, getDocumentTypes |
 | Portfolio | `portfolio.ts` | getPortfolios, createPortfolio, getUnits, createUnit, createEnrichedUnit, updateUnit, updatePortfolio, deletePortfolio, deleteUnit, getDepartments, getCitiesByDepartment, getPropertyTypes |
 | Accounting | `accounting.ts` | getAggregatedReport, getIndividualReport |
-| Contract | `contract.ts` | createContract, getContract, signContract, getContractsByLandlord |
+| Contract | `contract.ts` | createContract, getContract, signContract, replaceContractFile, deleteContract, getContractsByLandlord |
 | Lease | `lease.ts` | getUnitLeases, getLeaseDetail, createLease, cancelLease |
 | Notification | `notification.ts` | getNotifications, getNotificationCount, markAsRead, markAllAsRead, getPreferences, updatePreference, deleteNotification |
 | Role | `role.ts` | addRole, removeRole, getRemovableRoles |
@@ -391,6 +391,8 @@ El frontend consume los endpoints REST del backend NestJS:
 - `GET /contracts/landlord` — Listado de contratos del arrendador (requiere JWT)
 - `GET /contracts/:id` — Resumen de contrato (requiere JWT, rol LANDLORD)
 - `POST /contracts/:id/sign` — Iniciar firma digital (requiere JWT, rol LANDLORD)
+- `PUT /contracts/:id/file` — Reemplazar archivo PDF del contrato (requiere JWT, rol LANDLORD)
+- `DELETE /contracts/:id` — Eliminar contrato (requiere JWT, rol LANDLORD)
 - `GET /contracts/tenant` — Listado de contratos del arrendatario (requiere JWT, rol TENANT)
 - `GET /notifications` — Listado de notificaciones in-app del usuario (requiere JWT)
 - `GET /notifications/count` — Conteo de notificaciones no leídas (requiere JWT)

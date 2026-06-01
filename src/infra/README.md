@@ -138,6 +138,7 @@ graph TB
 
 | Component | Staging | Production |
 |-----------|---------|------------|
+| Custom Domain | ✅ `puentehogar.co` (ACM + Route 53) | ❌ CloudFront domain only |
 | NAT Gateway | ❌ None (VPC Endpoints) | ✅ 1 NAT Gateway |
 | ElastiCache Redis | ❌ Disabled (no-op fallback) | ✅ 2-node cluster with failover |
 | RDS | Single-AZ, db.t3.micro | Multi-AZ, db.t3.medium |
@@ -151,7 +152,7 @@ graph TB
 | **DataStack** | RDS PostgreSQL 16, ElastiCache Redis 7 (production only), S3 bucket, Secrets Manager |
 | **CiStack** | ECR repositories, GitHub Actions IAM role |
 | **ComputeStack** | ECS Cluster, ALB, Fargate services (backend + frontend), task definitions, IAM roles, auto-scaling |
-| **CdnStack** | CloudFront distribution (ALB + S3 origins), WAF Web ACL, ACM certificate, SSM parameter for CDN domain |
+| **CdnStack** | CloudFront distribution (ALB + S3 origins), WAF Web ACL, ACM certificate (DNS-validated via Route 53), Route 53 alias record, SSM parameter for CDN domain |
 | **MonitoringStack** | CloudWatch alarms (ALB/ECS metrics), dashboards, log groups, SNS notifications |
 
 ### Request Flow
@@ -307,8 +308,8 @@ The `CDN_DOMAIN` environment variable tells the backend which CloudFront domain 
 
 Two mechanisms solve this:
 
-1. **Static config** (current): `cdnDomain` is hardcoded in `lib/config/environments.ts` for staging (where the distribution domain is known). The Compute stack injects it as `CDN_DOMAIN` at deploy time.
-2. **SSM parameter** (runtime fallback): The CDN stack writes the distribution domain to `/{environment}/cdn/domain` in SSM Parameter Store. This allows the backend (or CI pipelines) to discover the CDN domain at runtime without a deploy-time circular dependency.
+1. **Custom domain** (staging): `domainName: 'puentehogar.co'` is configured in `lib/config/environments.ts`. When set, the CDN stack creates an ACM certificate (DNS-validated via Route 53), attaches it to the CloudFront distribution, and creates an A-record alias in the hosted zone. The SSM parameter stores the custom domain instead of the CloudFront domain.
+2. **SSM parameter** (runtime fallback): The CDN stack writes the distribution domain (or custom domain if configured) to `/{environment}/cdn/domain` in SSM Parameter Store. This allows the backend (or CI pipelines) to discover the CDN domain at runtime without a deploy-time circular dependency.
 
 If `CDN_DOMAIN` is not set in the container environment (e.g., production first deploy before the domain is known), the backend falls back to direct S3 URLs for assets.
 
@@ -431,6 +432,7 @@ src/infra/
 
 | Setting | Staging | Production |
 |---------|---------|------------|
+| Custom Domain | `puentehogar.co` (ACM + Route 53) | None (CloudFront domain only) |
 | NAT Gateways | 0 (uses VPC Endpoints) | 1 |
 | VPC Endpoints | ECR, CloudWatch Logs, Secrets Manager, SSM, S3 | None (uses NAT) |
 | ElastiCache Redis | Disabled (no-op cache fallback) | cache.t3.small, 2 nodes, failover |
