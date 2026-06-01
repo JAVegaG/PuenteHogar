@@ -175,7 +175,7 @@ export default function PaymentHistoryView() {
                                         role="tab"
                                         aria-selected={status === tab.value}
                                         onClick={() => handleFilterChange(tab.value)}
-                                        className={`min-h-[36px] px-4 py-2 rounded-full text-caption font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${status === tab.value
+                                        className={`min-h-[44px] px-4 py-2 rounded-full text-caption font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${status === tab.value
                                             ? 'bg-[#1d4ed8] text-white'
                                             : 'bg-white text-neutral-700 border border-neutral-300 hover:bg-neutral-50'
                                             }`}
@@ -274,7 +274,7 @@ export default function PaymentHistoryView() {
                                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                                     disabled={page === 1}
                                     aria-label="Página anterior"
-                                    className="min-h-[36px] min-w-[36px] flex items-center justify-center rounded-[6px] text-body text-neutral-600 hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                                    className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-[6px] text-body text-neutral-600 hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                                 >
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                                         <polyline points="15 18 9 12 15 6" />
@@ -288,7 +288,7 @@ export default function PaymentHistoryView() {
                                         onClick={() => setPage(pageNum)}
                                         aria-label={`Página ${pageNum}`}
                                         aria-current={page === pageNum ? 'page' : undefined}
-                                        className={`min-h-[36px] min-w-[36px] flex items-center justify-center rounded-[6px] text-caption font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${page === pageNum
+                                        className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-[6px] text-caption font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${page === pageNum
                                             ? 'bg-[#1d4ed8] text-white'
                                             : 'text-neutral-700 hover:bg-neutral-100'
                                             }`}
@@ -302,7 +302,7 @@ export default function PaymentHistoryView() {
                                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                                     disabled={page === totalPages}
                                     aria-label="Página siguiente"
-                                    className="min-h-[36px] min-w-[36px] flex items-center justify-center rounded-[6px] text-body text-neutral-600 hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                                    className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-[6px] text-body text-neutral-600 hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                                 >
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                                         <polyline points="9 18 15 12 9 6" />
