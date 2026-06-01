@@ -205,17 +205,19 @@ export default function RentalDetailView() {
                                                 <h2 className="text-h2 font-bold text-neutral-900">
                                                     {data.propertyType}
                                                 </h2>
-                                                {data.neighborhood && (
-                                                    <div className="flex items-center gap-1 mt-1">
-                                                        <LocationIcon />
-                                                        <span className="text-caption text-neutral-600">
-                                                            {data.neighborhood}
+                                                <div className="flex items-start gap-1 mt-1">
+                                                    <LocationIcon />
+                                                    <div>
+                                                        {data.neighborhood && (
+                                                            <span className="text-caption text-neutral-600 block">
+                                                                {data.neighborhood}
+                                                            </span>
+                                                        )}
+                                                        <span className="text-caption text-neutral-600 block">
+                                                            {data.address}
                                                         </span>
                                                     </div>
-                                                )}
-                                                <p className="text-caption text-neutral-600 pl-[20px]">
-                                                    {data.address}
-                                                </p>
+                                                </div>
                                             </div>
                                         </div>
 
