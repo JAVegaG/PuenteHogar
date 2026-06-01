@@ -1,6 +1,6 @@
 # Implementation Plan
 
-- [x] 1. Write bug condition exploration test
+- [ ] 1. Write bug condition exploration test
   - **Property 1: Bug Condition** - Tenant Lease Detail Shows Tracking Instead of Property Info
   - **CRITICAL**: This test MUST FAIL on unfixed code — failure confirms the bug exists
   - **DO NOT attempt to fix the test or the code when it fails**
@@ -29,7 +29,7 @@
   - Mark task complete when tests are written, run, and failure is documented
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6_
 
-- [~] 2. Write preservation property tests (BEFORE implementing fix)
+- [ ] 2. Write preservation property tests (BEFORE implementing fix)
   - **Property 2: Preservation** - Unchanged Tenant Behaviors (Empty States, Permissions, Not-Found, Gateway Flow)
   - **IMPORTANT**: Follow observation-first methodology
   - **Observe behavior on UNFIXED code for non-buggy inputs:**
@@ -52,13 +52,13 @@
 
 - [ ] 3. Backend: New `GetTenantLeaseDetailUseCase` + endpoint in `landlord-portfolio` module
 
-  - [~] 3.1 Create `TenantLeaseDetailDto` response DTO
+  - [ ] 3.1 Create `TenantLeaseDetailDto` response DTO
     - File: `src/backend/modules/landlord-portfolio/application/dtos/tenant-lease-detail.dto.ts`
     - Fields: `leaseId`, `unitId`, `propertyType`, `neighborhood`, `address`, `monthlyAmount`, `currency`, `leaseStatus`, `nextPayment: { id, amount, dueDate, status } | null`
     - Add `@ApiProperty()` decorators on all fields for Swagger documentation
     - _Requirements: 2.1_
 
-  - [~] 3.2 Create `GetTenantLeaseDetailUseCase`
+  - [ ] 3.2 Create `GetTenantLeaseDetailUseCase`
     - File: `src/backend/modules/landlord-portfolio/application/use-cases/get-tenant-lease-detail.use-case.ts`
     - Accepts `leaseId` and `userId` (from JWT)
     - Verifies `Lease.user_id = userId` (resource ownership — 403 if not tenant)
@@ -71,7 +71,7 @@
     - _Preservation: Existing landlord-facing tracking views remain unchanged_
     - _Requirements: 2.1_
 
-  - [~] 3.3 Create `tenant-leases.controller.ts` with `GET /leases/:leaseId/detail` endpoint
+  - [ ] 3.3 Create `tenant-leases.controller.ts` with `GET /leases/:leaseId/detail` endpoint
     - File: `src/backend/modules/landlord-portfolio/tenant-leases.controller.ts`
     - Route prefix: `/leases`
     - `@ApiTags('tenant-leases')`
@@ -81,7 +81,7 @@
     - Register controller in `landlord-portfolio.module.ts`
     - _Requirements: 2.1_
 
-  - [~] 3.4 Define `IPaymentsCrossModuleQuery` port for next pending payment lookup
+  - [ ] 3.4 Define `IPaymentsCrossModuleQuery` port for next pending payment lookup
     - File: `src/backend/modules/payments/domain/ports/payments-cross-module-query.port.ts`
     - Method: `getNextPendingPayment(leaseId: string): Promise<{ id: string; amount: number; dueDate: Date; status: string } | null>`
     - Implement in `payments/infrastructure/` using Prisma query against `payments` schema
@@ -89,7 +89,7 @@
     - Inject in `landlord-portfolio` module via `@Inject(PAYMENTS_CROSS_MODULE_QUERY)`
     - _Requirements: 2.1_
 
-  - [~] 3.5 Write unit tests for `GetTenantLeaseDetailUseCase`
+  - [ ] 3.5 Write unit tests for `GetTenantLeaseDetailUseCase`
     - Test resolves property info within `landlord_portfolio` schema correctly
     - Test returns next pending payment via cross-module port (earliest due date)
     - Test returns `null` next payment when all are PAID
@@ -99,13 +99,13 @@
 
 - [ ] 4. Backend: New `GET /payments/units` endpoint (unit-grouped cards)
 
-  - [~] 4.1 Create `PaymentUnitCardDto` response DTO
+  - [ ] 4.1 Create `PaymentUnitCardDto` response DTO
     - File: `src/backend/modules/payments/application/dtos/payment-unit-card.dto.ts`
     - Fields: `unitId`, `propertyName`, `propertyType`, `neighborhood`, `leaseStatus`, `pendingCount`
     - Add `@ApiProperty()` decorators
     - _Requirements: 2.3_
 
-  - [~] 4.2 Create `GetPaymentUnitsUseCase`
+  - [ ] 4.2 Create `GetPaymentUnitsUseCase`
     - File: `src/backend/modules/payments/application/use-cases/get-payment-units.use-case.ts`
     - Accepts `userId` (from JWT)
     - Queries `ScheduledPayment` grouped by `lease_id`
@@ -116,13 +116,13 @@
     - _Expected_Behavior: page displays unit_cards_grouped_by_property AND NOT flat_payment_list_
     - _Requirements: 2.3_
 
-  - [~] 4.3 Add `GET /payments/units` endpoint
+  - [ ] 4.3 Add `GET /payments/units` endpoint
     - File: `src/backend/modules/payments/payments.controller.ts`
     - Protected route, `@ApiTags('payments')`, `@ApiBearerAuth('JWT')`
     - Add `@ApiOperation`, `@ApiOkResponse({ type: [PaymentUnitCardDto] })`
     - _Requirements: 2.3_
 
-  - [~] 4.4 Write unit tests for `GetPaymentUnitsUseCase`
+  - [ ] 4.4 Write unit tests for `GetPaymentUnitsUseCase`
     - Test groups payments by unit correctly (one card per distinct unit)
     - Test resolves property name cross-schema via port
     - Test returns empty array for tenant with no payments
@@ -131,13 +131,13 @@
 
 - [ ] 5. Backend: New `GET /payments/units/:unitId/history` endpoint
 
-  - [~] 5.1 Create `PaymentHistoryQueryDto` request DTO and `PaymentHistoryItemDto` response DTO
+  - [ ] 5.1 Create `PaymentHistoryQueryDto` request DTO and `PaymentHistoryItemDto` response DTO
     - Query params: `status` (ALL | PENDING | PAID | OVERDUE), `page` (default 1), `limit` (default 10)
     - Response fields: `id`, `monthLabel`, `dueDate`, `amount`, `currency`, `status`
     - Add `@ApiProperty()` and `class-validator` decorators
     - _Requirements: 2.4_
 
-  - [~] 5.2 Create `GetPaymentHistoryByUnitUseCase`
+  - [ ] 5.2 Create `GetPaymentHistoryByUnitUseCase`
     - File: `src/backend/modules/payments/application/use-cases/get-payment-history-by-unit.use-case.ts`
     - Accepts `unitId`, `userId`, `status`, `page`, `limit`
     - Verifies authenticated user is the tenant on the lease associated with the unit
@@ -145,13 +145,13 @@
     - Returns paginated results with total count
     - _Requirements: 2.4_
 
-  - [~] 5.3 Add `GET /payments/units/:unitId/history` endpoint
+  - [ ] 5.3 Add `GET /payments/units/:unitId/history` endpoint
     - File: `src/backend/modules/payments/payments.controller.ts`
     - Protected route with query param validation
     - Add Swagger decorators
     - _Requirements: 2.4_
 
-  - [~] 5.4 Write unit tests for `GetPaymentHistoryByUnitUseCase`
+  - [ ] 5.4 Write unit tests for `GetPaymentHistoryByUnitUseCase`
     - Test filters by status (PENDING, PAID, OVERDUE, ALL)
     - Test pagination (page, limit, total count)
     - Test rejects non-tenant users (403)
@@ -159,14 +159,14 @@
 
 - [ ] 6. Backend: New `GET /payments/:paymentId/detail` endpoint
 
-  - [~] 6.1 Create `PaymentDetailDto` response DTO
+  - [ ] 6.1 Create `PaymentDetailDto` response DTO
     - File: `src/backend/modules/payments/application/dtos/payment-detail.dto.ts`
     - Fields: `id`, `status`, `amount`, `currency`, `dueDate`, `lineItems: PaymentLineItemDto[]`, `isPending: boolean`
     - Conditional fields for PAID: `datePaid`, `paymentMethod`, `receiptUrl`
     - Add `@ApiProperty()` decorators
     - _Requirements: 2.5, 2.6_
 
-  - [~] 6.2 Create `GetPaymentDetailUseCase`
+  - [ ] 6.2 Create `GetPaymentDetailUseCase`
     - File: `src/backend/modules/payments/application/use-cases/get-payment-detail.use-case.ts`
     - Accepts `paymentId` and `userId`
     - Verifies authenticated user is the tenant
@@ -177,12 +177,12 @@
     - _Expected_Behavior: pending → line items + checkout; paid → receipt only, NO payment actions_
     - _Requirements: 2.5, 2.6_
 
-  - [~] 6.3 Add `GET /payments/:paymentId/detail` endpoint
+  - [ ] 6.3 Add `GET /payments/:paymentId/detail` endpoint
     - File: `src/backend/modules/payments/payments.controller.ts`
     - Protected route with Swagger decorators
     - _Requirements: 2.5, 2.6_
 
-  - [~] 6.4 Write unit tests for `GetPaymentDetailUseCase`
+  - [ ] 6.4 Write unit tests for `GetPaymentDetailUseCase`
     - Test returns line items for pending payments
     - Test returns receipt data for paid payments
     - Test does NOT include checkout fields for paid payments
@@ -191,7 +191,7 @@
 
 - [ ] 7. Frontend: Refactor `RentalDetailView` to show property info + payment CTAs (no tracking)
 
-  - [~] 7.1 Update `tenant.ts` service with new API calls
+  - [ ] 7.1 Update `tenant.ts` service with new API calls
     - File: `src/frontend/shared/services/tenant.ts`
     - Add `getTenantLeaseDetail(leaseId, token)` → `GET /leases/:leaseId/detail`
     - Add `getPaymentUnits(token)` → `GET /payments/units`
@@ -199,7 +199,7 @@
     - Add `getPaymentDetail(paymentId, token)` → `GET /payments/:paymentId/detail`
     - _Requirements: 2.1, 2.3, 2.4, 2.5, 2.6_
 
-  - [~] 7.2 Refactor `RentalDetailView` component
+  - [ ] 7.2 Refactor `RentalDetailView` component
     - File: `src/frontend/modules/tenant/components/RentalDetailView.tsx`
     - Replace tracking-only view with property-info-centric layout
     - Call `getTenantLeaseDetail(leaseId, token)` for property info + next payment
@@ -217,7 +217,7 @@
 
 - [ ] 8. Frontend: Refactor `PaymentsView` to show unit cards
 
-  - [~] 8.1 Refactor `PaymentsView` component
+  - [ ] 8.1 Refactor `PaymentsView` component
     - File: `src/frontend/modules/tenant/components/PaymentsView.tsx`
     - Replace flat payment list with unit cards (call `getPaymentUnits(token)`)
     - Each card shows property name + lease status badge (use `StatusBadge` with `variant='lease'`)
@@ -231,7 +231,7 @@
 
 - [ ] 9. Frontend: New route `/mis-pagos/[unitId]/page.tsx` with `PaymentHistoryView`
 
-  - [~] 9.1 Create `PaymentHistoryView` component
+  - [ ] 9.1 Create `PaymentHistoryView` component
     - File: `src/frontend/modules/tenant/components/PaymentHistoryView.tsx`
     - Filter tabs: Todos, Pendientes, Pagados, Vencidos
     - List of monthly payment cards: month/year title, due date, amount, status badge, "Pagar >" link (pending), "Ver comprobante" link (paid)
@@ -242,7 +242,7 @@
     - Back button navigates to `/mis-pagos`
     - _Requirements: 2.4_
 
-  - [~] 9.2 Create page route file
+  - [ ] 9.2 Create page route file
     - File: `src/frontend/app/mis-pagos/[unitId]/page.tsx`
     - Import and render `PaymentHistoryView`
     - Follow centered container standard, back button pattern, Header with `leftAction`
@@ -250,7 +250,7 @@
 
 - [ ] 10. Frontend: New route `/mis-pagos/[unitId]/[paymentId]/page.tsx` with `PaymentDetailView`
 
-  - [~] 10.1 Create `PaymentDetailView` component
+  - [ ] 10.1 Create `PaymentDetailView` component
     - File: `src/frontend/modules/tenant/components/PaymentDetailView.tsx`
     - Conditional rendering based on payment status:
       - **PENDING**: "Resumen de la cuota" with line items, due date warning banner, payment method selection (Tarjeta débito/crédito, Transferencia bancaria / PSE), "Continuar con pago" primary button
@@ -263,7 +263,7 @@
     - _Expected_Behavior: pending → checkout UI; paid → read-only receipt_
     - _Requirements: 2.5, 2.6_
 
-  - [~] 10.2 Create page route file
+  - [ ] 10.2 Create page route file
     - File: `src/frontend/app/mis-pagos/[unitId]/[paymentId]/page.tsx`
     - Import and render `PaymentDetailView`
     - Follow centered container standard, back button pattern, Header with `leftAction`
@@ -271,7 +271,7 @@
 
 - [ ] 11. Fix verification and validation
 
-  - [~] 11.1 Verify bug condition exploration test now passes
+  - [ ] 11.1 Verify bug condition exploration test now passes
     - **Property 1: Expected Behavior** - Tenant Lease Detail Shows Property Info and Payment CTAs
     - **IMPORTANT**: Re-run the SAME test from task 1 — do NOT write a new test
     - The test from task 1 encodes the expected behavior
@@ -286,7 +286,7 @@
     - **EXPECTED OUTCOME**: Test PASSES (confirms bug is fixed)
     - _Requirements: 2.1, 2.3, 2.4, 2.5, 2.6_
 
-  - [~] 11.2 Verify preservation tests still pass
+  - [ ] 11.2 Verify preservation tests still pass
     - **Property 2: Preservation** - Unchanged Tenant Behaviors
     - **IMPORTANT**: Re-run the SAME tests from task 2 — do NOT write new tests
     - Run preservation property tests from step 2
@@ -299,7 +299,7 @@
       - Pagination works
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.7, 3.8_
 
-- [~] 12. Checkpoint - Ensure all tests pass
+- [ ] 12. Checkpoint - Ensure all tests pass
   - Run `npm run build` in `src/backend/` — no compilation errors
   - Run `npm run test` in `src/backend/` — all unit tests pass
   - Run `npm run build` in `src/frontend/` — no compilation errors
@@ -307,7 +307,7 @@
   - Verify all property-based tests (bug condition + preservation) pass
   - Ensure all tests pass, ask the user if questions arise
 
-- [~] 13. Manual QA and post-implementation review
+- [ ] 13. Manual QA and post-implementation review
   - Deploy or run the feature locally and test all user-facing flows end-to-end
   - Test flow: lease list → lease detail → "Pagar ahora" → payment detail → "Continuar con pago" → gateway redirect
   - Test flow: lease detail → "Ver historial de pagos" → payment history → filter tabs → click paid payment → receipt view
