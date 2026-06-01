@@ -7,11 +7,13 @@ import { InitiatePaymentDto } from './application/dtos/initiate-payment.dto';
 import { PaymentWebhookDto } from './application/dtos/payment-webhook.dto';
 import { PaymentResponseDto } from './application/dtos/payment-response.dto';
 import { PaymentUnitCardDto } from './application/dtos/payment-unit-card.dto';
+import { PaymentDetailDto } from './application/dtos/payment-detail.dto';
 import { PaymentHistoryQueryDto } from './application/dtos/payment-history-query.dto';
 import { PaginatedPaymentHistoryDto } from './application/dtos/payment-history-item.dto';
 import { GetPaymentHistoryUseCase } from './application/use-cases/get-payment-history.use-case';
 import { GetPaymentUnitsUseCase } from './application/use-cases/get-payment-units.use-case';
 import { GetPaymentHistoryByUnitUseCase } from './application/use-cases/get-payment-history-by-unit.use-case';
+import { GetPaymentDetailUseCase } from './application/use-cases/get-payment-detail.use-case';
 import { HandlePaymentWebhookUseCase } from './application/use-cases/handle-payment-webhook.use-case';
 import { InitiatePaymentUseCase } from './application/use-cases/initiate-payment.use-case';
 
@@ -27,6 +29,7 @@ export class PaymentsController {
     private readonly getPaymentHistoryUseCase: GetPaymentHistoryUseCase,
     private readonly getPaymentUnitsUseCase: GetPaymentUnitsUseCase,
     private readonly getPaymentHistoryByUnitUseCase: GetPaymentHistoryByUnitUseCase,
+    private readonly getPaymentDetailUseCase: GetPaymentDetailUseCase,
     private readonly handlePaymentWebhookUseCase: HandlePaymentWebhookUseCase,
   ) { }
 
@@ -57,6 +60,20 @@ export class PaymentsController {
       query.page ?? 1,
       query.limit ?? 10,
     );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':paymentId/detail')
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Obtener detalle de un pago', description: 'Retorna el detalle completo de un pago programado, incluyendo desglose de ítems y datos de recibo para pagos realizados.' })
+  @ApiOkResponse({ description: 'Detalle del pago', type: PaymentDetailDto })
+  @ApiForbiddenResponse({ description: 'El usuario no es arrendatario del pago' })
+  @ApiNotFoundResponse({ description: 'Pago programado no encontrado' })
+  getPaymentDetail(
+    @Param('paymentId') paymentId: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.getPaymentDetailUseCase.execute(paymentId, req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)

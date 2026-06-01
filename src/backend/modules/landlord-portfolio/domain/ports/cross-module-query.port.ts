@@ -18,4 +18,9 @@ export interface IPortfolioCrossModuleQuery {
      * Returns the lease ID if ownership is confirmed, null otherwise.
      */
     getLeaseIdByUnitForTenant(unitId: string, userId: string): Promise<string | null>;
+    /**
+     * Verifies that the given user is the tenant on the specified lease.
+     * Returns true if the lease exists and user_id matches, false otherwise.
+     */
+    verifyTenantOwnership(leaseId: string, userId: string): Promise<boolean>;
 }

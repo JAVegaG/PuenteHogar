@@ -111,4 +111,17 @@ export class PortfolioCrossModuleQueryService implements IPortfolioCrossModuleQu
             leaseStatus,
         };
     }
+
+    async verifyTenantOwnership(leaseId: string, userId: string): Promise<boolean> {
+        const lease = await this.prisma.lease.findFirst({
+            where: {
+                id: leaseId,
+                user_id: userId,
+                deleted_at: null,
+            },
+            select: { id: true },
+        });
+
+        return lease !== null;
+    }
 }
