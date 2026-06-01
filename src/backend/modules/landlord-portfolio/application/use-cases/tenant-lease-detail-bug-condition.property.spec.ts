@@ -4,6 +4,10 @@
 // This test MUST FAIL on unfixed code — failure confirms the bug exists.
 // DO NOT fix the test or the code when it fails.
 
+jest.mock('@src/shared/prisma/prisma.service', () => ({
+    PrismaService: jest.fn(),
+}));
+
 import * as fc from 'fast-check';
 
 /**

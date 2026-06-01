@@ -11,6 +11,7 @@ const config: Config = {
   moduleNameMapper: {
     '^@src/(.*)$': '<rootDir>/src/$1',
     '^@modules/(.*)$': '<rootDir>/modules/$1',
+    '^@prisma-generated/(.*)$': '<rootDir>/db/prisma/src/$1',
   },
   collectCoverageFrom: ['**/*.(t|j)s'],
   coverageDirectory: '../coverage',
