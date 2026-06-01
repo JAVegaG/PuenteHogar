@@ -13,4 +13,9 @@ export interface IPortfolioCrossModuleQuery {
     hasPortfoliosWithUnits(userId: string): Promise<boolean>;
     hasActiveLeasesInPortfolios(userId: string): Promise<boolean>;
     getPropertyInfoByLeaseId(leaseId: string): Promise<LeasePropertyInfo | null>;
+    /**
+     * Verifies that the given user is the tenant on the active lease for the specified unit.
+     * Returns the lease ID if ownership is confirmed, null otherwise.
+     */
+    getLeaseIdByUnitForTenant(unitId: string, userId: string): Promise<string | null>;
 }

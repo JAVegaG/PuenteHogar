@@ -59,6 +59,20 @@ export class PortfolioCrossModuleQueryService implements IPortfolioCrossModuleQu
         return Number(result[0].count) > 0;
     }
 
+    async getLeaseIdByUnitForTenant(unitId: string, userId: string): Promise<string | null> {
+        // Find an active lease on this unit where the user is the tenant
+        const lease = await this.prisma.lease.findFirst({
+            where: {
+                portfolio_unit_id: unitId,
+                user_id: userId,
+                deleted_at: null,
+            },
+            select: { id: true },
+        });
+
+        return lease?.id ?? null;
+    }
+
     async getPropertyInfoByLeaseId(leaseId: string): Promise<LeasePropertyInfo | null> {
         // Resolve: Lease → PortfolioUnit → Property + Address, and lease status from tracking
         const lease = await this.prisma.lease.findFirst({

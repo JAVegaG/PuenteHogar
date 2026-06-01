@@ -8,6 +8,7 @@ import { CircuitBreakerFactory } from '@src/shared/circuit-breaker/circuit-break
 import { PrismaService } from '@src/shared/prisma/prisma.service';
 import { GetPaymentHistoryUseCase } from './application/use-cases/get-payment-history.use-case';
 import { GetPaymentUnitsUseCase } from './application/use-cases/get-payment-units.use-case';
+import { GetPaymentHistoryByUnitUseCase } from './application/use-cases/get-payment-history-by-unit.use-case';
 import { HandlePaymentWebhookUseCase } from './application/use-cases/handle-payment-webhook.use-case';
 import {
   InitiatePaymentUseCase,
@@ -35,6 +36,7 @@ import { PaymentsController } from './payments.controller';
     InitiatePaymentUseCase,
     GetPaymentHistoryUseCase,
     GetPaymentUnitsUseCase,
+    GetPaymentHistoryByUnitUseCase,
     HandlePaymentWebhookUseCase,
     PaymentsCrossModuleQueryService,
     PortfolioCrossModuleQueryService,
@@ -64,6 +66,7 @@ import { PaymentsController } from './payments.controller';
     InitiatePaymentUseCase,
     GetPaymentHistoryUseCase,
     GetPaymentUnitsUseCase,
+    GetPaymentHistoryByUnitUseCase,
     HandlePaymentWebhookUseCase,
     PaymentsCrossModuleQueryService,
     PaymentSchedulingAdapter,

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiOkResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import { Request } from 'express';
 import { Public } from '@src/shared/decorators/public.decorator';
@@ -7,8 +7,11 @@ import { InitiatePaymentDto } from './application/dtos/initiate-payment.dto';
 import { PaymentWebhookDto } from './application/dtos/payment-webhook.dto';
 import { PaymentResponseDto } from './application/dtos/payment-response.dto';
 import { PaymentUnitCardDto } from './application/dtos/payment-unit-card.dto';
+import { PaymentHistoryQueryDto } from './application/dtos/payment-history-query.dto';
+import { PaginatedPaymentHistoryDto } from './application/dtos/payment-history-item.dto';
 import { GetPaymentHistoryUseCase } from './application/use-cases/get-payment-history.use-case';
 import { GetPaymentUnitsUseCase } from './application/use-cases/get-payment-units.use-case';
+import { GetPaymentHistoryByUnitUseCase } from './application/use-cases/get-payment-history-by-unit.use-case';
 import { HandlePaymentWebhookUseCase } from './application/use-cases/handle-payment-webhook.use-case';
 import { InitiatePaymentUseCase } from './application/use-cases/initiate-payment.use-case';
 
@@ -23,6 +26,7 @@ export class PaymentsController {
     private readonly initiatePaymentUseCase: InitiatePaymentUseCase,
     private readonly getPaymentHistoryUseCase: GetPaymentHistoryUseCase,
     private readonly getPaymentUnitsUseCase: GetPaymentUnitsUseCase,
+    private readonly getPaymentHistoryByUnitUseCase: GetPaymentHistoryByUnitUseCase,
     private readonly handlePaymentWebhookUseCase: HandlePaymentWebhookUseCase,
   ) { }
 
@@ -33,6 +37,26 @@ export class PaymentsController {
   @ApiOkResponse({ description: 'Lista de tarjetas de unidad con pagos pendientes', type: [PaymentUnitCardDto] })
   getUnits(@Req() req: AuthenticatedRequest) {
     return this.getPaymentUnitsUseCase.execute(req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('units/:unitId/history')
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Obtener historial de pagos por unidad', description: 'Retorna el historial de pagos paginado y filtrado por estado para una unidad específica.' })
+  @ApiOkResponse({ description: 'Historial de pagos paginado', type: PaginatedPaymentHistoryDto })
+  @ApiForbiddenResponse({ description: 'El usuario no es arrendatario de esta unidad' })
+  getUnitHistory(
+    @Param('unitId') unitId: string,
+    @Query() query: PaymentHistoryQueryDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.getPaymentHistoryByUnitUseCase.execute(
+      unitId,
+      req.user.id,
+      query.status ?? 'ALL',
+      query.page ?? 1,
+      query.limit ?? 10,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
