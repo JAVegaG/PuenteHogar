@@ -147,8 +147,8 @@ export default function PaymentHistoryView() {
                                         aria-selected={status === tab.value}
                                         onClick={() => handleFilterChange(tab.value)}
                                         className={`min-h-[44px] min-w-[44px] px-4 py-2 rounded-[6px] text-body font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${status === tab.value
-                                                ? 'bg-[#1d4ed8] text-white'
-                                                : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                                            ? 'bg-[#1d4ed8] text-white'
+                                            : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
                                             }`}
                                     >
                                         {tab.label}
@@ -192,7 +192,7 @@ export default function PaymentHistoryView() {
                                         <p className="text-body font-semibold text-neutral-900 mb-3">
                                             {formatCOP(item.amount)}
                                         </p>
-                                        {item.status === 'PENDING' && (
+                                        {(item.status === 'PENDING' || item.status === 'OVERDUE') && (
                                             <Link
                                                 href={`/mis-pagos/${unitId}/${item.id}`}
                                                 className="text-body font-medium text-[#1d4ed8] hover:underline inline-flex items-center min-h-[44px] min-w-[44px]"

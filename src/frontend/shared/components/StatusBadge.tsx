@@ -47,6 +47,7 @@ const paymentStatusColors: Record<string, ContractColorMapping> = {
     PENDING: { bg: '#FEF3C7', text: '#92400E', label: 'Pendiente' },
     PROCESSING: { bg: '#DBEAFE', text: '#1E40AF', label: 'Procesando' },
     PAID: { bg: '#DCFCE7', text: '#065F46', label: 'Pagado' },
+    OVERDUE: { bg: '#FEE2E2', text: '#991B1B', label: 'Vencido' },
     REJECTED: { bg: '#FEE2E2', text: '#991B1B', label: 'Rechazado' },
 };
 

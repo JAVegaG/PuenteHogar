@@ -210,7 +210,7 @@ export default function RentalDetailView() {
                                         </h2>
                                         <div className="border border-neutral-200 rounded-card bg-white p-4">
                                             <div className="flex items-start justify-between gap-2 mb-2">
-                                                <p className="text-h3 font-semibold text-neutral-900">
+                                                <p className="text-h2 font-bold text-neutral-900">
                                                     {formatCOP(data.nextPayment.amount)}
                                                 </p>
                                                 <StatusBadge status={data.nextPayment.status} variant="paymentStatus" />

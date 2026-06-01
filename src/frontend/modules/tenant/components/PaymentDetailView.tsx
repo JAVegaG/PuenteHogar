@@ -146,7 +146,7 @@ export default function PaymentDetailView() {
                                                     <span className="text-body font-semibold text-neutral-900">
                                                         Total
                                                     </span>
-                                                    <span className="text-h3 font-bold text-neutral-900">
+                                                    <span className="text-h2 font-bold text-neutral-900">
                                                         {formatCOP(data.amount)}
                                                     </span>
                                                 </div>
@@ -171,8 +171,8 @@ export default function PaymentDetailView() {
                                             <div className="flex flex-col gap-3">
                                                 <label
                                                     className={`flex items-center gap-3 border rounded-card p-4 cursor-pointer min-h-[44px] transition-colors ${selectedMethod === 'CARD'
-                                                            ? 'border-[#1d4ed8] bg-blue-50'
-                                                            : 'border-neutral-200 bg-white'
+                                                        ? 'border-[#1d4ed8] bg-blue-50'
+                                                        : 'border-neutral-200 bg-white'
                                                         }`}
                                                 >
                                                     <input
@@ -189,8 +189,8 @@ export default function PaymentDetailView() {
                                                 </label>
                                                 <label
                                                     className={`flex items-center gap-3 border rounded-card p-4 cursor-pointer min-h-[44px] transition-colors ${selectedMethod === 'PSE'
-                                                            ? 'border-[#1d4ed8] bg-blue-50'
-                                                            : 'border-neutral-200 bg-white'
+                                                        ? 'border-[#1d4ed8] bg-blue-50'
+                                                        : 'border-neutral-200 bg-white'
                                                         }`}
                                                 >
                                                     <input
@@ -226,7 +226,7 @@ export default function PaymentDetailView() {
                                             </h2>
                                             <div className="border border-neutral-200 rounded-card bg-white p-4">
                                                 <div className="flex items-start justify-between gap-2 mb-3">
-                                                    <p className="text-h3 font-bold text-neutral-900">
+                                                    <p className="text-h2 font-bold text-neutral-900">
                                                         {formatCOP(data.amount)}
                                                     </p>
                                                     <StatusBadge status={data.status} variant="paymentStatus" />
@@ -266,7 +266,7 @@ export default function PaymentDetailView() {
                                                     <span className="text-body font-semibold text-neutral-900">
                                                         Total
                                                     </span>
-                                                    <span className="text-h3 font-bold text-neutral-900">
+                                                    <span className="text-h2 font-bold text-neutral-900">
                                                         {formatCOP(data.amount)}
                                                     </span>
                                                 </div>
