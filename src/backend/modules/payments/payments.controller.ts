@@ -6,7 +6,9 @@ import { JwtAuthGuard } from '@src/shared/guards/jwt-auth.guard';
 import { InitiatePaymentDto } from './application/dtos/initiate-payment.dto';
 import { PaymentWebhookDto } from './application/dtos/payment-webhook.dto';
 import { PaymentResponseDto } from './application/dtos/payment-response.dto';
+import { PaymentUnitCardDto } from './application/dtos/payment-unit-card.dto';
 import { GetPaymentHistoryUseCase } from './application/use-cases/get-payment-history.use-case';
+import { GetPaymentUnitsUseCase } from './application/use-cases/get-payment-units.use-case';
 import { HandlePaymentWebhookUseCase } from './application/use-cases/handle-payment-webhook.use-case';
 import { InitiatePaymentUseCase } from './application/use-cases/initiate-payment.use-case';
 
@@ -20,8 +22,18 @@ export class PaymentsController {
   constructor(
     private readonly initiatePaymentUseCase: InitiatePaymentUseCase,
     private readonly getPaymentHistoryUseCase: GetPaymentHistoryUseCase,
+    private readonly getPaymentUnitsUseCase: GetPaymentUnitsUseCase,
     private readonly handlePaymentWebhookUseCase: HandlePaymentWebhookUseCase,
-  ) {}
+  ) { }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('units')
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Obtener unidades con pagos agrupados por propiedad', description: 'Retorna tarjetas de unidad agrupadas por propiedad para el arrendatario autenticado.' })
+  @ApiOkResponse({ description: 'Lista de tarjetas de unidad con pagos pendientes', type: [PaymentUnitCardDto] })
+  getUnits(@Req() req: AuthenticatedRequest) {
+    return this.getPaymentUnitsUseCase.execute(req.user.id);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Post('initiate')

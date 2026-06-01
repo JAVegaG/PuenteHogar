@@ -1,10 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { NotificationsModule } from '@modules/notifications';
+import { PortfolioCrossModuleQueryService } from '@modules/landlord-portfolio/infrastructure/repositories/portfolio-cross-module-query.service';
+import { PORTFOLIO_CROSS_MODULE_QUERY } from '@modules/landlord-portfolio/domain/ports/cross-module-query.port';
 import { AuditLoggerService } from '@src/shared/audit/audit-logger.service';
 import { CircuitBreakerFactory } from '@src/shared/circuit-breaker/circuit-breaker.factory';
 import { PrismaService } from '@src/shared/prisma/prisma.service';
 import { GetPaymentHistoryUseCase } from './application/use-cases/get-payment-history.use-case';
+import { GetPaymentUnitsUseCase } from './application/use-cases/get-payment-units.use-case';
 import { HandlePaymentWebhookUseCase } from './application/use-cases/handle-payment-webhook.use-case';
 import {
   InitiatePaymentUseCase,
@@ -31,8 +34,10 @@ import { PaymentsController } from './payments.controller';
     PaymentsEtlService,
     InitiatePaymentUseCase,
     GetPaymentHistoryUseCase,
+    GetPaymentUnitsUseCase,
     HandlePaymentWebhookUseCase,
     PaymentsCrossModuleQueryService,
+    PortfolioCrossModuleQueryService,
     PaymentSchedulingAdapter,
     {
       provide: PAYMENT_REPOSITORY,
@@ -50,10 +55,15 @@ import { PaymentsController } from './payments.controller';
       provide: PAYMENTS_CROSS_MODULE_QUERY,
       useExisting: PaymentsCrossModuleQueryService,
     },
+    {
+      provide: PORTFOLIO_CROSS_MODULE_QUERY,
+      useExisting: PortfolioCrossModuleQueryService,
+    },
   ],
   exports: [
     InitiatePaymentUseCase,
     GetPaymentHistoryUseCase,
+    GetPaymentUnitsUseCase,
     HandlePaymentWebhookUseCase,
     PaymentsCrossModuleQueryService,
     PaymentSchedulingAdapter,

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma-generated/client';
 import { PrismaService } from '@src/shared/prisma/prisma.service';
-import { IPortfolioCrossModuleQuery } from '../../domain/ports/cross-module-query.port';
+import { IPortfolioCrossModuleQuery, LeasePropertyInfo } from '../../domain/ports/cross-module-query.port';
 
 @Injectable()
 export class PortfolioCrossModuleQueryService implements IPortfolioCrossModuleQuery {
@@ -57,5 +57,44 @@ export class PortfolioCrossModuleQueryService implements IPortfolioCrossModuleQu
       `,
         );
         return Number(result[0].count) > 0;
+    }
+
+    async getPropertyInfoByLeaseId(leaseId: string): Promise<LeasePropertyInfo | null> {
+        // Resolve: Lease → PortfolioUnit → Property + Address, and lease status from tracking
+        const lease = await this.prisma.lease.findFirst({
+            where: { id: leaseId, deleted_at: null },
+        });
+
+        if (!lease) return null;
+
+        const unit = await this.prisma.portfolioUnit.findFirst({
+            where: { id: lease.portfolio_unit_id, deleted_at: null },
+        });
+
+        if (!unit) return null;
+
+        const property = await this.prisma.property.findFirst({
+            where: { id: unit.property_id, deleted_at: null },
+            include: { address: true },
+        });
+
+        // Resolve lease status from tracking_process schema
+        const currentStatus = await this.prisma.leaseCurrentStatus.findUnique({
+            where: { lease_id: leaseId },
+            include: { status: true },
+        });
+        const leaseStatus = currentStatus?.status?.name ?? 'Acordado';
+
+        const propertyType = property?.property_type ?? '';
+        const neighborhood = property?.address?.neighborhood ?? '';
+        const propertyName = `${propertyType} ${neighborhood}`.trim();
+
+        return {
+            unitId: unit.id,
+            propertyName,
+            propertyType,
+            neighborhood,
+            leaseStatus,
+        };
     }
 }
