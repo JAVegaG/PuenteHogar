@@ -16,8 +16,11 @@ export class PaymentsCrossModuleQueryService implements IPaymentsCrossModuleQuer
         WHERE l."user_id" = ${userId}
           AND NOT EXISTS (
             SELECT 1 FROM "payments"."Payment" p
+            INNER JOIN "payments"."PaymentLog" pl ON pl."payment_id" = p."id"
             WHERE p."scheduled_payment_id" = sp."id"
+              AND pl."status" = 'PAID'
               AND p."deleted_at" IS NULL
+              AND pl."deleted_at" IS NULL
           )
           AND sp."deleted_at" IS NULL
           AND l."deleted_at" IS NULL
@@ -36,8 +39,11 @@ export class PaymentsCrossModuleQueryService implements IPaymentsCrossModuleQuer
         WHERE sp."lease_id" = ${leaseId}
           AND NOT EXISTS (
             SELECT 1 FROM "payments"."Payment" p
+            INNER JOIN "payments"."PaymentLog" pl ON pl."payment_id" = p."id"
             WHERE p."scheduled_payment_id" = sp."id"
+              AND pl."status" = 'PAID'
               AND p."deleted_at" IS NULL
+              AND pl."deleted_at" IS NULL
           )
           AND sp."deleted_at" IS NULL
         ORDER BY sp."due_date" ASC
