@@ -16,8 +16,8 @@
         "diff:staging": "cdk diff --all -c env=staging",
         "diff:production": "cdk diff --all -c env=production",
         "destroy:staging": "cdk destroy --all -c env=staging --force",
-        "staging:sleep": "cdk destroy staging-Monitoring staging-Cdn staging-Compute staging-Network -c env=staging --force",
-        "staging:wake": "cdk deploy staging-Network staging-Compute staging-Cdn staging-Monitoring -c env=staging --require-approval never",
+        "staging:sleep": "cdk destroy staging-Monitoring staging-Cdn staging-Compute -c env=staging --force",
+        "staging:wake": "cdk deploy staging-Compute staging-Cdn staging-Monitoring -c env=staging --require-approval never",
         "bootstrap": "cdk bootstrap"
     },
     "dependencies": {
