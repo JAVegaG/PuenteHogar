@@ -28,34 +28,63 @@ function formatDueDate(dateStr: string): string {
     });
 }
 
-const PROPERTY_TYPE_ICONS: Record<string, string> = {
-    Apartamento: '🏢',
-    Casa: '🏠',
-    Estudio: '🏠',
-    Local: '🏪',
-    Oficina: '🏢',
-    Bodega: '🏭',
-};
+function CalendarIcon() {
+    return (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-500 shrink-0" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+    );
+}
+
+function DollarIcon() {
+    return (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-500 shrink-0" aria-hidden="true">
+            <line x1="12" y1="1" x2="12" y2="23" />
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+        </svg>
+    );
+}
+
+function LocationIcon() {
+    return (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-500 shrink-0" aria-hidden="true">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+            <circle cx="12" cy="10" r="3" />
+        </svg>
+    );
+}
+
+function PropertyIcon() {
+    return (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#1d4ed8]" aria-hidden="true">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+        </svg>
+    );
+}
 
 function RentalDetailSkeleton() {
     return (
         <div className="flex flex-col gap-6" aria-busy="true" aria-live="polite">
             <span className="sr-only">Cargando detalle del arriendo...</span>
-            <div className="border border-neutral-200 rounded-card bg-white p-4">
+            <div className="border border-neutral-200 rounded-card bg-white p-6">
                 <Skeleton className="h-6 w-40 mb-2" />
                 <Skeleton className="h-4 w-48 mb-1" />
-                <Skeleton className="h-4 w-56" />
+                <Skeleton className="h-4 w-56 mb-4" />
+                <Skeleton className="h-[1px] w-full mb-4" />
+                <Skeleton className="h-5 w-full" />
             </div>
-            <div className="border border-neutral-200 rounded-card bg-white p-4">
-                <Skeleton className="h-5 w-32 mb-2" />
-                <Skeleton className="h-6 w-40" />
-            </div>
-            <div className="border border-neutral-200 rounded-card bg-white p-4">
-                <Skeleton className="h-5 w-36 mb-3" />
+            <div className="border border-neutral-200 rounded-card bg-white p-6">
+                <Skeleton className="h-5 w-36 mb-4" />
                 <Skeleton className="h-4 w-48 mb-2" />
-                <Skeleton className="h-4 w-32 mb-3" />
-                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-5 w-32 mb-4" />
+                <Skeleton className="h-4 w-40 mb-2" />
+                <Skeleton className="h-5 w-32" />
             </div>
+            <Skeleton className="h-[48px] w-full rounded-[6px]" />
         </div>
     );
 }
@@ -122,7 +151,7 @@ export default function RentalDetailView() {
         return (
             <>
                 <Header
-                    title="Detalle del arriendo"
+                    title="Mi arriendo"
                     onMenuClick={() => { }}
                     leftAction={backArrow}
                 />
@@ -151,7 +180,7 @@ export default function RentalDetailView() {
     return (
         <>
             <Header
-                title="Detalle del arriendo"
+                title="Mi arriendo"
                 onMenuClick={() => { }}
                 leftAction={backArrow}
             />
@@ -165,76 +194,99 @@ export default function RentalDetailView() {
                             <ErrorState onRetry={fetchData} />
                         ) : data ? (
                             <div className="flex flex-col gap-6">
-                                {/* Property info card */}
+                                {/* Property info card with canon mensual */}
                                 <section aria-label="Información del inmueble">
-                                    <div className="border border-neutral-200 rounded-card bg-white p-4">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <span className="text-h2" aria-hidden="true">
-                                                {PROPERTY_TYPE_ICONS[data.propertyType] || '🏠'}
-                                            </span>
+                                    <div className="border border-neutral-200 rounded-card bg-white p-6">
+                                        <div className="flex items-start gap-3 mb-1">
+                                            <div className="w-[40px] h-[40px] rounded-[8px] bg-blue-50 flex items-center justify-center shrink-0">
+                                                <PropertyIcon />
+                                            </div>
                                             <div>
-                                                <h2 className="text-h3 font-semibold text-neutral-900">
+                                                <h2 className="text-h2 font-bold text-neutral-900">
                                                     {data.propertyType}
                                                 </h2>
-                                                <p className="text-caption text-neutral-600">
-                                                    {data.neighborhood}
+                                                <div className="flex items-center gap-1 mt-1">
+                                                    <LocationIcon />
+                                                    <span className="text-caption text-neutral-600">
+                                                        {data.neighborhood}
+                                                    </span>
+                                                </div>
+                                                <p className="text-caption text-neutral-600 ml-[20px]">
+                                                    {data.address}
                                                 </p>
                                             </div>
                                         </div>
-                                        <p className="text-body text-neutral-700">
-                                            {data.address}
-                                        </p>
-                                        <div className="mt-3">
-                                            <StatusBadge status={data.leaseStatus} variant="tracking" />
-                                        </div>
-                                    </div>
-                                </section>
 
-                                {/* Monthly rent */}
-                                <section aria-label="Canon mensual">
-                                    <div className="border border-neutral-200 rounded-card bg-white p-4">
-                                        <p className="text-caption text-neutral-600 mb-1">
-                                            Canon mensual
-                                        </p>
-                                        <p className="text-h2 font-bold text-neutral-900">
-                                            {formatCOP(data.monthlyAmount)}
-                                        </p>
+                                        {/* Canon mensual row */}
+                                        <div className="border-t border-neutral-200 mt-4 pt-4 flex items-center justify-between">
+                                            <span className="text-body text-neutral-700">
+                                                Canon mensual
+                                            </span>
+                                            <span className="text-h3 font-bold text-[#1d4ed8]">
+                                                {formatCOP(data.monthlyAmount)}
+                                            </span>
+                                        </div>
                                     </div>
                                 </section>
 
                                 {/* Next payment card */}
                                 {data.nextPayment && (
                                     <section aria-label="Próximo pago">
-                                        <h2 className="text-h3 font-semibold text-neutral-900 mb-3">
-                                            Próximo pago
-                                        </h2>
-                                        <div className="border border-neutral-200 rounded-card bg-white p-4">
-                                            <div className="flex items-start justify-between gap-2 mb-2">
-                                                <p className="text-h2 font-bold text-neutral-900">
-                                                    {formatCOP(data.nextPayment.amount)}
-                                                </p>
+                                        <div className="border border-neutral-200 rounded-card bg-white p-6">
+                                            <div className="flex items-center justify-between mb-4">
+                                                <h3 className="text-h3 font-bold text-neutral-900">
+                                                    Próximo pago
+                                                </h3>
                                                 <StatusBadge status={data.nextPayment.status} variant="paymentStatus" />
                                             </div>
-                                            <p className="text-caption text-neutral-500 mb-4">
-                                                Vence: {formatDueDate(data.nextPayment.dueDate)}
-                                            </p>
-                                            <Link
-                                                href={`/mis-pagos/${data.unitId}/${data.nextPayment.id}`}
-                                                className="bg-[#1d4ed8] text-white rounded-[6px] min-h-[44px] min-w-[44px] px-4 inline-flex items-center justify-center font-semibold text-body w-full"
-                                            >
-                                                Pagar ahora
-                                            </Link>
+
+                                            <div className="flex items-start gap-3 mb-4">
+                                                <CalendarIcon />
+                                                <div>
+                                                    <p className="text-caption text-neutral-500">
+                                                        Fecha de vencimiento
+                                                    </p>
+                                                    <p className="text-body font-medium text-neutral-900">
+                                                        {formatDueDate(data.nextPayment.dueDate)}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-start gap-3">
+                                                <DollarIcon />
+                                                <div>
+                                                    <p className="text-caption text-neutral-500">
+                                                        Valor a pagar
+                                                    </p>
+                                                    <p className="text-body font-medium text-neutral-900">
+                                                        {formatCOP(data.nextPayment.amount)}
+                                                    </p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </section>
                                 )}
 
+                                {/* Pagar ahora button */}
+                                {data.nextPayment && (
+                                    <Link
+                                        href={`/mis-pagos/${data.unitId}/${data.nextPayment.id}`}
+                                        className="bg-[#1d4ed8] text-white rounded-[6px] min-h-[48px] min-w-[44px] px-4 inline-flex items-center justify-center font-semibold text-body w-full"
+                                    >
+                                        Pagar ahora
+                                    </Link>
+                                )}
+
                                 {/* Payment history link */}
-                                <div className="text-center">
+                                <div className="flex justify-center">
                                     <Link
                                         href={`/mis-pagos/${data.unitId}`}
-                                        className="inline-flex items-center text-primary underline hover:text-primary/80 min-h-[44px] min-w-[44px] text-body font-medium"
+                                        className="inline-flex items-center gap-1 min-h-[44px] min-w-[44px] text-body font-medium text-neutral-700 hover:text-neutral-900"
                                     >
                                         Ver historial de pagos
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                            <polyline points="9 18 15 12 9 6" />
+                                        </svg>
                                     </Link>
                                 </div>
                             </div>
