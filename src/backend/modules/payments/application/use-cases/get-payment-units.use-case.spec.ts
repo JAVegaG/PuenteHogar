@@ -29,6 +29,7 @@ function createMockPortfolioQuery(): jest.Mocked<IPortfolioCrossModuleQuery> {
         hasActiveLeasesInPortfolios: jest.fn(),
         getPropertyInfoByLeaseId: jest.fn(),
         getLeaseIdByUnitForTenant: jest.fn(),
+        verifyTenantOwnership: jest.fn(),
     };
 }
 
