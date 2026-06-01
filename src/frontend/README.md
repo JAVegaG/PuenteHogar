@@ -76,7 +76,11 @@ src/frontend/
 │   │   └── [id]/
 │   │       └── page.tsx          # Detalle de contrato del arrendatario (Client Component, TENANT)
 │   ├── mis-pagos/
-│   │   └── page.tsx              # Historial de pagos del arrendatario (Client Component, TENANT)
+│   │   ├── page.tsx              # Unidades con pagos del arrendatario (Client Component, TENANT)
+│   │   └── [unitId]/
+│   │       ├── page.tsx          # Historial de pagos por unidad (Client Component, TENANT)
+│   │       └── [paymentId]/
+│   │           └── page.tsx      # Detalle de pago / checkout (Client Component, TENANT)
 │   └── mis-ingresos/
 │       ├── page.tsx              # Dashboard de ingresos del arrendador (Client Component, LANDLORD)
 │       └── portafolio/
@@ -163,10 +167,15 @@ src/frontend/
 │   │       ├── translate-notification-type.test.ts  # Tests de traducción de tipos de notificación
 │   │       └── translate-notification-type.ts       # Mapa de traducciones de tipos de notificación
 │   ├── tenant/
+│   │   ├── __tests__/
+│   │   │   ├── tenant-flows-bug-condition.property.test.ts   # PBT: bug condition exploration (endpoints + UI)
+│   │   │   └── tenant-flows-preservation.property.test.ts    # PBT: preservation of unchanged behaviors
 │   │   └── components/
 │   │       ├── ContactLandlordButton.tsx      # Botón de contacto con arrendador
-│   │       ├── PaymentsView.tsx               # Vista de historial de pagos
-│   │       ├── RentalDetailView.tsx           # Detalle de arriendo del arrendatario
+│   │       ├── PaymentDetailView.tsx          # Detalle de pago: checkout (pendiente) o recibo (pagado)
+│   │       ├── PaymentHistoryView.tsx         # Historial de pagos por unidad con filtros y paginación
+│   │       ├── PaymentsView.tsx               # Vista de unidades con pagos (tarjetas agrupadas por unidad)
+│   │       ├── RentalDetailView.tsx           # Detalle de arriendo: info propiedad + CTAs de pago (sin tracking)
 │   │       ├── RentalsListView.tsx            # Lista de arriendos activos
 │   │       ├── TenantContractDetailView.tsx   # Detalle de contrato del arrendatario
 │   │       └── TenantContractsListView.tsx    # Lista de contratos del arrendatario
@@ -204,7 +213,7 @@ src/frontend/
 │   │   ├── Pagination.tsx         # Paginación con selector de items/página
 │   │   ├── SideMenu.tsx           # Menú lateral (drawer 320px, auth-aware)
 │   │   ├── Skeleton.tsx           # Skeleton loader genérico
-│   │   ├── StatusBadge.tsx        # Badge de estado reutilizable (variantes: lease, unit, payment, listing, contract, tracking, paymentStatus, notification)
+│   │   ├── StatusBadge.tsx        # Badge de estado reutilizable (variantes: lease, unit, payment, listing, contract, tracking, paymentStatus [PENDING/PROCESSING/PAID/OVERDUE/REJECTED], notification)
 │   │   ├── Toast.tsx              # Notificación temporal (auto-hide, role="status")
 │   │   └── WizardProgress.tsx     # Indicador visual de progreso multi-paso (pasos numerados, checks, conectores)
 │   ├── hooks/
@@ -259,7 +268,7 @@ npm run lint       # Linting
 | `/mis-notificaciones` | Client Component | Sí | Historial de notificaciones in-app (leído/no leído, marcar como leída) |
 | `/mis-notificaciones/preferencias` | Client Component | Sí | Preferencias de canales externos (EMAIL, WHATSAPP) por tipo de notificación |
 | `/mis-arriendos` | Client Component | TENANT | Arriendos activos del arrendatario con estado y seguimiento |
-| `/mis-arriendos/[id]` | Client Component | TENANT | Detalle de arriendo del arrendatario (estado, contratos, pagos) |
+| `/mis-arriendos/[id]` | Client Component | TENANT | Detalle de arriendo: info propiedad, canon mensual, próximo pago, CTAs a pagos |
 | `/mi-portafolio` | Client Component | LANDLORD | Listado de portafolios con estadísticas, paginación y creación |
 | `/mi-portafolio/nueva-unidad` | Client Component | LANDLORD | Redirige a `/mi-portafolio` (legacy) |
 | `/mi-portafolio/[id]/editar` | Client Component | LANDLORD | Editar unidad de portafolio existente |
@@ -278,7 +287,9 @@ npm run lint       # Linting
 | `/mis-contratos/crear` | Client Component | LANDLORD | Creación de contrato via wizard (3 pasos) |
 | `/mis-contratos-arrendatario` | Client Component | TENANT | Listado de contratos del arrendatario |
 | `/mis-contratos-arrendatario/[id]` | Client Component | TENANT | Detalle de contrato del arrendatario |
-| `/mis-pagos` | Client Component | TENANT | Historial de pagos del arrendatario |
+| `/mis-pagos` | Client Component | TENANT | Unidades con pagos del arrendatario (tarjetas agrupadas por unidad) |
+| `/mis-pagos/[unitId]` | Client Component | TENANT | Historial de pagos por unidad con filtros (Todos, Pendientes, Pagados, Vencidos) |
+| `/mis-pagos/[unitId]/[paymentId]` | Client Component | TENANT | Detalle de pago: checkout con método de pago (pendiente) o recibo histórico (pagado) |
 | `/mis-ingresos` | Client Component | LANDLORD | Dashboard de ingresos del arrendador |
 | `/mis-ingresos/portafolio/[portfolioId]` | Client Component | LANDLORD | Reporte agregado de ingresos por portafolio |
 | `/mis-ingresos/portafolio/[portfolioId]/unidad/[unitId]` | Client Component | LANDLORD | Reporte individual de ingresos por unidad |
@@ -299,7 +310,7 @@ Notificaciones in-app y preferencias de canales externos: historial de notificac
 
 ### tenant
 
-Flujos del arrendatario: listado de arriendos activos con estado y seguimiento, detalle de arriendo con historial de estados, historial de pagos con iniciación de pago, listado y detalle de contratos del arrendatario, y botón de contacto con arrendador. Componentes: RentalsListView, RentalDetailView, PaymentsView, TenantContractsListView, TenantContractDetailView, ContactLandlordButton.
+Flujos del arrendatario: listado de arriendos activos con estado, detalle de arriendo con info de propiedad (tipo, barrio, dirección), canon mensual, próximo pago y CTAs de pago (sin tracking — tracking es solo para arrendadores), pagos agrupados por unidad con navegación multi-nivel (unidades → historial por unidad con filtros → detalle de pago/checkout o recibo), listado y detalle de contratos del arrendatario, y botón de contacto con arrendador. Incluye tests property-based (fast-check) para bug condition exploration y preservation de comportamientos existentes. Componentes: RentalsListView, RentalDetailView, PaymentsView, PaymentHistoryView, PaymentDetailView, TenantContractsListView, TenantContractDetailView, ContactLandlordButton.
 
 ### landlord-portfolio
 
@@ -336,7 +347,7 @@ Publicación de unidades: formulario para publicar una unidad del portafolio com
 | `SideMenu` | Menú lateral (drawer 320px, auth-aware, enlace "Mis notificaciones" con badge de no leídas) |
 | `Skeleton` | Skeleton loader genérico |
 | `ConfirmationDialog` | Diálogo modal de confirmación con variante visual (`variant?: 'destructive' | 'primary'`, default `'destructive'`). Native `<dialog>`, focus trap, Escape to close |
-| `StatusBadge` | Badge de estado con variantes: lease (Vigente/Acordado/Finalizado), unit (Ocupado/Disponible/Mantenimiento), payment (Al día/Pendiente), listing (Publicada/Sin publicar), contract (Pendiente/Firma pendiente/Firmado), notification (Enviada/Fallida/Pendiente), tracking, paymentStatus |
+| `StatusBadge` | Badge de estado con variantes: lease (Vigente/Acordado/Finalizado), unit (Ocupado/Disponible/Mantenimiento), payment (Al día/Pendiente), listing (Publicada/Sin publicar), contract (Pendiente/Firma pendiente/Firmado), notification (Enviada/Fallida/Pendiente), tracking (Publicado/Contacto iniciado/Contrato cargado/Contrato firmado/Pago recibido), paymentStatus (Pendiente/Procesando/Pagado/Vencido/Rechazado) |
 | `Toast` | Notificación temporal auto-hide (`role="status"`, `aria-live="polite"`) |
 | `WizardProgress` | Indicador visual de progreso multi-paso (pasos numerados con check en completados, conector entre pasos, `aria-current="step"`) |
 
@@ -352,7 +363,7 @@ Publicación de unidades: formulario para publicar una unidad del portafolio com
 | Lease | `lease.ts` | getUnitLeases, getLeaseDetail, createLease, cancelLease |
 | Notification | `notification.ts` | getNotifications, getNotificationCount, markAsRead, markAllAsRead, getPreferences, updatePreference, deleteNotification |
 | Role | `role.ts` | addRole, removeRole, getRemovableRoles |
-| Tenant | `tenant.ts` | getActiveLeases, getLeaseStatus, getPaymentHistory, initiatePayment, transitionLeaseState, getTenantContracts |
+| Tenant | `tenant.ts` | getActiveLeases, getLeaseStatus, getPaymentHistoryLegacy, initiatePayment, transitionLeaseState, getTenantContracts, getTenantLeaseDetail, getPaymentUnits, getPaymentHistory, getPaymentDetail |
 
 Todos los servicios usan `fetch` nativo, `Authorization: Bearer <token>` desde `localStorage`, y manejo de errores tipado con mensajes en español.
 
@@ -407,8 +418,12 @@ El frontend consume los endpoints REST del backend NestJS:
 - `GET /tracking/leases/active` — Arriendos activos del arrendatario (requiere JWT, rol TENANT)
 - `GET /tracking/leases/:leaseId/status` — Estado e historial de un arriendo (requiere JWT, rol TENANT)
 - `POST /tracking/leases/transition` — Transicionar estado de arriendo (requiere JWT)
-- `GET /payments/history` — Historial de pagos del arrendatario (requiere JWT, rol TENANT)
+- `GET /payments/history` — Historial de pagos del arrendatario (legacy, requiere JWT, rol TENANT)
 - `POST /payments/initiate` — Iniciar pago (requiere JWT, rol TENANT)
+- `GET /payments/units` — Unidades con pagos agrupadas por propiedad (requiere JWT, rol TENANT)
+- `GET /payments/units/:unitId/history` — Historial de pagos por unidad con filtros y paginación (requiere JWT, rol TENANT)
+- `GET /payments/:paymentId/detail` — Detalle de pago: líneas de costo (pendiente) o recibo (pagado) (requiere JWT, rol TENANT)
+- `GET /leases/:leaseId/detail` — Detalle de arriendo del arrendatario: info propiedad + próximo pago (requiere JWT, rol TENANT)
 
 ## Diseño
 
