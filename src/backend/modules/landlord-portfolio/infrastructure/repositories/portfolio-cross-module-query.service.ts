@@ -92,6 +92,12 @@ export class PortfolioCrossModuleQueryService implements IPortfolioCrossModuleQu
             include: { address: true },
         });
 
+        // Resolve listing title for display name (same source as "Mis arriendos")
+        const listing = await this.prisma.listing.findFirst({
+            where: { portfolio_unit_id: lease.portfolio_unit_id, deleted_at: null },
+            select: { title: true },
+        });
+
         // Resolve lease status from tracking_process schema
         const currentStatus = await this.prisma.leaseCurrentStatus.findUnique({
             where: { lease_id: leaseId },
@@ -101,7 +107,8 @@ export class PortfolioCrossModuleQueryService implements IPortfolioCrossModuleQu
 
         const propertyType = property?.property_type ?? '';
         const neighborhood = property?.address?.neighborhood ?? '';
-        const propertyName = `${propertyType} ${neighborhood}`.trim();
+        // Use listing title as propertyName (consistent with "Mis arriendos"), fallback to type + neighborhood
+        const propertyName = listing?.title || `${propertyType} ${neighborhood}`.trim();
 
         return {
             unitId: unit.id,
