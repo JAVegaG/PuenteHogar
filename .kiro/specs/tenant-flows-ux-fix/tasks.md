@@ -269,9 +269,9 @@
     - Follow centered container standard, back button pattern, Header with `leftAction`
     - _Requirements: 2.5, 2.6_
 
-- [ ] 11. Fix verification and validation
+- [x] 11. Fix verification and validation
 
-  - [~] 11.1 Verify bug condition exploration test now passes
+  - [x] 11.1 Verify bug condition exploration test now passes
     - **Property 1: Expected Behavior** - Tenant Lease Detail Shows Property Info and Payment CTAs
     - **IMPORTANT**: Re-run the SAME test from task 1 — do NOT write a new test
     - The test from task 1 encodes the expected behavior
@@ -286,7 +286,7 @@
     - **EXPECTED OUTCOME**: Test PASSES (confirms bug is fixed)
     - _Requirements: 2.1, 2.3, 2.4, 2.5, 2.6_
 
-  - [~] 11.2 Verify preservation tests still pass
+  - [x] 11.2 Verify preservation tests still pass
     - **Property 2: Preservation** - Unchanged Tenant Behaviors
     - **IMPORTANT**: Re-run the SAME tests from task 2 — do NOT write new tests
     - Run preservation property tests from step 2
