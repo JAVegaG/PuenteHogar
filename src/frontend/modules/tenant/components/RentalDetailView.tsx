@@ -185,7 +185,7 @@ export default function RentalDetailView() {
                                             {data.address}
                                         </p>
                                         <div className="mt-3">
-                                            <StatusBadge status={data.leaseStatus} variant="lease" />
+                                            <StatusBadge status={data.leaseStatus} variant="tracking" />
                                         </div>
                                     </div>
                                 </section>

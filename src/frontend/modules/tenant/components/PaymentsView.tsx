@@ -11,17 +11,11 @@ import { Skeleton } from '@/shared/components/Skeleton';
 import { ErrorState } from '@/shared/components/ErrorState';
 import { StatusBadge } from '@/shared/components/StatusBadge';
 
+import { translateRole } from '@/shared/utils/statusMaps';
+
 const SideMenu = lazy(() =>
     import('@/shared/components/SideMenu').then((m) => ({ default: m.SideMenu }))
 );
-
-function translateRole(role: string): string {
-    const map: Record<string, string> = {
-        LANDLORD: 'Arrendador',
-        TENANT: 'Arrendatario',
-    };
-    return map[role] || role;
-}
 
 function PaymentsSkeleton() {
     return (
@@ -136,7 +130,7 @@ export default function PaymentsView() {
                                                 <h3 className="text-h3 font-semibold text-neutral-900">
                                                     {unit.propertyName}
                                                 </h3>
-                                                <StatusBadge status={unit.leaseStatus} variant="lease" />
+                                                <StatusBadge status={unit.leaseStatus} variant="tracking" />
                                             </div>
                                             <p className="text-caption text-neutral-500 mt-1">
                                                 {unit.propertyType} · {unit.neighborhood}

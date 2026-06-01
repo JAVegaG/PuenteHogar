@@ -10,18 +10,11 @@ import { Header } from '@/shared/components/Header';
 import { Skeleton } from '@/shared/components/Skeleton';
 import { ErrorState } from '@/shared/components/ErrorState';
 import { StatusBadge } from '@/shared/components/StatusBadge';
+import { translateRole } from '@/shared/utils/statusMaps';
 
 const SideMenu = lazy(() =>
     import('@/shared/components/SideMenu').then((m) => ({ default: m.SideMenu }))
 );
-
-function translateRole(role: string): string {
-    const map: Record<string, string> = {
-        LANDLORD: 'Arrendador',
-        TENANT: 'Arrendatario',
-    };
-    return map[role] || role;
-}
 
 function getRelativeTime(dateStr: string): string {
     const now = Date.now();
