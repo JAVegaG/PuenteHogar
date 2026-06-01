@@ -299,7 +299,7 @@
       - Pagination works
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.7, 3.8_
 
-- [~] 12. Checkpoint - Ensure all tests pass
+- [x] 12. Checkpoint - Ensure all tests pass
   - Run `npm run build` in `src/backend/` — no compilation errors
   - Run `npm run test` in `src/backend/` — all unit tests pass
   - Run `npm run build` in `src/frontend/` — no compilation errors
