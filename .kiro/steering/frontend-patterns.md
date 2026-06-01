@@ -13,6 +13,17 @@ description: Frontend component patterns including typography tokens, layout con
 - Form labels: `text-caption font-medium`
 - Section headings: `text-h3 font-semibold`
 
+### Typography Hierarchy — Avoid Same-Weight Collisions
+- Each page must have a clear visual hierarchy. Do NOT use the same size+weight for both a section heading and a value inside that section.
+- Recommended hierarchy within a detail/card page:
+  - Page title (in Header): handled by the Header component
+  - Primary values (amounts, totals): `text-h2 font-bold`
+  - Section headings: `text-h3 font-semibold`
+  - Card titles / list item titles: `text-h3 font-semibold` (OK — they are visually separated by card boundaries)
+  - Body text / descriptions: `text-body`
+  - Metadata / secondary info: `text-caption`
+- If a section heading and a value inside it would both be `text-h3`, promote the value to `text-h2` to create contrast
+
 ## Primary Button Style
 All main CTAs use:
 ```
@@ -30,7 +41,27 @@ Card sections use: `border border-neutral-200 rounded-card bg-white p-4`
 - NOT the chevron (`<polyline points="15 18 9 12 15 6" />`)
 
 ## StatusBadge
-Import from `@/shared/components/StatusBadge`. Variants: `lease`, `unit`, `payment`, `listing`, `contract`.
+Import from `@/shared/components/StatusBadge`. Variants: `lease`, `unit`, `payment`, `listing`, `contract`, `tracking`, `paymentStatus`, `notification`.
+
+**Variant selection guide** — choose based on what the backend returns:
+- `tracking` → raw tracking states from backend (`PUBLISHED`, `CONTRACT_UPLOADED`, `PAYMENT_RECEIVED`, etc.)
+- `paymentStatus` → raw payment statuses (`PENDING`, `PAID`, `OVERDUE`, `REJECTED`)
+- `contract` → raw contract statuses (`PENDING`, `SIGNATURE_PENDING`, `SIGNED`)
+- `lease` → already-translated lease display labels (`Vigente`, `Acordado`, `Finalizado`)
+- `unit` → already-translated unit labels (`Ocupado`, `Disponible`, `Mantenimiento`)
+- `listing` → already-translated listing labels (`Publicada`, `Sin publicar`)
+- `notification` → raw notification statuses (`SENT`, `FAILED`, `PENDING`)
+
+## Status Labels & Centralized Mappers — CRITICAL
+- NEVER display raw English enum values (e.g., `CONTRACT_UPLOADED`, `OVERDUE`) to users
+- All status-to-label translations live in `@/shared/utils/statusMaps.ts`
+- Use the centralized helpers when you need a translated label outside of `StatusBadge`:
+  - `translateTrackingStatus(status)` — e.g., `'CONTRACT_UPLOADED'` → `'Contrato cargado'`
+  - `translatePaymentStatus(status)` — e.g., `'OVERDUE'` → `'Vencido'`
+  - `translateContractStatus(status)` — e.g., `'SIGNATURE_PENDING'` → `'Firma pendiente'`
+  - `translateRole(role)` — e.g., `'LANDLORD'` → `'Arrendador'`
+- Do NOT define inline `translateRole` or status mapping functions in components — import from `@/shared/utils/statusMaps`
+- When adding a new status value, update BOTH `statusMaps.ts` AND the corresponding color map in `StatusBadge.tsx`
 
 ## ConfirmationDialog
 Import from `@/shared/components/ConfirmationDialog`. Props: `isOpen`, `title`, `message`, `confirmLabel`, `cancelLabel?`, `onConfirm`, `onCancel`, `isLoading?`.
