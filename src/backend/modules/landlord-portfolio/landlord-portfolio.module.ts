@@ -5,6 +5,9 @@ import { PrismaService } from '@src/shared/prisma/prisma.service';
 import { PII_ENCRYPTOR } from '@modules/users/application/use-cases/register-user.use-case';
 import { AES256PIIEncryptor } from '@modules/users/infrastructure/adapters/aes256-pii-encryptor.adapter';
 import { NotificationsModule } from '@modules/notifications';
+import { PaymentsCrossModuleQueryService } from '@modules/payments/infrastructure/repositories/payments-cross-module-query.service';
+import { PAYMENTS_CROSS_MODULE_QUERY } from '@modules/payments/domain/ports/cross-module-query.port';
+import { PaymentsModule } from '@modules/payments/payments.module';
 import { CreatePortfolioUnitUseCase, PORTFOLIO_REPOSITORY } from './application/use-cases/create-portfolio-unit.use-case';
 import { GetPortfolioUseCase } from './application/use-cases/get-portfolio.use-case';
 import { UpdatePortfolioUnitUseCase } from './application/use-cases/update-portfolio-unit.use-case';
@@ -13,6 +16,7 @@ import { CreatePortfolioUseCase } from './application/use-cases/create-portfolio
 import { CreateEnrichedUnitUseCase } from './application/use-cases/create-enriched-unit.use-case';
 import { GetUnitLeasesUseCase } from './application/use-cases/get-unit-leases.use-case';
 import { GetLeaseDetailUseCase } from './application/use-cases/get-lease-detail.use-case';
+import { GetTenantLeaseDetailUseCase } from './application/use-cases/get-tenant-lease-detail.use-case';
 import { CreateLeaseUseCase } from './application/use-cases/create-lease.use-case';
 import { CancelLeaseUseCase } from './application/use-cases/cancel-lease.use-case';
 import { DeletePortfolioUseCase } from './application/use-cases/delete-portfolio.use-case';
@@ -25,10 +29,11 @@ import { PORTFOLIO_CROSS_MODULE_QUERY } from './domain/ports/cross-module-query.
 import { PORTFOLIO_NOTIFICATION_PORT } from './domain/ports/notification.port';
 import { PortfolioNotificationAdapter } from './infrastructure/adapters/portfolio-notification.adapter';
 import { LandlordPortfolioController } from './landlord-portfolio.controller';
+import { TenantLeasesController } from './tenant-leases.controller';
 
 @Module({
-  imports: [ConfigModule, NotificationsModule],
-  controllers: [LandlordPortfolioController],
+  imports: [ConfigModule, NotificationsModule, PaymentsModule],
+  controllers: [LandlordPortfolioController, TenantLeasesController],
   providers: [
     PrismaService,
     AuditLoggerService,
@@ -41,12 +46,14 @@ import { LandlordPortfolioController } from './landlord-portfolio.controller';
     CreateEnrichedUnitUseCase,
     GetUnitLeasesUseCase,
     GetLeaseDetailUseCase,
+    GetTenantLeaseDetailUseCase,
     CreateLeaseUseCase,
     CancelLeaseUseCase,
     UpdatePortfolioUseCase,
     DeletePortfolioUseCase,
     DeleteUnitUseCase,
     PortfolioCrossModuleQueryService,
+    PaymentsCrossModuleQueryService,
     {
       provide: PORTFOLIO_REPOSITORY,
       useClass: PrismaPortfolioRepository,
@@ -54,6 +61,10 @@ import { LandlordPortfolioController } from './landlord-portfolio.controller';
     {
       provide: PORTFOLIO_CROSS_MODULE_QUERY,
       useExisting: PortfolioCrossModuleQueryService,
+    },
+    {
+      provide: PAYMENTS_CROSS_MODULE_QUERY,
+      useExisting: PaymentsCrossModuleQueryService,
     },
     {
       provide: PII_ENCRYPTOR,
@@ -64,6 +75,6 @@ import { LandlordPortfolioController } from './landlord-portfolio.controller';
       useClass: PortfolioNotificationAdapter,
     },
   ],
-  exports: [CreatePortfolioUnitUseCase, GetPortfolioUseCase, UpdatePortfolioUnitUseCase, ListPortfoliosUseCase, CreatePortfolioUseCase, CreateEnrichedUnitUseCase, GetUnitLeasesUseCase, GetLeaseDetailUseCase, CreateLeaseUseCase, CancelLeaseUseCase, UpdatePortfolioUseCase, DeletePortfolioUseCase, DeleteUnitUseCase, PortfolioCrossModuleQueryService, PORTFOLIO_CROSS_MODULE_QUERY],
+  exports: [CreatePortfolioUnitUseCase, GetPortfolioUseCase, UpdatePortfolioUnitUseCase, ListPortfoliosUseCase, CreatePortfolioUseCase, CreateEnrichedUnitUseCase, GetUnitLeasesUseCase, GetLeaseDetailUseCase, GetTenantLeaseDetailUseCase, CreateLeaseUseCase, CancelLeaseUseCase, UpdatePortfolioUseCase, DeletePortfolioUseCase, DeleteUnitUseCase, PortfolioCrossModuleQueryService, PORTFOLIO_CROSS_MODULE_QUERY],
 })
 export class LandlordPortfolioModule { }

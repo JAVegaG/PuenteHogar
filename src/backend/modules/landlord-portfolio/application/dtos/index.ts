@@ -14,3 +14,4 @@ export * from './lease-list-item.dto';
 export * from './lease-detail.dto';
 export * from './create-lease.dto';
 export * from './update-portfolio.dto';
+export * from './tenant-lease-detail.dto';

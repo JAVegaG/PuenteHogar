@@ -6,5 +6,6 @@ export * from './create-portfolio.use-case';
 export * from './create-enriched-unit.use-case';
 export * from './get-unit-leases.use-case';
 export * from './get-lease-detail.use-case';
+export * from './get-tenant-lease-detail.use-case';
 export * from './create-lease.use-case';
 export * from './cancel-lease.use-case';
