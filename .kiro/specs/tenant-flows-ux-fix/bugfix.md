@@ -187,6 +187,65 @@ The following issues were discovered during the manual QA and post-implementatio
 
 **Status**: ✅ Fixed
 
+### Finding 13.2 — Raw English Status Values Displayed to Users (FIXED)
+
+**Observed**: The `StatusBadge` component was missing the `OVERDUE` mapping in `paymentStatusColors`, causing raw "OVERDUE" text to display. Additionally, `RentalDetailView` and `PaymentsView` used `variant="lease"` (which expects Spanish labels like "Vigente") but the backend returns raw tracking states like `CONTRACT_UPLOADED`. The `lease` variant only maps "Vigente", "Acordado", "Finalizado" — not the tracking enum values.
+
+**Fix Applied**:
+- Added `OVERDUE → 'Vencido'` (red) to `paymentStatusColors` in `StatusBadge.tsx`
+- Changed `RentalDetailView` and `PaymentsView` to use `variant="tracking"` which correctly maps raw states (e.g., `CONTRACT_UPLOADED` → "Contrato cargado")
+- Created centralized `shared/utils/statusMaps.ts` with all status label maps and helper functions
+- Updated `frontend-patterns.md` steering with variant selection guide and centralized mapper rules
+
+**Status**: ✅ Fixed
+
+### Finding 13.3 — Typography Hierarchy Collision (FIXED)
+
+**Observed**: In `RentalDetailView` and `PaymentDetailView`, section headings ("Próximo pago", "Resumen de la cuota", "Método de pago") and primary values (amounts, totals) both used `text-h3 font-semibold/bold`, making them visually indistinguishable. This violated the typography hierarchy principle.
+
+**Fix Applied**:
+- Primary values (amounts, totals) promoted to `text-h2 font-bold` (24px)
+- Section headings remain at `text-h3 font-semibold` (20px)
+- Updated `frontend-patterns.md` steering with explicit typography hierarchy rules
+
+**Status**: ✅ Fixed
+
+### Finding 13.4 — "Mis pagos" Card Shows Wrong Property Name (FIXED)
+
+**Observed**: The "Mis pagos" unit card displayed "CASA" (raw property type) while "Mis arriendos" displayed "Hermosa casa en el limonar" (listing title) for the same lease. The `getPropertyInfoByLeaseId` method constructed `propertyName` as `${propertyType} ${neighborhood}` instead of using the listing title.
+
+**Fix Applied**: Updated `PortfolioCrossModuleQueryService.getPropertyInfoByLeaseId` to resolve the listing title via `Lease → PortfolioUnit → Listing.title`, falling back to `${propertyType} ${neighborhood}` only when no listing exists.
+
+**Status**: ✅ Fixed
+
+### Finding 13.5 — Next Payment Not Showing on Lease Detail (FIXED)
+
+**Observed**: The "Mi arriendo" page showed "No tienes pagos pendientes" even though "Mis pagos" correctly showed an overdue payment for the same lease. The `getNextPendingPayment` SQL query used `NOT EXISTS (SELECT 1 FROM Payment WHERE scheduled_payment_id = sp.id)` which excluded scheduled payments that have a `Payment` record with non-PAID status (e.g., PENDING, REJECTED).
+
+**Fix Applied**: Changed the query to check `NOT EXISTS (... JOIN PaymentLog pl ... WHERE pl.status = 'PAID')` — now it only excludes scheduled payments with a confirmed PAID log, matching the logic used by `GetPaymentHistoryByUnitUseCase`.
+
+**Status**: ✅ Fixed
+
+### Finding 13.6 — Location Icon Not Showing When Neighborhood is Empty (FIXED)
+
+**Observed**: The location pin icon in `RentalDetailView` was wrapped in a conditional `{data.neighborhood && ...}` block, so when the neighborhood field was empty, the entire location section (including the address) lost its icon.
+
+**Fix Applied**: Restructured the layout so the location icon always renders next to the address. Neighborhood is shown above the address only when present.
+
+**Status**: ✅ Fixed
+
+### Finding 13.7 — Redesign to Match Figma Mockups (FIXED)
+
+**Observed**: The initial implementation of `RentalDetailView` and `PaymentHistoryView` did not match the provided Figma mockups. Key differences:
+- Lease detail: property card should include canon mensual as an inline row (not separate card), next payment card should use calendar/dollar icons with labeled fields
+- Payment history: cards should have calendar icon on left, month label as title, amount + action link on bottom row, pill-shaped filter tabs, numbered pagination
+
+**Fix Applied**: Complete redesign of both components to match the mockups exactly:
+- `RentalDetailView`: property card with home icon + location pin + canon mensual row, next payment card with calendar/dollar icons and labeled fields, full-width "Pagar ahora" button, "Ver historial de pagos >" link with chevron
+- `PaymentHistoryView`: calendar icon cards, pill-shaped filter tabs (rounded-full), "Mostrando X a Y de Z" counter, numbered page buttons
+
+**Status**: ✅ Fixed
+
 ### QA Verification Summary
 
 | Check | Result |
