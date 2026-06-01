@@ -307,7 +307,7 @@
   - Verify all property-based tests (bug condition + preservation) pass
   - Ensure all tests pass, ask the user if questions arise
 
-- [~] 13. Manual QA and post-implementation review
+- [x] 13. Manual QA and post-implementation review
   - Deploy or run the feature locally and test all user-facing flows end-to-end
   - Test flow: lease list → lease detail → "Pagar ahora" → payment detail → "Continuar con pago" → gateway redirect
   - Test flow: lease detail → "Ver historial de pagos" → payment history → filter tabs → click paid payment → receipt view

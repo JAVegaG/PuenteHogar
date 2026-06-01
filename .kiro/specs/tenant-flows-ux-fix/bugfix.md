@@ -171,3 +171,36 @@ END FOR
 ```
 
 This ensures that for all non-buggy navigation paths (empty states, permission checks, not-found handling, payment gateway flow, pagination), the fixed code behaves identically to the original.
+
+
+---
+
+## Post-Implementation Findings
+
+The following issues were discovered during the manual QA and post-implementation review (Task 13).
+
+### Finding 13.1 — WCAG Touch Target Violation on Filter Tabs and Pagination (FIXED)
+
+**Observed**: In `PaymentHistoryView.tsx`, the filter tab buttons (`Todos`, `Pendientes`, `Pagados`, `Vencidos`) and pagination buttons (page numbers, prev/next arrows) used `min-h-[36px]` / `min-w-[36px]`, which is below the WCAG 2.1 AA minimum touch target of 44×44px.
+
+**Fix Applied**: Updated all filter tab buttons to `min-h-[44px]` and all pagination buttons to `min-h-[44px] min-w-[44px]`.
+
+**Status**: ✅ Fixed
+
+### QA Verification Summary
+
+| Check | Result |
+|-------|--------|
+| `npm run build` (backend) | ✅ Pass — no compilation errors |
+| `npm run build` (frontend) | ✅ Pass — no compilation errors |
+| `npm run test` (backend) | ✅ Pass — 68 suites, 397 tests |
+| `npm run lint` (backend) | ✅ Pass — 0 errors, 0 warnings |
+| `npm run lint` (frontend) | ✅ Pass — 0 errors, 5 warnings (unused vars in test files only) |
+| Spanish UI text | ✅ All user-facing text in Spanish |
+| No raw UUIDs displayed | ✅ No IDs/UUIDs shown to users |
+| Touch targets ≥ 44px | ✅ All interactive elements meet minimum (after fix 13.1) |
+| `StatusBadge` variants correct | ✅ `paymentStatus` for payment statuses, `tracking` for lease tracking states |
+| `formatCOP` for currency | ✅ All amounts use `Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' })` |
+| Centered container `max-w-[560px]` | ✅ All pages follow the standard |
+| Back button pattern (Link + left-arrow SVG) | ✅ All sub-pages use correct pattern |
+| No tracking timeline on tenant lease detail | ✅ `RentalDetailView` shows property info + payment CTAs only |
