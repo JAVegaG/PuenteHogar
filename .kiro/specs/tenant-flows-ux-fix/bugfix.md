@@ -246,6 +246,54 @@ The following issues were discovered during the manual QA and post-implementatio
 
 **Status**: ✅ Fixed
 
+---
+
+## Future Considerations (Out of Scope for This Bugfix)
+
+The following issues were identified during QA but are **not bugs introduced by this fix** — they are pre-existing limitations or post-MVP concerns.
+
+### FC-1: Payment Webhook Does Not Validate Amount
+
+**Issue**: The `HandlePaymentWebhookUseCase` does not verify that the webhook `amount` matches the `ScheduledPayment.amount`. A malicious or erroneous webhook could mark a payment as PAID with a different amount than expected.
+
+**Impact**: The `Payment` record stores whatever amount the webhook sends. The accounting module then reports this incorrect amount as income.
+
+**Recommendation for post-MVP**:
+- Verify webhook signature (HMAC from payment gateway)
+- Validate `webhook.amount === scheduledPayment.amount` (reject mismatches)
+- Log amount discrepancies in the audit trail
+- Consider a tolerance threshold for rounding differences
+
+### FC-2: No Idempotency Check on Payment Webhook
+
+**Issue**: The webhook endpoint does not check if a `ScheduledPayment` has already been marked as PAID. Sending the same webhook twice (or sending a second webhook for an already-paid payment) creates a duplicate `Payment` record.
+
+**Impact**: Multiple `Payment` records for the same `ScheduledPayment`. The accounting module uses `payments[0]` (most recent) which may have a different amount than the original payment.
+
+**Recommendation for post-MVP**:
+- Check if `ScheduledPayment` already has a PAID `PaymentLog` before processing
+- Use the `idempotencyKey` field to deduplicate webhook calls
+- Return 200 OK (idempotent) for duplicate webhooks without creating new records
+
+### FC-3: "Último mes" Period Filter Shows Previous Month, Not Current Month
+
+**Issue**: The "Mis ingresos" page's "Último mes" filter uses `computePeriod('1m')` which subtracts 1 month from today. On May 31, 2026, it queries April 2026 — not May 2026. Payments due in the current month won't appear until next month.
+
+**Impact**: Landlord sees `$0` income for a payment that was just processed today if the payment's `due_date` is in the current month.
+
+**Recommendation**:
+- Consider renaming "Último mes" to "Mes anterior" for clarity
+- Add a "Mes actual" option that queries the current month
+- Or change the default to show the current month instead of the previous month
+
+### FC-4: Accounting Module Missing `deleted_at` Filters
+
+**Issue**: The `PrismaAccountingRepository` queries `PortfolioUnit`, `Lease`, and `ScheduledPayment` without `deleted_at: null` filters. Soft-deleted records could be included in income calculations.
+
+**Impact**: Cancelled leases or deleted units could still contribute to income reports.
+
+**Recommendation**: Add `deleted_at: null` to all `where` clauses in the accounting repository (same pattern as all other modules).
+
 ### QA Verification Summary
 
 | Check | Result |
