@@ -38,6 +38,72 @@ export interface InitiatePaymentResponse {
     status: string;
 }
 
+export interface TenantLeaseDetailResponse {
+    leaseId: string;
+    unitId: string;
+    propertyType: string;
+    neighborhood: string;
+    address: string;
+    monthlyAmount: number;
+    currency: string;
+    leaseStatus: string;
+    nextPayment: {
+        id: string;
+        amount: number;
+        dueDate: string;
+        status: string;
+    } | null;
+}
+
+export interface PaymentUnitCard {
+    unitId: string;
+    propertyName: string;
+    propertyType: string;
+    neighborhood: string;
+    leaseStatus: string;
+    pendingCount: number;
+}
+
+export interface PaymentHistoryFilters {
+    status?: 'ALL' | 'PENDING' | 'PAID' | 'OVERDUE';
+    page?: number;
+    limit?: number;
+}
+
+export interface PaymentHistoryItem {
+    id: string;
+    monthLabel: string;
+    dueDate: string;
+    amount: number;
+    currency: string;
+    status: string;
+}
+
+export interface PaymentHistoryResponse {
+    items: PaymentHistoryItem[];
+    total: number;
+    page: number;
+    limit: number;
+}
+
+export interface PaymentLineItem {
+    description: string;
+    amount: number;
+}
+
+export interface PaymentDetailResponse {
+    id: string;
+    status: string;
+    amount: number;
+    currency: string;
+    dueDate: string;
+    lineItems: PaymentLineItem[];
+    isPending: boolean;
+    datePaid?: string;
+    paymentMethod?: string;
+    receiptUrl?: string;
+}
+
 export interface TenantContractListItem {
     id: string;
     leaseId: string;
@@ -99,7 +165,7 @@ export const tenantService = {
         return res.json();
     },
 
-    async getPaymentHistory(token: string): Promise<PaymentResponse[]> {
+    async getPaymentHistoryLegacy(token: string): Promise<PaymentResponse[]> {
         let res: Response;
         try {
             res = await fetch(`${API_URL}/payments/history`, {
@@ -165,6 +231,94 @@ export const tenantService = {
         let res: Response;
         try {
             res = await fetch(`${API_URL}/contracts/tenant`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+        } catch {
+            throw new Error('No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo.');
+        }
+
+        if (!res.ok) {
+            handleTenantError(res.status);
+        }
+
+        return res.json();
+    },
+
+    async getTenantLeaseDetail(leaseId: string, token: string): Promise<TenantLeaseDetailResponse> {
+        let res: Response;
+        try {
+            res = await fetch(`${API_URL}/leases/${leaseId}/detail`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+        } catch {
+            throw new Error('No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo.');
+        }
+
+        if (!res.ok) {
+            handleTenantError(res.status);
+        }
+
+        return res.json();
+    },
+
+    async getPaymentUnits(token: string): Promise<PaymentUnitCard[]> {
+        let res: Response;
+        try {
+            res = await fetch(`${API_URL}/payments/units`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+        } catch {
+            throw new Error('No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo.');
+        }
+
+        if (!res.ok) {
+            handleTenantError(res.status);
+        }
+
+        return res.json();
+    },
+
+    async getPaymentHistory(unitId: string, token: string, filters?: PaymentHistoryFilters): Promise<PaymentHistoryResponse> {
+        const params = new URLSearchParams();
+        if (filters?.status && filters.status !== 'ALL') params.set('status', filters.status);
+        if (filters?.page) params.set('page', String(filters.page));
+        if (filters?.limit) params.set('limit', String(filters.limit));
+
+        const queryString = params.toString();
+        const url = `${API_URL}/payments/units/${unitId}/history${queryString ? `?${queryString}` : ''}`;
+
+        let res: Response;
+        try {
+            res = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+        } catch {
+            throw new Error('No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo.');
+        }
+
+        if (!res.ok) {
+            handleTenantError(res.status);
+        }
+
+        return res.json();
+    },
+
+    async getPaymentDetail(paymentId: string, token: string): Promise<PaymentDetailResponse> {
+        let res: Response;
+        try {
+            res = await fetch(`${API_URL}/payments/${paymentId}/detail`, {
                 method: 'GET',
                 headers: {
                     Authorization: `Bearer ${token}`,
