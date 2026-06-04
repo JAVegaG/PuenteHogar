@@ -220,14 +220,34 @@ De esta manera, la evaluación no se planteó como una actividad aislada, sino c
 
 ## Síntesis de respuestas
 
-Se obtuvieron cuatro respuestas post-interacción. Todas las personas accedieron desde teléfono celular, lo cual reforzó la pertinencia del enfoque mobile-first definido desde requisitos y diseño.
+Se obtuvieron cuatro respuestas post-interacción. Todas las personas accedieron desde teléfono celular, lo cual reforzó la pertinencia del enfoque mobile-first definido desde requisitos y diseño. Para facilitar la lectura en Markdown, los resultados se presentan en tres tablas complementarias: contexto del participante, valoración de la experiencia y comentarios abiertos.
 
-| Perfil de interacción | Rango de edad | Experiencia en arriendo | Uso digital | Acceso | Claridad exploración | Claridad detalle | Confianza | Reducción de fricciones | Video de apoyo | Comentario abierto |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Arrendatario | 18 - 32 años | Ocasional | Siempre / muy cómodo | Muy fácil | Muy clara | Muy clara | Mucha confianza | Totalmente de acuerdo | Totalmente de acuerdo | Sin comentario adicional |
-| Arrendador | 33 - 59 años | Alta | Frecuente / cómodo | Fácil | Muy clara | Clara | Neutral | De acuerdo | De acuerdo | Solicitó ampliar ubicación, barrio y detalles como parqueaderos o piscina |
-| Arrendador | 33 - 59 años | Ocasional | Algunas veces / cómodo | Muy fácil | Muy clara | Muy clara | Confianza | De acuerdo | Totalmente de acuerdo | Solicitó ampliar información del inmueble y publicar fotos de cada espacio |
-| Arrendatario | 33 - 59 años | Primera vez o muy poca experiencia | Frecuente / cómodo | Muy fácil | Clara | Clara | Confianza | De acuerdo | Totalmente de acuerdo | Valoró la organización de áreas y la comodidad percibida del inmueble |
+### Perfil y contexto de participantes
+
+| ID | Perfil de interacción | Rango de edad | Experiencia en arriendo | Uso digital |
+| --- | --- | --- | --- | --- |
+| P1 | Arrendatario | 18 - 32 años | Ocasional | Siempre / muy cómodo |
+| P2 | Arrendador | 33 - 59 años | Alta | Frecuente / cómodo |
+| P3 | Arrendador | 33 - 59 años | Ocasional | Algunas veces / cómodo |
+| P4 | Arrendatario | 33 - 59 años | Primera vez o muy poca experiencia | Frecuente / cómodo |
+
+### Valoración de acceso, claridad y confianza
+
+| ID | Acceso | Claridad exploración | Claridad detalle | Confianza | Reducción de fricciones | Video de apoyo |
+| --- | --- | --- | --- | --- | --- | --- |
+| P1 | Muy fácil | Muy clara | Muy clara | Mucha confianza | Totalmente de acuerdo | Totalmente de acuerdo |
+| P2 | Fácil | Muy clara | Clara | Neutral | De acuerdo | De acuerdo |
+| P3 | Muy fácil | Muy clara | Muy clara | Confianza | De acuerdo | Totalmente de acuerdo |
+| P4 | Muy fácil | Clara | Clara | Confianza | De acuerdo | Totalmente de acuerdo |
+
+### Comentarios abiertos
+
+| ID | Comentario abierto |
+| --- | --- |
+| P1 | Sin comentario adicional. |
+| P2 | Solicitó ampliar ubicación, barrio y detalles como parqueaderos o piscina. |
+| P3 | Solicitó ampliar información del inmueble y publicar fotos de cada espacio. |
+| P4 | Valoró la organización de áreas y la comodidad percibida del inmueble. |
 
 ## Lectura de resultados
 
@@ -265,22 +285,14 @@ Este hallazgo no invalida el principio de accesibilidad, pero sí muestra que el
 
 # Conclusiones de la evaluación
 
-## Qué se hizo
+La evaluación inicial se ejecutó mediante interacción remota, formulario post-interacción y entrevistas complementarias. La prueba se apoyó en datos dummy, un perfil de arrendador preparado por el implementador, enlaces compartidos por internet y videos de apoyo para flujos difíciles de recorrer completamente. Este esquema permitió contrastar la experiencia del prototipo con usuarios provenientes de la etapa de requisitos, conservando trazabilidad entre necesidades identificadas y percepción posterior de uso.
 
-Se ejecutó una evaluación inicial del prototipo mediante interacción remota, formulario post-interacción y entrevistas complementarias. La prueba se apoyó en datos dummy, un perfil de arrendador preparado por el implementador, enlaces compartidos por internet y videos de apoyo para flujos difíciles de recorrer completamente.
+Los resultados mostraron que el prototipo fue accesible desde teléfono celular, que los flujos de exploración y detalle resultaron claros, que los filtros fueron percibidos como útiles y que los participantes consideraron que la solución podría reducir fricciones frente al proceso tradicional de arriendo. Al mismo tiempo, la confianza no fue uniforme y surgieron requerimientos adicionales sobre mapa, detalle del inmueble, fotos representativas, reportes de control y requisitos configurables.
 
-## Qué se encontró
+A partir de estos hallazgos, se concluyó que el prototipo funcional permitió validar propuestas de valor de manera más concreta que una especificación o un diseño visual aislado. Al interactuar con software materializado, los usuarios no solo evaluaron lo existente, sino que también formularon nuevas necesidades. Esto confirmó el valor del prototipado temprano como mecanismo para continuar descubriendo historias de usuario y ajustar prioridades.
 
-Se encontró que el prototipo fue accesible desde teléfono celular, que los flujos de exploración y detalle resultaron claros, que los filtros fueron percibidos como útiles y que los participantes consideraron que la solución podría reducir fricciones frente al proceso tradicional de arriendo. Al mismo tiempo, la confianza no fue uniforme y surgieron requerimientos adicionales sobre mapa, detalle del inmueble, fotos representativas, reportes de control y requisitos configurables.
-
-## Qué significa
-
-Los resultados sugieren que un prototipo funcional permite validar propuestas de valor de manera más concreta que una especificación o un diseño visual aislado. Al interactuar con software materializado, los usuarios no solo evaluaron lo existente, sino que también formularon nuevas necesidades. Esto confirmó el valor del prototipado temprano como mecanismo para continuar descubriendo historias de usuario y ajustar prioridades.
-
-## Qué faltó
+El principal aprendizaje de la evaluación fue que la simplicidad de interfaz debe gestionarse como una decisión de equilibrio. La baja carga cognitiva favorece la navegación y la inclusión digital, pero una experiencia demasiado simple puede percibirse como básica frente a plataformas consolidadas. Por tanto, el diseño futuro debe conservar claridad sin sacrificar riqueza funcional, confianza visual ni suficiencia de información.
 
 La evaluación mantuvo una muestra acotada y no permitió establecer conclusiones estadísticas. También faltó observar sesiones completas de uso, ampliar perfiles de participantes, probar flujos dependientes de firma y pagos con mayor profundidad, y contrastar la experiencia con métricas más específicas de accesibilidad, confianza y carga cognitiva.
-
-## Qué sigue
 
 Las siguientes iteraciones deberían ampliar la muestra, incorporar mapa, enriquecer el detalle de inmueble, validar fotos representativas de características, fortalecer el portafolio del arrendador con reportes de control y requisitos configurables, y refinar la interfaz para equilibrar simplicidad accesible con una percepción visual más completa y confiable.
