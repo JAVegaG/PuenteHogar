@@ -294,6 +294,34 @@ The following issues were identified during QA but are **not bugs introduced by 
 
 **Recommendation**: Add `deleted_at: null` to all `where` clauses in the accounting repository (same pattern as all other modules).
 
+---
+
+## Post-Implementation Enhancement: Text Sanitization with Auto-Capitalize
+
+### Finding 13.8 — Titles and Descriptions Not Capitalized (FIXED)
+
+**Observed**: User-submitted titles, names, and descriptions were stored exactly as entered — no normalization applied. This led to inconsistent display across the platform (e.g., "apartamento en el centro" vs "Apartamento en el centro"). Additionally, old data stored without capitalization displayed as-is with no retroactive fix.
+
+**Fix Applied**: Created a platform-wide text sanitization system:
+
+1. **Shared utility** (`src/backend/src/shared/text/sanitize-text.utils.ts`):
+   - `sanitizeText(value)` — trims, collapses multiple spaces, capitalizes first character
+   - `sanitizeTextStrict(value)` — non-nullable variant for required fields
+   - `sanitizeDisplayText(value)` — alias for backward compatibility on output
+
+2. **Input sanitization** (ValidationInterceptor enhanced):
+   - Fields `title`, `name`, `description`, `fullName`, `firstName`, `lastName`, `preferredName`, `businessName`, `conditions` are automatically capitalized on every incoming request body
+   - Applied globally via the existing `ValidationInterceptor` — no per-module changes needed
+
+3. **Output sanitization for backward compatibility** (new `TextSanitizeResponseInterceptor`):
+   - Registered globally in `main.ts`
+   - Capitalizes `title`, `name`, `description`, `propertyName`, `unitName`, `landlordName`, etc. on all API responses
+   - Ensures old data stored without capitalization displays correctly without requiring a data migration
+
+**Affected fields**: `title`, `name`, `description`, `fullName`, `firstName`, `lastName`, `preferredName`, `businessName`, `conditions`, `propertyName`, `unitName`, `landlordName`
+
+**Status**: ✅ Fixed and deployed to staging
+
 ### QA Verification Summary
 
 | Check | Result |
