@@ -47,7 +47,8 @@ src/backend/
 │       │   ├── prisma-migrations.spec.ts   # PBT Property 51: idempotencia de migraciones
 │       │   └── prisma-uniqueness.spec.ts   # PBT Property 50: restricciones de unicidad
 │       ├── redis/              # RedisService (cache-aside con fallback)
-│       └── s3/                 # S3ClientFactory, object-key utils, custom exceptions (ObjectStorage*)
+│       ├── s3/                 # S3ClientFactory, object-key utils, custom exceptions (ObjectStorage*)
+│       └── text/               # sanitizeText(), sanitizeTextStrict(), sanitizeDisplayText() — normalización de texto para títulos, descripciones y nombres
 └── modules/
     ├── users/                  # Registro, login, RBAC
     ├── property-listings/      # Publicaciones, búsqueda con filtros extendidos (departamento, ciudad, barrio, características adicionales), fotos, gestión de publicaciones (editar, despublicar, consulta por unidad), catálogo de características adicionales activas (con metadata: type, element, active, main, required, error_message), notificaciones in-app (NEW_INTEREST) via ListingNotificationAdapter
@@ -89,6 +90,7 @@ modules/{nombre}/
 | `HealthController` | Endpoint público `GET /api/health` que retorna `{ status: 'ok' }` — usado como health check del ALB. (`@src/shared/health/`) |
 | `S3ClientFactory` | Crea y cachea una instancia de `S3Client` (AWS SDK v3); soporta endpoint personalizado para LocalStack/MinIO |
 | `@aws-sdk/s3-request-presigner` | Genera presigned URLs para descarga segura de archivos privados en S3 (usado por `ContractObjectStorageAdapter.getPresignedUrl()`) |
+| `sanitizeText()` / `sanitizeTextStrict()` / `sanitizeDisplayText()` | Normalización de texto: trim, colapso de espacios múltiples, capitalización de primera letra. `sanitizeText` acepta `null`/`undefined`, `sanitizeTextStrict` garantiza `string`, `sanitizeDisplayText` es alias para compatibilidad con datos existentes en DB. Complementa (no reemplaza) la sanitización XSS/SQL del `ValidationInterceptor`. (`@src/shared/text/sanitize-text.utils.ts`) |
 
 > Los módulos acceden a `shared/` mediante el alias `@src/shared/` (resuelto por `tsconfig.paths` como `@src/*` → `./src/*`).
 
