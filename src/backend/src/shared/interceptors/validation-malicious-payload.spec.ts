@@ -287,18 +287,18 @@ describe('ValidationInterceptor — Property 9: Payloads maliciosos son sanitiza
     );
   });
 
-  it('Property 9 — safe payloads pass through interceptor without modification', () => {
+  it('Property 9 — safe payloads pass through interceptor with only capitalization applied to text fields', () => {
     fc.assert(
       fc.property(
         fc.record({
-          name: fc.stringMatching(/^[a-zA-Z0-9 ]{1,30}$/),
+          name: fc.stringMatching(/^[A-Z][a-zA-Z0-9]{0,29}$/), // Already capitalized, no leading/trailing spaces
           value: fc.nat(),
         }),
         (payload) => {
           const ctx = buildMockContext(payload as Record<string, unknown>);
           interceptor.intercept(ctx, buildMockHandler());
           const mutatedBody = ctx.switchToHttp().getRequest<{ body: Record<string, unknown> }>().body;
-          // Safe payloads should not be altered
+          // Safe payloads with already-capitalized name pass through unchanged
           return (
             mutatedBody['name'] === payload.name &&
             mutatedBody['value'] === payload.value

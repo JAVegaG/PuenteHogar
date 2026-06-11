@@ -6,6 +6,7 @@ import logger from 'morgan'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import helmet from 'helmet'
 import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm';
+import { TextSanitizeResponseInterceptor } from '@src/shared/interceptors/text-sanitize-response.interceptor';
 
 /**
  * Resolves CDN_DOMAIN from SSM Parameter Store if not already set.
@@ -45,6 +46,8 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  app.useGlobalInterceptors(new TextSanitizeResponseInterceptor());
 
   app.use(helmet())
   app.disable('x-powered-by')
